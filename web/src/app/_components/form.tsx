@@ -35,6 +35,27 @@ export function TextField(props: {
   );
 }
 
+export function TextAreaField(props: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  rows?: number;
+}) {
+  return (
+    <label className="block">
+      <Label>{props.label}</Label>
+      <textarea
+        className={`${inputCls} resize-y leading-relaxed`}
+        rows={props.rows ?? 5}
+        value={props.value}
+        placeholder={props.placeholder}
+        onChange={(e) => props.onChange(e.target.value)}
+      />
+    </label>
+  );
+}
+
 export function SelectField(props: {
   label: string;
   value: string;

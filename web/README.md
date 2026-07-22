@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LOST — приложение
 
-## Getting Started
+Операционная система лиги [League of Spirit](https://leagueofspirits.ru): отчёты по матчам из OpenDota,
+таблица лиги, справочник команд и игроков, генерация графики к матчам.
 
-First, run the development server:
+Next.js 16 (App Router, Turbopack) · React 19 · Tailwind v4 · Prisma 7 + SQLite (libsql-адаптер).
+
+## Запуск
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Откроется на http://localhost:3000. Проверка связки с БД: `GET /api/health`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`.env` (в `.gitignore`, в репозиторий не попадает):
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Переменная | Зачем |
+|---|---|
+| `DATABASE_URL` | путь к SQLite, **относительный** к `web/` — абсолютный `file:`-URL ломает libsql на Windows |
+| `OPENAI_API_KEY` | генерация картинок в `/studio/generate`; без неё остальное приложение работает |
 
-## Learn More
+Проверки: `npx tsc --noEmit` и `npm run lint`. Тестов в проекте нет.
 
-To learn more about Next.js, take a look at the following resources:
+## Где что
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **[../CLAUDE.md](../CLAUDE.md)** — карта проекта: где что лежит и кто за что отвечает. Начинать отсюда.
+- **[../ARCHITECTURE.md](../ARCHITECTURE.md)** — принятые решения, модель данных, флоу, статус этапов.
+- **[AGENTS.md](./AGENTS.md)** — правила работы внутри этой папки (Next 16, Prisma 7).

@@ -1,0 +1,160 @@
+"use client";
+
+import { useState } from "react";
+import { IMAGE_MODELS, IMAGE_QUALITIES, IMAGE_SIZES, MAX_IMAGES, MAX_REFERENCES } from "@/lib/image-options";
+import { SelectField, TextAreaField } from "../../_components/form";
+
+// Генерация картинок по API. Настройки → POST /api/studio/generate → готовые файлы в public/uploads/generated.
+// Ключ OpenAI живёт только на сервере, сюда не приходит.
+
+const opts = (list: readonly { value: string; label: string }[]) => list.map((o) => ({ ...o }));
+
+export function Generator() {
+  const [model, setModel] = useState<string>(IMAGE_MODELS[0].value);
+  const [prompt, setPrompt] = useState("");
+  const [size, setSize] = useState<string>(IMAGE_SIZES[0].value);
+  const [quality, setQuality] = useState<string>(IMAGE_QUALITIES[0].value);
+  const [n, setN] = useState(1);
+  const [useRefs, setUseRefs] = useState(false);
+  const [refs, setRefs] = useState<File[]>([]);
+
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [results, setResults] = useState<string[]>([]);
+
+  const activeRefs = useRefs ? refs : [];
+  const canRun = prompt.trim().length > 0 && !busy && (!useRefs || refs.length > 0);
+
+  async function run() {
+    setBusy(true);
+    setError(null);
+    try {
+      const body = new FormData();
+      body.set("model", model);
+      body.set("prompt", prompt.trim());
+      body.set("size", size);
+      body.set("quality", quality);
+      body.set("n", String(n));
+      for (const f of activeRefs) body.append("ref", f);
+
+      const res = await fetch("/api/studio/generate", { method: "POST", body });
+      const json = (await res.json()) as { paths?: string[]; error?: string };
+      if (!res.ok || !json.paths) throw new Error(json.error ?? "Не удалось сгенерировать");
+      // новые результаты сверху, прошлые не теряем — удобно сравнивать варианты
+      setResults((prev) => [...json.paths!, ...prev]);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="grid items-start gap-8 lg:grid-cols-[minmax(300px,380px)_minmax(0,1fr)]">
+      <div className="space-y-5">
+        <SelectField label="Модель" value={model} onChange={setModel} options={opts(IMAGE_MODELS)} />
+
+        <TextAreaField
+          label="Промт"
+          value={prompt}
+          onChange={setPrompt}
+          rows={6}
+          placeholder="Что нарисовать. Промты для визуала пишем по-английски."
+        />
+
+        <SelectField label="Размер" value={size} onChange={setSize} options={opts(IMAGE_SIZES)} />
+        <SelectField label="Качество" value={quality} onChange={setQuality} options={opts(IMAGE_QUALITIES)} />
+
+        <SelectField
+          label="Количество картинок"
+          value={String(n)}
+          onChange={(v) => setN(Number(v))}
+          options={Array.from({ length: MAX_IMAGES }, (_, i) => ({ value: String(i + 1), label: String(i + 1) }))}
+        />
+
+        <div className="rounded border border-neutral-800 bg-neutral-900/40 p-3">
+          <label className="flex cursor-pointer items-center gap-2">
+            <input
+              type="checkbox"
+              checked={useRefs}
+              onChange={(e) => setUseRefs(e.target.checked)}
+              className="h-4 w-4 accent-violet-600"
+            />
+            <span className="text-sm text-neutral-200">Использовать как референс</span>
+          </label>
+          <p className="mt-1 text-xs text-neutral-500">
+            С референсом модель правит присланные картинки, а не рисует с нуля. До {MAX_REFERENCES} файлов.
+          </p>
+
+          {useRefs && (
+            <div className="mt-3">
+              <input
+                type="file"
+                multiple
+                accept="image/png,image/jpeg,image/webp"
+                className="block w-full text-xs text-neutral-400 file:mr-3 file:rounded file:border-0 file:bg-neutral-800 file:px-3 file:py-1.5 file:text-neutral-200"
+                onChange={(e) => setRefs(Array.from(e.target.files ?? []).slice(0, MAX_REFERENCES))}
+              />
+              {refs.length > 0 && (
+                <ul className="mt-2 space-y-0.5 text-xs text-neutral-500">
+                  {refs.map((f) => (
+                    <li key={f.name} className="truncate">
+                      {f.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 pt-2">
+          <button
+            type="button"
+            disabled={!canRun}
+            onClick={() => void run()}
+            className="rounded bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-50"
+          >
+            {busy ? "Рисую…" : `Сгенерировать${n > 1 ? ` ×${n}` : ""}`}
+          </button>
+          {busy && <span className="text-sm text-neutral-500">высокое качество считается до минуты</span>}
+        </div>
+
+        {error && (
+          <p className="rounded border border-rose-900 bg-rose-950/40 px-3 py-2 text-sm text-rose-300">{error}</p>
+        )}
+      </div>
+
+      <div>
+        {results.length === 0 ? (
+          <div className="grid h-[45vh] place-items-center rounded border border-dashed border-neutral-800 text-sm text-neutral-600 lg:h-[calc(100vh-14rem)]">
+            Здесь появятся картинки
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {results.map((src) => (
+              <figure key={src} className="overflow-hidden rounded border border-neutral-800 bg-neutral-950">
+                {/* локальный файл из public/uploads — оптимизация next/image здесь не нужна */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt="" className="block w-full" />
+                <figcaption className="flex items-center justify-between px-3 py-2 text-xs">
+                  <a href={src} download className="text-violet-400 hover:underline">
+                    скачать
+                  </a>
+                  <a href={src} target="_blank" rel="noreferrer" className="text-neutral-500 hover:text-neutral-300">
+                    открыть
+                  </a>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        )}
+        {results.length > 0 && (
+          <p className="mt-2 text-xs text-neutral-600">
+            Файлы лежат в <code>public/uploads/generated/</code> — они вне git, чистить вручную.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}

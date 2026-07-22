@@ -108,7 +108,7 @@ function WizardForm({
   const groupKey = template.fields.find((f) => f.kind === "group")?.key;
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(320px,420px)_1fr]">
+    <div className="grid items-start gap-8 lg:grid-cols-[minmax(300px,380px)_minmax(0,1fr)]">
       <div className="space-y-5">
         {matches.length > 0 && (
           <div className="rounded border border-neutral-800 bg-neutral-900/40 p-3">
@@ -178,11 +178,14 @@ function WizardForm({
         </div>
       </div>
 
-      <div>
-        <Canvas w={size.w} h={size.h} nodeRef={node}>
-          <Render data={data} />
-        </Canvas>
-        <p className="mt-2 text-xs text-neutral-600">
+      {/* превью держим в поле зрения: липкая колонка ростом не выше экрана */}
+      <div className="lg:sticky lg:top-6">
+        <div className="h-[45vh] min-h-[220px] lg:h-[calc(100vh-11rem)]">
+          <Canvas w={size.w} h={size.h} nodeRef={node}>
+            <Render data={data} />
+          </Canvas>
+        </div>
+        <p className="mt-2 text-center text-xs text-neutral-600">
           Превью масштабировано; PNG выгружается в натуральных {size.w}×{size.h}.
         </p>
       </div>

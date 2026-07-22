@@ -39,6 +39,9 @@ type RawPlayer = {
   ability_upgrades_arr?: number[] | null;
   purchase_log?: { key: string; time: number }[] | null;
   permanent_buffs?: { permanent_buff: number; stack_count: number }[] | null;
+  account_id?: number | null;
+  camps_stacked?: number;
+  lane_role?: number | null;
 };
 type RawMatch = {
   match_id: number;
@@ -56,12 +59,18 @@ type RawMatch = {
   players: RawPlayer[];
 };
 
+// Сущность с картинкой: name — для показа, slug — имя ассета (см. src/lib/assets.ts).
+export type Entity = { name: string; slug: string };
+
 // --- Кэши на процесс ---
-let heroCache: Map<number, string> | null = null;
-async function heroNames(): Promise<Map<number, string>> {
+let heroCache: Map<number, Entity> | null = null;
+async function heroInfo(): Promise<Map<number, Entity>> {
   if (heroCache) return heroCache;
-  const arr = await getJson<{ id: number; localized_name: string }[]>("https://api.opendota.com/api/heroes");
-  heroCache = new Map(arr.map((h) => [h.id, h.localized_name]));
+  const arr = await getJson<{ id: number; name: string; localized_name: string }[]>(
+    "https://api.opendota.com/api/heroes",
+  );
+  // slug из name (npc_dota_hero_antimage → antimage) — совпадает с sync-assets.ts
+  heroCache = new Map(arr.map((h) => [h.id, { name: h.localized_name, slug: h.name.replace(/^npc_dota_hero_/, "") }]));
   return heroCache;
 }
 
@@ -104,9 +113,7 @@ export type OdPlayerStat = {
 export type OdMatch = { matchId: string; radiantWin: boolean; players: OdPlayerStat[] };
 
 export async function fetchOpenDotaMatch(matchId: string): Promise<OdMatch> {
-  const m = await getJson<RawMatch & { players: (RawPlayer & { account_id?: number | null; camps_stacked?: number })[] }>(
-    `https://api.opendota.com/api/matches/${matchId}`,
-  );
+  const m = await getJson<RawMatch>(`https://api.opendota.com/api/matches/${matchId}`);
   return {
     matchId: String(m.match_id),
     radiantWin: !!m.radiant_win,
@@ -140,8 +147,10 @@ export function mvpScore(s: {
 // --- Расширенный отчёт по матчу (вставил id → полная стата) ---
 export type PlayerReport = {
   side: "radiant" | "dire";
+  pos: number; // 1..5 (эвристика), 0 — не определена
+  role: string; // "Керри" … "Хард-сап"
   name: string;
-  hero: string;
+  hero: Entity;
   level: number;
   kills: number;
   deaths: number;
@@ -154,14 +163,14 @@ export type PlayerReport = {
   heroDamage: number;
   towerDamage: number;
   heroHealing: number;
-  items: string[];
-  backpack: string[];
-  neutral: string | null;
-  abilityOrder: string[];
-  purchases: { name: string; time: number }[];
+  items: Entity[];
+  backpack: Entity[];
+  neutral: Entity | null;
+  abilityOrder: Entity[];
+  purchases: { name: string; slug: string; time: number }[];
   buffs: { name: string; stacks: number }[];
 };
-export type PickBan = { order: number; isPick: boolean; side: "radiant" | "dire"; hero: string };
+export type PickBan = { order: number; isPick: boolean; side: "radiant" | "dire"; hero: Entity };
 export type MatchReport = {
   matchId: string;
   parsed: boolean;
@@ -178,31 +187,78 @@ export type MatchReport = {
   players: PlayerReport[];
 };
 
+const ROLE_LABEL: Record<number, string> = {
+  1: "Керри",
+  2: "Мид",
+  3: "Оффлейн",
+  4: "Софт-сап",
+  5: "Хард-сап",
+};
+
+// Позиции 1–5 по эвристике: линия (lane_role) + фарм (net worth). Это приближение —
+// детальные линии есть только у распарсенных матчей, и роли не всегда однозначны.
+// Возвращает Map: индекс игрока в команде → позиция.
+function assignPositions(side: { i: number; laneRole?: number | null; nw: number }[]): Map<number, number> {
+  const pos = new Map<number, number>();
+  const used = new Set<number>();
+  const take = (pool: typeof side, p: number, pick: "max" | "min") => {
+    const free = pool.filter((c) => !used.has(c.i)).sort((a, b) => (pick === "max" ? b.nw - a.nw : a.nw - b.nw));
+    if (free.length) {
+      pos.set(free[0].i, p);
+      used.add(free[0].i);
+    }
+  };
+  const lane = (n: number) => side.filter((p) => p.laneRole === n);
+  take(lane(2), 2, "max"); // мид
+  take(lane(1), 1, "max"); // керри из сейфлейна
+  take(lane(1), 5, "min"); // хард-сап из сейфлейна
+  take(lane(3), 3, "max"); // оффлейн из хардлейна
+  take(lane(3), 4, "min"); // софт-сап из хардлейна
+  // оставшихся (роум/джангл/нераспарсено) добиваем по фарму на свободные позиции
+  const freePos = [1, 2, 3, 4, 5].filter((p) => ![...pos.values()].includes(p));
+  side
+    .filter((p) => !used.has(p.i))
+    .sort((a, b) => b.nw - a.nw)
+    .forEach((p, k) => freePos[k] != null && pos.set(p.i, freePos[k]));
+  return pos;
+}
+
 export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
   const [m, heroes, c] = await Promise.all([
     getJson<RawMatch>(`https://api.opendota.com/api/matches/${matchId}`),
-    heroNames(),
+    heroInfo(),
     constants(),
   ]);
   if (!m || !Array.isArray(m.players) || m.players.length === 0) {
     throw new Error(`Матч ${matchId} не найден или без данных`);
   }
 
-  const itemName = (id?: number): string | null => {
+  // id → сущность {name, slug}. slug = ключ константы (== имя ассета), name — читаемое имя.
+  const itemEntity = (id?: number): Entity | null => {
     if (!id) return null;
     const key = c.itemIds[String(id)];
-    return key ? c.items[key]?.dname ?? pretty(key) : `#${id}`;
+    return key ? { name: c.items[key]?.dname ?? pretty(key), slug: key } : { name: `#${id}`, slug: "" };
   };
-  const abilityName = (id: number): string => {
+  const abilityEntity = (id: number): Entity => {
     const key = c.abilityIds[String(id)];
-    return key ? c.abilities[key]?.dname ?? pretty(key) : `#${id}`;
+    return key ? { name: c.abilities[key]?.dname ?? pretty(key), slug: key } : { name: `#${id}`, slug: "" };
   };
-  const heroName = (id: number) => heroes.get(id) ?? `Hero ${id}`;
+  const heroEntity = (id: number): Entity => heroes.get(id) ?? { name: `Hero ${id}`, slug: "" };
 
-  const players: PlayerReport[] = m.players.map((p) => ({
+  // Позиции считаем отдельно по каждой стороне; ключ — индекс в общем массиве m.players.
+  const asRoleInput = (pred: (p: RawPlayer) => boolean) =>
+    m.players.map((p, i) => ({ i, laneRole: p.lane_role, nw: p.net_worth ?? 0, keep: pred(p) })).filter((x) => x.keep);
+  const posMap = new Map<number, number>([
+    ...assignPositions(asRoleInput((p) => !!p.isRadiant)),
+    ...assignPositions(asRoleInput((p) => !p.isRadiant)),
+  ]);
+
+  const players: PlayerReport[] = m.players.map((p, i) => ({
     side: p.isRadiant ? "radiant" : "dire",
+    pos: posMap.get(i) ?? 0,
+    role: ROLE_LABEL[posMap.get(i) ?? 0] ?? "",
     name: p.name || p.personaname || "Аноним",
-    hero: heroName(p.hero_id),
+    hero: heroEntity(p.hero_id),
     level: p.level ?? 0,
     kills: p.kills ?? 0,
     deaths: p.deaths ?? 0,
@@ -216,12 +272,16 @@ export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
     towerDamage: p.tower_damage ?? 0,
     heroHealing: p.hero_healing ?? 0,
     items: [p.item_0, p.item_1, p.item_2, p.item_3, p.item_4, p.item_5]
-      .map(itemName)
-      .filter((x): x is string => !!x),
-    backpack: [p.backpack_0, p.backpack_1, p.backpack_2].map(itemName).filter((x): x is string => !!x),
-    neutral: itemName(p.item_neutral),
-    abilityOrder: (p.ability_upgrades_arr ?? []).map(abilityName),
-    purchases: (p.purchase_log ?? []).map((e) => ({ name: c.items[e.key]?.dname ?? pretty(String(e.key)), time: e.time })),
+      .map(itemEntity)
+      .filter((x): x is Entity => !!x),
+    backpack: [p.backpack_0, p.backpack_1, p.backpack_2].map(itemEntity).filter((x): x is Entity => !!x),
+    neutral: itemEntity(p.item_neutral),
+    abilityOrder: (p.ability_upgrades_arr ?? []).map(abilityEntity),
+    purchases: (p.purchase_log ?? []).map((e) => ({
+      name: c.items[e.key]?.dname ?? pretty(String(e.key)),
+      slug: String(e.key),
+      time: e.time,
+    })),
     buffs: (p.permanent_buffs ?? []).map((b) => ({ name: pretty(c.buffs[String(b.permanent_buff)] ?? `#${b.permanent_buff}`), stacks: b.stack_count ?? 0 })),
   }));
 
@@ -238,7 +298,7 @@ export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
       order: pb.order,
       isPick: pb.is_pick,
       side: (pb.team === 0 ? "radiant" : "dire") as "radiant" | "dire",
-      hero: heroName(pb.hero_id),
+      hero: heroEntity(pb.hero_id),
     }))
     .sort((a, b) => a.order - b.order);
 

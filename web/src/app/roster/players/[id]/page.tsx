@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPlayer, listTeams } from "@/lib/studio-data";
+import { getPlayer, listTeams } from "@/lib/roster-data";
 import { playerLinks } from "@/lib/profiles";
-import { PlayerEditor } from "../../_components/editors";
+import { PlayerEditor } from "../../editors";
 
 export const dynamic = "force-dynamic";
 
@@ -16,9 +16,22 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
   return (
     <div className="space-y-8">
       <div>
-        <Link href="/studio/players" className="text-sm text-neutral-500 hover:text-neutral-300">
-          ← Игроки
-        </Link>
+        {/* хлебные крошки: чаще всего сюда приходят из состава команды, туда и возвращаемся */}
+        <div className="flex flex-wrap items-center gap-2 text-sm text-neutral-500">
+          <Link href="/roster/players" className="hover:text-neutral-300">
+            Игроки
+          </Link>
+          {player.team && (
+            <>
+              <span className="text-neutral-700">/</span>
+              <Link href={`/roster/teams/${player.team.id}`} className="hover:text-neutral-300">
+                {player.team.name}
+              </Link>
+            </>
+          )}
+          <span className="text-neutral-700">/</span>
+          <span className="text-neutral-400">{player.nickname}</span>
+        </div>
         <h1 className="mt-2 text-2xl font-bold tracking-tight">{player.nickname}</h1>
         <p className="text-xs text-neutral-600">slug: {player.slug}</p>
       </div>
@@ -30,7 +43,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
           nickname: player.nickname,
           realName: player.realName ?? "",
           accountId: player.accountId ?? "",
-          position: player.position ? String(player.position) : "",
+          role: player.role ?? "",
           isCaptain: player.isCaptain,
           telegram: player.telegram ?? "",
           photo: player.photo,

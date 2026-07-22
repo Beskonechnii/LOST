@@ -72,7 +72,7 @@ export function ImageField(props: {
     const body = new FormData();
     body.set("kind", props.kind);
     body.set("file", file);
-    const res = await fetch("/api/studio/upload", { method: "POST", body });
+    const res = await fetch("/api/roster/upload", { method: "POST", body });
     const json = (await res.json()) as { path?: string; error?: string };
     setBusy(false);
     if (!res.ok || !json.path) setError(json.error ?? "Не удалось загрузить");

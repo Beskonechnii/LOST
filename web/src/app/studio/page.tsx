@@ -14,9 +14,13 @@ export default async function StudioHome() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Шаблоны</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Студия</h1>
         <p className="mt-1 text-sm text-neutral-500">
-          В базе {teams} команд(ы) и {players} игрок(ов). Профили — во вкладках сверху.
+          Графика собирается по данным ростера: {teams} команд(ы) и {players} игрок(ов). Лого, фото и составы правятся в{" "}
+          <Link href="/roster/teams" className="text-violet-400 hover:underline">
+            разделе «Ростер»
+          </Link>
+          .
         </p>
       </div>
 

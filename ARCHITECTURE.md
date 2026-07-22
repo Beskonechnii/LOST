@@ -78,7 +78,9 @@ PointsEntry { id, subjectType[team|player|caster|streamer], subjectId, reason[pl
 
 ## Студия графики (`/studio`)
 
-Раздел генерации графики к матчам. Живёт в том же приложении и на тех же данных: профили команд/игроков в БД, матчи — из `Match`.
+Раздел генерации графики к матчам. Живёт в том же приложении и на тех же данных: команды и игроки — из ростера
+(`/roster`, см. ниже), матчи — из `Match`. Разделы приложения и переходы между ними — общая навигация
+`src/app/_components/site-nav.tsx`: **Матч** (отчёт OpenDota) · **Таблица** · **Ростер** · **Студия**.
 
 **Шаблон = подложка PNG + схема полей + React-компонент фиксированного размера** (`web/src/studio/`):
 `registry.ts` — единственная точка добавления; `types.ts` — `FieldDef` (text/select/team/player/group);
@@ -93,12 +95,37 @@ PointsEntry { id, subjectType[team|player|caster|streamer], subjectId, reason[pl
 `/studio/render/[templateId]?p=<base64 payload>` — «голый» рендер без интерфейса: цель для будущего
 серверного скриншота (Playwright) при рендере по API. Компонент общий с превью, расхождений не будет.
 
-**Профили:** `Team` (+`slug`, `wordmark`, `photo`, `color`), `Player` (+`slug`, `photo`, `realName`, `position`,
-`isCaptain`, ссылки, `telegram`). Ссылки на Dotabuff/Stratz/Steam выводятся из `accountId` (`src/lib/profiles.ts`),
-поля в БД их перекрывают. Картинки — локально в `public/uploads/` (в `.gitignore`), загрузка `POST /api/studio/upload`.
+## Ростер (`/roster`) — справочник лиги
 
-**Наполнение базы:** `web/data/roster.json` → `npx tsx scripts/import-roster.ts` (upsert по `slug`, идемпотентно,
-картинки не трогает) и `npx tsx scripts/import-media.ts --from "<папка>"` (файлы по имени = `slug` → `public/uploads` + пути в БД).
+Команды и игроки живут отдельно от студии: сюда данные **пишут**, а студия и таблица их только читают.
+
+**Модели:** `Team` (+`slug`, `wordmark`, `photo`, `color`), `Player` (+`slug`, `photo`, `realName`, `role`,
+`isCaptain`, ссылки, `telegram`). Роль — строка из `src/lib/roles.ts`: `carry | mid | offlane | soft-support |
+hard-support | standin | coach`; порядок массива задаёт сортировку состава. Ссылки на Dotabuff/Stratz/Steam
+выводятся из `accountId` (`src/lib/profiles.ts`), поля в БД их перекрывают. Картинки — локально в
+`public/uploads/` (в `.gitignore`), загрузка `POST /api/roster/upload`.
+
+**Наполнение базы (три шага):**
+
+1. `npx tsx scripts/sheet-to-roster.ts --sheet "<ссылка на гугл-таблицу>"` — разбор составов сезона в `data/roster.json`.
+   Берётся **xlsx**-экспорт, а не CSV: ссылки на профили в таблице — гиперссылки ячеек, в CSV их нет. Из адресов
+   `dotabuff.com/players/<id>` достаётся `accountId`; ссылка на что-то другое (сайт лиги, Stratz) → поле пустое.
+   Дивизион берётся из названия вкладки («Команды 1 div»), роль — из колонки «Роль» (1–5, «Тренер», пусто → замена).
+   Ключи: `--only <слаги>`, `--div 1`, `--alias "300$=300-dollars"`, `--dry`.
+2. `npx tsx scripts/import-roster.ts` — заливка в БД, upsert по `slug`, идемпотентно, картинки не трогает.
+3. `npx tsx scripts/import-media.ts --from "<папка>"` — лого и фото по имени файла = `slug` → `public/uploads` + пути в БД.
+
+### Открытый вопрос: игрок в двух составах
+
+Сейчас в базе **только Division 1** (решение от 22.07.2026, второй дивизион добавим позже).
+
+В таблице один и тот же человек может стоять в составах двух команд: `Старый Ёж` и `Mayonez1s` с одинаковыми
+`account_id` числятся и в ReMix из div 1, и в ReMix из div 2. У `Player` одна команда (`teamId`), поэтому при
+заливке обоих дивизионов такой игрок молча уедет в тот, что импортировался последним — `sheet-to-roster.ts`
+предупреждает об этом строкой «одинаковые слаги игроков».
+
+Дубли карточек заводить не хотим — нужна связь «состав» (player ↔ team + дивизион/сезон) вместо `Player.teamId`.
+**Решить до импорта div 2.**
 
 ## Инструмент: импорт матча (каркас)
 

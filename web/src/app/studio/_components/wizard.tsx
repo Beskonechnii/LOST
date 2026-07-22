@@ -6,7 +6,7 @@ import { Canvas } from "@/studio/Canvas";
 import { getTemplate } from "@/studio/registry";
 import { resolvePayload, type Refs } from "@/studio/resolve";
 import { emptyPayload, emptyRow, type FieldDef, type RawPayload, type RawRow, type TemplateDef } from "@/studio/types";
-import { Label, SelectField, TextField } from "./ui";
+import { Label, SelectField, TextField } from "../../_components/form";
 
 // Мастер генерации: форма строится из schema шаблона, справа — живое превью,
 // снизу — экспорт PNG в натуральном размере и сохранение payload в историю.

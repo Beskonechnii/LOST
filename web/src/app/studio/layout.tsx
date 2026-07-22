@@ -1,19 +1,6 @@
-import { SubNav } from "../_components/site-nav";
-
-// Студия — раздел генерации графики. Верхняя навигация приложения общая (корневой layout),
-// здесь — только подразделы студии.
-
-const TABS = [
-  { href: "/studio", label: "Шаблоны", hint: "Собрать графику по шаблону" },
-  { href: "/studio/teams", label: "Команды", hint: "Лого, wordmark, фото, цвет" },
-  { href: "/studio/players", label: "Игроки", hint: "Ники, фото, позиции" },
-];
+// Студия — только генерация графики. Профили команд и игроков живут в разделе «Ростер»,
+// студия берёт их оттуда как справочник (src/lib/studio-refs.ts).
 
 export default function StudioLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <SubNav items={TABS} />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-6">{children}</main>
-    </>
-  );
+  return <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-6">{children}</main>;
 }

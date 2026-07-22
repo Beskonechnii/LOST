@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ImageField, SaveButton, SelectField, TextField, Label } from "./ui";
+import { ImageField, SaveButton, SelectField, TextField, Label } from "../_components/form";
+import { ROLES } from "@/lib/roles";
 
 // Формы профилей. Значения приходят из серверной страницы, изменения уходят в /api/studio/*.
 
@@ -51,7 +52,7 @@ export function TeamEditor({ id, initial }: { id: number; initial: TeamForm }) {
         <ImageField label="Фото команды" kind="teams" value={v.photo} onChange={(x) => set("photo", x)} hint="Кадр в рамку VS-анонса" />
       </div>
 
-      <SaveButton url={`/api/studio/teams/${id}`} data={v} />
+      <SaveButton url={`/api/roster/teams/${id}`} data={v} />
     </div>
   );
 }
@@ -60,7 +61,7 @@ type PlayerForm = {
   nickname: string;
   realName: string;
   accountId: string;
-  position: string;
+  role: string;
   isCaptain: boolean;
   telegram: string;
   photo: string | null;
@@ -91,10 +92,13 @@ export function PlayerEditor({
           options={[{ value: "", label: "— без команды —" }, ...teams.map((t) => ({ value: String(t.id), label: t.name }))]}
         />
         <SelectField
-          label="Позиция"
-          value={v.position}
-          onChange={(x) => set("position", x)}
-          options={[{ value: "", label: "—" }, ...[1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: `Позиция ${n}` }))]}
+          label="Роль"
+          value={v.role}
+          onChange={(x) => set("role", x)}
+          options={[
+            { value: "", label: "— не задана —" },
+            ...ROLES.map((r) => ({ value: r.key, label: r.position ? `${r.label} (поз. ${r.position})` : r.label })),
+          ]}
         />
         <TextField label="Dota account_id" value={v.accountId} onChange={(x) => set("accountId", x)} placeholder="123456789" />
         <TextField label="Telegram" value={v.telegram} onChange={(x) => set("telegram", x)} placeholder="@nick" />
@@ -107,7 +111,7 @@ export function PlayerEditor({
 
       <ImageField label="Фото" kind="players" value={v.photo} onChange={(x) => set("photo", x)} hint="Портрет для плашек и анонсов" />
 
-      <SaveButton url={`/api/studio/players/${id}`} data={{ ...v, position: v.position === "" ? null : Number(v.position) }} />
+      <SaveButton url={`/api/roster/players/${id}`} data={v} />
     </div>
   );
 }

@@ -5,15 +5,121 @@
     "tag": "MLK",
     "group": "Division 1",
     "color": "#A855F7",
-    "players": []
+    "players": [
+      {
+        "slug": "irishtea",
+        "nickname": "irishtea",
+        "realName": "Матвей Мощиц",
+        "role": "carry",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "npq",
+        "nickname": "NPQ",
+        "realName": "Дмитрий Приставка",
+        "role": "mid",
+        "accountId": "368509389",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/368509389"
+      },
+      {
+        "slug": "morgan",
+        "nickname": "morgan",
+        "realName": "Сергей Ковчур",
+        "role": "offlane",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "saldatau",
+        "nickname": "saldatau",
+        "realName": "Дмитрий Солдатов",
+        "role": "soft-support",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "ehot",
+        "nickname": "EHOT",
+        "realName": "Алексей Хмелюк",
+        "role": "hard-support",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "chervyak",
+        "nickname": "Chervyak",
+        "realName": "Никита Черницкий",
+        "role": "standin",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "lonely",
+        "nickname": "Lonely",
+        "realName": "Артём Лизурчик",
+        "role": "standin",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "brazil",
+        "nickname": "BRAZIL",
+        "realName": "Никита",
+        "role": "coach",
+        "accountId": null,
+        "dotabuffUrl": null
+      }
+    ]
   },
   {
     "slug": "morbus-mentis",
-    "name": "MORBUS MENTIS",
-    "tag": "MM",
+    "name": "morbus mentis",
+    "tag": "morme",
     "group": "Division 1",
     "color": "#C4B5FD",
-    "players": []
+    "players": [
+      {
+        "slug": "e-sim",
+        "nickname": "E-sim",
+        "realName": "Есимхан Наби",
+        "role": "carry",
+        "accountId": "1145610752",
+        "dotabuffUrl": "https://www.dotabuff.com/players/1145610752"
+      },
+      {
+        "slug": "armyanman",
+        "nickname": "ArmyanMan",
+        "realName": "Артём Умбриян",
+        "role": "mid",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "ash",
+        "nickname": "Ash",
+        "realName": "Станислав Шавенько",
+        "role": "offlane",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "sh1za-qb",
+        "nickname": "sh1za_qb",
+        "realName": "Никита Корячко",
+        "role": "soft-support",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "chipollino",
+        "nickname": "Chipollino",
+        "realName": "Вадим Лукша",
+        "role": "hard-support",
+        "accountId": null,
+        "dotabuffUrl": null
+      }
+    ]
   },
   {
     "slug": "300-dollars",
@@ -21,15 +127,97 @@
     "tag": "300",
     "group": "Division 1",
     "color": "#F59E0B",
-    "players": []
+    "players": [
+      {
+        "slug": "devileye",
+        "nickname": "Devileye",
+        "realName": "Павел Канаш",
+        "role": "carry",
+        "accountId": "169018608",
+        "dotabuffUrl": "https://www.dotabuff.com/players/169018608"
+      },
+      {
+        "slug": "mangekyou6o",
+        "nickname": "mangekyou6o$$",
+        "realName": "Никита Воронявский",
+        "role": "mid",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "andryusha",
+        "nickname": "Андрюша",
+        "realName": "Андрей Лобач",
+        "role": "offlane",
+        "accountId": "171135579",
+        "dotabuffUrl": "https://www.dotabuff.com/players/171135579"
+      },
+      {
+        "slug": "kolpaks",
+        "nickname": "Колпакс",
+        "realName": "Влад Шитик",
+        "role": "soft-support",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "tokyomane",
+        "nickname": "Tokyomane",
+        "realName": "Сергей Белков",
+        "role": "hard-support",
+        "accountId": "122505509",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/122505509"
+      }
+    ]
   },
   {
     "slug": "remix",
-    "name": "REMIX",
+    "name": "ReMix",
     "tag": "RMX",
-    "group": "Division 2",
+    "group": "Division 1",
     "color": "#EF4444",
-    "players": []
+    "players": [
+      {
+        "slug": "morphine",
+        "nickname": "morphine ($)",
+        "realName": "Кирилл Московченко",
+        "role": "carry",
+        "accountId": "136225521",
+        "dotabuffUrl": "https://www.dotabuff.com/players/136225521"
+      },
+      {
+        "slug": "staryy-ezh",
+        "nickname": "Старый Ёж",
+        "realName": "Вадим Манаев",
+        "role": "mid",
+        "accountId": "913264608",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/913264608"
+      },
+      {
+        "slug": "mayonez1s",
+        "nickname": "Mayonez1s",
+        "realName": "Владислав Мытько",
+        "role": "offlane",
+        "accountId": "113798996",
+        "dotabuffUrl": "https://www.dotabuff.com/players/113798996"
+      },
+      {
+        "slug": "mini-bayk",
+        "nickname": "мини байк",
+        "realName": "Денис Велесевич",
+        "role": "soft-support",
+        "accountId": "167518771",
+        "dotabuffUrl": "https://www.dotabuff.com/players/167518771"
+      },
+      {
+        "slug": "nosferatu",
+        "nickname": "Nosferatu",
+        "realName": "Валерий Лапо",
+        "role": "hard-support",
+        "accountId": "112174078",
+        "dotabuffUrl": "https://www.dotabuff.com/players/112174078"
+      }
+    ]
   },
   {
     "slug": "alt-q-q",

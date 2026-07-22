@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { listPlayers } from "@/lib/studio-data";
+import { listPlayers } from "@/lib/roster-data";
 import { slugify } from "@/lib/profiles";
+import { isRole } from "@/lib/roles";
 
 export async function GET() {
   return NextResponse.json(await listPlayers());
@@ -13,7 +14,7 @@ export async function POST(req: Request) {
     slug?: string;
     teamId?: number | null;
     accountId?: string;
-    position?: number | null;
+    role?: string | null;
   };
   const nickname = body.nickname?.trim();
   if (!nickname) return NextResponse.json({ error: "Нужен ник игрока" }, { status: 400 });
@@ -30,7 +31,7 @@ export async function POST(req: Request) {
       nickname,
       teamId: body.teamId ?? null,
       accountId: body.accountId?.trim() || null,
-      position: body.position ?? null,
+      role: isRole(body.role) ? body.role : null,
     },
   });
   return NextResponse.json(player, { status: 201 });

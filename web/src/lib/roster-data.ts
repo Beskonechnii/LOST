@@ -2,6 +2,7 @@
 // Пишет — только API-роуты (/api/studio/*), здесь только выборки.
 
 import { prisma } from "@/lib/prisma";
+import { roleOrder } from "@/lib/roles";
 
 export type TeamCard = {
   id: number;
@@ -25,10 +26,13 @@ export async function listTeams(): Promise<TeamCard[]> {
 }
 
 export async function getTeam(id: number) {
-  return prisma.team.findUnique({
-    where: { id },
-    include: { players: { orderBy: [{ position: "asc" }, { nickname: "asc" }] } },
-  });
+  const team = await prisma.team.findUnique({ where: { id }, include: { players: true } });
+  if (!team) return null;
+  // порядок состава задаёт список ролей (керри → хард, потом замены и тренер), не алфавит
+  const players = [...team.players].sort(
+    (a, b) => roleOrder(a.role) - roleOrder(b.role) || a.nickname.localeCompare(b.nickname),
+  );
+  return { ...team, players };
 }
 
 export function getPlayer(id: number) {

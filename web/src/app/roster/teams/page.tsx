@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { listTeams } from "@/lib/studio-data";
-import { CreateForm } from "../_components/editors";
+import { listTeams } from "@/lib/roster-data";
+import { CreateForm } from "../editors";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +15,7 @@ export default async function TeamsPage() {
       </div>
 
       <CreateForm
-        url="/api/studio/teams"
+        url="/api/roster/teams"
         submitLabel="Добавить команду"
         fields={[
           { key: "name", label: "Название", placeholder: "MOLOKO" },
@@ -28,7 +28,7 @@ export default async function TeamsPage() {
         {teams.map((t) => (
           <Link
             key={t.id}
-            href={`/studio/teams/${t.id}`}
+            href={`/roster/teams/${t.id}`}
             className="flex items-center gap-3 rounded border border-neutral-800 bg-neutral-900/40 p-3 hover:border-violet-600"
           >
             <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded bg-neutral-900">

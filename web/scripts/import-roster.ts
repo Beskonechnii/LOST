@@ -13,13 +13,14 @@ import { fileURLToPath } from "node:url";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { slugify } from "../src/lib/profiles";
+import { isRole } from "../src/lib/roles";
 
 type PlayerInput = {
   slug?: string;
   nickname: string;
   realName?: string | null;
   accountId?: string | number | null;
-  position?: number | null;
+  role?: string | null; // carry | mid | offlane | soft-support | hard-support | coach | standin
   isCaptain?: boolean;
   telegram?: string | null;
   steamUrl?: string | null;
@@ -84,12 +85,13 @@ async function importPlayer(p: PlayerInput, teamId: number, teamSlug: string) {
 
   const accountId = clean(p.accountId);
   if (!accountId) warnings.push(`${teamSlug}/${slug}: нет accountId — синк статы из OpenDota для него не сработает`);
+  if (p.role && !isRole(p.role)) warnings.push(`${teamSlug}/${slug}: неизвестная роль «${p.role}» — записал пустой`);
 
   const data = {
     nickname: p.nickname.trim(),
     realName: clean(p.realName),
     accountId,
-    position: p.position ?? null,
+    role: isRole(p.role) ? p.role : null,
     isCaptain: p.isCaptain ?? false,
     telegram: clean(p.telegram),
     steamUrl: clean(p.steamUrl),

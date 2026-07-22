@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { isRole } from "@/lib/roles";
 
 const TEXT_FIELDS = [
   "nickname", "realName", "accountId", "photo", "telegram", "steamUrl", "dotabuffUrl", "stratzUrl",
@@ -13,12 +14,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   for (const f of TEXT_FIELDS) {
     if (f in body) data[f] = String(body[f] ?? "").trim() || null;
   }
-  if ("position" in body) {
-    const pos = Number(body.position);
-    data.position = body.position === null || body.position === "" ? null : pos;
-    if (data.position !== null && !(pos >= 1 && pos <= 5)) {
-      return NextResponse.json({ error: "Позиция — число 1…5" }, { status: 400 });
+  if ("role" in body) {
+    const role = body.role === null || body.role === "" ? null : String(body.role);
+    if (role !== null && !isRole(role)) {
+      return NextResponse.json({ error: `Неизвестная роль «${role}»` }, { status: 400 });
     }
+    data.role = role;
   }
   if ("isCaptain" in body) data.isCaptain = Boolean(body.isCaptain);
   if ("teamId" in body) data.teamId = body.teamId === null || body.teamId === "" ? null : Number(body.teamId);

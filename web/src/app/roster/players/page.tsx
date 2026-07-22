@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { listPlayers } from "@/lib/studio-data";
-import { CreateForm } from "../_components/editors";
+import { listPlayers } from "@/lib/roster-data";
+import { roleLabel } from "@/lib/roles";
+import { CreateForm } from "../editors";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,7 @@ export default async function PlayersPage() {
       </div>
 
       <CreateForm
-        url="/api/studio/players"
+        url="/api/roster/players"
         submitLabel="Добавить игрока"
         fields={[
           { key: "nickname", label: "Ник", placeholder: "CHIPOLLINO" },
@@ -27,7 +28,7 @@ export default async function PlayersPage() {
         {players.map((p) => (
           <Link
             key={p.id}
-            href={`/studio/players/${p.id}`}
+            href={`/roster/players/${p.id}`}
             className="flex items-center gap-3 rounded border border-neutral-800 bg-neutral-900/40 p-2 hover:border-violet-600"
           >
             <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded bg-neutral-900">
@@ -39,8 +40,13 @@ export default async function PlayersPage() {
               )}
             </div>
             <div className="min-w-0">
-              <div className="truncate text-sm font-medium">{p.nickname}</div>
-              <div className="truncate text-xs text-neutral-500">{p.team?.name ?? "без команды"}</div>
+              <div className="truncate text-sm font-medium">
+                {p.nickname}
+                {p.isCaptain && <span className="ml-2 text-xs text-violet-400">(C)</span>}
+              </div>
+              <div className="truncate text-xs text-neutral-500">
+                {[p.team?.name ?? "без команды", roleLabel(p.role)].filter(Boolean).join(" · ")}
+              </div>
             </div>
           </Link>
         ))}

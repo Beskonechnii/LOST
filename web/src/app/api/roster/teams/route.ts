@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { listTeams } from "@/lib/studio-data";
+import { listTeams } from "@/lib/roster-data";
 import { slugify } from "@/lib/profiles";
 
 export async function GET() {

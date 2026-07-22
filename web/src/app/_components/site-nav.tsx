@@ -11,6 +11,7 @@ export type NavItem = { href: string; label: string; hint?: string };
 const SECTIONS: NavItem[] = [
   { href: "/", label: "Матч", hint: "Отчёт из OpenDota по ID матча" },
   { href: "/standings", label: "Таблица", hint: "Standings лиги" },
+  { href: "/roster", label: "Ростер", hint: "Команды и игроки лиги" },
   { href: "/studio", label: "Студия", hint: "Графика к матчам" },
 ];
 

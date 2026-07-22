@@ -36,7 +36,7 @@ model Player {
   realName    String?
   accountId   String? // Dota/Steam32 account id (для OpenDota)
   photo       String?
-  position    Int? // 1–5
+  role        String? // carry | mid | offlane | soft-support | hard-support | coach | standin (src/lib/roles.ts)
   isCaptain   Boolean  @default(false)
   steamUrl    String? // перекрывает ссылку, выведенную из accountId
   dotabuffUrl String?

@@ -2,6 +2,10 @@
 // денаи, порядок скиллов, тайминги покупок, баффы, график преимущества) есть только
 // у распарсенных матчей (version != null); иначе — пусто/нули.
 
+// Полные описания талантов (с числами) — сгенерированы из Dota 2 Wiki, т.к. в константах
+// OpenDota значения {s:...} не подставлены (~59% талантов). См. scripts/build-talents.mjs.
+import talentNames from "./talents.json";
+
 async function getJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`OpenDota ${res.status} ${url}`);
@@ -74,29 +78,40 @@ async function heroInfo(): Promise<Map<number, Entity>> {
   return heroCache;
 }
 
+type HeroAbilities = { talents?: { name: string; level: number }[] };
 type Constants = {
   itemIds: Record<string, string>;
   items: Record<string, { dname?: string }>;
   abilityIds: Record<string, string>;
   abilities: Record<string, { dname?: string }>;
+  heroAbilities: Record<string, HeroAbilities>;
   buffs: Record<string, string>;
 };
 let constsCache: Constants | null = null;
 async function constants(): Promise<Constants> {
   if (constsCache) return constsCache;
   const base = "https://api.opendota.com/api/constants/";
-  const [itemIds, items, abilityIds, abilities, buffs] = await Promise.all([
+  const [itemIds, items, abilityIds, abilities, heroAbilities, buffs] = await Promise.all([
     getJson<Record<string, string>>(base + "item_ids"),
     getJson<Record<string, { dname?: string }>>(base + "items"),
     getJson<Record<string, string>>(base + "ability_ids"),
     getJson<Record<string, { dname?: string }>>(base + "abilities"),
+    getJson<Record<string, HeroAbilities>>(base + "hero_abilities"),
     getJson<Record<string, string>>(base + "permanent_buffs"),
   ]);
-  constsCache = { itemIds, items, abilityIds, abilities, buffs };
+  constsCache = { itemIds, items, abilityIds, abilities, heroAbilities, buffs };
   return constsCache;
 }
 
 const pretty = (s: string) => s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+// dname талантов содержит шаблоны `{s:...}` со значением, которого нет в этой константе.
+// Числа подставить неоткуда — убираем токен (и знак/единицу рядом), оставляя суть таланта.
+const cleanTalent = (s: string) =>
+  s
+    .replace(/[+\-±]?\{[^}]*\}[a-z%]*/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
 // --- Стата для синка (match-sync) ---
 export type OdPlayerStat = {
@@ -144,6 +159,12 @@ export function mvpScore(s: {
   return s.kills * 3 + s.assists * 1.5 - s.deaths + s.heroDamage / 1000 + s.netWorth / 2000 + s.campsStacked;
 }
 
+// Ярус дерева талантов: героический уровень (10/15/20/25) и две стороны.
+// ВАЖНО: в hero_abilities пара идёт [правый, левый] (Ability10/12/… — правая ветка),
+// поэтому первый элемент пары кладём в right, второй — в left (как в самой игре).
+export type TalentOpt = { name: string; picked: boolean };
+export type TalentTier = { heroLevel: number; left: TalentOpt | null; right: TalentOpt | null };
+
 // --- Расширенный отчёт по матчу (вставил id → полная стата) ---
 export type PlayerReport = {
   side: "radiant" | "dire";
@@ -166,7 +187,10 @@ export type PlayerReport = {
   items: Entity[];
   backpack: Entity[];
   neutral: Entity | null;
-  abilityOrder: Entity[];
+  hasScepter: boolean; // Аганим (предмет в слоте или скушанный бафф)
+  hasShard: boolean; // Шард (предмет в слоте или скушанный бафф)
+  talents: TalentTier[]; // дерево талантов (25 → 10 сверху вниз)
+  abilityOrder: Entity[]; // порядок прокачки способностей (без талантов)
   purchases: { name: string; slug: string; time: number }[];
   buffs: { name: string; stacks: number }[];
 };
@@ -245,6 +269,29 @@ export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
   };
   const heroEntity = (id: number): Entity => heroes.get(id) ?? { name: `Hero ${id}`, slug: "" };
 
+  // Дерево талантов героя: пары по ярусам (level 1..4 → герой-уровни 10/15/20/25),
+  // отдаём сверху вниз (25 → 10). picked — по ключам из ability_upgrades_arr.
+  const talentTree = (heroSlug: string, upgradeKeys: Set<string>): TalentTier[] => {
+    const ha = c.heroAbilities[`npc_dota_hero_${heroSlug}`];
+    if (!ha?.talents?.length) return [];
+    const byTier = new Map<number, TalentOpt[]>();
+    for (const t of ha.talents) {
+      // Приоритет: полное описание из вики → очищенный dname OpenDota → человекочитаемый ключ.
+      const name =
+        (talentNames as Record<string, string>)[t.name] ??
+        cleanTalent(c.abilities[t.name]?.dname ?? pretty(t.name));
+      const opt = { name, picked: upgradeKeys.has(t.name) };
+      (byTier.get(t.level) ?? byTier.set(t.level, []).get(t.level)!).push(opt);
+    }
+    // Пара [0]=правый, [1]=левый талант (см. коммент к TalentTier).
+    return [4, 3, 2, 1]
+      .filter((tier) => byTier.has(tier))
+      .map((tier) => {
+        const pair = byTier.get(tier)!;
+        return { heroLevel: tier * 5 + 5, right: pair[0] ?? null, left: pair[1] ?? null };
+      });
+  };
+
   // Позиции считаем отдельно по каждой стороне; ключ — индекс в общем массиве m.players.
   const asRoleInput = (pred: (p: RawPlayer) => boolean) =>
     m.players.map((p, i) => ({ i, laneRole: p.lane_role, nw: p.net_worth ?? 0, keep: pred(p) })).filter((x) => x.keep);
@@ -253,37 +300,56 @@ export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
     ...assignPositions(asRoleInput((p) => !p.isRadiant)),
   ]);
 
-  const players: PlayerReport[] = m.players.map((p, i) => ({
-    side: p.isRadiant ? "radiant" : "dire",
-    pos: posMap.get(i) ?? 0,
-    role: ROLE_LABEL[posMap.get(i) ?? 0] ?? "",
-    name: p.name || p.personaname || "Аноним",
-    hero: heroEntity(p.hero_id),
-    level: p.level ?? 0,
-    kills: p.kills ?? 0,
-    deaths: p.deaths ?? 0,
-    assists: p.assists ?? 0,
-    lastHits: p.last_hits ?? 0,
-    denies: p.denies ?? 0,
-    gpm: p.gold_per_min ?? 0,
-    xpm: p.xp_per_min ?? 0,
-    netWorth: p.net_worth ?? 0,
-    heroDamage: p.hero_damage ?? 0,
-    towerDamage: p.tower_damage ?? 0,
-    heroHealing: p.hero_healing ?? 0,
-    items: [p.item_0, p.item_1, p.item_2, p.item_3, p.item_4, p.item_5]
+  const players: PlayerReport[] = m.players.map((p, i) => {
+    const items = [p.item_0, p.item_1, p.item_2, p.item_3, p.item_4, p.item_5]
       .map(itemEntity)
-      .filter((x): x is Entity => !!x),
-    backpack: [p.backpack_0, p.backpack_1, p.backpack_2].map(itemEntity).filter((x): x is Entity => !!x),
-    neutral: itemEntity(p.item_neutral),
-    abilityOrder: (p.ability_upgrades_arr ?? []).map(abilityEntity),
-    purchases: (p.purchase_log ?? []).map((e) => ({
-      name: c.items[e.key]?.dname ?? pretty(String(e.key)),
-      slug: String(e.key),
-      time: e.time,
-    })),
-    buffs: (p.permanent_buffs ?? []).map((b) => ({ name: pretty(c.buffs[String(b.permanent_buff)] ?? `#${b.permanent_buff}`), stacks: b.stack_count ?? 0 })),
-  }));
+      .filter((x): x is Entity => !!x);
+    const backpack = [p.backpack_0, p.backpack_1, p.backpack_2].map(itemEntity).filter((x): x is Entity => !!x);
+    // Аганим/Шард: либо предмет в инвентаре, либо скушанный перманентный бафф
+    // (permanent_buffs: 2 = ultimate_scepter, 12 = aghanims_shard).
+    const buffIds = new Set((p.permanent_buffs ?? []).map((b) => b.permanent_buff));
+    const slugs = new Set([...items, ...backpack].map((e) => e.slug));
+    const hasScepter = buffIds.has(2) || slugs.has("ultimate_scepter") || slugs.has("ultimate_scepter_2");
+    const hasShard = buffIds.has(12) || slugs.has("aghanims_shard");
+    // Все прокачанные способности (id → ключ); таланты выносим в дерево, из порядка убираем.
+    const hero = heroEntity(p.hero_id);
+    const upgradeKeys = (p.ability_upgrades_arr ?? []).map((id) => c.abilityIds[String(id)]).filter(Boolean);
+    const upgradeSet = new Set(upgradeKeys);
+    return {
+      side: p.isRadiant ? "radiant" : "dire",
+      pos: posMap.get(i) ?? 0,
+      role: ROLE_LABEL[posMap.get(i) ?? 0] ?? "",
+      name: p.name || p.personaname || "Аноним",
+      hero,
+      level: p.level ?? 0,
+      kills: p.kills ?? 0,
+      deaths: p.deaths ?? 0,
+      assists: p.assists ?? 0,
+      lastHits: p.last_hits ?? 0,
+      denies: p.denies ?? 0,
+      gpm: p.gold_per_min ?? 0,
+      xpm: p.xp_per_min ?? 0,
+      netWorth: p.net_worth ?? 0,
+      heroDamage: p.hero_damage ?? 0,
+      towerDamage: p.tower_damage ?? 0,
+      heroHealing: p.hero_healing ?? 0,
+      items,
+      backpack,
+      neutral: itemEntity(p.item_neutral),
+      hasScepter,
+      hasShard,
+      talents: talentTree(hero.slug, upgradeSet),
+      abilityOrder: (p.ability_upgrades_arr ?? [])
+        .map(abilityEntity)
+        .filter((a) => a.slug && !a.slug.startsWith("special_bonus")),
+      purchases: (p.purchase_log ?? []).map((e) => ({
+        name: c.items[e.key]?.dname ?? pretty(String(e.key)),
+        slug: String(e.key),
+        time: e.time,
+      })),
+      buffs: (p.permanent_buffs ?? []).map((b) => ({ name: pretty(c.buffs[String(b.permanent_buff)] ?? `#${b.permanent_buff}`), stacks: b.stack_count ?? 0 })),
+    };
+  });
 
   const aegis = { radiant: 0, dire: 0 };
   for (const o of m.objectives ?? []) {

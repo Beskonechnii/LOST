@@ -12,9 +12,13 @@ datasource db {
 
 model Team {
   id        Int      @id @default(autoincrement())
+  slug      String   @unique // ключ импорта и имя файла ассета
   name      String
   tag       String?
   logo      String?
+  wordmark  String? // граффити-надпись названия (для анонсов)
+  photo     String? // командное фото в рамку
+  color     String? // акцент команды, hex
   group     String?
   createdAt DateTime @default(now())
 
@@ -26,14 +30,23 @@ model Team {
 }
 
 model Player {
-  id        Int      @id @default(autoincrement())
-  nickname  String
-  accountId String? // Dota/Steam32 account id (для OpenDota)
-  createdAt DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique // ключ импорта и имя файла фото
+  nickname    String
+  realName    String?
+  accountId   String? // Dota/Steam32 account id (для OpenDota)
+  photo       String?
+  position    Int? // 1–5
+  isCaptain   Boolean  @default(false)
+  steamUrl    String? // перекрывает ссылку, выведенную из accountId
+  dotabuffUrl String?
+  stratzUrl   String?
+  telegram    String?
+  createdAt   DateTime @default(now())
 
-  team    Team?       @relation(fields: [teamId], references: [id])
-  teamId  Int?
-  stats   MatchStat[]
+  team   Team?       @relation(fields: [teamId], references: [id])
+  teamId Int?
+  stats  MatchStat[]
 }
 
 model Match {
@@ -54,6 +67,20 @@ model Match {
 
   stats         MatchStat[]
   pointsEntries PointsEntry[]
+  renders       Render[]
+}
+
+// Сохранённая генерация графики: id шаблона + payload формы (JSON строкой, sqlite).
+// Нужна, чтобы переоткрыть прошлый анонс и поправить, а не собирать заново.
+model Render {
+  id         Int      @id @default(autoincrement())
+  templateId String
+  title      String?
+  payload    String // JSON
+  createdAt  DateTime @default(now())
+
+  match   Match? @relation(fields: [matchId], references: [id])
+  matchId Int?
 }
 
 // Кэш статы из OpenDota (по игроку в матче) — для инфографики и подсказки MVP.

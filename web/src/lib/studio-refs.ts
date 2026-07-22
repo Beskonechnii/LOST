@@ -1,0 +1,53 @@
+// Справочники для шаблонов: команды и игроки в форме, которую ждёт рендер (src/studio/types.ts),
+// плюс список матчей для автозаполнения. Один источник и для мастера, и для /studio/render.
+
+import { prisma } from "@/lib/prisma";
+import type { PlayerRef, TeamRef } from "@/studio/types";
+import type { Refs } from "@/studio/resolve";
+import type { MatchOption } from "@/app/studio/_components/wizard";
+
+export async function getRefs(): Promise<Refs> {
+  const [teams, players] = await Promise.all([
+    prisma.team.findMany({ orderBy: { name: "asc" } }),
+    prisma.player.findMany({ orderBy: { nickname: "asc" }, include: { team: { select: { name: true } } } }),
+  ]);
+
+  const teamRefs: TeamRef[] = teams.map((t) => ({
+    id: t.id,
+    name: t.name,
+    tag: t.tag,
+    group: t.group,
+    color: t.color,
+    logo: t.logo,
+    wordmark: t.wordmark,
+    photo: t.photo,
+  }));
+  const playerRefs: PlayerRef[] = players.map((p) => ({
+    id: p.id,
+    nickname: p.nickname,
+    photo: p.photo,
+    teamName: p.team?.name ?? null,
+  }));
+
+  return { teams: teamRefs, players: playerRefs };
+}
+
+export async function getMatchOptions(): Promise<MatchOption[]> {
+  const matches = await prisma.match.findMany({
+    orderBy: [{ scheduledAt: "desc" }, { id: "desc" }],
+    take: 30,
+    include: { teamA: true, teamB: true },
+  });
+
+  return matches.map((m) => {
+    const date = m.scheduledAt;
+    return {
+      id: m.id,
+      label: `${m.teamA.name} — ${m.teamB.name}${date ? ` · ${date.toLocaleDateString("ru-RU")}` : ""}`,
+      teamAId: m.teamAId,
+      teamBId: m.teamBId,
+      time: date ? date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }) : "",
+      division: m.teamA.group ?? m.teamB.group ?? "",
+    };
+  });
+}

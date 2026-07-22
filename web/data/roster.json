@@ -1,0 +1,42 @@
+[
+  {
+    "slug": "moloko",
+    "name": "MOLOKO",
+    "tag": "MLK",
+    "group": "Division 1",
+    "color": "#A855F7",
+    "players": []
+  },
+  {
+    "slug": "morbus-mentis",
+    "name": "MORBUS MENTIS",
+    "tag": "MM",
+    "group": "Division 1",
+    "color": "#C4B5FD",
+    "players": []
+  },
+  {
+    "slug": "300-dollars",
+    "name": "300$",
+    "tag": "300",
+    "group": "Division 1",
+    "color": "#F59E0B",
+    "players": []
+  },
+  {
+    "slug": "remix",
+    "name": "REMIX",
+    "tag": "RMX",
+    "group": "Division 2",
+    "color": "#EF4444",
+    "players": []
+  },
+  {
+    "slug": "alt-q-q",
+    "name": "ALT+Q+Q",
+    "tag": "AQQ",
+    "group": "Division 2",
+    "color": "#DC2626",
+    "players": []
+  }
+]

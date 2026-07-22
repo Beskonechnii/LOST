@@ -42,6 +42,9 @@ next-env.d.ts
 
 /src/generated/prisma
 
+# загруженные лого/фото профилей (ассеты, не исходники)
+/public/uploads/
+
 # local sqlite db
 /dev.db
 /dev.db-journal

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { assetUrl, assetFallback, type AssetKind } from "@/lib/assets";
 
 type Entity = { name: string; slug: string };
@@ -614,13 +615,30 @@ export default function Home() {
   const byPos = [...radiant, ...dire];
 
   return (
-    <main className="min-h-screen bg-neutral-950 p-4 text-neutral-100 md:p-8">
+    <main className="flex-1 p-4 md:p-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-4">
-          <h1 className="text-lg font-bold tracking-tight">LOST — импорт матча</h1>
-          <p className="text-sm text-neutral-400">
-            Вставь ID матча Dota 2 — постгейм-отчёт подтянется из OpenDota. Команды переименовываешь под LOST.
-          </p>
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-lg font-bold tracking-tight">LOST — импорт матча</h1>
+            <p className="text-sm text-neutral-400">
+              Вставь ID матча Dota 2 — постгейм-отчёт подтянется из OpenDota. Команды переименовываешь под LOST.
+            </p>
+          </div>
+          {/* следующий шаг после разбора матча — графика по нему */}
+          <div className="flex gap-2 text-sm">
+            <Link
+              href="/studio/new/match-day"
+              className="rounded-md border border-neutral-700 px-3 py-1.5 text-neutral-300 hover:border-violet-500 hover:text-white"
+            >
+              Итоги дня →
+            </Link>
+            <Link
+              href="/studio/new/vs-announce"
+              className="rounded-md border border-neutral-700 px-3 py-1.5 text-neutral-300 hover:border-violet-500 hover:text-white"
+            >
+              Анонс матча →
+            </Link>
+          </div>
         </div>
         <div className="mb-6 flex flex-wrap items-center gap-2">
           <input

@@ -74,7 +74,31 @@ PointsEntry { id, subjectType[team|player|caster|streamer], subjectId, reason[pl
 3. ✅ SYNC OpenDota (`src/lib/opendota.ts` + `src/lib/match-sync.ts`, `POST /api/matches/[id]/sync`): по `openDotaMatchId` → `MatchStat` (10 игроков), авто-победитель из `radiant_win`, подсказка MVP по композитному скору. Баллы не начисляет. Демо-привязка: `npx tsx prisma/demo-link.ts`.
 4. Реестр баллов: начисление (команды/MVP/кастер/стример) + корректировки.
 5. Защита админки.
-6. Отдача данных в визуальные шаблоны (тест на картинках).
+6. ✅ Отдача данных в визуальные шаблоны: студия `/studio` — профили команд/игроков, шаблоны, экспорт PNG (см. ниже).
+
+## Студия графики (`/studio`)
+
+Раздел генерации графики к матчам. Живёт в том же приложении и на тех же данных: профили команд/игроков в БД, матчи — из `Match`.
+
+**Шаблон = подложка PNG + схема полей + React-компонент фиксированного размера** (`web/src/studio/`):
+`registry.ts` — единственная точка добавления; `types.ts` — `FieldDef` (text/select/team/player/group);
+`templates/vs-announce.tsx` (1920×1080) и `templates/match-day.tsx` (1080×1920). Фоны — `web/public/templates/<id>/bg.png`
+(экспорт из Figma, без текста и лого команд; пока файла нет — фирменный градиент-заглушка).
+
+Форма мастера (`/studio/new/[templateId]`) строится из схемы автоматически — новый шаблон не требует новых страниц.
+Превью — тот же компонент в натуральных пикселях под `transform: scale`; **экспорт PNG клиентский**
+(`modern-screenshot`, масштаб снимается на клоне → размер ровно как у шаблона). Сохранённые генерации — модель `Render`
+(payload формы), открываются обратно через `?render=<id>`.
+
+`/studio/render/[templateId]?p=<base64 payload>` — «голый» рендер без интерфейса: цель для будущего
+серверного скриншота (Playwright) при рендере по API. Компонент общий с превью, расхождений не будет.
+
+**Профили:** `Team` (+`slug`, `wordmark`, `photo`, `color`), `Player` (+`slug`, `photo`, `realName`, `position`,
+`isCaptain`, ссылки, `telegram`). Ссылки на Dotabuff/Stratz/Steam выводятся из `accountId` (`src/lib/profiles.ts`),
+поля в БД их перекрывают. Картинки — локально в `public/uploads/` (в `.gitignore`), загрузка `POST /api/studio/upload`.
+
+**Наполнение базы:** `web/data/roster.json` → `npx tsx scripts/import-roster.ts` (upsert по `slug`, идемпотентно,
+картинки не трогает) и `npx tsx scripts/import-media.ts --from "<папка>"` (файлы по имени = `slug` → `public/uploads` + пути в БД).
 
 ## Инструмент: импорт матча (каркас)
 

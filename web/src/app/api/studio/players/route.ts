@@ -1,0 +1,37 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { listPlayers } from "@/lib/studio-data";
+import { slugify } from "@/lib/profiles";
+
+export async function GET() {
+  return NextResponse.json(await listPlayers());
+}
+
+export async function POST(req: Request) {
+  const body = (await req.json()) as {
+    nickname?: string;
+    slug?: string;
+    teamId?: number | null;
+    accountId?: string;
+    position?: number | null;
+  };
+  const nickname = body.nickname?.trim();
+  if (!nickname) return NextResponse.json({ error: "Нужен ник игрока" }, { status: 400 });
+
+  const slug = body.slug?.trim() || slugify(nickname);
+  if (!slug) return NextResponse.json({ error: "Не удалось вывести slug — задайте вручную" }, { status: 400 });
+  if (await prisma.player.findUnique({ where: { slug } })) {
+    return NextResponse.json({ error: `Игрок со слагом «${slug}» уже есть` }, { status: 409 });
+  }
+
+  const player = await prisma.player.create({
+    data: {
+      slug,
+      nickname,
+      teamId: body.teamId ?? null,
+      accountId: body.accountId?.trim() || null,
+      position: body.position ?? null,
+    },
+  });
+  return NextResponse.json(player, { status: 201 });
+}

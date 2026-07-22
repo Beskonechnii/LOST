@@ -6,7 +6,7 @@ export default async function StandingsPage() {
   const groups = await getStandings();
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-100 p-6 md:p-10">
+    <main className="flex-1 p-6 md:p-10">
       <div className="mx-auto max-w-3xl">
         <h1 className="mb-6 text-2xl font-bold tracking-tight">LOST — Таблица</h1>
 

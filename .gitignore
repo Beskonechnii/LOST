@@ -1,0 +1,11 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# node / env — подстраховка на весь репозиторий (у web/ есть свой .gitignore)
+**/node_modules/
+**/.env
+**/.env.*
+!**/.env.example

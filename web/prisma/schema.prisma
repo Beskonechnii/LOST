@@ -1,0 +1,90 @@
+// LOST — операционная система: данные / флоу / треккинг.
+// Спека: ../../ARCHITECTURE.md. sqlite не поддерживает enum → строковые поля с комментами.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Team {
+  id        Int      @id @default(autoincrement())
+  name      String
+  tag       String?
+  logo      String?
+  group     String?
+  createdAt DateTime @default(now())
+
+  players        Player[]
+  matchesA       Match[]  @relation("TeamA")
+  matchesB       Match[]  @relation("TeamB")
+  matchesWon     Match[]  @relation("Winner")
+  matchesRadiant Match[]  @relation("Radiant")
+}
+
+model Player {
+  id        Int      @id @default(autoincrement())
+  nickname  String
+  accountId String? // Dota/Steam32 account id (для OpenDota)
+  createdAt DateTime @default(now())
+
+  team    Team?       @relation(fields: [teamId], references: [id])
+  teamId  Int?
+  stats   MatchStat[]
+}
+
+model Match {
+  id              Int       @id @default(autoincrement())
+  openDotaMatchId String?   @unique // строкой: id матчей Dota > 32-bit Int
+  scheduledAt     DateTime?
+  status          String    @default("scheduled") // scheduled | live | finished
+  createdAt       DateTime  @default(now())
+
+  teamA         Team  @relation("TeamA", fields: [teamAId], references: [id])
+  teamAId       Int
+  teamB         Team  @relation("TeamB", fields: [teamBId], references: [id])
+  teamBId       Int
+  winner        Team? @relation("Winner", fields: [winnerTeamId], references: [id])
+  winnerTeamId  Int?
+  radiantTeam   Team? @relation("Radiant", fields: [radiantTeamId], references: [id])
+  radiantTeamId Int?
+
+  stats         MatchStat[]
+  pointsEntries PointsEntry[]
+}
+
+// Кэш статы из OpenDota (по игроку в матче) — для инфографики и подсказки MVP.
+model MatchStat {
+  id           Int    @id @default(autoincrement())
+  match        Match  @relation(fields: [matchId], references: [id])
+  matchId      Int
+  player       Player @relation(fields: [playerId], references: [id])
+  playerId     Int
+  heroDamage   Int    @default(0)
+  netWorth     Int    @default(0)
+  kills        Int    @default(0)
+  deaths       Int    @default(0)
+  assists      Int    @default(0)
+  campsStacked Int    @default(0)
+  lastHits     Int    @default(0)
+
+  @@unique([matchId, playerId])
+}
+
+// Реестр баллов — единственный способ менять очки. Корректировки = новые записи (аудит).
+model PointsEntry {
+  id          Int      @id @default(autoincrement())
+  subjectType String // team | player | caster | streamer
+  subjectId   Int // Team.id / Player.id / (позже) staff id
+  reason      String // placement | mvp | cast | stream | manual
+  amount      Int
+  note        String?
+  createdBy   String?
+  createdAt   DateTime @default(now())
+
+  match   Match? @relation(fields: [matchId], references: [id])
+  matchId Int?
+}

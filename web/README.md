@@ -5,16 +5,34 @@
 
 Next.js 16 (App Router, Turbopack) · React 19 · Tailwind v4 · Prisma 7 + SQLite (libsql-адаптер).
 
+## Первый запуск на новой машине
+
+Единственное, чего нет в репозитории, — `.env`:
+
+```bash
+git clone https://github.com/Beskonechnii/League-of-spirit.git && cd League-of-spirit/web
+cp .env.example .env
+npm install
+npx prisma migrate deploy
+npm run dev
+```
+
+`npm install` сам дёргает `prisma generate` (`postinstall`) — без него `src/generated/prisma` нет и сборка падает.
+`migrate deploy` докатывает миграции на пришедшую из репозитория `prisma/dev.db`.
+
+**База ездит в репозитории.** Данные лиги вводятся руками в UI и скриптами из таблицы не восстанавливаются,
+поэтому `prisma/dev.db` коммитится. Смержить её нельзя: правим на одной машине за раз и пушим,
+на второй — сначала `git pull`, потом работа. Разошлись — побеждает одна из версий, вторая переписывается.
+
 ## Запуск
 
 ```bash
-npm install
 npm run dev
 ```
 
 Откроется на http://localhost:3000. Проверка связки с БД: `GET /api/health`.
 
-`.env` (в `.gitignore`, в репозиторий не попадает):
+`.env` (в `.gitignore`, в репозиторий не попадает; шаблон — `.env.example`):
 
 | Переменная | Зачем |
 |---|---|

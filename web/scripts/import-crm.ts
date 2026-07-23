@@ -20,7 +20,7 @@ import path from "node:path";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { loadWorkbook, type Grid } from "./xlsx";
-import { accountIdFromUrl, normalizeTelegram, parseBirthday, slugify } from "../src/lib/profiles";
+import { COUNTRIES, accountIdFromUrl, normalizeTelegram, parseBirthday, slugify } from "../src/lib/profiles";
 
 const args = process.argv.slice(2);
 const arg = (name: string) => (args.includes(name) ? args[args.indexOf(name) + 1] : undefined);
@@ -176,15 +176,12 @@ async function fromFile(src: string): Promise<Row[]> {
 // ── разбор значений ──────────────────────────────────────────────────────────
 
 // В CRM одна колонка «Проживает в», и пишут в неё что угодно: «Минск», «Беларусь», «Россия, Пермь».
-// Разводим по нашим двум полям по списку стран — угадывать по любому слову было бы хуже, чем не угадывать.
-const COUNTRIES = [
-  "Беларусь", "Россия", "Украина", "Казахстан", "Польша", "Литва", "Латвия", "Эстония",
-  "Армения", "Грузия", "Германия", "Молдова", "Узбекистан", "Кыргызстан", "Азербайджан",
-];
-
+// Разводим по нашим двум полям по списку стран (он же рисует коды в UI) — угадывать по любому
+// слову было бы хуже, чем не угадывать.
 function splitPlace(raw: string): { city: string | null; country: string | null } {
+  const names = Object.keys(COUNTRIES);
   const parts = raw.split(/\s*,\s*/).filter(Boolean);
-  const country = parts.find((p) => COUNTRIES.some((c) => c.toLowerCase() === p.toLowerCase())) ?? null;
+  const country = parts.find((p) => names.some((c) => c.toLowerCase() === p.toLowerCase())) ?? null;
   const city = parts.find((p) => p !== country) ?? null;
   return { city, country };
 }

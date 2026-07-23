@@ -33,6 +33,35 @@ export function teamTag(team: { tag?: string | null; name: string }): string {
   return (clean || team.name).slice(0, 5).toUpperCase();
 }
 
+/**
+ * Акцентный цвет команды. Поле в ростере — истина, но заполнено оно у единиц, а без цвета
+ * все карточки и обложки выглядят одинаково. Поэтому цвет по умолчанию выводим из слага:
+ * тон стабилен (у команды он всегда один и тот же), насыщенность и светлота фиксированы,
+ * чтобы на тёмной теме ничего не выжигало. Как только цвет заведут руками — он перекроет.
+ */
+export function teamAccent(team: { color?: string | null; slug?: string | null; name?: string }): string {
+  const own = team.color?.trim();
+  if (own) return own;
+
+  const key = team.slug || team.name || "";
+  let hash = 0;
+  for (const ch of key) hash = (hash * 31 + ch.codePointAt(0)!) % 360;
+  return hslToHex(hash, 0.62, 0.58);
+}
+
+/** Всегда возвращаем hex: к нему в разметке дописывают альфу суффиксом («#a855f766»), с hsl() так нельзя. */
+function hslToHex(h: number, s: number, l: number): string {
+  const c = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const v = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+    return Math.round(v * 255)
+      .toString(16)
+      .padStart(2, "0");
+  };
+  return `#${c(0)}${c(8)}${c(4)}`;
+}
+
 /** Публичный путь к загруженной картинке профиля. Имя файла хранится в БД целиком. */
 export function uploadUrl(kind: UploadKind, file: string): string {
   return `/uploads/${kind}/${file}`;
@@ -75,6 +104,26 @@ function fromNumeric(digits: string): string | null {
   const n = BigInt(digits);
   if (n > STEAM64_BASE) return String(n - STEAM64_BASE);
   return n > BigInt(0) ? digits : null;
+}
+
+/**
+ * Страны, которые реально встречаются в анкетах лиги, с двухбуквенным кодом.
+ * Код, а не флаг-эмодзи: Windows рисует флаги как пару букв, и «🇧🇾» выглядел бы как «BY»
+ * в одних браузерах и как флаг в других — лучше сразу одинаково везде.
+ * Список общий с импортом из CRM (scripts/import-crm.ts), там по нему разбирают «Проживает в».
+ */
+export const COUNTRIES: Record<string, string> = {
+  "Беларусь": "BY", "Россия": "RU", "Украина": "UA", "Казахстан": "KZ", "Польша": "PL",
+  "Литва": "LT", "Латвия": "LV", "Эстония": "EE", "Армения": "AM", "Грузия": "GE",
+  "Германия": "DE", "Молдова": "MD", "Узбекистан": "UZ", "Кыргызстан": "KG", "Азербайджан": "AZ",
+};
+
+/** «Беларусь» → «BY». Незнакомая страна — первые две буквы, чтобы плашка не пустовала. */
+export function countryCode(country: string | null | undefined): string | null {
+  const name = country?.trim();
+  if (!name) return null;
+  const known = Object.entries(COUNTRIES).find(([ru]) => ru.toLowerCase() === name.toLowerCase());
+  return known ? known[1] : name.slice(0, 2).toUpperCase();
 }
 
 /** Хендл телеграма в канонический вид: без «@», без ссылки, без хвостов. Мусор → null. */

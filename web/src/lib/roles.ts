@@ -17,7 +17,9 @@ const BY_KEY = new Map(ROLES.map((r) => [r.key as string, r]));
 
 export const isRole = (v: string | null | undefined): v is RoleKey => !!v && BY_KEY.has(v);
 export const roleLabel = (v: string | null | undefined) => (v && BY_KEY.get(v)?.label) ?? null;
-export const rolePosition = (v: string | null | undefined) => (v && BY_KEY.get(v)?.position) ?? null;
+// именно number | null: пустая строка вместо роли не должна протекать в тип позиции
+export const rolePosition = (v: string | null | undefined): number | null =>
+  (v ? BY_KEY.get(v)?.position : null) ?? null;
 
 /** Роль по номеру позиции 1–5 (в таблице составов роли записаны цифрами). */
 export const roleByPosition = (n: number): RoleKey | null =>

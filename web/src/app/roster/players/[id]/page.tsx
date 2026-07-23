@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPlayerProfile } from "@/lib/roster-data";
-import { ageOf, formatBirthday, playerGaps, playerLinks, telegramUrl, yearsLabel } from "@/lib/profiles";
+import { ageOf, formatBirthday, playerGaps, playerLinks, teamAccent, telegramUrl, yearsLabel } from "@/lib/profiles";
 import { roleLabel } from "@/lib/roles";
 import { PlayerAvatar, TeamLogo } from "../../_components/avatar";
 
 export const dynamic = "force-dynamic";
-
-const ACCENT = "#a855f7";
 
 /** Плашка факта: роль, MMR, возраст, город. Пустые значения не рисуем — дыр в строке быть не должно. */
 function Chip({ children }: { children: React.ReactNode }) {
@@ -38,7 +36,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
 
   // главное место — первое по порядку ролей: оно и задаёт цвет страницы, и рисуется в крошках
   const main = player.spots[0] ?? null;
-  const accent = main?.team.color?.trim() || ACCENT;
+  const accent = main ? teamAccent(main.team) : "#a855f7";
   const links = playerLinks(player);
   const where = [player.city, player.country].filter(Boolean).join(", ");
   const gaps = playerGaps(player);
@@ -163,7 +161,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                   href={`/roster/players/${m.id}`}
                   className="flex items-center gap-3 rounded-lg border border-neutral-800 bg-neutral-900/40 p-2 hover:border-violet-600"
                 >
-                  <PlayerAvatar photo={m.photo} nickname={m.nickname} color={spot.team.color} size={40} className="rounded-lg" />
+                  <PlayerAvatar photo={m.photo} nickname={m.nickname} color={teamAccent(spot.team)} size={40} className="rounded-lg" />
                   <div className="min-w-0">
                     <div className="truncate text-sm font-medium">
                       {m.nickname}

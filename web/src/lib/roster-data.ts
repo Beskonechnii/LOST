@@ -52,6 +52,78 @@ export async function listTeams(): Promise<TeamCard[]> {
   );
 }
 
+export type RosterMember = {
+  id: number;
+  nickname: string;
+  photo: string | null;
+  mmr: number | null;
+  role: string | null;
+  position: number | null;
+  isCaptain: boolean;
+  country: string | null;
+  accountId: string | null;
+};
+
+export type TeamWithRoster = TeamCard & { players: RosterMember[] };
+
+type SpotWithPlayer = { role: string | null; isCaptain: boolean; player: PlayerRecord };
+type PlayerRecord = { id: number; slug: string; nickname: string; photo: string | null; mmr: number | null; country: string | null; accountId: string | null };
+
+/** Место в составе → строка ростера. Один вид данных для списка команд и для страницы команды. */
+async function toRosterMember(spot: SpotWithPlayer): Promise<RosterMember> {
+  const player = await withPlayerUploads(spot.player);
+  return {
+    id: player.id,
+    nickname: player.nickname,
+    photo: player.photo,
+    mmr: player.mmr,
+    role: spot.role,
+    position: rolePosition(spot.role),
+    isCaptain: spot.isCaptain,
+    country: player.country,
+    accountId: player.accountId,
+  };
+}
+
+/** Состав в привычном порядке: керри → хард, потом замены и тренер, внутри роли — по алфавиту. */
+const byRole = (a: SpotWithPlayer, b: SpotWithPlayer) =>
+  roleOrder(a.role) - roleOrder(b.role) || a.player.nickname.localeCompare(b.player.nickname);
+
+async function withRoster<T extends { slug: string; logo: string | null; wordmark?: string | null; photo?: string | null }>(
+  team: T,
+  roster: SpotWithPlayer[],
+): Promise<T & { players: RosterMember[]; playersCount: number; noAccountIdCount: number; mmrAverage: number | null; mmrTotal: number }> {
+  const mmr = teamMmr(roster.map((s) => ({ role: s.role, mmr: s.player.mmr })));
+  return {
+    ...(await withTeamUploads(team)),
+    players: await Promise.all([...roster].sort(byRole).map(toRosterMember)),
+    playersCount: roster.length,
+    noAccountIdCount: roster.filter((s) => !s.player.accountId).length,
+    mmrAverage: mmr.average,
+    mmrTotal: mmr.total,
+  };
+}
+
+/**
+ * Список команд вместе с составами — для карточек на /roster/teams, которые разворачиваются
+ * прямо в списке. Отдельно от listTeams(): там состав не нужен, а тут без него нечего показывать.
+ */
+export async function listTeamRosters(): Promise<TeamWithRoster[]> {
+  const teams = await prisma.team.findMany({
+    orderBy: [{ group: "asc" }, { name: "asc" }],
+    include: { roster: { include: { player: true } } },
+  });
+  return Promise.all(teams.map(({ roster, ...t }) => withRoster(t, roster)));
+}
+
+/** Всё для страницы команды: картинки, состав и агрегаты по MMR. */
+export async function getTeamProfile(id: number) {
+  const team = await prisma.team.findUnique({ where: { id }, include: { roster: { include: { player: true } } } });
+  if (!team) return null;
+  const { roster, ...rest } = team;
+  return withRoster(rest, roster);
+}
+
 /** Команда с составом: место в составе разворачивается в игрока с ролью этого места. */
 export async function getTeam(id: number) {
   const team = await prisma.team.findUnique({ where: { id }, include: { roster: { include: { player: true } } } });
@@ -114,8 +186,8 @@ export async function getPlayerProfile(id: number) {
 export async function listPlayers() {
   const players = await prisma.player.findMany({
     orderBy: [{ nickname: "asc" }],
-    // color нужен аватаркам-заглушкам: инициалы рисуются в цвет команды
-    include: { spots: { include: { team: { select: { id: true, name: true, tag: true, color: true } } } } },
+    // slug и color нужны аватаркам-заглушкам: цвет команды выводится из слага (teamAccent)
+    include: { spots: { include: { team: { select: { id: true, slug: true, name: true, tag: true, color: true } } } } },
   });
   // в списке показываем основное место (действующее, если оно есть), остальные — счётчиком
   return Promise.all(

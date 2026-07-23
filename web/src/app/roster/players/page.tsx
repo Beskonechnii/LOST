@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { listPlayers } from "@/lib/roster-data";
 import { roleLabel } from "@/lib/roles";
-import { playerGaps } from "@/lib/profiles";
+import { playerGaps, teamAccent } from "@/lib/profiles";
 import { CreateForm } from "../editors";
 import { PlayerAvatar } from "../_components/avatar";
 
@@ -47,7 +47,7 @@ export default async function PlayersPage() {
               <PlayerAvatar
                 photo={p.photo}
                 nickname={p.nickname}
-                color={p.main?.team.color}
+                color={p.main ? teamAccent(p.main.team) : null}
                 size={40}
                 className="rounded-lg"
               />

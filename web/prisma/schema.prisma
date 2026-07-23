@@ -33,8 +33,8 @@ model Team {
 }
 
 model Player {
-  id          Int      @id @default(autoincrement())
-  slug        String   @unique // ключ импорта и имя файла фото
+  id          Int       @id @default(autoincrement())
+  slug        String    @unique // ключ импорта и имя файла фото
   nickname    String
   realName    String?
   accountId   String? // Dota/Steam32 account id (для OpenDota)
@@ -43,8 +43,11 @@ model Player {
   steamUrl    String? // перекрывает ссылку, выведенную из accountId
   dotabuffUrl String?
   stratzUrl   String?
-  telegram    String?
-  createdAt   DateTime @default(now())
+  telegram    String? // хранится без «@» — собачку рисует UI (см. src/lib/profiles.ts)
+  birthday    DateTime? // только дата, время не значимо; нужна для возраста в графике и поздравлений
+  city        String? // где живёт — город как в CRM, страна опционально следом
+  country     String?
+  createdAt   DateTime  @default(now())
 
   spots RosterSpot[]
   stats MatchStat[]

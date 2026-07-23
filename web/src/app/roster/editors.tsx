@@ -65,24 +65,61 @@ type PlayerForm = {
   accountId: string;
   mmr: string;
   telegram: string;
+  birthday: string;
+  city: string;
+  country: string;
   photo: string | null;
 };
+
+function Fieldset({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded border border-neutral-800 bg-neutral-900/40 p-4">
+      <h3 className="mb-3 text-xs uppercase tracking-widest text-neutral-500">{title}</h3>
+      {children}
+    </section>
+  );
+}
 
 export function PlayerEditor({ id, initial }: { id: number; initial: PlayerForm }) {
   const [v, setV] = useState(initial);
   const set = <K extends keyof PlayerForm>(k: K, val: PlayerForm[K]) => setV((p) => ({ ...p, [k]: val }));
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <TextField label="Ник" value={v.nickname} onChange={(x) => set("nickname", x)} />
-        <TextField label="Имя" value={v.realName} onChange={(x) => set("realName", x)} />
-        <TextField label="Dota account_id" value={v.accountId} onChange={(x) => set("accountId", x)} placeholder="123456789" />
-        <TextField label="MMR" value={v.mmr} onChange={(x) => set("mmr", x)} placeholder="7000" />
-        <TextField label="Telegram" value={v.telegram} onChange={(x) => set("telegram", x)} placeholder="@nick" />
-      </div>
+    <div className="space-y-4">
+      {/* Личное и игровое разведены: анкету из CRM заполняют одни люди, account_id и MMR — другие */}
+      <Fieldset title="Человек">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <TextField label="Ник" value={v.nickname} onChange={(x) => set("nickname", x)} />
+          <TextField label="Имя" value={v.realName} onChange={(x) => set("realName", x)} />
+          <TextField label="Дата рождения" type="date" value={v.birthday} onChange={(x) => set("birthday", x)} />
+          <TextField label="Город" value={v.city} onChange={(x) => set("city", x)} placeholder="Минск" />
+          <TextField label="Страна" value={v.country} onChange={(x) => set("country", x)} placeholder="Беларусь" />
+          <TextField
+            label="Telegram"
+            value={v.telegram}
+            onChange={(x) => set("telegram", x)}
+            placeholder="@nick"
+            hint="Можно вставить ссылку t.me — сохраним хендл"
+          />
+        </div>
+      </Fieldset>
 
-      <ImageField label="Фото" kind="players" value={v.photo} onChange={(x) => set("photo", x)} hint="Портрет для плашек и анонсов" />
+      <Fieldset title="Игра">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <TextField
+            label="Dota account_id"
+            value={v.accountId}
+            onChange={(x) => set("accountId", x)}
+            placeholder="123456789"
+            hint="Или ссылка на steamcommunity.com/profiles/… — id вытащим сами"
+          />
+          <TextField label="MMR" value={v.mmr} onChange={(x) => set("mmr", x)} placeholder="7000" />
+        </div>
+      </Fieldset>
+
+      <Fieldset title="Фото">
+        <ImageField label="Портрет" kind="players" value={v.photo} onChange={(x) => set("photo", x)} hint="Для плашек и анонсов" />
+      </Fieldset>
 
       <SaveButton url={`/api/roster/players/${id}`} data={v} />
     </div>

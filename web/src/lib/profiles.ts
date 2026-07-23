@@ -45,6 +45,134 @@ export const stratzOf = (accountId: string) => `https://stratz.com/players/${acc
 export const steamOf = (accountId: string) =>
   `https://steamcommunity.com/profiles/${BigInt(accountId) + BigInt("76561197960265728")}`;
 
+const STEAM64_BASE = BigInt("76561197960265728");
+
+/**
+ * Ссылка на профиль → Dota account_id (он же steam32). Понимает то, что реально лежит в CRM:
+ * steamcommunity.com/profiles/<steam64>, dotabuff/stratz/opendota и просто число (32- или 64-битное).
+ *
+ * Именной адрес steamcommunity.com/id/<vanity> не резолвится: имя → steam64 знает только Steam Web API,
+ * ключа у нас нет. Такие возвращаем null — в UI они подсвечиваются как «ссылку надо открыть руками».
+ */
+export function accountIdFromUrl(raw: string): string | null {
+  const s = raw.trim();
+  if (!s) return null;
+
+  if (/^\d+$/.test(s)) return fromNumeric(s);
+
+  const path = s.replace(/^https?:\/\//i, "").replace(/[?#].*$/, "").replace(/\/+$/, "");
+  const m =
+    /^(?:www\.)?steamcommunity\.com\/profiles\/(\d+)/i.exec(path) ??
+    /^(?:www\.)?dotabuff\.com\/(?:esports\/)?players\/(\d+)/i.exec(path) ??
+    /^(?:www\.)?stratz\.com\/players\/(\d+)/i.exec(path) ??
+    /^(?:www\.)?opendota\.com\/players\/(\d+)/i.exec(path);
+
+  return m ? fromNumeric(m[1]) : null;
+}
+
+/** steam64 больше 2^53 — сравнение и вычитание только через BigInt, иначе Number всё округлит. */
+function fromNumeric(digits: string): string | null {
+  const n = BigInt(digits);
+  if (n > STEAM64_BASE) return String(n - STEAM64_BASE);
+  return n > BigInt(0) ? digits : null;
+}
+
+/** Хендл телеграма в канонический вид: без «@», без ссылки, без хвостов. Мусор → null. */
+export function normalizeTelegram(raw: string): string | null {
+  const handle = raw
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/^(?:www\.)?(?:t\.me|telegram\.me|telegram\.dog)\//i, "")
+    .replace(/^@/, "")
+    .replace(/[?#].*$/, "")
+    .replace(/\/+$/, "");
+  return /^[a-zA-Z0-9_]{4,32}$/.test(handle) ? handle : null;
+}
+
+export const telegramUrl = (handle: string) => `https://t.me/${handle.replace(/^@/, "")}`;
+
+/**
+ * Дата рождения из строки. Принимаем то, чем её пишут люди и выгрузки CRM:
+ * «1998-04-21», «21.04.1998», «21/04/1998». Полдень по UTC — чтобы сдвиг таймзоны
+ * не увёл дату на сутки назад при выводе.
+ */
+export function parseBirthday(raw: string): Date | null {
+  const s = raw.trim();
+  if (!s) return null;
+
+  // Ячейка с датой в xlsx приходит числом — дней от 30.12.1899 («36222.0» = 21.03.1999).
+  // Порог 10000 (1927 год) отсекает случай, когда в поле написали только год.
+  const serial = /^(\d{4,5})(?:\.0+)?$/.exec(s);
+  if (serial && Number(serial[1]) >= 10000) {
+    return new Date(Date.UTC(1899, 11, 30, 12) + Number(serial[1]) * 86400000);
+  }
+
+  const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+  const dotted = /^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})$/.exec(s);
+  const [y, m, d] = iso
+    ? [Number(iso[1]), Number(iso[2]), Number(iso[3])]
+    : dotted
+      ? [Number(dotted[3]), Number(dotted[2]), Number(dotted[1])]
+      : [0, 0, 0];
+  if (!y || m < 1 || m > 12 || d < 1 || d > 31) return null;
+
+  const date = new Date(Date.UTC(y, m - 1, d, 12));
+  // 31.02 Date молча превратит в 3 марта — ловим это сверкой обратно
+  return date.getUTCMonth() === m - 1 && date.getUTCDate() === d ? date : null;
+}
+
+/** Дата рождения к виду «21 апреля 1998» — «г.» в конце тут лишнее. */
+export function formatBirthday(date: Date): string {
+  const s = new Intl.DateTimeFormat("ru", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(date);
+  return s.replace(/\s*г\.$/, "");
+}
+
+/** Полных лет на сегодня. Дата рождения хранится как дата, время игнорируем. */
+export function ageOf(birthday: Date, now = new Date()): number {
+  let age = now.getFullYear() - birthday.getFullYear();
+  const passed =
+    now.getMonth() > birthday.getMonth() ||
+    (now.getMonth() === birthday.getMonth() && now.getDate() >= birthday.getDate());
+  if (!passed) age -= 1;
+  return age;
+}
+
+/** Склонение к числу лет: 21 год, 22 года, 25 лет. */
+export function yearsLabel(age: number): string {
+  const t = age % 100;
+  if (t >= 11 && t <= 14) return `${age} лет`;
+  const u = age % 10;
+  if (u === 1) return `${age} год`;
+  if (u >= 2 && u <= 4) return `${age} года`;
+  return `${age} лет`;
+}
+
+/**
+ * Чего не хватает в карточке игрока. Один список на список игроков и на профиль,
+ * чтобы «12 без анкеты» в шапке и подпись под ником не разъезжались.
+ *
+ * Фото сюда не входит намеренно: его отсутствие и так видно — вместо портрета
+ * стоят инициалы, — а приписка «нет фото» у всех 95 карточек превратила бы
+ * подсказку в шум. Портреты заливаются отдельным потоком (scripts/import-media.ts).
+ */
+export function playerGaps(p: {
+  accountId?: string | null;
+  realName?: string | null;
+  birthday?: Date | null;
+  city?: string | null;
+  country?: string | null;
+  telegram?: string | null;
+}): string[] {
+  return [
+    !p.accountId && "account_id",
+    !p.realName && "имя",
+    !p.birthday && "дата рождения",
+    // в CRM часто указана только страна — считаем, что место жительства всё-таки есть
+    !p.city && !p.country && "город",
+    !p.telegram && "телеграм",
+  ].filter((x): x is string => typeof x === "string");
+}
+
 type PlayerLinksInput = {
   accountId?: string | null;
   steamUrl?: string | null;

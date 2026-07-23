@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { listPlayers } from "@/lib/roster-data";
-import { slugify } from "@/lib/profiles";
+import { accountIdFromUrl, slugify } from "@/lib/profiles";
 import { isRole } from "@/lib/roles";
 
 export async function GET() {
@@ -25,10 +25,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Игрок со слагом «${slug}» уже есть` }, { status: 409 });
   }
 
+  // В поле «account_id» пускают и ссылку на стим — разбираем так же, как в PATCH.
+  const rawId = body.accountId?.trim();
+  const accountId = rawId ? accountIdFromUrl(rawId) : null;
+  if (rawId && !accountId) {
+    return NextResponse.json({ error: `Не разобрал «${rawId}» — нужен account_id или ссылка на профиль` }, { status: 400 });
+  }
+
   // Команду и роль здесь не заводим — это место в составе, оно ставится на карточке игрока (RosterSpot).
-  const player = await prisma.player.create({
-    data: { slug, nickname, accountId: body.accountId?.trim() || null },
-  });
+  const player = await prisma.player.create({ data: { slug, nickname, accountId } });
   if (body.teamId) {
     await prisma.rosterSpot.create({
       data: { playerId: player.id, teamId: body.teamId, role: isRole(body.role) ? body.role : null },

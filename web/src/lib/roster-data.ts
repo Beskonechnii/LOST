@@ -76,10 +76,46 @@ export function getPlayer(id: number) {
   });
 }
 
+/**
+ * Всё для страницы профиля: человек, его места в составах — с лого команды и сокомандниками.
+ * Отдельно от getPlayer(), потому что редактору эта развесистая выборка не нужна.
+ */
+export async function getPlayerProfile(id: number) {
+  const player = await prisma.player.findUnique({
+    where: { id },
+    include: {
+      spots: {
+        include: { team: { include: { roster: { include: { player: true } } } } },
+        orderBy: { id: "asc" },
+      },
+    },
+  });
+  if (!player) return null;
+
+  // порядок мест — как везде: сначала действующая команда (по порядку ролей), потом замены и тренерство
+  const spots = await Promise.all(
+    [...player.spots]
+      .sort((a, b) => roleOrder(a.role) - roleOrder(b.role))
+      .map(async ({ team, ...spot }) => ({
+        ...spot,
+        team: await withTeamUploads(team),
+        teammates: await Promise.all(
+          team.roster
+            .filter((m) => m.playerId !== id)
+            .sort((a, b) => roleOrder(a.role) - roleOrder(b.role) || a.player.nickname.localeCompare(b.player.nickname))
+            .map(async (m) => ({ ...(await withPlayerUploads(m.player)), role: m.role, isCaptain: m.isCaptain })),
+        ),
+      })),
+  );
+
+  return { ...(await withPlayerUploads(player)), spots };
+}
+
 export async function listPlayers() {
   const players = await prisma.player.findMany({
     orderBy: [{ nickname: "asc" }],
-    include: { spots: { include: { team: { select: { id: true, name: true, tag: true } } } } },
+    // color нужен аватаркам-заглушкам: инициалы рисуются в цвет команды
+    include: { spots: { include: { team: { select: { id: true, name: true, tag: true, color: true } } } } },
   });
   // в списке показываем основное место (действующее, если оно есть), остальные — счётчиком
   return Promise.all(

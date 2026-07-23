@@ -19,7 +19,8 @@ export function TextField(props: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
-  type?: "text" | "number";
+  type?: "text" | "number" | "date";
+  hint?: string;
 }) {
   return (
     <label className="block">
@@ -31,6 +32,7 @@ export function TextField(props: {
         placeholder={props.placeholder}
         onChange={(e) => props.onChange(e.target.value)}
       />
+      {props.hint && <span className="mt-1 block text-xs text-neutral-600">{props.hint}</span>}
     </label>
   );
 }

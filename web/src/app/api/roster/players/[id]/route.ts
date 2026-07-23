@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { accountIdFromUrl, normalizeTelegram, parseBirthday } from "@/lib/profiles";
 
 const TEXT_FIELDS = [
-  "nickname", "realName", "accountId", "photo", "telegram", "steamUrl", "dotabuffUrl", "stratzUrl",
+  "nickname", "realName", "photo", "steamUrl", "dotabuffUrl", "stratzUrl", "city", "country",
 ] as const;
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -13,6 +14,46 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   for (const f of TEXT_FIELDS) {
     if (f in body) data[f] = String(body[f] ?? "").trim() || null;
   }
+  // account_id: в CRM это ссылка на стим-профиль, поэтому в поле принимаем и её.
+  // Именной адрес /id/<vanity> без Steam API не разворачивается — говорим об этом прямо.
+  if ("accountId" in body) {
+    const raw = String(body.accountId ?? "").trim();
+    if (raw === "") {
+      data.accountId = null;
+    } else {
+      const id = accountIdFromUrl(raw);
+      if (!id) {
+        return NextResponse.json(
+          { error: `Не разобрал «${raw}». Нужен account_id, ссылка на steamcommunity.com/profiles/… , Dotabuff или Stratz` },
+          { status: 400 },
+        );
+      }
+      data.accountId = id;
+    }
+  }
+
+  if ("telegram" in body) {
+    const raw = String(body.telegram ?? "").trim();
+    if (raw === "") {
+      data.telegram = null;
+    } else {
+      const handle = normalizeTelegram(raw);
+      if (!handle) return NextResponse.json({ error: `«${raw}» не похоже на телеграм-хендл` }, { status: 400 });
+      data.telegram = handle;
+    }
+  }
+
+  if ("birthday" in body) {
+    const raw = String(body.birthday ?? "").trim();
+    if (raw === "") {
+      data.birthday = null;
+    } else {
+      const date = parseBirthday(raw);
+      if (!date) return NextResponse.json({ error: `Дата «${raw}» не разобрана — ждём 21.04.1998` }, { status: 400 });
+      data.birthday = date;
+    }
+  }
+
   if ("mmr" in body) {
     // пустое поле = «не указан», а не ноль: нулевой MMR утянул бы вниз средний по команде
     const raw = String(body.mmr ?? "").trim();

@@ -26,5 +26,7 @@ description: Закоммитить и запушить изменения ре�
 - Трейлер co-author обязателен.
 - Хуки не пропускать (`--no-verify` — только по просьбе).
 - При первом сетевом обращении Git Credential Manager может показать окно входа — его завершает пользователь.
-- Не коммитить `node_modules` / `.env` / `dev.db` / `web/src/generated` (уже в `.gitignore`).
+- Не коммитить `node_modules` / `.env` / `web/src/generated` (уже в `.gitignore`).
+- `web/prisma/dev.db` **коммитится** — это данные лиги, они переезжают между машинами вместе с кодом
+  (решение от 23.07.2026, см. `ARCHITECTURE.md`). Мержить бинарник нельзя: перед работой `git pull`.
 - Remote: `origin` → github.com/Beskonechnii/League-of-spirit (приватный).

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTeam, teamMmr } from "@/lib/roster-data";
 import { roleLabel } from "@/lib/roles";
 import { TeamEditor } from "../../editors";
+import { PlayerAvatar } from "../../_components/avatar";
 
 export const dynamic = "force-dynamic";
 
@@ -60,14 +61,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
               href={`/roster/players/${p.id}`}
               className="flex items-center gap-3 rounded border border-neutral-800 bg-neutral-900/40 p-2 hover:border-violet-600"
             >
-              <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded bg-neutral-900">
-                {p.photo ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.photo} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <span className="text-[10px] text-neutral-600">—</span>
-                )}
-              </div>
+              <PlayerAvatar photo={p.photo} nickname={p.nickname} color={team.color} size={40} className="rounded-lg" />
               <div className="min-w-0">
                 <div className="truncate text-sm font-medium">
                   {p.nickname}

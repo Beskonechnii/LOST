@@ -1,16 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { QUALIFICATION, qualificationOf } from "@/lib/qualification";
 import type { GroupTable } from "@/lib/group-stage";
 
 // Групповая стадия — отыгранный этап перед плей-офф, поэтому подан отдельным блоком-постером,
 // а не ещё одной строкой в таблице лиги.
 
 const OUTCOMES = ["2:0", "2:1", "1:2", "0:2"];
-
-/** Короткая подпись команды для шапки сетки: тег, если он есть, иначе обрезанное название. */
-const shortName = (tag: string | null, name: string) => tag ?? (name.length > 6 ? `${name.slice(0, 5)}…` : name);
 
 export function GroupStage({ tables }: { tables: GroupTable[] }) {
   const router = useRouter();
@@ -33,7 +32,6 @@ export function GroupStage({ tables }: { tables: GroupTable[] }) {
     router.refresh();
   }
 
-  const totalGuessed = tables.reduce((s, t) => s + t.guessedCount, 0);
   // расхождение с таблицей сезона: считаем по каждой строке, а не по группе — так видно, кого проверять
   const drifted = tables.flatMap((t) =>
     t.rows.filter((r) => r.wins !== r.sheet.wins || r.losses !== r.sheet.losses || r.points !== r.sheet.points),
@@ -41,11 +39,6 @@ export function GroupStage({ tables }: { tables: GroupTable[] }) {
 
   return (
     <section className="space-y-4">
-      {totalGuessed > 0 && (
-        <p className="text-xs text-amber-400">
-          {totalGuessed} встреч(и) под вопросом — в таблице сезона сетка не подписана, пары восстановлены расчётом
-        </p>
-      )}
       {drifted.length > 0 && (
         <p className="text-xs text-rose-400">
           Расходится с таблицей сезона: {drifted.map((r) => r.name).join(", ")} — сверьте сетку
@@ -64,11 +57,11 @@ export function GroupStage({ tables }: { tables: GroupTable[] }) {
               <table className="w-full border-collapse text-sm">
                 <thead>
                   <tr className="text-neutral-500">
-                    <th className="w-6 py-1 text-left text-xs font-medium">#</th>
+                    <th className="w-10 py-1 text-left text-xs font-medium">#</th>
                     <th className="py-1 text-left text-xs font-medium">Команда</th>
                     {t.rows.map((r) => (
                       <th key={r.teamId} className="w-10 py-1 text-center text-[10px] font-medium" title={r.name}>
-                        {shortName(r.tag, r.name)}
+                        {r.tag}
                       </th>
                     ))}
                     <th className="w-8 py-1 text-center text-xs font-medium">В</th>
@@ -77,11 +70,20 @@ export function GroupStage({ tables }: { tables: GroupTable[] }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {t.rows.map((r, i) => (
+                  {t.rows.map((r, i) => {
+                    const zone = QUALIFICATION[qualificationOf(r.place, t.rows.length)];
+                    return (
                     <tr key={r.teamId} className="border-t border-neutral-900">
-                      <td className="py-1 text-xs text-neutral-500">{r.place}</td>
-                      <td className="max-w-32 truncate py-1 font-medium" title={r.name}>
-                        {r.name}
+                      <td className="py-1">
+                        <span className="flex items-center gap-1.5">
+                          <span className={`h-3.5 w-1 rounded-sm ${zone.marker}`} title={zone.label} />
+                          <span className="text-xs text-neutral-500">{r.place}</span>
+                        </span>
+                      </td>
+                      <td className="max-w-32 truncate py-1" title={r.name}>
+                        <Link href={`/roster/teams/${r.teamId}`} className={`font-medium hover:underline ${zone.text}`}>
+                          {r.name}
+                        </Link>
                       </td>
                       {t.grid[i].map((cell, j) => (
                         <td key={t.rows[j].teamId} className="p-0.5 text-center">
@@ -93,12 +95,8 @@ export function GroupStage({ tables }: { tables: GroupTable[] }) {
                               value={cell.score}
                               onChange={(e) => void save(cell.id, e.target.value, cell.flipped)}
                               title={`${r.name} — ${t.rows[j].name}`}
-                              className={`w-full cursor-pointer rounded border-0 px-0 py-1 text-center text-xs outline-none focus:ring-1 focus:ring-violet-500 ${
-                                cell.guessed
-                                  ? "bg-amber-500/15 text-amber-300"
-                                  : cell.score.startsWith("2")
-                                    ? "bg-transparent text-emerald-400"
-                                    : "bg-transparent text-neutral-500"
+                              className={`w-full cursor-pointer rounded border-0 bg-transparent px-0 py-1 text-center text-xs outline-none focus:ring-1 focus:ring-violet-500 ${
+                                cell.score.startsWith("2") ? "text-emerald-400" : "text-neutral-500"
                               }`}
                             >
                               {OUTCOMES.map((o) => (
@@ -123,7 +121,8 @@ export function GroupStage({ tables }: { tables: GroupTable[] }) {
                         )}
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

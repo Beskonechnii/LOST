@@ -14,7 +14,7 @@
 import { unzipSync, strFromU8 } from "fflate";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "../src/generated/prisma/client";
-import { seriesPoints } from "../src/lib/group-stage";
+import { seriesPoints } from "../src/lib/qualification";
 
 const args = process.argv.slice(2);
 const arg = (name: string) => (args.includes(name) ? args[args.indexOf(name) + 1] : undefined);

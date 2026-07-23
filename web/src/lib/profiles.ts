@@ -19,6 +19,20 @@ export function slugify(input: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+/**
+ * Тег команды для таблиц и графики. У части команд тега в таблице сезона нет, а колонка должна быть
+ * заполнена всегда — поэтому выводим из названия: берём первое слово, латиницу/цифры, до 5 знаков.
+ * Это фолбэк: как только тег заведут в ростере, он перекроет вычисленный.
+ */
+export function teamTag(team: { tag?: string | null; name: string }): string {
+  const own = team.tag?.trim();
+  if (own) return own;
+
+  const word = team.name.trim().split(/\s+/)[0] ?? team.name;
+  const clean = [...word].filter((ch) => /[\p{L}\p{N}]/u.test(ch)).join("");
+  return (clean || team.name).slice(0, 5).toUpperCase();
+}
+
 /** Публичный путь к загруженной картинке профиля. Имя файла хранится в БД целиком. */
 export function uploadUrl(kind: UploadKind, file: string): string {
   return `/uploads/${kind}/${file}`;

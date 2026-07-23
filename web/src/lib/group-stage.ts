@@ -2,21 +2,14 @@
 // Живая таблица лиги считается отдельно — в standings.ts; здесь этап, который уже отыгран.
 
 import { prisma } from "@/lib/prisma";
-
-/**
- * Очки за серию Bo3. Формула выведена из таблицы сезона и сошлась на всех командах группы A
- * первого дивизиона (ГУЗЛИКИ 15, Ethereal 15, 5KN 2), поэтому считаем её правилом лиги:
- * 2:0 → 3, 2:1 → 2, 1:2 → 1, 0:2 → 0. Идея — «сухая» победа дороже, а взятая карта не пропадает.
- */
-export function seriesPoints(own: number, opp: number) {
-  if (own > opp) return opp === 0 ? 3 : 2;
-  return own === 0 ? 0 : 1;
-}
+import { teamTag } from "@/lib/profiles";
+import { qualificationOf, seriesPoints } from "@/lib/qualification";
 
 export type GroupRow = {
   teamId: number;
   name: string;
-  tag: string | null;
+  /** Всегда заполнен: свой из ростера либо выведенный из названия (см. teamTag). */
+  tag: string;
   logo: string | null;
   place: number;
   /** Считается из сетки — поэтому правка встречи сразу видна и здесь, и в таблице лиги. */
@@ -40,6 +33,22 @@ export type GroupTable = {
   /** Сколько встреч восстановлено расчётом, а не прочитано из таблицы — их надо проверить руками. */
   guessedCount: number;
 };
+
+/** Кто куда вышел: команды по зонам, в порядке места в группе. Для сетки плей-офф. */
+export async function getQualified(division: string) {
+  const tables = await getGroupStage(division);
+  const seeded = tables.flatMap((t) =>
+    t.rows.map((r) => ({ ...r, group: t.group, zone: qualificationOf(r.place, t.rows.length) })),
+  );
+  const byPlace = (a: { place: number; group: string }, b: { place: number; group: string }) =>
+    a.place - b.place || a.group.localeCompare(b.group);
+
+  return {
+    upper: seeded.filter((r) => r.zone === "upper").sort(byPlace),
+    lower: seeded.filter((r) => r.zone === "lower").sort(byPlace),
+    out: seeded.filter((r) => r.zone === "out").sort(byPlace),
+  };
+}
 
 export async function getGroupStage(division: string): Promise<GroupTable[]> {
   const [entries, series] = await Promise.all([
@@ -74,7 +83,7 @@ export async function getGroupStage(division: string): Promise<GroupTable[]> {
       return {
         teamId: e.teamId,
         name: e.team.name,
-        tag: e.team.tag,
+        tag: teamTag(e.team),
         logo: e.team.logo,
         place: e.place,
         played: played.length,

@@ -1,10 +1,11 @@
 import { SubNav } from "../_components/site-nav";
 
-// Таблица лиги. Пока один дивизион, поэтому подразделы — по этапам, а не по дивизионам.
+// Раздел дивизиона. Пока он один, поэтому подразделы — по этапам, а не по дивизионам.
 
 const TABS = [
-  { href: "/standings", label: "LOST div1", hint: "Общая таблица лиги" },
+  { href: "/standings", label: "Таблицы", hint: "Общая таблица лиги" },
   { href: "/standings/groups", label: "Групповая стадия", hint: "Группы A и B с сеткой встреч" },
+  { href: "/standings/playoff", label: "Плей-офф", hint: "Черновик сетки: посев из групп" },
 ];
 
 export default function StandingsLayout({ children }: { children: React.ReactNode }) {

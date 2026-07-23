@@ -1,16 +1,20 @@
 import { prisma } from "@/lib/prisma";
-import { seriesPoints } from "@/lib/group-stage";
+import { seriesPoints } from "@/lib/qualification";
+import { teamTag } from "@/lib/profiles";
 
 export type StandingRow = {
   teamId: number;
   name: string;
-  tag: string | null;
+  /** Всегда заполнен: свой из ростера либо выведенный из названия (см. teamTag). */
+  tag: string;
   played: number;
   wins: number;
   losses: number;
   points: number;
   /** Из какой группы команда пришла на этап — чтобы в общей таблице было видно происхождение. */
   stageGroup: string | null;
+  /** Место в группе из таблицы сезона. При равенстве очков порядок задавал организатор, из цифр он не выводится. */
+  place: number | null;
 };
 export type StandingGroup = { group: string; rows: StandingRow[] };
 
@@ -22,8 +26,9 @@ export type StandingGroup = { group: string; rows: StandingRow[] };
  *  • реестр баллов (`PointsEntry`) — ручные начисления за места, касты и прочее.
  */
 export async function getStandings(): Promise<StandingGroup[]> {
-  const [teams, series, matches, points] = await Promise.all([
+  const [teams, entries, series, matches, points] = await Promise.all([
     prisma.team.findMany(),
+    prisma.groupEntry.findMany(),
     prisma.groupSeries.findMany(),
     prisma.match.findMany({ where: { status: "finished" } }),
     prisma.pointsEntry.findMany({ where: { subjectType: "team" } }),
@@ -48,17 +53,21 @@ export async function getStandings(): Promise<StandingGroup[]> {
     wins += played2.filter((m) => m.winnerTeamId === t.id).length;
     pts += points.filter((p) => p.subjectId === t.id).reduce((s, p) => s + p.amount, 0);
 
+    const entry = entries.find((e) => e.teamId === t.id);
     const row: StandingRow = {
       teamId: t.id,
       name: t.name,
-      tag: t.tag,
+      tag: teamTag(t),
       played,
       wins,
       losses: played - wins,
       points: pts,
-      stageGroup: mine.length ? (mine[0].group ?? null) : null,
+      stageGroup: entry?.group ?? (mine.length ? mine[0].group : null),
+      place: entry?.place ?? null,
     };
-    const g = t.group ?? "—";
+    // Делим по группе группового этапа: команды из разных групп между собой не играли,
+    // поэтому в одной таблице их очки несопоставимы. Без группы — отдельным блоком.
+    const g = row.stageGroup ?? t.group ?? "—";
     if (!groups.has(g)) groups.set(g, []);
     groups.get(g)!.push(row);
   }
@@ -67,6 +76,15 @@ export async function getStandings(): Promise<StandingGroup[]> {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([group, rows]) => ({
       group,
-      rows: rows.sort((a, b) => b.points - a.points || b.wins - a.wins || a.name.localeCompare(b.name)),
+      // Место из таблицы сезона главнее расчёта: при равенстве очков и побед порядок задавал
+      // организатор (morbus mentis / Eclipse Gaming — 4-3 и 12 очков у обеих), и по цифрам его не
+      // восстановить. Без места — считаем сами.
+      rows: rows.sort(
+        (a, b) =>
+          (a.place !== null && b.place !== null ? a.place - b.place : 0) ||
+          b.points - a.points ||
+          b.wins - a.wins ||
+          a.name.localeCompare(b.name),
+      ),
     }));
 }

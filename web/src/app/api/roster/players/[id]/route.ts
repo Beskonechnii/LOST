@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { isRole } from "@/lib/roles";
 
 const TEXT_FIELDS = [
   "nickname", "realName", "accountId", "photo", "telegram", "steamUrl", "dotabuffUrl", "stratzUrl",
@@ -14,15 +13,20 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   for (const f of TEXT_FIELDS) {
     if (f in body) data[f] = String(body[f] ?? "").trim() || null;
   }
-  if ("role" in body) {
-    const role = body.role === null || body.role === "" ? null : String(body.role);
-    if (role !== null && !isRole(role)) {
-      return NextResponse.json({ error: `Неизвестная роль «${role}»` }, { status: 400 });
+  if ("mmr" in body) {
+    // пустое поле = «не указан», а не ноль: нулевой MMR утянул бы вниз средний по команде
+    const raw = String(body.mmr ?? "").trim();
+    if (raw === "") {
+      data.mmr = null;
+    } else {
+      const mmr = Number(raw);
+      if (!Number.isFinite(mmr) || mmr < 0) {
+        return NextResponse.json({ error: `MMR должен быть числом, а не «${raw}»` }, { status: 400 });
+      }
+      data.mmr = Math.round(mmr);
     }
-    data.role = role;
   }
-  if ("isCaptain" in body) data.isCaptain = Boolean(body.isCaptain);
-  if ("teamId" in body) data.teamId = body.teamId === null || body.teamId === "" ? null : Number(body.teamId);
+  // Роль, капитанство и команда — это место в составе, они правятся через /api/roster/spots.
   if (data.nickname === null) return NextResponse.json({ error: "Ник не может быть пустым" }, { status: 400 });
 
   const player = await prisma.player.update({ where: { id: Number(id) }, data });

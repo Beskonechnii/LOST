@@ -2,6 +2,7 @@
 // плюс список матчей для автозаполнения. Один источник и для мастера, и для /studio/render.
 
 import { prisma } from "@/lib/prisma";
+import { isCoreRole } from "@/lib/roster-spots";
 import type { PlayerRef, TeamRef } from "@/studio/types";
 import type { Refs } from "@/studio/resolve";
 import type { MatchOption } from "@/app/studio/_components/wizard";
@@ -9,7 +10,10 @@ import type { MatchOption } from "@/app/studio/_components/wizard";
 export async function getRefs(): Promise<Refs> {
   const [teams, players] = await Promise.all([
     prisma.team.findMany({ orderBy: { name: "asc" } }),
-    prisma.player.findMany({ orderBy: { nickname: "asc" }, include: { team: { select: { name: true } } } }),
+    prisma.player.findMany({
+      orderBy: { nickname: "asc" },
+      include: { spots: { include: { team: { select: { name: true } } }, orderBy: { id: "asc" } } },
+    }),
   ]);
 
   const teamRefs: TeamRef[] = teams.map((t) => ({
@@ -26,7 +30,8 @@ export async function getRefs(): Promise<Refs> {
     id: p.id,
     nickname: p.nickname,
     photo: p.photo,
-    teamName: p.team?.name ?? null,
+    // в подписи шаблона нужна одна команда — берём ту, где игрок действующий, иначе первую
+    teamName: (p.spots.find((s) => isCoreRole(s.role)) ?? p.spots[0])?.team.name ?? null,
   }));
 
   return { teams: teamRefs, players: playerRefs };

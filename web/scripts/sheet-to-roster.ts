@@ -29,6 +29,7 @@ type Player = {
   nickname: string;
   realName: string | null;
   role: RoleKey | null;
+  mmr: number | null;
   accountId: string | null;
   dotabuffUrl: string | null;
 };
@@ -174,6 +175,21 @@ const accountIdFrom = (href: string | null) =>
 
 const teamSlug = (name: string) => aliases.get(name.toLowerCase()) ?? slugify(name);
 
+/**
+ * Таблица главнее по составу и ролям, но пустой ячейкой не затирает то, что проставили руками:
+ * account_id, добытый не из таблицы, должен пережить следующий разбор.
+ */
+function mergePlayer(prev: Player | undefined, next: Player): Player {
+  if (!prev) return next;
+  return {
+    ...prev,
+    ...next,
+    accountId: next.accountId ?? prev.accountId ?? null,
+    dotabuffUrl: next.dotabuffUrl ?? prev.dotabuffUrl ?? null,
+    mmr: next.mmr ?? prev.mmr ?? null,
+  };
+}
+
 /** Числа в xlsx хранятся как «1.0» — приводим к «1», чтобы сравнивать с ролями и номерами. */
 const asInt = (s: string) => (/^\d+(\.0+)?$/.test(s) ? String(Number(s)) : s);
 
@@ -201,11 +217,14 @@ function parseRoster(grid: Grid, group: string | null = null): Team[] {
     if (!parsed) continue;
 
     const linkCell = row.find((c) => c?.href && /dotabuff\.com\/players\/\d+/i.test(c.href));
+    const mmr = Number(cell(6));
     current.players.push({
       slug: slugify(parsed.nickname),
       nickname: parsed.nickname,
       realName: parsed.realName,
-      role: /^[1-5]$/.test(role) ? roleByPosition(Number(role)) : role === "Тренер" ? "coach" : "standin",
+      mmr: Number.isFinite(mmr) && mmr > 0 ? mmr : null, // у тренеров колонка пустая
+      // роль пишут по-разному («Тренер», «ТРЕНЕР») — регистр не должен решать, тренер человек или замена
+      role: /^[1-5]$/.test(role) ? roleByPosition(Number(role)) : role.toLowerCase() === "тренер" ? "coach" : "standin",
       accountId: accountIdFrom(linkCell?.href ?? null),
       dotabuffUrl: linkCell?.href ?? null,
     });
@@ -268,7 +287,29 @@ async function main() {
   // Мержим в существующий roster.json: команды из таблицы перекрывают одноимённые по слагу.
   const existing = JSON.parse(await fs.readFile(outFile, "utf8").catch(() => "[]")) as Team[];
   const bySlug = new Map(existing.map((t) => [t.slug, t]));
-  for (const t of picked) bySlug.set(t.slug, { ...bySlug.get(t.slug), ...t, tag: t.tag ?? bySlug.get(t.slug)?.tag ?? null });
+  for (const t of picked) {
+    const prev = bySlug.get(t.slug);
+    bySlug.set(t.slug, {
+      ...prev,
+      ...t,
+      tag: t.tag ?? prev?.tag ?? null,
+      players: t.players.map((p) => mergePlayer(prev?.players?.find((x) => x.slug === p.slug), p)),
+    });
+  }
+
+  // Таблица — источник истины по составам, поэтому команду, которой в ней больше нет, надо убрать
+  // из файла, а не оставлять навсегда: иначе переименование или смена слага плодит команду-дубль
+  // (так и появился «300-dollars» рядом с «300»). Чистим только те дивизионы, что реально разобрали,
+  // и только когда взяли таблицу целиком — при --only мы про остальные команды ничего не знаем.
+  if (!only) {
+    const scannedGroups = new Set(parsed.map((t) => t.group ?? "—"));
+    const fromSheet = new Set(picked.map((t) => t.slug));
+    for (const t of [...bySlug.values()]) {
+      if (fromSheet.has(t.slug) || !scannedGroups.has(t.group ?? "—")) continue;
+      bySlug.delete(t.slug);
+      console.log(`  убрал из файла: ${t.slug} — «${t.name}» больше нет в таблице`);
+    }
+  }
 
   let noId = 0;
   for (const t of picked) {
@@ -276,7 +317,8 @@ async function main() {
     noId += t.players.length - ids;
     console.log(`${t.slug} — ${t.name}: ${t.players.length} игрок(ов), account_id у ${ids}`);
     for (const p of t.players) {
-      console.log(`   ${(p.role ?? "—").padEnd(13)} ${p.nickname}${p.accountId ? ` · ${p.accountId}` : ""}`);
+      const mmr = p.mmr ? ` · ${p.mmr} MMR` : "";
+      console.log(`   ${(p.role ?? "—").padEnd(13)} ${p.nickname}${p.accountId ? ` · ${p.accountId}` : ""}${mmr}`);
     }
   }
   if (noId) console.log(`\n⚠ без account_id: ${noId} — в таблице у них ссылка не на Dotabuff (или её нет)`);

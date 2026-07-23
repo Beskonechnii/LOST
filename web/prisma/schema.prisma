@@ -22,11 +22,14 @@ model Team {
   group     String?
   createdAt DateTime @default(now())
 
-  players        Player[]
-  matchesA       Match[]  @relation("TeamA")
-  matchesB       Match[]  @relation("TeamB")
-  matchesWon     Match[]  @relation("Winner")
-  matchesRadiant Match[]  @relation("Radiant")
+  roster         RosterSpot[]
+  matchesA       Match[]       @relation("TeamA")
+  matchesB       Match[]       @relation("TeamB")
+  matchesWon     Match[]       @relation("Winner")
+  matchesRadiant Match[]       @relation("Radiant")
+  groupEntries   GroupEntry[]
+  seriesHome     GroupSeries[] @relation("SeriesHome")
+  seriesAway     GroupSeries[] @relation("SeriesAway")
 }
 
 model Player {
@@ -35,18 +38,34 @@ model Player {
   nickname    String
   realName    String?
   accountId   String? // Dota/Steam32 account id (для OpenDota)
+  mmr         Int? // из таблицы сезона; у команды не хранится — считается по составу
   photo       String?
-  role        String? // carry | mid | offlane | soft-support | hard-support | coach | standin (src/lib/roles.ts)
-  isCaptain   Boolean  @default(false)
   steamUrl    String? // перекрывает ссылку, выведенную из accountId
   dotabuffUrl String?
   stratzUrl   String?
   telegram    String?
   createdAt   DateTime @default(now())
 
-  team   Team?       @relation(fields: [teamId], references: [id])
-  teamId Int?
-  stats  MatchStat[]
+  spots RosterSpot[]
+  stats MatchStat[]
+}
+
+/// Место игрока в составе команды. Роль и капитанство живут здесь, а не у игрока: один человек
+/// может быть действующим саппортом в одной команде и заменой в другой — это разные места.
+/// Инвариант «нельзя быть действующим (поз. 1–5) в двух командах» проверяется в коде
+/// (src/lib/roster-spots.ts): sqlite не умеет частичные уникальные индексы.
+model RosterSpot {
+  id        Int      @id @default(autoincrement())
+  role      String? // carry | mid | offlane | soft-support | hard-support | coach | standin (src/lib/roles.ts)
+  isCaptain Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  team     Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId   Int
+  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  playerId Int
+
+  @@unique([teamId, playerId]) // дважды в одном составе стоять нельзя
 }
 
 model Match {
@@ -68,6 +87,44 @@ model Match {
   stats         MatchStat[]
   pointsEntries PointsEntry[]
   renders       Render[]
+}
+
+/// Строка команды в таблице групповой стадии — как она напечатана в таблице сезона (вкладка «GS»).
+/// Групповая стадия отыграна до начала плей-офф и дальше не меняется, поэтому итоги храним как есть,
+/// а не пересчитываем: это снимок результата, а не живая таблица лиги (та считается в standings.ts).
+model GroupEntry {
+  id       Int    @id @default(autoincrement())
+  division String // «Division 1»
+  group    String // «A» | «B»
+  place    Int
+  played   Int
+  wins     Int
+  losses   Int
+  points   Int
+
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId Int
+
+  @@unique([division, group, teamId])
+}
+
+/// Личная встреча внутри группы, счёт серии (Bo3). В таблице сезона кросс-таблица не подписана
+/// (в шапке логотипы, а не текст), поэтому пары восстановлены по записям В-П и очкам и правятся руками.
+/// `guessed` = пару определили расчётом, а не прочитали — такие подсвечиваем в UI.
+model GroupSeries {
+  id        Int     @id @default(autoincrement())
+  division  String
+  group     String
+  homeScore Int
+  awayScore Int
+  guessed   Boolean @default(true)
+
+  home   Team @relation("SeriesHome", fields: [homeId], references: [id], onDelete: Cascade)
+  homeId Int
+  away   Team @relation("SeriesAway", fields: [awayId], references: [id], onDelete: Cascade)
+  awayId Int
+
+  @@unique([division, group, homeId, awayId])
 }
 
 // Сохранённая генерация графики: id шаблона + payload формы (JSON строкой, sqlite).

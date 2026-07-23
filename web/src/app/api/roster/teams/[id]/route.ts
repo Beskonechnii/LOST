@@ -30,7 +30,7 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: `У команды ${matches} матч(ей) — удаление сломает историю` }, { status: 409 });
   }
 
-  await prisma.player.updateMany({ where: { teamId }, data: { teamId: null } });
+  // Места в составе уходят каскадом, сами карточки игроков остаются в базе.
   await prisma.team.delete({ where: { id: teamId } });
   return NextResponse.json({ ok: true });
 }

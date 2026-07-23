@@ -57,26 +57,18 @@ export function TeamEditor({ id, initial }: { id: number; initial: TeamForm }) {
   );
 }
 
+// Карточка игрока — про человека. Команда, роль и капитанство лежат на месте в составе,
+// потому что у одного человека их может быть несколько (см. SpotsEditor ниже).
 type PlayerForm = {
   nickname: string;
   realName: string;
   accountId: string;
-  role: string;
-  isCaptain: boolean;
+  mmr: string;
   telegram: string;
   photo: string | null;
-  teamId: string;
 };
 
-export function PlayerEditor({
-  id,
-  initial,
-  teams,
-}: {
-  id: number;
-  initial: PlayerForm;
-  teams: { id: number; name: string }[];
-}) {
+export function PlayerEditor({ id, initial }: { id: number; initial: PlayerForm }) {
   const [v, setV] = useState(initial);
   const set = <K extends keyof PlayerForm>(k: K, val: PlayerForm[K]) => setV((p) => ({ ...p, [k]: val }));
 
@@ -85,33 +77,123 @@ export function PlayerEditor({
       <div className="grid gap-4 sm:grid-cols-2">
         <TextField label="Ник" value={v.nickname} onChange={(x) => set("nickname", x)} />
         <TextField label="Имя" value={v.realName} onChange={(x) => set("realName", x)} />
-        <SelectField
-          label="Команда"
-          value={v.teamId}
-          onChange={(x) => set("teamId", x)}
-          options={[{ value: "", label: "— без команды —" }, ...teams.map((t) => ({ value: String(t.id), label: t.name }))]}
-        />
-        <SelectField
-          label="Роль"
-          value={v.role}
-          onChange={(x) => set("role", x)}
-          options={[
-            { value: "", label: "— не задана —" },
-            ...ROLES.map((r) => ({ value: r.key, label: r.position ? `${r.label} (поз. ${r.position})` : r.label })),
-          ]}
-        />
         <TextField label="Dota account_id" value={v.accountId} onChange={(x) => set("accountId", x)} placeholder="123456789" />
+        <TextField label="MMR" value={v.mmr} onChange={(x) => set("mmr", x)} placeholder="7000" />
         <TextField label="Telegram" value={v.telegram} onChange={(x) => set("telegram", x)} placeholder="@nick" />
       </div>
-
-      <label className="flex items-center gap-2 text-sm text-neutral-300">
-        <input type="checkbox" checked={v.isCaptain} onChange={(e) => set("isCaptain", e.target.checked)} />
-        Капитан
-      </label>
 
       <ImageField label="Фото" kind="players" value={v.photo} onChange={(x) => set("photo", x)} hint="Портрет для плашек и анонсов" />
 
       <SaveButton url={`/api/roster/players/${id}`} data={v} />
+    </div>
+  );
+}
+
+export type SpotView = { id: number; teamId: number; teamName: string; role: string; isCaptain: boolean };
+
+const ROLE_OPTIONS = [
+  { value: "", label: "— не задана —" },
+  ...ROLES.map((r) => ({ value: r.key, label: r.position ? `${r.label} (поз. ${r.position})` : r.label })),
+];
+
+/**
+ * Места игрока в составах. Их может быть несколько: действующим — только в одной команде,
+ * заменой или тренером — где угодно. Правило проверяет сервер, здесь только показываем отказ.
+ */
+export function SpotsEditor({
+  playerId,
+  spots,
+  teams,
+}: {
+  playerId: number;
+  spots: SpotView[];
+  teams: { id: number; name: string }[];
+}) {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [newTeam, setNewTeam] = useState("");
+  const [newRole, setNewRole] = useState("standin");
+
+  async function send(url: string, method: string, body?: unknown) {
+    setBusy(true);
+    setError(null);
+    const res = await fetch(url, {
+      method,
+      headers: { "content-type": "application/json" },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    setBusy(false);
+    if (!res.ok) {
+      const j = (await res.json().catch(() => ({}))) as { error?: string };
+      setError(j.error ?? "Не удалось сохранить");
+      router.refresh(); // откатываем селект к тому, что реально в базе
+      return;
+    }
+    router.refresh();
+  }
+
+  const free = teams.filter((t) => !spots.some((s) => s.teamId === t.id));
+
+  return (
+    <div className="space-y-3">
+      {spots.length === 0 && <p className="text-sm text-neutral-500">Игрок не числится ни в одном составе.</p>}
+
+      {spots.map((s) => (
+        <div key={s.id} className="flex flex-wrap items-end gap-3 rounded border border-neutral-800 bg-neutral-900/40 p-3">
+          <div className="min-w-40 flex-1 text-sm font-medium text-neutral-200">{s.teamName}</div>
+          <div className="w-56">
+            <SelectField
+              label="Роль"
+              value={s.role}
+              onChange={(x) => void send(`/api/roster/spots/${s.id}`, "PATCH", { role: x })}
+              options={ROLE_OPTIONS}
+            />
+          </div>
+          <label className="flex items-center gap-2 pb-2 text-sm text-neutral-300">
+            <input
+              type="checkbox"
+              checked={s.isCaptain}
+              onChange={(e) => void send(`/api/roster/spots/${s.id}`, "PATCH", { isCaptain: e.target.checked })}
+            />
+            Капитан
+          </label>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void send(`/api/roster/spots/${s.id}`, "DELETE")}
+            className="rounded border border-neutral-800 px-3 py-2 text-sm text-neutral-400 hover:border-rose-600 hover:text-rose-400 disabled:opacity-50"
+          >
+            Убрать
+          </button>
+        </div>
+      ))}
+
+      {free.length > 0 && (
+        <div className="flex flex-wrap items-end gap-3 rounded border border-dashed border-neutral-800 p-3">
+          <div className="w-56">
+            <SelectField
+              label="Добавить в состав"
+              value={newTeam}
+              onChange={setNewTeam}
+              options={[{ value: "", label: "— выберите команду —" }, ...free.map((t) => ({ value: String(t.id), label: t.name }))]}
+            />
+          </div>
+          <div className="w-56">
+            <SelectField label="Роль" value={newRole} onChange={setNewRole} options={ROLE_OPTIONS} />
+          </div>
+          <button
+            type="button"
+            disabled={busy || !newTeam}
+            onClick={() => void send("/api/roster/spots", "POST", { playerId, teamId: Number(newTeam), role: newRole })}
+            className="rounded bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-50"
+          >
+            Добавить
+          </button>
+        </div>
+      )}
+
+      {error && <p className="text-sm text-rose-400">{error}</p>}
     </div>
   );
 }

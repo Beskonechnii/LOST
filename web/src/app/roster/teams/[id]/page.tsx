@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTeam } from "@/lib/roster-data";
+import { getTeam, teamMmr } from "@/lib/roster-data";
 import { roleLabel } from "@/lib/roles";
 import { TeamEditor } from "../../editors";
 
@@ -10,6 +10,8 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const team = await getTeam(Number(id));
   if (!team) notFound();
+
+  const mmr = teamMmr(team.players);
 
   return (
     <div className="space-y-8">
@@ -39,7 +41,17 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
       />
 
       <section>
-        <h2 className="mb-3 text-sm uppercase tracking-widest text-neutral-500">Состав</h2>
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-sm uppercase tracking-widest text-neutral-500">Состав</h2>
+          {mmr.average !== null && (
+            <span className="text-xs text-neutral-400">
+              MMR основы: ср. <span className="font-medium text-neutral-200">{mmr.average.toLocaleString("ru")}</span>
+              {" · сумма "}
+              <span className="font-medium text-neutral-200">{mmr.total.toLocaleString("ru")}</span>
+              <span className="text-neutral-600"> (по {mmr.counted} из 5)</span>
+            </span>
+          )}
+        </div>
         {team.players.length === 0 && <p className="text-sm text-neutral-500">Игроков нет — добавьте на странице «Игроки».</p>}
         <div className="grid gap-2 sm:grid-cols-2">
           {team.players.map((p) => (
@@ -61,7 +73,11 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
                   {p.nickname}
                   {p.isCaptain && <span className="ml-2 text-xs text-violet-400">(C)</span>}
                 </div>
-                <div className="text-xs text-neutral-500">{roleLabel(p.role) ?? "роль не задана"}</div>
+                <div className="text-xs text-neutral-500">
+                  {[roleLabel(p.role) ?? "роль не задана", p.mmr ? `${p.mmr.toLocaleString("ru")} MMR` : null]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </div>
               </div>
             </Link>
           ))}

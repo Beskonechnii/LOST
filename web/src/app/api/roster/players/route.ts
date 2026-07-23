@@ -25,14 +25,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Игрок со слагом «${slug}» уже есть` }, { status: 409 });
   }
 
+  // Команду и роль здесь не заводим — это место в составе, оно ставится на карточке игрока (RosterSpot).
   const player = await prisma.player.create({
-    data: {
-      slug,
-      nickname,
-      teamId: body.teamId ?? null,
-      accountId: body.accountId?.trim() || null,
-      role: isRole(body.role) ? body.role : null,
-    },
+    data: { slug, nickname, accountId: body.accountId?.trim() || null },
   });
+  if (body.teamId) {
+    await prisma.rosterSpot.create({
+      data: { playerId: player.id, teamId: body.teamId, role: isRole(body.role) ? body.role : null },
+    });
+  }
   return NextResponse.json(player, { status: 201 });
 }

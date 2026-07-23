@@ -3,6 +3,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { rolePosition, roleOrder } from "@/lib/roles";
+import { withPlayerUploads, withTeamUploads } from "@/lib/uploads";
 
 /**
  * MMR команды не хранится — считается по составу, как и standings. Берём только основу (позиции 1–5):
@@ -37,16 +38,18 @@ export async function listTeams(): Promise<TeamCard[]> {
     orderBy: [{ group: "asc" }, { name: "asc" }],
     include: { roster: { select: { role: true, player: { select: { accountId: true, mmr: true } } } } },
   });
-  return teams.map(({ roster, ...t }) => {
-    const mmr = teamMmr(roster.map((s) => ({ role: s.role, mmr: s.player.mmr })));
-    return {
-      ...t,
-      playersCount: roster.length,
-      noAccountIdCount: roster.filter((s) => !s.player.accountId).length,
-      mmrAverage: mmr.average,
-      mmrTotal: mmr.total,
-    };
-  });
+  return Promise.all(
+    teams.map(async ({ roster, ...t }) => {
+      const mmr = teamMmr(roster.map((s) => ({ role: s.role, mmr: s.player.mmr })));
+      return {
+        ...(await withTeamUploads(t)),
+        playersCount: roster.length,
+        noAccountIdCount: roster.filter((s) => !s.player.accountId).length,
+        mmrAverage: mmr.average,
+        mmrTotal: mmr.total,
+      };
+    }),
+  );
 }
 
 /** Команда с составом: место в составе разворачивается в игрока с ролью этого места. */
@@ -54,9 +57,14 @@ export async function getTeam(id: number) {
   const team = await prisma.team.findUnique({ where: { id }, include: { roster: { include: { player: true } } } });
   if (!team) return null;
   // порядок состава задаёт список ролей (керри → хард, потом замены и тренер), не алфавит
-  const players = team.roster
-    .map((s) => ({ ...s.player, role: s.role, isCaptain: s.isCaptain, spotId: s.id }))
-    .sort((a, b) => roleOrder(a.role) - roleOrder(b.role) || a.nickname.localeCompare(b.nickname));
+  const players = await Promise.all(
+    team.roster
+      .map((s) => ({ ...s.player, role: s.role, isCaptain: s.isCaptain, spotId: s.id }))
+      .sort((a, b) => roleOrder(a.role) - roleOrder(b.role) || a.nickname.localeCompare(b.nickname))
+      .map(withPlayerUploads),
+  );
+  // Картинки самой команды оставляем как в БД: страница отдаёт их в редактор, а он должен
+  // показывать реальное состояние поля, а не файл, подставленный по слагу.
   return { ...team, players };
 }
 
@@ -74,10 +82,12 @@ export async function listPlayers() {
     include: { spots: { include: { team: { select: { id: true, name: true, tag: true } } } } },
   });
   // в списке показываем основное место (действующее, если оно есть), остальные — счётчиком
-  return players.map((p) => {
-    const spots = [...p.spots].sort((a, b) => roleOrder(a.role) - roleOrder(b.role));
-    return { ...p, spots, main: spots[0] ?? null };
-  });
+  return Promise.all(
+    players.map(async (p) => {
+      const spots = [...p.spots].sort((a, b) => roleOrder(a.role) - roleOrder(b.role));
+      return { ...(await withPlayerUploads(p)), spots, main: spots[0] ?? null };
+    }),
+  );
 }
 
 /** Матчи для автозаполнения шаблонов: ближайшие сверху, с командами и победителем. */

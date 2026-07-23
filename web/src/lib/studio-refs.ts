@@ -3,6 +3,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { isCoreRole } from "@/lib/roster-spots";
+import { withPlayerUploads, withTeamUploads } from "@/lib/uploads";
 import type { PlayerRef, TeamRef } from "@/studio/types";
 import type { Refs } from "@/studio/resolve";
 import type { MatchOption } from "@/app/studio/_components/wizard";
@@ -16,23 +17,31 @@ export async function getRefs(): Promise<Refs> {
     }),
   ]);
 
-  const teamRefs: TeamRef[] = teams.map((t) => ({
-    id: t.id,
-    name: t.name,
-    tag: t.tag,
-    group: t.group,
-    color: t.color,
-    logo: t.logo,
-    wordmark: t.wordmark,
-    photo: t.photo,
-  }));
-  const playerRefs: PlayerRef[] = players.map((p) => ({
-    id: p.id,
-    nickname: p.nickname,
-    photo: p.photo,
-    // в подписи шаблона нужна одна команда — берём ту, где игрок действующий, иначе первую
-    teamName: (p.spots.find((s) => isCoreRole(s.role)) ?? p.spots[0])?.team.name ?? null,
-  }));
+  // Картинки — через фолбэк по слагу: шаблон должен собираться и на чистом клоне, где БД пустая.
+  const teamRefs: TeamRef[] = await Promise.all(
+    teams.map(async (t) => {
+      const img = await withTeamUploads(t);
+      return {
+        id: t.id,
+        name: t.name,
+        tag: t.tag,
+        group: t.group,
+        color: t.color,
+        logo: img.logo,
+        wordmark: img.wordmark,
+        photo: img.photo,
+      };
+    }),
+  );
+  const playerRefs: PlayerRef[] = await Promise.all(
+    players.map(async (p) => ({
+      id: p.id,
+      nickname: p.nickname,
+      photo: (await withPlayerUploads(p)).photo,
+      // в подписи шаблона нужна одна команда — берём ту, где игрок действующий, иначе первую
+      teamName: (p.spots.find((s) => isCoreRole(s.role)) ?? p.spots[0])?.team.name ?? null,
+    })),
+  );
 
   return { teams: teamRefs, players: playerRefs };
 }

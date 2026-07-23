@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { uploadUrl, type UploadKind } from "@/lib/profiles";
+import { invalidateUploads } from "@/lib/uploads";
 
 // Загрузка картинки профиля: multipart { kind: teams|players, file } → файл в public/uploads + путь.
 // Путь дальше кладётся в Team.logo / Team.wordmark / Team.photo / Player.photo.
@@ -37,6 +38,7 @@ export async function POST(req: Request) {
   const dir = path.join(process.cwd(), "public", "uploads", kind);
   await fs.mkdir(dir, { recursive: true });
   await fs.writeFile(path.join(dir, name), Buffer.from(await file.arrayBuffer()));
+  invalidateUploads(kind); // листинг папки закэширован — иначе фолбэк не увидит свежий файл
 
   return NextResponse.json({ path: uploadUrl(kind, name) });
 }

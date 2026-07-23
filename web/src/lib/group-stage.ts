@@ -4,6 +4,7 @@
 import { prisma } from "@/lib/prisma";
 import { teamTag } from "@/lib/profiles";
 import { qualificationOf, seriesPoints } from "@/lib/qualification";
+import { resolveUpload } from "@/lib/uploads";
 
 export type GroupRow = {
   teamId: number;
@@ -54,11 +55,18 @@ export async function getGroupStage(division: string): Promise<GroupTable[]> {
   const [entries, series] = await Promise.all([
     prisma.groupEntry.findMany({
       where: { division },
-      include: { team: { select: { id: true, name: true, tag: true, logo: true } } },
+      include: { team: { select: { id: true, slug: true, name: true, tag: true, logo: true } } },
       orderBy: [{ group: "asc" }, { place: "asc" }],
     }),
     prisma.groupSeries.findMany({ where: { division } }),
   ]);
+
+  // Лого разрешаем разом до сборки таблиц: дальше идёт синхронный расчёт очков, асинхронность туда не тащим.
+  const logoByTeam = new Map(
+    await Promise.all(
+      entries.map(async (e) => [e.teamId, await resolveUpload("teams", e.team.slug, "logo", e.team.logo)] as const),
+    ),
+  );
 
   const byGroup = new Map<string, typeof entries>();
   for (const e of entries) {
@@ -84,7 +92,7 @@ export async function getGroupStage(division: string): Promise<GroupTable[]> {
         teamId: e.teamId,
         name: e.team.name,
         tag: teamTag(e.team),
-        logo: e.team.logo,
+        logo: logoByTeam.get(e.teamId) ?? null,
         place: e.place,
         played: played.length,
         wins,

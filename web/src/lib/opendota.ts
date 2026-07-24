@@ -178,6 +178,7 @@ export type PlayerReport = {
   side: "radiant" | "dire";
   pos: number; // 1..5 (эвристика), 0 — не определена
   role: string; // "Керри" … "Хард-сап"
+  accountId: number | null; // steam32 — для распознавания команды лиги по составу
   name: string;
   hero: Entity;
   level: number;
@@ -388,6 +389,7 @@ export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
       side: p.isRadiant ? "radiant" : "dire",
       pos: posMap.get(i) ?? 0,
       role: ROLE_LABEL[posMap.get(i) ?? 0] ?? "",
+      accountId: p.account_id ?? null,
       name: p.name || p.personaname || "Аноним",
       hero,
       level: p.level ?? 0,

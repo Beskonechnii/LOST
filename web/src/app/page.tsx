@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import {
   AdvantageChart,
@@ -27,8 +27,8 @@ import {
   type TalentTier,
 } from "./_components/postgame/types";
 
-// Команда из ростера — для подстановки наших лого/тегов по введённому названию.
-type RosterTeam = { name: string; tag: string | null; logo: string | null };
+// Команда из ростера — для подстановки наших лого/тегов по названию или составу матча.
+type RosterTeam = { name: string; tag: string | null; logo: string | null; accountIds: string[] };
 
 // --- Шапка со счётом (блок 1 референса: лого · имя · бейджи | время · счёт · дата | имя · лого) ---
 function TeamSide({
@@ -539,7 +539,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [match, setMatch] = useState<MatchReport | null>(null);
-  const [names, setNames] = useState({ radiant: "", dire: "" });
+  // Только то, что вручную вписал пользователь; «» — значит взять распознанное/из OpenDota (см. names ниже).
+  const [manual, setManual] = useState({ radiant: "", dire: "" });
   const [tab, setTab] = useState<Tab>("report");
   const [roster, setRoster] = useState<RosterTeam[]>([]);
 
@@ -550,6 +551,31 @@ export default function Home() {
       .then((list: RosterTeam[]) => setRoster(Array.isArray(list) ? list : []))
       .catch(() => {});
   }, []);
+
+  // account_id → команда лиги: по этой карте состав матча распознаётся автоматически.
+  const teamByAccount = useMemo(() => {
+    const m = new Map<string, RosterTeam>();
+    for (const t of roster) for (const a of t.accountIds) m.set(a, t);
+    return m;
+  }, [roster]);
+
+  // Команда лиги по составу стороны: та, чьих игроков в пятёрке больше всего (минимум двое,
+  // чтобы случайное совпадение одного account_id не переименовало команду).
+  const detectTeam = useMemo(
+    () =>
+      (players: PlayerReport[]): RosterTeam | null => {
+        const tally = new Map<RosterTeam, number>();
+        for (const p of players) {
+          const t = p.accountId != null ? teamByAccount.get(String(p.accountId)) : undefined;
+          if (t) tally.set(t, (tally.get(t) ?? 0) + 1);
+        }
+        let best: RosterTeam | null = null;
+        let bestN = 0;
+        for (const [t, n] of tally) if (n > bestN) [best, bestN] = [t, n];
+        return bestN >= 2 ? best : null;
+      },
+    [teamByAccount],
+  );
 
   async function load() {
     const clean = id.trim();
@@ -563,7 +589,7 @@ export default function Home() {
       if (!json.ok) throw new Error(json.error ?? "Ошибка запроса");
       const m = json.match as MatchReport;
       setMatch(m);
-      setNames({ radiant: m.radiantTeam ?? "", dire: m.direTeam ?? "" });
+      setManual({ radiant: "", dire: "" }); // сброс прежних ручных правок под новый матч
       setTab("report");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -575,6 +601,15 @@ export default function Home() {
   const radiant = (match?.players.filter((p) => p.side === "radiant") ?? []).slice().sort((a, b) => a.pos - b.pos);
   const dire = (match?.players.filter((p) => p.side === "dire") ?? []).slice().sort((a, b) => a.pos - b.pos);
   const byPos = [...radiant, ...dire];
+
+  // Итоговые названия сторон — производные (не в state), поэтому распознавание срабатывает и когда
+  // ростер догрузился после матча: ручной ввод → команда по составу → название из OpenDota → пусто.
+  const names = {
+    radiant: manual.radiant || detectTeam(radiant)?.name || match?.radiantTeam || "",
+    dire: manual.dire || detectTeam(dire)?.name || match?.direTeam || "",
+  };
+  const setNames = (u: (s: { radiant: string; dire: string }) => { radiant: string; dire: string }) =>
+    setManual((m) => u({ radiant: m.radiant, dire: m.dire }));
 
   // Команда лиги по введённому названию (или тегу) — без учёта регистра.
   const fromRoster = (name: string): RosterTeam | null => {

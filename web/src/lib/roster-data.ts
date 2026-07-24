@@ -31,6 +31,8 @@ export type TeamCard = {
   /** Средний MMR основы (поз. 1–5); null, если MMR не проставлен ни у кого. */
   mmrAverage: number | null;
   mmrTotal: number;
+  /** steam32 игроков команды — для распознавания команды лиги по составу матча (страница «Матч»). */
+  accountIds: string[];
 };
 
 export async function listTeams(): Promise<TeamCard[]> {
@@ -47,6 +49,7 @@ export async function listTeams(): Promise<TeamCard[]> {
         noAccountIdCount: roster.filter((s) => !s.player.accountId).length,
         mmrAverage: mmr.average,
         mmrTotal: mmr.total,
+        accountIds: roster.map((s) => s.player.accountId).filter((a): a is string => !!a),
       };
     }),
   );
@@ -92,7 +95,7 @@ const byRole = (a: SpotWithPlayer, b: SpotWithPlayer) =>
 async function withRoster<T extends { slug: string; logo: string | null; wordmark?: string | null; photo?: string | null }>(
   team: T,
   roster: SpotWithPlayer[],
-): Promise<T & { players: RosterMember[]; playersCount: number; noAccountIdCount: number; mmrAverage: number | null; mmrTotal: number }> {
+): Promise<T & { players: RosterMember[]; playersCount: number; noAccountIdCount: number; mmrAverage: number | null; mmrTotal: number; accountIds: string[] }> {
   const mmr = teamMmr(roster.map((s) => ({ role: s.role, mmr: s.player.mmr })));
   return {
     ...(await withTeamUploads(team)),
@@ -101,6 +104,7 @@ async function withRoster<T extends { slug: string; logo: string | null; wordmar
     noAccountIdCount: roster.filter((s) => !s.player.accountId).length,
     mmrAverage: mmr.average,
     mmrTotal: mmr.total,
+    accountIds: roster.map((s) => s.player.accountId).filter((a): a is string => !!a),
   };
 }
 

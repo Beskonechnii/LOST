@@ -182,22 +182,28 @@ function PlayerCard({ p, side, tag, maxNet }: { p: PlayerReport; side: Side; tag
             </span>
             {box("XPM", p.xpm)}
             {box("GPM", p.gpm)}
-            <span className="ml-auto text-[8px] tabular-nums text-neutral-400">
+          </div>
+          {/* NET-бар относительно максимума в матче + урон и ЛХ/ДН справа */}
+          <div className="mt-1 flex items-center gap-1.5">
+            <div className="relative h-2.5 min-w-0 flex-1 overflow-hidden rounded bg-neutral-800/60">
+              <div
+                className="absolute inset-y-0 left-0 rounded bg-gradient-to-r from-amber-600 to-amber-400"
+                style={{ width: `${Math.max(5, (p.netWorth / maxNet) * 100)}%` }}
+              />
+              <span
+                className="absolute inset-0 grid place-items-center text-[8px] font-bold leading-none text-white"
+                style={{ textShadow: "0 1px 2px rgba(0,0,0,.8)" }}
+              >
+                {fmt(p.netWorth)}
+              </span>
+            </div>
+            <span className="shrink-0 text-[8px] tabular-nums text-neutral-400">
+              <span className="text-neutral-500">УРОН </span>
+              {fmt(p.heroDamage)}
+            </span>
+            <span className="shrink-0 text-[8px] tabular-nums text-neutral-400">
               <span className="text-neutral-500">ЛХ/ДН </span>
               {p.lastHits}/{p.denies}
-            </span>
-          </div>
-          {/* NET-бар относительно максимума в матче */}
-          <div className="relative mt-1 h-2.5 overflow-hidden rounded bg-neutral-800/60">
-            <div
-              className="absolute inset-y-0 left-0 rounded bg-gradient-to-r from-amber-600 to-amber-400"
-              style={{ width: `${Math.max(5, (p.netWorth / maxNet) * 100)}%` }}
-            />
-            <span
-              className="absolute inset-0 grid place-items-center text-[8px] font-bold leading-none text-white"
-              style={{ textShadow: "0 1px 2px rgba(0,0,0,.8)" }}
-            >
-              {fmt(p.netWorth)}
             </span>
           </div>
         </div>

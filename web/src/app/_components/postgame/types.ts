@@ -8,6 +8,7 @@ export type PlayerReport = {
   side: "radiant" | "dire";
   pos: number;
   role: string;
+  accountId: number | null;
   name: string;
   hero: Entity;
   level: number;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type MouseEvent, type ReactNode } from "react";
 import Link from "next/link";
 import { assetUrl, assetFallback, type AssetKind } from "@/lib/assets";
 
@@ -35,7 +35,21 @@ type PlayerReport = {
   purchases: { name: string; slug: string; time: number }[];
   buffs: { name: string; stacks: number }[];
 };
-type PickBan = { order: number; isPick: boolean; side: "radiant" | "dire"; hero: Entity };
+type Side = "radiant" | "dire";
+type PickBan = { order: number; isPick: boolean; side: Side; hero: Entity };
+type Lane = "top" | "mid" | "bot";
+type SideBuildings = {
+  towers: { lane: Lane; tier: 1 | 2 | 3; alive: boolean }[];
+  ancient: { top: boolean; bottom: boolean };
+  racks: { lane: Lane; ranged: boolean; melee: boolean }[];
+};
+type EventActor = { name: string; hero: Entity };
+type MatchEvents = {
+  firstBlood: { time: number; side: Side; killer: EventActor | null } | null;
+  firstTower: { time: number; side: Side; killer: EventActor | null } | null;
+  roshan: { radiant: number; dire: number; kills: { time: number; side: Side }[] };
+  couriers: { radiant: number; dire: number; kills: { time: number; victimSide: Side; killer: Entity | null }[] };
+};
 type MatchReport = {
   matchId: string;
   parsed: boolean;
@@ -45,9 +59,15 @@ type MatchReport = {
   direScore: number;
   radiantTeam: string | null;
   direTeam: string | null;
+  radiantTag: string | null;
+  direTag: string | null;
+  radiantLogo: string | null;
+  direLogo: string | null;
   aegis: { radiant: number; dire: number };
   goldAdv: number[];
   xpAdv: number[];
+  buildings: { radiant: SideBuildings; dire: SideBuildings };
+  events: MatchEvents;
   picksBans: PickBan[];
   players: PlayerReport[];
 };
@@ -115,30 +135,71 @@ function HeroPortrait({ hero, dim }: { hero: Entity; dim?: boolean }) {
   );
 }
 
-function AdvantageChart({ gold }: { gold: number[] }) {
-  if (gold.length < 2) return null;
-  const W = 640;
-  const H = 160;
-  const pad = 8;
+// Округление вверх до «красивого» шага для подписей оси (5к/10к/25к…).
+function niceCeil(v: number): number {
+  if (v <= 0) return 1;
+  const pow = Math.pow(10, Math.floor(Math.log10(v)));
+  const steps = [1, 2, 2.5, 5, 10];
+  for (const s of steps) if (v <= s * pow) return s * pow;
+  return 10 * pow;
+}
+
+// Интерактивный график преимущества: золото (заливка + линия) и опыт (пунктир), общая шкала.
+// Ось Y слева подписана значениями золота (верх — Свет, низ — Тьма), по X — тики времени.
+// Наведение → вертикальный курсор с золотом/опытом на этой минуте.
+function AdvantageChart({ gold, xp }: { gold: number[]; xp: number[] }) {
+  const [hover, setHover] = useState<number | null>(null);
   const n = gold.length;
-  const maxAbs = Math.max(1, ...gold.map((v) => Math.abs(v)));
-  const x = (i: number) => (i / (n - 1)) * W;
-  const y = (v: number) => H / 2 - (v / maxAbs) * (H / 2 - pad);
-  const line = gold.map((v, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
-  const area = `${line} L${W},${H / 2} L0,${H / 2} Z`;
+  if (n < 2) return null;
+  const hasXp = xp.length === n;
+  const W = 660,
+    H = 200,
+    padL = 46,
+    padR = 10,
+    padT = 12,
+    padB = 20;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+  const mid = padT + plotH / 2;
+  const maxAbs = Math.max(1, ...gold.map(Math.abs), ...(hasXp ? xp.map(Math.abs) : []));
+  const top = niceCeil(maxAbs);
+  const x = (i: number) => padL + (i / (n - 1)) * plotW;
+  const y = (v: number) => mid - (v / top) * (plotH / 2);
+  const path = (arr: number[]) => arr.map((v, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const goldLine = path(gold);
+  const area = `${goldLine} L${x(n - 1).toFixed(1)},${mid} L${padL},${mid} Z`;
   const last = gold[n - 1];
-  const peakR = Math.max(...gold);
-  const peakD = Math.min(...gold);
+  const yTicks = [top, top / 2, 0, -top / 2, -top];
+  const xStep = Math.max(1, Math.round((n - 1) / 6)); // ~6 подписей времени
+
+  const onMove = (e: MouseEvent<SVGSVGElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const svgX = ((e.clientX - rect.left) / rect.width) * W;
+    const i = Math.round(((svgX - padL) / plotW) * (n - 1));
+    setHover(Math.max(0, Math.min(n - 1, i)));
+  };
+
   return (
     <div>
-      <div className="mb-2 flex items-center justify-between text-xs text-neutral-400">
-        <span>Преимущество по золоту (по минутам)</span>
-        <span>
-          пик Свет <span className="text-emerald-400">+{fmt(Math.max(0, peakR))}</span> · пик Тьма{" "}
-          <span className="text-rose-400">+{fmt(Math.max(0, -peakD))}</span>
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs text-neutral-400">
+        <span>Преимущество по минутам</span>
+        <span className="flex items-center gap-3">
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-0.5 w-4 bg-emerald-400" />золото
+          </span>
+          {hasXp && (
+            <span className="flex items-center gap-1">
+              <span className="inline-block h-0 w-4 border-t border-dashed border-sky-400" />опыт
+            </span>
+          )}
         </span>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="w-full" style={{ height: 160 }}>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="w-full touch-none"
+        onMouseMove={onMove}
+        onMouseLeave={() => setHover(null)}
+      >
         <defs>
           <linearGradient id="adv" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="rgb(52 211 153)" stopOpacity="0.35" />
@@ -146,14 +207,72 @@ function AdvantageChart({ gold }: { gold: number[] }) {
             <stop offset="100%" stopColor="rgb(251 113 133)" stopOpacity="0.35" />
           </linearGradient>
         </defs>
-        <line x1="0" y1={H / 2} x2={W} y2={H / 2} stroke="rgb(82 82 82)" strokeDasharray="4 4" strokeWidth="1" />
+        {/* сетка + подписи оси Y (золото) */}
+        {yTicks.map((v) => (
+          <g key={v}>
+            <line
+              x1={padL}
+              y1={y(v)}
+              x2={W - padR}
+              y2={y(v)}
+              stroke={v === 0 ? "rgb(82 82 82)" : "rgb(38 38 38)"}
+              strokeWidth={v === 0 ? 1 : 0.5}
+              strokeDasharray={v === 0 ? "4 4" : undefined}
+            />
+            <text
+              x={padL - 6}
+              y={y(v) + 3}
+              textAnchor="end"
+              className="fill-neutral-500"
+              style={{ fontSize: 9 }}
+            >
+              {v === 0 ? "0" : `${v > 0 ? "+" : "−"}${kFmt(Math.abs(v))}`}
+            </text>
+          </g>
+        ))}
+        {/* тики времени по X */}
+        {Array.from({ length: n }, (_, i) => i)
+          .filter((i) => i % xStep === 0 || i === n - 1)
+          .map((i) => (
+            <text key={i} x={x(i)} y={H - 6} textAnchor="middle" className="fill-neutral-600" style={{ fontSize: 9 }}>
+              {clock(i * 60)}
+            </text>
+          ))}
         <path d={area} fill="url(#adv)" />
-        <path d={line} fill="none" stroke={last >= 0 ? "rgb(52 211 153)" : "rgb(251 113 133)"} strokeWidth="2" vectorEffect="non-scaling-stroke" />
+        {hasXp && (
+          <path d={path(xp)} fill="none" stroke="rgb(56 189 248)" strokeWidth="1.4" strokeDasharray="3 3" vectorEffect="non-scaling-stroke" />
+        )}
+        <path
+          d={goldLine}
+          fill="none"
+          stroke={last >= 0 ? "rgb(52 211 153)" : "rgb(251 113 133)"}
+          strokeWidth="2"
+          vectorEffect="non-scaling-stroke"
+        />
+        {/* курсор наведения */}
+        {hover != null && (
+          <g>
+            <line x1={x(hover)} y1={padT} x2={x(hover)} y2={H - padB} stroke="rgb(163 163 163)" strokeWidth="0.6" />
+            <circle cx={x(hover)} cy={y(gold[hover])} r="2.6" fill={gold[hover] >= 0 ? "rgb(52 211 153)" : "rgb(251 113 133)"} />
+            {hasXp && <circle cx={x(hover)} cy={y(xp[hover])} r="2.4" fill="rgb(56 189 248)" />}
+            {/* тултип */}
+            <g transform={`translate(${Math.min(x(hover) + 6, W - 128)}, ${padT + 4})`}>
+              <rect width="122" height={hasXp ? 46 : 32} rx="4" fill="rgb(10 10 10)" stroke="rgb(64 64 64)" strokeWidth="0.5" />
+              <text x="8" y="14" className="fill-neutral-300" style={{ fontSize: 9 }}>
+                {`${hover} мин`}
+              </text>
+              <text x="8" y="27" style={{ fontSize: 9 }} className={gold[hover] >= 0 ? "fill-emerald-400" : "fill-rose-400"}>
+                {`золото ${gold[hover] >= 0 ? "+" : "−"}${fmt(Math.abs(gold[hover]))}`}
+              </text>
+              {hasXp && (
+                <text x="8" y="40" className="fill-sky-400" style={{ fontSize: 9 }}>
+                  {`опыт ${xp[hover] >= 0 ? "+" : "−"}${fmt(Math.abs(xp[hover]))}`}
+                </text>
+              )}
+            </g>
+          </g>
+        )}
       </svg>
-      <div className="mt-1 flex justify-between text-[10px] text-neutral-500">
-        <span>0:00</span>
-        <span>{clock((n - 1) * 60)}</span>
-      </div>
     </div>
   );
 }
@@ -201,25 +320,45 @@ function Draft({ picksBans, names }: { picksBans: PickBan[]; names: { radiant: s
   );
 }
 
+// Герб команды: логотип из OpenDota, при отсутствии/ошибке — монограмма-заглушка.
+function TeamCrest({ logo, name }: { logo: string | null; name: string }) {
+  const [broken, setBroken] = useState(false);
+  if (logo && !broken)
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={logo}
+        alt={name}
+        title={name}
+        loading="lazy"
+        onError={() => setBroken(true)}
+        className="h-11 w-11 shrink-0 rounded-lg object-contain ring-1 ring-neutral-700"
+      />
+    );
+  return (
+    <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-600 text-sm font-black text-white shadow">
+      {initials(name)}
+    </div>
+  );
+}
+
 // --- Шапка со счётом (в духе broadcast-графики) ---
 function TeamSide({
   name,
   onName,
+  logo,
   score,
   won,
   align,
 }: {
   name: string;
   onName: (v: string) => void;
+  logo: string | null;
   score: number;
   won: boolean;
   align: "left" | "right";
 }) {
-  const mono = (
-    <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-600 text-sm font-black text-white shadow">
-      {initials(name)}
-    </div>
-  );
+  const mono = <TeamCrest logo={logo} name={name} />;
   const nameBlock = (
     <div className={`min-w-0 flex-1 ${align === "right" ? "text-right" : ""}`}>
       <input
@@ -271,6 +410,7 @@ function ScoreHeader({
       <TeamSide
         name={names.radiant}
         onName={(v) => setNames((s) => ({ ...s, radiant: v }))}
+        logo={match.radiantLogo}
         score={match.radiantScore}
         won={match.radiantWin}
         align="left"
@@ -283,10 +423,281 @@ function ScoreHeader({
       <TeamSide
         name={names.dire}
         onName={(v) => setNames((s) => ({ ...s, dire: v }))}
+        logo={match.direLogo}
         score={match.direScore}
         won={!match.radiantWin}
         align="right"
       />
+    </div>
+  );
+}
+
+// Сводка итогового преимущества: последний отсчёт adv (>0 — ведёт Свет). Показываем сторону и разницу.
+function AdvantageSummary({ match, names }: { match: MatchReport; names: { radiant: string; dire: string } }) {
+  const gold = match.goldAdv.at(-1) ?? 0;
+  const xp = match.xpAdv.at(-1) ?? 0;
+  if (match.goldAdv.length === 0 && match.xpAdv.length === 0) return null;
+  const leader = (v: number) =>
+    v === 0
+      ? { label: "равенство", cls: "text-neutral-400" }
+      : v > 0
+        ? { label: names.radiant || "Свет", cls: "text-emerald-400" }
+        : { label: names.dire || "Тьма", cls: "text-rose-400" };
+  const metric = (title: string, v: number, unit: string) => {
+    const l = leader(v);
+    return (
+      <div key={title} className="flex flex-1 flex-col items-center gap-0.5 px-2 py-2">
+        <div className="text-[10px] uppercase tracking-widest text-neutral-500">{title}</div>
+        <div className={`text-lg font-black tabular-nums ${l.cls}`}>{v === 0 ? "—" : `+${kFmt(Math.abs(v))}`}</div>
+        <div className={`truncate text-[11px] font-semibold ${l.cls}`} title={l.label}>
+          {l.label}
+          {v !== 0 && <span className="text-neutral-500"> · {unit}</span>}
+        </div>
+      </div>
+    );
+  };
+  return (
+    <div className="flex items-stretch divide-x divide-neutral-800 rounded-xl border border-neutral-800 bg-neutral-900/60">
+      {metric("Преимущество по золоту", gold, "золото")}
+      {metric("Преимущество по опыту", xp, "опыт")}
+    </div>
+  );
+}
+
+// --- Баны под командами (в порядке очереди драфта) ---
+function BansStrip({ picksBans, names }: { picksBans: PickBan[]; names: { radiant: string; dire: string } }) {
+  const bans = picksBans.filter((pb) => !pb.isPick);
+  if (bans.length === 0) return null;
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      {(["radiant", "dire"] as const).map((side) => {
+        const list = bans.filter((b) => b.side === side);
+        const accent = side === "radiant" ? "text-emerald-400" : "text-rose-400";
+        return (
+          <div key={side} className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <span className={`truncate text-xs font-bold uppercase tracking-wide ${accent}`}>
+                {(side === "radiant" ? names.radiant : names.dire) || (side === "radiant" ? "Свет" : "Тьма")}
+              </span>
+              <span className="text-[10px] uppercase tracking-widest text-neutral-500">Баны</span>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {list.length === 0 ? (
+                <span className="text-xs text-neutral-600">—</span>
+              ) : (
+                list.map((b) => (
+                  <div key={b.order} className="relative" title={`бан ${b.order + 1}: ${b.hero.name}`}>
+                    <Icon kind="heroes" slug={b.hero.slug} name={b.hero.name} h={26} className="grayscale" />
+                    <span className="absolute -bottom-0.5 -right-0.5 rounded-sm bg-black/80 px-0.5 text-[8px] leading-tight tabular-nums text-neutral-300">
+                      {b.order + 1}
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// --- Карта строений (схематичная миникарта; уничтоженные — белые) ---
+// Координаты в системе 0..100 (x вправо, y вниз). Свет — низ-лево, Тьма — верх-право,
+// река — диагональ. Тир 1 дальше от базы (ближе к центру), тир 3 у базы.
+const TOWER_XY: Record<Side, Record<Lane, Record<1 | 2 | 3, [number, number]>>> = {
+  radiant: {
+    top: { 1: [8, 22], 2: [8, 42], 3: [9, 60] },
+    mid: { 1: [52, 50], 2: [40, 62], 3: [28, 72] },
+    bot: { 1: [78, 92], 2: [54, 91], 3: [32, 86] },
+  },
+  dire: {
+    top: { 1: [22, 8], 2: [46, 9], 3: [68, 14] },
+    mid: { 1: [50, 50], 2: [60, 38], 3: [72, 28] },
+    bot: { 1: [92, 78], 2: [91, 54], 3: [86, 40] },
+  },
+};
+const RACK_XY: Record<Side, Record<Lane, [number, number]>> = {
+  radiant: { top: [12, 64], mid: [25, 76], bot: [28, 82] },
+  dire: { top: [72, 12], mid: [75, 24], bot: [88, 36] },
+};
+const ANCIENT_XY: Record<Side, { base: [number, number]; top: [number, number]; bottom: [number, number] }> = {
+  radiant: { base: [16, 84], top: [12, 80], bottom: [20, 88] },
+  dire: { base: [84, 16], top: [80, 12], bottom: [88, 20] },
+};
+
+function BuildingMap({ buildings }: { buildings: MatchReport["buildings"] }) {
+  const color = (side: Side) => (side === "radiant" ? "#34d399" : "#fb7185");
+  // Целое — цвет стороны, уничтоженное — белое (полое).
+  const fill = (side: Side, alive: boolean) => (alive ? color(side) : "#ffffff");
+  const stroke = (side: Side, alive: boolean) => (alive ? color(side) : "#a3a3a3");
+  const sides: Side[] = ["radiant", "dire"];
+  return (
+    <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-3">
+      <div className="mb-2 flex items-center justify-between">
+        <span className="text-xs uppercase tracking-widest text-neutral-400">Строения</span>
+        <span className="flex items-center gap-3 text-[10px] text-neutral-500">
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-2 w-2 rounded-sm bg-emerald-400" />Свет
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-2 w-2 rounded-sm bg-rose-400" />Тьма
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-2 w-2 rounded-sm bg-white" />уничтожено
+          </span>
+        </span>
+      </div>
+      <svg viewBox="0 0 100 100" className="mx-auto block aspect-square w-full max-w-[340px]">
+        {/* половины карты + река */}
+        <polygon points="0,0 100,0 0,100" fill="rgba(52,211,153,0.06)" />
+        <polygon points="100,0 100,100 0,100" fill="rgba(251,113,133,0.06)" />
+        <line x1="0" y1="100" x2="100" y2="0" stroke="rgb(64 64 64)" strokeWidth="0.6" strokeDasharray="2 2" />
+        {sides.map((side) => {
+          const b = buildings[side];
+          const anc = ANCIENT_XY[side];
+          return (
+            <g key={side}>
+              {/* казармы: два кружка (дальний — ranged, ближний — melee) */}
+              {b.racks.map((r) => {
+                const [x, y] = RACK_XY[side][r.lane];
+                return (
+                  <g key={`${side}-rk-${r.lane}`}>
+                    <circle cx={x - 1.4} cy={y} r="1.5" fill={fill(side, r.ranged)} stroke={stroke(side, r.ranged)} strokeWidth="0.4" />
+                    <circle cx={x + 1.4} cy={y} r="1.5" fill={fill(side, r.melee)} stroke={stroke(side, r.melee)} strokeWidth="0.4" />
+                  </g>
+                );
+              })}
+              {/* вышки: квадратики */}
+              {b.towers.map((t) => {
+                const [x, y] = TOWER_XY[side][t.lane][t.tier];
+                return (
+                  <rect
+                    key={`${side}-tw-${t.lane}-${t.tier}`}
+                    x={x - 1.7}
+                    y={y - 1.7}
+                    width="3.4"
+                    height="3.4"
+                    rx="0.6"
+                    fill={fill(side, t.alive)}
+                    stroke={stroke(side, t.alive)}
+                    strokeWidth="0.5"
+                  >
+                    <title>{`${side === "radiant" ? "Свет" : "Тьма"} · ${t.lane} T${t.tier}${t.alive ? "" : " (уничтожена)"}`}</title>
+                  </rect>
+                );
+              })}
+              {/* трон: две башни ромбом */}
+              {(["top", "bottom"] as const).map((k) => {
+                const [x, y] = anc[k];
+                const alive = b.ancient[k];
+                return (
+                  <rect
+                    key={`${side}-anc-${k}`}
+                    x={x - 2}
+                    y={y - 2}
+                    width="4"
+                    height="4"
+                    transform={`rotate(45 ${x} ${y})`}
+                    fill={fill(side, alive)}
+                    stroke={stroke(side, alive)}
+                    strokeWidth="0.5"
+                  />
+                );
+              })}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// --- Ключевые события: FB, первая вышка, рошан, курьеры ---
+function KeyEvents({ events, names }: { events: MatchEvents; names: { radiant: string; dire: string } }) {
+  const sideName = (s: Side) => (s === "radiant" ? names.radiant || "Свет" : names.dire || "Тьма");
+  const sideCls = (s: Side) => (s === "radiant" ? "text-emerald-400" : "text-rose-400");
+  const { firstBlood, firstTower, roshan, couriers } = events;
+  const hasAny =
+    firstBlood || firstTower || roshan.kills.length > 0 || couriers.kills.length > 0;
+  if (!hasAny) return null;
+  const card = (label: string, body: ReactNode) => (
+    <div key={label} className="rounded-lg border border-neutral-800 bg-neutral-900/40 p-3">
+      <div className="mb-1.5 text-[10px] uppercase tracking-widest text-neutral-500">{label}</div>
+      {body}
+    </div>
+  );
+  const actor = (a: EventActor | null, side: Side) =>
+    a ? (
+      <span className="flex items-center gap-1.5">
+        <Icon kind="heroes" slug={a.hero.slug} name={a.hero.name} h={22} />
+        <span className={`text-sm font-semibold ${sideCls(side)}`}>{a.name}</span>
+      </span>
+    ) : (
+      <span className={`text-sm font-semibold ${sideCls(side)}`}>{sideName(side)}</span>
+    );
+  const firstEvent = (e: { time: number; side: Side; killer: EventActor | null } | null) =>
+    e ? (
+      <div className="flex items-center justify-between gap-2">
+        {actor(e.killer, e.side)}
+        <span className="shrink-0 tabular-nums text-xs text-neutral-500">{clock(e.time)}</span>
+      </div>
+    ) : (
+      <span className="text-sm text-neutral-600">—</span>
+    );
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {card("Первая кровь", firstEvent(firstBlood))}
+      {card("Первая вышка", firstEvent(firstTower))}
+      {card(
+        "Рошан",
+        roshan.kills.length === 0 ? (
+          <span className="text-sm text-neutral-600">—</span>
+        ) : (
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <span className="text-emerald-400">{roshan.radiant}</span>
+              <span className="text-neutral-600">:</span>
+              <span className="text-rose-400">{roshan.dire}</span>
+            </div>
+            <div className="flex flex-wrap gap-x-2 gap-y-0.5 text-[11px]">
+              {roshan.kills.map((k, i) => (
+                <span key={i} className={sideCls(k.side)}>
+                  {clock(k.time)}
+                </span>
+              ))}
+            </div>
+          </div>
+        ),
+      )}
+      {card(
+        "Курьеры",
+        couriers.kills.length === 0 ? (
+          <span className="text-sm text-neutral-600">—</span>
+        ) : (
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <span className="text-emerald-400">{couriers.radiant}</span>
+              <span className="text-neutral-600">:</span>
+              <span className="text-rose-400">{couriers.dire}</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {couriers.kills.map((k, i) => {
+                const killerSide: Side = k.victimSide === "radiant" ? "dire" : "radiant";
+                return k.killer ? (
+                  <span key={i} className="flex items-center" title={`${clock(k.time)} · убил курьера`}>
+                    <Icon kind="heroes" slug={k.killer.slug} name={k.killer.name} h={18} />
+                  </span>
+                ) : (
+                  <span key={i} className={`text-[11px] ${sideCls(killerSide)}`} title={clock(k.time)}>
+                    {clock(k.time)}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        ),
+      )}
     </div>
   );
 }
@@ -388,9 +799,15 @@ function PlayerRow({ p }: { p: PlayerReport }) {
       className="grid items-center gap-x-2 border-t border-neutral-800/70 px-3 py-1.5 hover:bg-neutral-800/25"
       style={{ gridTemplateColumns: SB_COLS }}
     >
-      {/* герой */}
-      <div className="w-14">
+      {/* герой + уровень */}
+      <div className="relative w-14">
         <HeroPortrait hero={p.hero} />
+        <span
+          className="absolute -bottom-1 -left-1 grid h-5 w-5 place-items-center rounded-full bg-neutral-950 text-[10px] font-bold tabular-nums text-amber-300 ring-1 ring-amber-500/50"
+          title={`Уровень ${p.level}`}
+        >
+          {p.level}
+        </span>
       </div>
       {/* игрок: ник + роль */}
       <div className="min-w-0">
@@ -494,6 +911,131 @@ function Scoreboard({
     <div className="space-y-3">
       <TeamTable side="radiant" fallback="Свет" teamName={names.radiant} players={radiant} score={radiantScore} won={radiantWin} />
       <TeamTable side="dire" fallback="Тьма" teamName={names.dire} players={dire} score={direScore} won={!radiantWin} />
+    </div>
+  );
+}
+
+// --- Скорборд карточками (главный вид, в стиле панели «Statistics» cyberscore) ---
+// Карточка героя в тоне команды: портрет+уровень, ник+роль, статы, предметы, дерево талантов.
+function HeroCard({ p, side }: { p: PlayerReport; side: "radiant" | "dire" }) {
+  const tint =
+    side === "radiant"
+      ? "border-emerald-900/40 bg-emerald-950/15 hover:bg-emerald-950/25"
+      : "border-rose-900/40 bg-rose-950/15 hover:bg-rose-950/25";
+  const stat = (label: string, value: string, cls = "text-neutral-100") => (
+    <div key={label} className="flex flex-col leading-tight">
+      <span className="text-[9px] uppercase tracking-wide text-neutral-500">{label}</span>
+      <span className={`text-xs font-semibold tabular-nums ${cls}`}>{value}</span>
+    </div>
+  );
+  return (
+    <div className={`rounded-lg border p-2 transition-colors ${tint}`}>
+      <div className="flex items-start gap-2">
+        {/* портрет + уровень */}
+        <div className="relative w-14 shrink-0">
+          <HeroPortrait hero={p.hero} />
+          <span
+            className="absolute -bottom-1 -left-1 grid h-5 w-5 place-items-center rounded-full bg-neutral-950 text-[10px] font-bold tabular-nums text-amber-300 ring-1 ring-amber-500/50"
+            title={`Уровень ${p.level}`}
+          >
+            {p.level}
+          </span>
+        </div>
+        {/* ник + статы */}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="truncate text-sm font-semibold text-neutral-100" title={p.name}>
+              {p.name}
+            </span>
+            {p.role && <span className="shrink-0 text-[10px] uppercase tracking-wide text-neutral-500">{p.role}</span>}
+          </div>
+          <div className="mt-1 grid grid-cols-3 gap-x-2 gap-y-1 sm:grid-cols-6">
+            {stat("KDA", `${p.kills}/${p.deaths}/${p.assists}`)}
+            {stat("Ценность", fmt(p.netWorth), "text-amber-300")}
+            {stat("GPM", String(p.gpm))}
+            {stat("XPM", String(p.xpm))}
+            {stat("ЛХ/ДН", `${p.lastHits}/${p.denies}`)}
+            {stat("Урон", kFmt(p.heroDamage))}
+          </div>
+        </div>
+        {/* дерево талантов */}
+        <div className="shrink-0 pl-1">
+          <TalentTreeMini talents={p.talents} />
+        </div>
+      </div>
+      {/* предметы */}
+      <div className="mt-2 overflow-x-auto border-t border-neutral-800/60 pt-2">
+        <ItemsRow p={p} />
+      </div>
+    </div>
+  );
+}
+
+function CardTeam({
+  side,
+  fallback,
+  teamName,
+  logo,
+  players,
+  score,
+  won,
+}: {
+  side: "radiant" | "dire";
+  fallback: string;
+  teamName: string;
+  logo: string | null;
+  players: PlayerReport[];
+  score: number;
+  won: boolean;
+}) {
+  const accent = side === "radiant" ? "text-emerald-400" : "text-rose-400";
+  const bar = side === "radiant" ? "bg-emerald-500" : "bg-rose-500";
+  return (
+    <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-3">
+      <div className="mb-2 flex items-center gap-2">
+        <span className={`h-4 w-1 rounded ${bar}`} />
+        {logo && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={logo} alt={teamName} className="h-5 w-5 rounded object-contain" />
+        )}
+        <span className={`truncate text-sm font-bold ${accent}`}>{teamName || fallback}</span>
+        {won && (
+          <span className="rounded bg-violet-600 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+            Победа
+          </span>
+        )}
+        <span className="ml-auto text-lg font-black tabular-nums text-neutral-100">{score}</span>
+      </div>
+      <div className="space-y-2">
+        {players.map((p, i) => (
+          <HeroCard key={i} p={p} side={side} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CardScoreboard({
+  radiant,
+  dire,
+  names,
+  logos,
+  radiantScore,
+  direScore,
+  radiantWin,
+}: {
+  radiant: PlayerReport[];
+  dire: PlayerReport[];
+  names: { radiant: string; dire: string };
+  logos: { radiant: string | null; dire: string | null };
+  radiantScore: number;
+  direScore: number;
+  radiantWin: boolean;
+}) {
+  return (
+    <div className="grid gap-3 lg:grid-cols-2">
+      <CardTeam side="radiant" fallback="Свет" teamName={names.radiant} logo={logos.radiant} players={radiant} score={radiantScore} won={radiantWin} />
+      <CardTeam side="dire" fallback="Тьма" teamName={names.dire} logo={logos.dire} players={dire} score={direScore} won={!radiantWin} />
     </div>
   );
 }
@@ -677,14 +1219,45 @@ export default function Home() {
             </div>
 
             <ScoreHeader match={match} names={names} setNames={setNames} />
-            <Scoreboard
+            <AdvantageSummary match={match} names={names} />
+            <BansStrip picksBans={match.picksBans} names={names} />
+            <KeyEvents events={match.events} names={names} />
+
+            {/* карта строений + график преимущества */}
+            <div className="grid gap-3 lg:grid-cols-3">
+              <BuildingMap buildings={match.buildings} />
+              {match.goldAdv.length >= 2 && (
+                <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-3 lg:col-span-2">
+                  <AdvantageChart gold={match.goldAdv} xp={match.xpAdv} />
+                </div>
+              )}
+            </div>
+
+            <CardScoreboard
               radiant={radiant}
               dire={dire}
               names={names}
+              logos={{ radiant: match.radiantLogo, dire: match.direLogo }}
               radiantScore={match.radiantScore}
               direScore={match.direScore}
               radiantWin={match.radiantWin}
             />
+
+            <details className="rounded-xl border border-neutral-800 bg-neutral-900/40">
+              <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-neutral-300 hover:text-neutral-100">
+                Таблица (плотный вид)
+              </summary>
+              <div className="px-4 pb-4">
+                <Scoreboard
+                  radiant={radiant}
+                  dire={dire}
+                  names={names}
+                  radiantScore={match.radiantScore}
+                  direScore={match.direScore}
+                  radiantWin={match.radiantWin}
+                />
+              </div>
+            </details>
 
             <details className="rounded-xl border border-neutral-800 bg-neutral-900/40">
               <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-neutral-300 hover:text-neutral-100">
@@ -699,11 +1272,10 @@ export default function Home() {
 
             <details className="rounded-xl border border-neutral-800 bg-neutral-900/40">
               <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-neutral-300 hover:text-neutral-100">
-                Драфт и график золота
+                Драфт (пики и баны по очереди)
               </summary>
-              <div className="space-y-5 px-4 pb-4">
+              <div className="px-4 pb-4">
                 <Draft picksBans={match.picksBans} names={names} />
-                <AdvantageChart gold={match.goldAdv} />
               </div>
             </details>
           </div>

@@ -46,7 +46,10 @@ type RawPlayer = {
   account_id?: number | null;
   camps_stacked?: number;
   lane_role?: number | null;
+  player_slot?: number; // <128 — свет, иначе тьма; нужен для резолва событий objectives
 };
+type RawTeam = { name?: string; tag?: string; logo_url?: string } | null;
+type RawObjective = { type?: string; time?: number; player_slot?: number; team?: number; key?: string; killer?: number };
 type RawMatch = {
   match_id: number;
   version?: number | null;
@@ -54,12 +57,16 @@ type RawMatch = {
   duration?: number;
   radiant_score?: number;
   dire_score?: number;
-  radiant_team?: { name?: string } | null;
-  dire_team?: { name?: string } | null;
+  radiant_team?: RawTeam;
+  dire_team?: RawTeam;
+  tower_status_radiant?: number | null;
+  tower_status_dire?: number | null;
+  barracks_status_radiant?: number | null;
+  barracks_status_dire?: number | null;
   radiant_gold_adv?: number[] | null;
   radiant_xp_adv?: number[] | null;
   picks_bans?: { order: number; is_pick: boolean; team: number; hero_id: number }[] | null;
-  objectives?: { type?: string; player_slot?: number }[] | null;
+  objectives?: RawObjective[] | null;
   players: RawPlayer[];
 };
 
@@ -195,6 +202,25 @@ export type PlayerReport = {
   buffs: { name: string; stacks: number }[];
 };
 export type PickBan = { order: number; isPick: boolean; side: "radiant" | "dire"; hero: Entity };
+export type Side = "radiant" | "dire";
+
+// Строения одной стороны, декодированные из битмасок tower/barracks_status.
+export type Lane = "top" | "mid" | "bot";
+export type SideBuildings = {
+  towers: { lane: Lane; tier: 1 | 2 | 3; alive: boolean }[];
+  ancient: { top: boolean; bottom: boolean }; // две башни у трона (alive)
+  racks: { lane: Lane; ranged: boolean; melee: boolean }[]; // казармы (alive)
+};
+
+// Убийца события — игрок (ник + герой) либо только герой (для курьеров резолвим по hero_id).
+export type EventActor = { name: string; hero: Entity };
+export type MatchEvents = {
+  firstBlood: { time: number; side: Side; killer: EventActor | null } | null;
+  firstTower: { time: number; side: Side; killer: EventActor | null } | null;
+  roshan: { radiant: number; dire: number; kills: { time: number; side: Side }[] };
+  couriers: { radiant: number; dire: number; kills: { time: number; victimSide: Side; killer: Entity | null }[] };
+};
+
 export type MatchReport = {
   matchId: string;
   parsed: boolean;
@@ -204,12 +230,51 @@ export type MatchReport = {
   direScore: number;
   radiantTeam: string | null;
   direTeam: string | null;
+  radiantTag: string | null;
+  direTag: string | null;
+  radiantLogo: string | null;
+  direLogo: string | null;
   aegis: { radiant: number; dire: number };
   goldAdv: number[];
   xpAdv: number[];
+  buildings: { radiant: SideBuildings; dire: SideBuildings };
+  events: MatchEvents;
   picksBans: PickBan[];
   players: PlayerReport[];
 };
+
+// --- Декод битмасок строений (бит=1 → строение цело) ---
+// tower_status: 0 anc-bot,1 anc-top,2 bot-t3,3 bot-t2,4 bot-t1,5 mid-t3,6 mid-t2,7 mid-t1,8 top-t3,9 top-t2,10 top-t1.
+function decodeTowers(mask: number | null | undefined): SideBuildings {
+  const m = mask ?? 0;
+  const bit = (n: number) => (m & (1 << n)) !== 0;
+  return {
+    ancient: { bottom: bit(0), top: bit(1) },
+    towers: [
+      { lane: "bot", tier: 3, alive: bit(2) },
+      { lane: "bot", tier: 2, alive: bit(3) },
+      { lane: "bot", tier: 1, alive: bit(4) },
+      { lane: "mid", tier: 3, alive: bit(5) },
+      { lane: "mid", tier: 2, alive: bit(6) },
+      { lane: "mid", tier: 1, alive: bit(7) },
+      { lane: "top", tier: 3, alive: bit(8) },
+      { lane: "top", tier: 2, alive: bit(9) },
+      { lane: "top", tier: 1, alive: bit(10) },
+    ],
+    // казармы дозаполним из barracks-маски отдельно
+    racks: [],
+  };
+}
+// barracks_status: 0 bot-ranged,1 bot-melee,2 mid-ranged,3 mid-melee,4 top-ranged,5 top-melee.
+function decodeRacks(mask: number | null | undefined): SideBuildings["racks"] {
+  const m = mask ?? 0;
+  const bit = (n: number) => (m & (1 << n)) !== 0;
+  return [
+    { lane: "bot", ranged: bit(0), melee: bit(1) },
+    { lane: "mid", ranged: bit(2), melee: bit(3) },
+    { lane: "top", ranged: bit(4), melee: bit(5) },
+  ];
+}
 
 const ROLE_LABEL: Record<number, string> = {
   1: "Керри",
@@ -351,13 +416,61 @@ export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
     };
   });
 
+  const sideOfSlot = (slot: number | undefined): Side => ((slot ?? 0) < 128 ? "radiant" : "dire");
+
+  // Слот игрока → актор (ник + герой) для резолва «кто сделал». Слот есть у каждого игрока матча.
+  const slotActor = new Map<number, EventActor>();
+  m.players.forEach((p) => {
+    if (p.player_slot != null) {
+      slotActor.set(p.player_slot, { name: p.name || p.personaname || "Аноним", hero: heroEntity(p.hero_id) });
+    }
+  });
+
   const aegis = { radiant: 0, dire: 0 };
+  const events: MatchEvents = {
+    firstBlood: null,
+    firstTower: null,
+    roshan: { radiant: 0, dire: 0, kills: [] },
+    couriers: { radiant: 0, dire: 0, kills: [] },
+  };
   for (const o of m.objectives ?? []) {
-    if (typeof o.type === "string" && o.type.includes("AEGIS")) {
+    const t = o.type;
+    if (!t) continue;
+    if (t.includes("AEGIS")) {
       if ((o.player_slot ?? 0) < 128) aegis.radiant++;
       else aegis.dire++;
+    } else if (t === "CHAT_MESSAGE_FIRSTBLOOD" && !events.firstBlood) {
+      events.firstBlood = {
+        time: o.time ?? 0,
+        side: sideOfSlot(o.player_slot),
+        killer: slotActor.get(o.player_slot ?? -1) ?? null,
+      };
+    } else if (t === "building_kill" && !events.firstTower && typeof o.key === "string" && o.key.includes("tower")) {
+      // Сторона убийцы — противоположна владельцу вышки (goodguys=свет). player_slot точнее, если есть.
+      const side: Side = o.player_slot != null ? sideOfSlot(o.player_slot) : o.key.includes("goodguys") ? "dire" : "radiant";
+      events.firstTower = { time: o.time ?? 0, side, killer: slotActor.get(o.player_slot ?? -1) ?? null };
+    } else if (t === "CHAT_MESSAGE_ROSHAN_KILL") {
+      // team: 2 — рошана убил свет, 3 — тьма.
+      const side: Side = o.team === 2 ? "radiant" : "dire";
+      events.roshan[side]++;
+      events.roshan.kills.push({ time: o.time ?? 0, side });
+    } else if (t === "CHAT_MESSAGE_COURIER_LOST") {
+      // team — чей курьер погиб (2 свет / 3 тьма); убийца — противоположная сторона, killer=hero_id.
+      const victimSide: Side = o.team === 2 ? "radiant" : "dire";
+      const killerSide: Side = victimSide === "radiant" ? "dire" : "radiant";
+      events.couriers[killerSide]++;
+      events.couriers.kills.push({
+        time: o.time ?? 0,
+        victimSide,
+        killer: o.killer ? heroEntity(o.killer) : null, // killer=0 → не герой (вышка/крип)
+      });
     }
   }
+
+  const buildings = {
+    radiant: { ...decodeTowers(m.tower_status_radiant), racks: decodeRacks(m.barracks_status_radiant) },
+    dire: { ...decodeTowers(m.tower_status_dire), racks: decodeRacks(m.barracks_status_dire) },
+  };
 
   const picksBans: PickBan[] = (m.picks_bans ?? [])
     .map((pb) => ({
@@ -377,9 +490,15 @@ export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
     direScore: m.dire_score ?? 0,
     radiantTeam: m.radiant_team?.name ?? null,
     direTeam: m.dire_team?.name ?? null,
+    radiantTag: m.radiant_team?.tag || null,
+    direTag: m.dire_team?.tag || null,
+    radiantLogo: m.radiant_team?.logo_url || null,
+    direLogo: m.dire_team?.logo_url || null,
     aegis,
     goldAdv: m.radiant_gold_adv ?? [],
     xpAdv: m.radiant_xp_adv ?? [],
+    buildings,
+    events,
     picksBans,
     players,
   };

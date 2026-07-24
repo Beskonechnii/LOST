@@ -249,6 +249,7 @@ function TeamColumn({
   players,
   side,
   name,
+  logo,
   score,
   tag,
   maxNet,
@@ -256,6 +257,7 @@ function TeamColumn({
   players: PlayerReport[];
   side: Side;
   name: string;
+  logo: string | null;
   score: number;
   tag: string;
   maxNet: number;
@@ -264,8 +266,9 @@ function TeamColumn({
   const bar = side === "radiant" ? "bg-emerald-500" : "bg-rose-500";
   return (
     <div className="flex min-w-0 flex-1 flex-col gap-1">
-      <div className="flex h-[20px] shrink-0 items-center gap-2">
-        <span className={`h-4 w-1 rounded ${bar}`} />
+      <div className="flex h-[26px] shrink-0 items-center gap-2">
+        <span className={`h-5 w-1 rounded ${bar}`} />
+        <TeamCrest logo={logo} name={name} size={24} />
         <span className={`truncate text-[14px] font-bold ${accent}`}>{name || (side === "radiant" ? "Свет" : "Тьма")}</span>
         <span className="ml-auto text-[16px] font-black leading-none tabular-nums text-neutral-100">{score}</span>
       </div>
@@ -310,15 +313,15 @@ export function SummaryCanvas({ match, names, tags, logos }: { match: MatchRepor
 }
 
 // --- Блок 2: статистика игроков ---
-export function PlayersCanvas({ match, names, tags }: { match: MatchReport; names: Names; tags: Names; logos: Logos }) {
+export function PlayersCanvas({ match, names, tags, logos }: { match: MatchReport; names: Names; tags: Names; logos: Logos }) {
   const radiant = match.players.filter((p) => p.side === "radiant").slice().sort((a, b) => a.pos - b.pos);
   const dire = match.players.filter((p) => p.side === "dire").slice().sort((a, b) => a.pos - b.pos);
   const maxNet = Math.max(1, ...match.players.map((p) => p.netWorth));
   return (
     <Frame>
       <div className="flex min-w-0 flex-1 gap-3">
-        <TeamColumn players={radiant} side="radiant" name={names.radiant} score={match.radiantScore} tag={tags.radiant} maxNet={maxNet} />
-        <TeamColumn players={dire} side="dire" name={names.dire} score={match.direScore} tag={tags.dire} maxNet={maxNet} />
+        <TeamColumn players={radiant} side="radiant" name={names.radiant} logo={logos.radiant} score={match.radiantScore} tag={tags.radiant} maxNet={maxNet} />
+        <TeamColumn players={dire} side="dire" name={names.dire} logo={logos.dire} score={match.direScore} tag={tags.dire} maxNet={maxNet} />
       </div>
     </Frame>
   );

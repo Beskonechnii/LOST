@@ -7,6 +7,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   try {
     return NextResponse.json({ ok: true, match: await fetchMatchReport(id.trim()) });
   } catch (e) {
-    return NextResponse.json({ ok: false, error: String(e) }, { status: 400 });
+    // Сообщения из lib/opendota.ts уже написаны для человека — отдаём их как есть, без «Error: ».
+    return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : String(e) }, { status: 400 });
   }
 }

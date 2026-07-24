@@ -5,11 +5,41 @@
 // Полные описания талантов (с числами) — сгенерированы из Dota 2 Wiki, т.к. в константах
 // OpenDota значения {s:...} не подставлены (~59% талантов). См. scripts/build-talents.mjs.
 import talentNames from "./talents.json";
+import { localConstants, localHeroes } from "./dota-constants";
+
+// OpenDota регулярно отдаёт 429 (рейт-лимит) и 5xx от Cloudflare — чаще всего 522/524,
+// когда их бэкенд не ответил вовремя. Это не ошибка запроса, а «попробуй ещё раз»,
+// поэтому такие ответы ретраим с нарастающей паузой, а наружу отдаём текст для человека.
+const RETRY_STATUS = new Set([408, 425, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524]);
+const RETRIES = 3;
+const TIMEOUT_MS = 20_000;
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+function odError(status: number): Error {
+  if (status === 429) return new Error("OpenDota ограничил частоту запросов (429). Подожди минуту и попробуй снова.");
+  if (RETRY_STATUS.has(status))
+    return new Error(`OpenDota сейчас недоступна (${status}). Это на их стороне — попробуй через пару минут.`);
+  if (status === 404) return new Error("OpenDota не знает такой матч (404). Проверь ID.");
+  return new Error(`OpenDota ответила ${status}.`);
+}
 
 async function getJson<T>(url: string): Promise<T> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`OpenDota ${res.status} ${url}`);
-  return res.json() as Promise<T>;
+  let last: Error | null = null;
+  for (let attempt = 0; attempt <= RETRIES; attempt++) {
+    if (attempt) await sleep(500 * 2 ** (attempt - 1)); // 0.5с → 1с → 2с
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) });
+      if (res.ok) return (await res.json()) as T;
+      last = odError(res.status);
+      if (!RETRY_STATUS.has(res.status)) throw last;
+    } catch (e) {
+      // Обрыв связи и таймаут ретраим так же, как 5xx; ошибку статуса пробрасываем как есть.
+      if (e === last) throw e;
+      last = new Error("Не достучались до OpenDota — сеть или таймаут.");
+    }
+  }
+  throw last ?? new Error("OpenDota недоступна.");
 }
 
 // --- Сырые формы OpenDota (только нужные поля) ---
@@ -50,7 +80,7 @@ type RawPlayer = {
 };
 type RawTeam = { name?: string; tag?: string; logo_url?: string } | null;
 type RawObjective = { type?: string; time?: number; player_slot?: number; team?: number; key?: string; killer?: number };
-type RawMatch = {
+export type RawMatch = {
   match_id: number;
   version?: number | null;
   radiant_win?: boolean;
@@ -78,9 +108,9 @@ export type Entity = { name: string; slug: string };
 let heroCache: Map<number, Entity> | null = null;
 async function heroInfo(): Promise<Map<number, Entity>> {
   if (heroCache) return heroCache;
-  const arr = await getJson<{ id: number; name: string; localized_name: string }[]>(
-    "https://api.opendota.com/api/heroes",
-  );
+  const arr = localHeroes().length
+    ? localHeroes()
+    : await getJson<{ id: number; name: string; localized_name: string }[]>("https://api.opendota.com/api/heroes");
   // slug из name (npc_dota_hero_antimage → antimage) — совпадает с sync-assets.ts
   heroCache = new Map(arr.map((h) => [h.id, { name: h.localized_name, slug: h.name.replace(/^npc_dota_hero_/, "") }]));
   return heroCache;
@@ -98,6 +128,13 @@ type Constants = {
 let constsCache: Constants | null = null;
 async function constants(): Promise<Constants> {
   if (constsCache) return constsCache;
+  // Основной источник — вендоренная копия (см. lib/dota-constants.ts). Сеть остаётся
+  // запасным путём: если файл почему-то пуст, работаем как раньше, через их API.
+  const local = localConstants();
+  if (Object.keys(local.itemIds).length) {
+    constsCache = local;
+    return constsCache;
+  }
   const base = "https://api.opendota.com/api/constants/";
   const [itemIds, items, abilityIds, abilities, heroAbilities, buffs] = await Promise.all([
     getJson<Record<string, string>>(base + "item_ids"),
@@ -318,11 +355,15 @@ function assignPositions(side: { i: number; laneRole?: number | null; nw: number
 }
 
 export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
-  const [m, heroes, c] = await Promise.all([
-    getJson<RawMatch>(`https://api.opendota.com/api/matches/${matchId}`),
-    heroInfo(),
-    constants(),
-  ]);
+  const m = await getJson<RawMatch>(`https://api.opendota.com/api/matches/${matchId}`);
+  return buildMatchReport(String(matchId), m);
+}
+
+// Сборка отчёта отделена от загрузки: форма RawMatch — это форма Valve GetMatchDetails
+// плюс поля OpenDota, поэтому второй источник (см. lib/steam-match.ts) переиспользует
+// ровно эту функцию, а не дублирует резолв имён, позиции и декод строений.
+export async function buildMatchReport(matchId: string, m: RawMatch): Promise<MatchReport> {
+  const [heroes, c] = await Promise.all([heroInfo(), constants()]);
   if (!m || !Array.isArray(m.players) || m.players.length === 0) {
     throw new Error(`Матч ${matchId} не найден или без данных`);
   }
@@ -488,7 +529,7 @@ export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
     .sort((a, b) => a.order - b.order);
 
   return {
-    matchId: String(m.match_id),
+    matchId: String(m.match_id ?? matchId),
     parsed: m.version != null,
     radiantWin: !!m.radiant_win,
     durationSeconds: m.duration ?? 0,

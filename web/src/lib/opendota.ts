@@ -55,6 +55,7 @@ type RawMatch = {
   version?: number | null;
   radiant_win?: boolean;
   duration?: number;
+  start_time?: number; // unix-секунды начала матча — для даты в шапке отчёта
   radiant_score?: number;
   dire_score?: number;
   radiant_team?: RawTeam;
@@ -226,6 +227,7 @@ export type MatchReport = {
   parsed: boolean;
   radiantWin: boolean;
   durationSeconds: number;
+  startTime: number;
   radiantScore: number;
   direScore: number;
   radiantTeam: string | null;
@@ -244,35 +246,37 @@ export type MatchReport = {
 };
 
 // --- Декод битмасок строений (бит=1 → строение цело) ---
-// tower_status: 0 anc-bot,1 anc-top,2 bot-t3,3 bot-t2,4 bot-t1,5 mid-t3,6 mid-t2,7 mid-t1,8 top-t3,9 top-t2,10 top-t1.
+// Раскладка Valve (см. WebAPI/GetMatchDetails; подтверждено порядком в odota/web BuildingMap):
+// tower_status, от LSB: 0 top-t1, 1 top-t2, 2 top-t3, 3 mid-t1, 4 mid-t2, 5 mid-t3,
+// 6 bot-t1, 7 bot-t2, 8 bot-t3, 9 anc-top, 10 anc-bottom.
 function decodeTowers(mask: number | null | undefined): SideBuildings {
   const m = mask ?? 0;
   const bit = (n: number) => (m & (1 << n)) !== 0;
   return {
-    ancient: { bottom: bit(0), top: bit(1) },
+    ancient: { top: bit(9), bottom: bit(10) },
     towers: [
-      { lane: "bot", tier: 3, alive: bit(2) },
-      { lane: "bot", tier: 2, alive: bit(3) },
-      { lane: "bot", tier: 1, alive: bit(4) },
+      { lane: "top", tier: 1, alive: bit(0) },
+      { lane: "top", tier: 2, alive: bit(1) },
+      { lane: "top", tier: 3, alive: bit(2) },
+      { lane: "mid", tier: 1, alive: bit(3) },
+      { lane: "mid", tier: 2, alive: bit(4) },
       { lane: "mid", tier: 3, alive: bit(5) },
-      { lane: "mid", tier: 2, alive: bit(6) },
-      { lane: "mid", tier: 1, alive: bit(7) },
-      { lane: "top", tier: 3, alive: bit(8) },
-      { lane: "top", tier: 2, alive: bit(9) },
-      { lane: "top", tier: 1, alive: bit(10) },
+      { lane: "bot", tier: 1, alive: bit(6) },
+      { lane: "bot", tier: 2, alive: bit(7) },
+      { lane: "bot", tier: 3, alive: bit(8) },
     ],
     // казармы дозаполним из barracks-маски отдельно
     racks: [],
   };
 }
-// barracks_status: 0 bot-ranged,1 bot-melee,2 mid-ranged,3 mid-melee,4 top-ranged,5 top-melee.
+// barracks_status, от LSB: 0 top-melee, 1 top-ranged, 2 mid-melee, 3 mid-ranged, 4 bot-melee, 5 bot-ranged.
 function decodeRacks(mask: number | null | undefined): SideBuildings["racks"] {
   const m = mask ?? 0;
   const bit = (n: number) => (m & (1 << n)) !== 0;
   return [
-    { lane: "bot", ranged: bit(0), melee: bit(1) },
-    { lane: "mid", ranged: bit(2), melee: bit(3) },
-    { lane: "top", ranged: bit(4), melee: bit(5) },
+    { lane: "top", melee: bit(0), ranged: bit(1) },
+    { lane: "mid", melee: bit(2), ranged: bit(3) },
+    { lane: "bot", melee: bit(4), ranged: bit(5) },
   ];
 }
 
@@ -486,6 +490,7 @@ export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
     parsed: m.version != null,
     radiantWin: !!m.radiant_win,
     durationSeconds: m.duration ?? 0,
+    startTime: m.start_time ?? 0,
     radiantScore: m.radiant_score ?? 0,
     direScore: m.dire_score ?? 0,
     radiantTeam: m.radiant_team?.name ?? null,

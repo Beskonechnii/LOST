@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import Link from "next/link";
 import {
   AdvantageChart,
   BuildingMap,
@@ -13,6 +12,7 @@ import {
   TeamCrest,
 } from "./_components/postgame/blocks";
 import { PostgameExport } from "./_components/postgame/export-canvas";
+import { MatchHistory, pushHistory, useHistory } from "./_components/match-history";
 import {
   clock,
   fmt,
@@ -536,13 +536,17 @@ type Tab = "report" | "extra" | "export";
 
 export default function Home() {
   const [id, setId] = useState("");
-  const [loading, setLoading] = useState(false);
+  // Не просто «грузится», а какой источник грузится — чтобы спиннер был на нажатой кнопке.
+  const [loading, setLoading] = useState<"opendota" | "steam" | null>(null);
+  const [source, setSource] = useState<"opendota" | "steam">("opendota");
   const [error, setError] = useState<string | null>(null);
   const [match, setMatch] = useState<MatchReport | null>(null);
   // Только то, что вручную вписал пользователь; «» — значит взять распознанное/из OpenDota (см. names ниже).
   const [manual, setManual] = useState({ radiant: "", dire: "" });
   const [tab, setTab] = useState<Tab>("report");
   const [roster, setRoster] = useState<RosterTeam[]>([]);
+  // Архив матчей — внешнее хранилище (localStorage), правки видны сразу и в соседней вкладке.
+  const history = useHistory();
 
   // Команды лиги — для подстановки наших лого и тегов по названию (наши ассеты приоритетнее OpenDota).
   useEffect(() => {
@@ -577,24 +581,45 @@ export default function Home() {
     [teamByAccount],
   );
 
-  async function load() {
-    const clean = id.trim();
+  // Источник матча выбирается кнопкой: OpenDota богаче (график золота, события, тайминги),
+  // Steam — первоисточник Valve, выручает когда OpenDota недоступна. См. lib/steam-match.ts.
+  // matchId передаётся при открытии из архива: там id известен сразу, ждать setId нельзя.
+  async function load(src: "opendota" | "steam", matchId?: string) {
+    const clean = (matchId ?? id).trim();
     if (!clean) return;
-    setLoading(true);
+    if (matchId) setId(matchId);
+    setLoading(src);
     setError(null);
     setMatch(null);
     try {
-      const res = await fetch(`/api/opendota/match/${clean}`);
+      const res = await fetch(`/api/${src}/match/${clean}`);
       const json = await res.json();
       if (!json.ok) throw new Error(json.error ?? "Ошибка запроса");
       const m = json.match as MatchReport;
       setMatch(m);
+      setSource(src);
       setManual({ radiant: "", dire: "" }); // сброс прежних ручных правок под новый матч
       setTab("report");
+      // В архив кладём названия на момент разбора: распознанную команду лиги, иначе то,
+      // что пришло из источника. Ручное переименование потом — уже про графику, не про архив.
+      const sideNames = (side: "radiant" | "dire") => {
+        const players = m.players.filter((p) => p.side === side);
+        return detectTeam(players)?.name || (side === "radiant" ? m.radiantTeam : m.direTeam) || "";
+      };
+      pushHistory({
+        matchId: m.matchId,
+        source: src,
+        savedAt: Date.now(),
+        radiant: sideNames("radiant") || "Свет",
+        dire: sideNames("dire") || "Тьма",
+        radiantScore: m.radiantScore,
+        direScore: m.direScore,
+        radiantWin: m.radiantWin,
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   }
 
@@ -644,42 +669,39 @@ export default function Home() {
           <div>
             <h1 className="text-lg font-bold tracking-tight">LOST — импорт матча</h1>
             <p className="text-sm text-neutral-400">
-              Вставь ID матча Dota 2 — постгейм-отчёт подтянется из OpenDota. Команды переименовываешь под LOST.
+              Вставь ID матча Dota 2 — постгейм-отчёт подтянется из OpenDota, а если она лежит, то из Steam.
+              Команды переименовываешь под LOST.
             </p>
-          </div>
-          {/* следующий шаг после разбора матча — графика по нему */}
-          <div className="flex gap-2 text-sm">
-            <Link
-              href="/studio/new/match-day"
-              className="rounded-md border border-neutral-700 px-3 py-1.5 text-neutral-300 hover:border-violet-500 hover:text-white"
-            >
-              Итоги дня →
-            </Link>
-            <Link
-              href="/studio/new/vs-announce"
-              className="rounded-md border border-neutral-700 px-3 py-1.5 text-neutral-300 hover:border-violet-500 hover:text-white"
-            >
-              Анонс матча →
-            </Link>
           </div>
         </div>
         <div className="mb-6 flex flex-wrap items-center gap-2">
           <input
             value={id}
             onChange={(e) => setId(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && load()}
+            onKeyDown={(e) => e.key === "Enter" && load("opendota")}
             placeholder="ID матча Dota 2, напр. 8907510684"
             inputMode="numeric"
             className="w-full max-w-xs rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-neutral-500"
           />
           <button
-            onClick={load}
-            disabled={loading || !id.trim()}
+            onClick={() => load("opendota")}
+            disabled={!!loading || !id.trim()}
             className="rounded-md bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-900 hover:bg-white disabled:opacity-50"
           >
-            {loading ? "Загрузка…" : "Получить"}
+            {loading === "opendota" ? "Загрузка…" : "Из OpenDota"}
+          </button>
+          {/* Запасной источник: беднее данными, но живёт независимо от аварий OpenDota. */}
+          <button
+            onClick={() => load("steam")}
+            disabled={!!loading || !id.trim()}
+            title="Первоисточник Valve: без графика золота, таймингов покупок, событий и ников"
+            className="rounded-md border border-neutral-700 px-4 py-2 text-sm font-medium text-neutral-300 hover:border-neutral-500 hover:text-white disabled:opacity-50"
+          >
+            {loading === "steam" ? "Загрузка…" : "Из Steam"}
           </button>
         </div>
+
+        <MatchHistory items={history} onOpen={(e) => load(e.source, e.matchId)} />
 
         {error && (
           <p className="rounded-md border border-rose-900 bg-rose-950/40 px-3 py-2 text-sm text-rose-300">{error}</p>
@@ -695,6 +717,15 @@ export default function Home() {
                 </div>
                 <h1 className="text-lg font-black uppercase tracking-tight md:text-xl">Postgame Stats</h1>
                 <span className="text-[11px] text-amber-400">{match.parsed ? "" : "⚠ не распарсен"}</span>
+                {/* Откуда данные — иначе непонятно, почему у матча из Steam пустые график и события. */}
+                {source === "steam" && (
+                  <span
+                    className="rounded border border-neutral-700 px-1.5 py-0.5 text-[11px] text-neutral-400"
+                    title="Steam не отдаёт график золота, тайминги покупок, события и ники"
+                  >
+                    источник: Steam
+                  </span>
+                )}
               </div>
               <div className="flex gap-1 rounded-lg bg-neutral-950/60 p-1">
                 {tabs.map((t) => (

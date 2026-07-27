@@ -1,0 +1,207 @@
+# Развёртывание LOST
+
+Полный путь от чистого сервера до работающего сайта. Все команды — копипастой в терминал.
+
+## Что за приложение и куда оно ставится
+
+LOST — это **Next.js**, то есть постоянно работающий процесс Node.js: он рендерит страницы,
+ходит в OpenDota, отдаёт `/api/*`, читает SQLite и пишет картинки на диск.
+
+Отсюда два жёстких требования к хостингу:
+
+| Нужно | Почему |
+|---|---|
+| **Node.js 20+** (или Docker) | `.next` — это программа, а не папка с HTML. Apache её не запустит |
+| **Постоянный диск** | На диске живут база лиги и все загруженные картинки |
+
+**Куда НЕ встанет:**
+
+- PHP-хостинги (InfinityFree, 000webhost, бесплатные тарифы Beget/Hostinger) — там нет Node.js,
+  и это принципиальная позиция площадок, а не ограничение тарифа.
+- Статические хостинги (GitHub Pages, Tilda, Netlify без функций) — они умеют отдавать только файлы.
+- Serverless-платформы (Vercel, Netlify Functions) — Node есть, но диск эфемерный: база и
+  загруженные картинки исчезнут при первом же перезапуске. Туда можно, но сначала база
+  переезжает в Turso, а картинки — в облачное хранилище (в этом репозитории не сделано).
+
+**Куда встанет:** любой VPS с Docker (рекомендуется) или с голым Node.js.
+
+**Если сервера нет.** Публично от лиги нужна прежде всего таблица, а она отлично живёт статикой —
+см. [Вариант C](#вариант-c--только-таблица-статикой), он работает даже на бесплатном PHP-хостинге.
+
+---
+
+## Вариант A — Docker (рекомендуется)
+
+Один раз настроил, дальше обновление в две команды.
+
+### 1. Поставить Docker на сервер
+
+Ubuntu/Debian, от `root` или через `sudo`:
+
+```bash
+curl -fsSL https://get.docker.com | sh
+```
+
+Проверить:
+
+```bash
+docker --version && docker compose version
+```
+
+### 2. Забрать код
+
+```bash
+git clone https://github.com/Beskonechnii/League-of-spirit.git
+cd League-of-spirit/web
+```
+
+### 3. Создать `.env`
+
+Файл в `.gitignore`, поэтому на сервере его надо завести руками:
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+Заполнить:
+
+| Переменная | Обязательна | Что писать |
+|---|---|---|
+| `DATABASE_URL` | не трогать | в контейнере переопределяется на `file:./data/dev.db` |
+| `ADMIN_PASSWORD` | **да** | пароль от админки. Пустой = админка закрыта наглухо |
+| `OPENAI_API_KEY` | нет | без неё не работает только `/studio/generate` |
+| `STEAM_API_KEY` | нет | без него не работает только кнопка «Из Steam» |
+
+### 4. Запустить
+
+```bash
+docker compose up -d --build
+```
+
+Проверить, что живое:
+
+```bash
+curl http://127.0.0.1:3000/api/health
+```
+
+Ответ вида `{"ok":true,"teams":16,...}` — значит связка с БД поднялась.
+
+### 5. Домен и HTTPS
+
+Контейнер намеренно слушает только `127.0.0.1:3000` — без этого админка торчала бы
+в интернет по голому http. Наружу его выводит обратный прокси.
+
+Самый короткий путь — Caddy, он сам получает сертификат Let's Encrypt:
+
+```bash
+apt install -y caddy
+```
+
+`/etc/caddy/Caddyfile`:
+
+```
+app.leagueofspirits.ru {
+    reverse_proxy 127.0.0.1:3000
+}
+```
+
+```bash
+systemctl reload caddy
+```
+
+Перед этим в DNS домена завести запись `A` на IP сервера.
+
+### 6. Обновление после правок
+
+```bash
+cd League-of-spirit && git pull && cd web && docker compose up -d --build
+```
+
+---
+
+## Вариант B — без Docker, голый Node.js
+
+```bash
+# Node 24 LTS
+curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && apt install -y nodejs
+
+git clone https://github.com/Beskonechnii/League-of-spirit.git
+cd League-of-spirit/web
+cp .env.example .env && nano .env      # заполнить ADMIN_PASSWORD
+
+npm ci                                  # postinstall сам сделает prisma generate
+npx prisma migrate deploy
+npm run build
+npm run start
+```
+
+Чтобы приложение пережило перезагрузку сервера — завести юнит systemd
+`/etc/systemd/system/lost.service`:
+
+```ini
+[Unit]
+Description=LOST
+After=network.target
+
+[Service]
+WorkingDirectory=/root/League-of-spirit/web
+EnvironmentFile=/root/League-of-spirit/web/.env
+ExecStart=/usr/bin/npm run start
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+systemctl enable --now lost
+```
+
+---
+
+## Данные и бэкапы
+
+Всё состояние приложения — в двух местах. В варианте A это тома Docker:
+
+| Том | Что внутри | Восстановимо? |
+|---|---|---|
+| `lost-data` | база лиги: составы, сетка встреч, результаты | **нет** — вводится руками в UI |
+| `lost-uploads` | лого и фото ростера, архив постгеймов | частично (лого — скриптами импорта) |
+
+Бэкап базы:
+
+```bash
+docker compose exec -T web cat /app/data/dev.db > backup-$(date +%F).db
+```
+
+Положить обратно:
+
+```bash
+docker compose cp backup-2026-07-25.db web:/app/data/dev.db && docker compose restart web
+```
+
+**Важно про базу.** В репозитории лежит `prisma/dev.db` — она копируется в том **только при
+первом запуске**, дальше сервер живёт своей копией. Это сделано специально: результаты матчей
+вводятся через админку на сервере, и `git pull` не должен их затирать.
+
+Обратная сторона: с этого момента база на сервере и база в репозитории расходятся. Определись,
+кто главный. Правишь через сайт — сервер главный, локальную базу считай тестовой. Правишь
+локально — тогда после каждой правки заливай файл на сервер командой `docker compose cp` выше.
+
+---
+
+## Диагностика
+
+```bash
+docker compose logs -f web            # логи приложения
+docker compose ps                     # статус и healthcheck
+docker compose exec web sh            # заглянуть внутрь контейнера
+```
+
+| Симптом | Причина |
+|---|---|
+| `/admin/login` пишет «ADMIN_PASSWORD не задан» | пустая переменная в `.env`, перезапустить контейнер |
+| Пропали лого команд | том `lost-uploads` пересоздан; докладываются при старте из образа |
+| 502 от прокси | контейнер не поднялся — смотреть `docker compose logs web` |
+| Матч не грузится из OpenDota | сторонний сервис недоступен, попробовать кнопку «Из Steam» |

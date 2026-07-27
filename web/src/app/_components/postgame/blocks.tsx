@@ -47,6 +47,39 @@ export function Icon({ kind, slug, name, h = 24, className = "" }: { kind: Asset
   );
 }
 
+// Рамка вокруг иконки героя для бана/пика: аккуратная карточка вместо голой иконки на пустом фоне.
+// banned — приглушает и перечёркивает (бан), иначе просто тонированная по стороне рамка (пик).
+export function HeroFrame({
+  hero,
+  side,
+  h = 22,
+  banned = false,
+  title,
+  className = "",
+}: {
+  hero: Entity;
+  side: Side;
+  h?: number;
+  banned?: boolean;
+  title?: string;
+  className?: string;
+}) {
+  const tint = side === "radiant" ? "border-emerald-700/40 bg-emerald-950/40" : "border-rose-700/40 bg-rose-950/40";
+  return (
+    <div title={title ?? hero.name} className={`relative inline-flex shrink-0 rounded-md border p-0.5 ${tint} ${className}`}>
+      <Icon kind="heroes" slug={hero.slug} name={hero.name} h={h} className={`!ring-0 ${banned ? "opacity-55 grayscale" : ""}`} />
+      {banned && (
+        <span
+          className="pointer-events-none absolute inset-0 grid place-items-center text-[11px] font-black text-rose-500"
+          style={{ textShadow: "0 1px 2px rgba(0,0,0,.85)" }}
+        >
+          ✕
+        </span>
+      )}
+    </div>
+  );
+}
+
 // Портрет героя во всю ширину колонки (у скорборда своя раскладка, не Icon).
 export function HeroPortrait({ hero, dim }: { hero: Entity; dim?: boolean }) {
   if (!hero.slug) return <div className="aspect-video w-full rounded-md bg-neutral-800" />;
@@ -257,7 +290,7 @@ export function AdvantageChart({
       </div>
       <svg
         viewBox={`0 0 ${W} ${H}`}
-        className="w-full touch-none"
+        className="w-full touch-none overflow-hidden rounded-lg"
         onMouseMove={interactive ? onMove : undefined}
         onMouseLeave={interactive ? () => setHover(null) : undefined}
       >
@@ -267,6 +300,13 @@ export function AdvantageChart({
             <stop offset="50%" stopColor="rgb(120 120 120)" stopOpacity="0.05" />
             <stop offset="100%" stopColor="rgb(251 113 133)" stopOpacity="0.35" />
           </linearGradient>
+          {/* подложка панели: лёгкий фиолетовый акцент сверху, к низу — в чёрный, чтобы график
+              не сидел на плоской заливке карточки */}
+          <linearGradient id="advPanel" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgb(139 92 246)" stopOpacity="0.12" />
+            <stop offset="55%" stopColor="rgb(12 10 16)" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="rgb(0 0 0)" stopOpacity="0.7" />
+          </linearGradient>
           {/* верх/низ графика — для двухцветной линии (лидирует Свет / Тьма) */}
           <clipPath id="advTop">
             <rect x={padL} y={padT - 2} width={plotW} height={plotH / 2 + 2} />
@@ -274,7 +314,26 @@ export function AdvantageChart({
           <clipPath id="advBot">
             <rect x={padL} y={mid} width={plotW} height={plotH / 2 + 2} />
           </clipPath>
+          {/* весь плот целиком — под опциональную подложку-картинку */}
+          <clipPath id="advPlot">
+            <rect x={padL} y={padT} width={plotW} height={plotH} />
+          </clipPath>
         </defs>
+        {/* фон панели: сперва фирменный градиент (работает всегда), поверх — вендоренная
+            картинка из public/assets/chart/bg.png, если она есть (иначе просто не рисуется),
+            и лёгкое затемнение сверху для читаемости сетки и подписей */}
+        <rect x={padL} y={padT} width={plotW} height={plotH} fill="url(#advPanel)" />
+        <image
+          href="/assets/chart/bg.png"
+          x={padL}
+          y={padT}
+          width={plotW}
+          height={plotH}
+          preserveAspectRatio="xMidYMid slice"
+          opacity="0.5"
+          clipPath="url(#advPlot)"
+        />
+        <rect x={padL} y={padT} width={plotW} height={plotH} fill="rgba(8,6,14,0.4)" />
         {/* сетка + подписи оси Y (без минуса: верх — Свет, низ — Тьма) */}
         {yTicks.map((v) => (
           <g key={v}>

@@ -9,7 +9,8 @@
 import { useRef, useState } from "react";
 import { domToPng } from "modern-screenshot";
 import { Canvas } from "@/studio/Canvas";
-import { AdvantageChart, BuildingMap, EventBadges, HeroPortrait, Icon, ItemsRow, TeamCrest } from "./blocks";
+import { archiveShot, type ArchiveDraft, type ShotKind } from "../match-archive";
+import { AdvantageChart, BuildingMap, EventBadges, HeroFrame, HeroPortrait, ItemsRow, TeamCrest } from "./blocks";
 import { clock, fmt, kFmt1, pad, type MatchReport, type PlayerReport, type Side } from "./types";
 
 export const EXPORT_W = 960;
@@ -161,10 +162,7 @@ function Bans({ match }: { match: MatchReport }) {
       {bans
         .filter((b) => b.side === side)
         .map((b) => (
-          <div key={b.order} className="relative">
-            <Icon kind="heroes" slug={b.hero.slug} name={b.hero.name} h={19} className="opacity-60 grayscale" />
-            <span className="pointer-events-none absolute inset-0 grid place-items-center text-[11px] font-black text-rose-500">✕</span>
-          </div>
+          <HeroFrame key={b.order} hero={b.hero} side={side} h={19} banned />
         ))}
     </div>
   );
@@ -327,44 +325,83 @@ export function PlayersCanvas({ match, names, tags, logos }: { match: MatchRepor
   );
 }
 
-// --- Один блок: превью через студийный Canvas + своя кнопка скачивания ---
-function ExportBlock({ title, file, children }: { title: string; file: string; children: React.ReactNode }) {
+// --- Один блок: превью через студийный Canvas + скачивание и отправка в архив ---
+function ExportBlock({
+  title,
+  kind,
+  file,
+  meta,
+  onSaved,
+  children,
+}: {
+  title: string;
+  kind: ShotKind;
+  file: string;
+  meta: ArchiveDraft;
+  onSaved: () => void;
+  children: React.ReactNode;
+}) {
   const node = useRef<HTMLDivElement>(null);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<"download" | "archive" | null>(null);
+  const [note, setNote] = useState<string | null>(null);
 
-  async function exportPng() {
+  // масштаб превью снимаем на клоне; без явных width/height клон меряется по
+  // ужатому bounding box превью и PNG выходит обрезанным. scale ×2 даёт 1920×1080.
+  const shoot = () =>
+    domToPng(node.current!, { width: EXPORT_W, height: EXPORT_H, scale: EXPORT_SCALE, style: { transform: "none" } });
+
+  async function download() {
     if (!node.current) return;
-    setBusy(true);
+    setBusy("download");
     try {
-      // масштаб превью снимаем на клоне; без явных width/height клон меряется по
-      // ужатому bounding box превью и PNG выходит обрезанным. scale ×2 даёт 1920×1080.
-      const url = await domToPng(node.current, {
-        width: EXPORT_W,
-        height: EXPORT_H,
-        scale: EXPORT_SCALE,
-        style: { transform: "none" },
-      });
       const a = document.createElement("a");
-      a.href = url;
+      a.href = await shoot();
       a.download = `${file}.png`;
       a.click();
     } finally {
-      setBusy(false);
+      setBusy(null);
+    }
+  }
+
+  // В архив уходит ровно тот же снимок, что и в скачивание — второй раз ничего не пересобираем.
+  async function toArchive() {
+    if (!node.current) return;
+    setBusy("archive");
+    setNote(null);
+    try {
+      const blob = await (await fetch(await shoot())).blob();
+      await archiveShot(meta, kind, blob);
+      setNote("сохранено");
+      onSaved();
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(null);
     }
   }
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <span className="text-sm font-medium text-neutral-200">{title}</span>
         <button
           type="button"
-          disabled={busy}
-          onClick={() => void exportPng()}
+          disabled={!!busy}
+          onClick={() => void download()}
           className="rounded bg-violet-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-500 disabled:opacity-50"
         >
-          {busy ? "Готовлю PNG…" : `Скачать PNG ${EXPORT_W * EXPORT_SCALE}×${EXPORT_H * EXPORT_SCALE}`}
+          {busy === "download" ? "Готовлю PNG…" : `Скачать PNG ${EXPORT_W * EXPORT_SCALE}×${EXPORT_H * EXPORT_SCALE}`}
         </button>
+        <button
+          type="button"
+          disabled={!!busy}
+          onClick={() => void toArchive()}
+          title="Положить эту картинку в архив выгрузок"
+          className="rounded border border-neutral-700 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:border-neutral-500 hover:text-white disabled:opacity-50"
+        >
+          {busy === "archive" ? "Сохраняю…" : "В архив"}
+        </button>
+        {note && <span className="text-xs text-neutral-500">{note}</span>}
       </div>
       <div className="h-[42vh] min-h-[240px]">
         <Canvas w={EXPORT_W} h={EXPORT_H} nodeRef={node}>
@@ -376,17 +413,30 @@ function ExportBlock({ title, file, children }: { title: string; file: string; c
 }
 
 // --- Вкладка «Экспорт»: две картинки, каждая скачивается отдельно ---
-export function PostgameExport(props: { match: MatchReport; names: Names; tags: Names; logos: Logos }) {
+export function PostgameExport({
+  meta,
+  onSaved,
+  ...props
+}: {
+  match: MatchReport;
+  names: Names;
+  tags: Names;
+  logos: Logos;
+  meta: ArchiveDraft;
+  onSaved: () => void;
+}) {
+  const block = { meta, onSaved };
   return (
     <div className="space-y-5">
       <p className="text-xs text-neutral-500">
         Две картинки 1920×1080 на общей подложке <code className="text-neutral-400">public/templates/postgame/bg.png</code>.
         Файла нет — под контентом фирменный градиент. Названия команд и лого правятся во вкладке «Отчёт».
+        «В архив» кладёт картинку на полку под полем ввода — там она переживёт и патч Доты, и падение OpenDota.
       </p>
-      <ExportBlock title="Сводка матча" file={`postgame-${props.match.matchId}-summary`}>
+      <ExportBlock title="Сводка матча" kind="summary" file={`postgame-${props.match.matchId}-summary`} {...block}>
         <SummaryCanvas {...props} />
       </ExportBlock>
-      <ExportBlock title="Статистика игроков" file={`postgame-${props.match.matchId}-players`}>
+      <ExportBlock title="Статистика игроков" kind="players" file={`postgame-${props.match.matchId}-players`} {...block}>
         <PlayersCanvas {...props} />
       </ExportBlock>
     </div>

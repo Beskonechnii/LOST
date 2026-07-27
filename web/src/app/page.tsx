@@ -5,6 +5,7 @@ import {
   AdvantageChart,
   BuildingMap,
   EventBadges,
+  HeroFrame,
   HeroPortrait,
   Icon,
   ItemsRow,
@@ -12,7 +13,7 @@ import {
   TeamCrest,
 } from "./_components/postgame/blocks";
 import { PostgameExport } from "./_components/postgame/export-canvas";
-import { MatchHistory, pushHistory, useHistory } from "./_components/match-history";
+import { MatchArchive, useArchive } from "./_components/match-archive";
 import {
   clock,
   fmt,
@@ -193,12 +194,7 @@ function BansStrip({ picksBans }: { picksBans: PickBan[] }) {
       {bans
         .filter((b) => b.side === side)
         .map((b) => (
-          <div key={b.order} className="relative" title={`бан ${b.order + 1}: ${b.hero.name}`}>
-            <Icon kind="heroes" slug={b.hero.slug} name={b.hero.name} h={24} className="opacity-60 grayscale" />
-            <span className="pointer-events-none absolute inset-0 grid place-items-center text-xs font-black text-rose-500">
-              ✕
-            </span>
-          </div>
+          <HeroFrame key={b.order} hero={b.hero} side={side} h={24} banned title={`бан ${b.order + 1}: ${b.hero.name}`} />
         ))}
     </div>
   );
@@ -220,7 +216,7 @@ function Draft({ picksBans, names }: { picksBans: PickBan[]; names: { radiant: s
       } ${pb.side === "radiant" ? "text-emerald-300" : "text-rose-300"}`}
     >
       <span className="w-4 shrink-0 text-right tabular-nums text-neutral-500">{pb.order + 1}.</span>
-      <Icon kind="heroes" slug={pb.hero.slug} name={pb.hero.name} h={18} className={pb.isPick ? "" : "grayscale"} />
+      <HeroFrame hero={pb.hero} side={pb.side} h={18} banned={!pb.isPick} />
       <span className="truncate">
         {pb.isPick ? "" : "бан "}
         {pb.hero.name}
@@ -545,8 +541,8 @@ export default function Home() {
   const [manual, setManual] = useState({ radiant: "", dire: "" });
   const [tab, setTab] = useState<Tab>("report");
   const [roster, setRoster] = useState<RosterTeam[]>([]);
-  // Архив матчей — внешнее хранилище (localStorage), правки видны сразу и в соседней вкладке.
-  const history = useHistory();
+  // Архив — выгруженные картинки на диске (public/uploads/postgame), а не шапки матчей.
+  const archive = useArchive();
 
   // Команды лиги — для подстановки наших лого и тегов по названию (наши ассеты приоритетнее OpenDota).
   useEffect(() => {
@@ -600,22 +596,6 @@ export default function Home() {
       setSource(src);
       setManual({ radiant: "", dire: "" }); // сброс прежних ручных правок под новый матч
       setTab("report");
-      // В архив кладём названия на момент разбора: распознанную команду лиги, иначе то,
-      // что пришло из источника. Ручное переименование потом — уже про графику, не про архив.
-      const sideNames = (side: "radiant" | "dire") => {
-        const players = m.players.filter((p) => p.side === side);
-        return detectTeam(players)?.name || (side === "radiant" ? m.radiantTeam : m.direTeam) || "";
-      };
-      pushHistory({
-        matchId: m.matchId,
-        source: src,
-        savedAt: Date.now(),
-        radiant: sideNames("radiant") || "Свет",
-        dire: sideNames("dire") || "Тьма",
-        radiantScore: m.radiantScore,
-        direScore: m.direScore,
-        radiantWin: m.radiantWin,
-      });
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -701,7 +681,7 @@ export default function Home() {
           </button>
         </div>
 
-        <MatchHistory items={history} onOpen={(e) => load(e.source, e.matchId)} />
+        <MatchArchive items={archive.items} onOpen={(e) => load(e.source, e.matchId)} onChanged={archive.reload} />
 
         {error && (
           <p className="rounded-md border border-rose-900 bg-rose-950/40 px-3 py-2 text-sm text-rose-300">{error}</p>
@@ -802,7 +782,23 @@ export default function Home() {
 
             {tab === "export" && (
               <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-4">
-                <PostgameExport match={match} names={names} tags={tags} logos={logos} />
+                {/* В архив уходит подпись ровно с теми названиями, что нарисованы на картинке. */}
+                <PostgameExport
+                  match={match}
+                  names={names}
+                  tags={tags}
+                  logos={logos}
+                  meta={{
+                    matchId: match.matchId,
+                    source,
+                    radiant: names.radiant || "Свет",
+                    dire: names.dire || "Тьма",
+                    radiantScore: match.radiantScore,
+                    direScore: match.direScore,
+                    radiantWin: match.radiantWin,
+                  }}
+                  onSaved={archive.reload}
+                />
               </div>
             )}
           </div>

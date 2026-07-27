@@ -55,6 +55,14 @@ export function SiteNav() {
             );
           })}
         </nav>
+
+        <Link
+          href="/admin/login"
+          title="Вход в админку"
+          className={`shrink-0 rounded-md px-2 py-1.5 text-xs text-neutral-600 transition-colors hover:text-neutral-300 ${focus}`}
+        >
+          Админ
+        </Link>
       </div>
     </header>
   );

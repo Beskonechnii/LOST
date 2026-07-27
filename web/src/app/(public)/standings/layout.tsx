@@ -1,4 +1,4 @@
-import { SubNav } from "../_components/site-nav";
+import { SubNav } from "../../_components/site-nav";
 
 // Раздел дивизиона. Пока он один, поэтому подразделы — по этапам, а не по дивизионам.
 

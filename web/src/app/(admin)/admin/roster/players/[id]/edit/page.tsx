@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPlayer, listTeams } from "@/lib/roster-data";
 import { roleOrder } from "@/lib/roles";
-import { PlayerEditor, SpotsEditor } from "../../../editors";
+import { PlayerEditor, SpotsEditor } from "@/app/_components/roster-editors";
 
 export const dynamic = "force-dynamic";
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { IMAGE_MODELS, IMAGE_QUALITIES, IMAGE_SIZES, MAX_IMAGES, MAX_REFERENCES } from "@/lib/image-options";
-import { SelectField, TextAreaField } from "../../_components/form";
+import { SelectField, TextAreaField } from "../../../_components/form";
 
 // Генерация картинок по API. Настройки → POST /api/studio/generate → готовые файлы в public/uploads/generated.
 // Ключ OpenAI живёт только на сервере, сюда не приходит.

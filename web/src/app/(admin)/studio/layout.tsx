@@ -1,4 +1,4 @@
-import { SubNav } from "../_components/site-nav";
+import { SubNav } from "../../_components/site-nav";
 
 // Студия — только генерация графики. Профили команд и игроков живут в разделе «Ростер»,
 // студия берёт их оттуда как справочник (src/lib/studio-refs.ts).

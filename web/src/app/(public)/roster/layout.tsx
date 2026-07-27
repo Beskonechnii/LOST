@@ -1,4 +1,4 @@
-import { SubNav } from "../_components/site-nav";
+import { SubNav } from "../../_components/site-nav";
 
 // Ростер — справочник лиги: команды и игроки. Отдельно от студии: сюда пишут данные,
 // а студия и таблица их только читают.

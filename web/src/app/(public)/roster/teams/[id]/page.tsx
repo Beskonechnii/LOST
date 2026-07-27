@@ -5,6 +5,7 @@ import { getStandings } from "@/lib/standings";
 import { countryCode, teamAccent, teamTag } from "@/lib/profiles";
 import { roleLabel } from "@/lib/roles";
 import { QUALIFICATION, qualificationOf } from "@/lib/qualification";
+import { isAdmin } from "@/lib/admin-session";
 import { PlayerAvatar } from "../../_components/avatar";
 import { TeamCover } from "../../_components/team-cover";
 
@@ -32,7 +33,11 @@ function Stat({
 
 export default async function TeamPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [team, standings] = await Promise.all([getTeamProfile(Number(id)), getStandings()]);
+  const [team, standings, authed] = await Promise.all([
+    getTeamProfile(Number(id)),
+    getStandings(),
+    isAdmin(),
+  ]);
   if (!team) notFound();
 
   const accent = teamAccent(team);
@@ -87,12 +92,14 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
             )}
           </div>
 
-          <Link
-            href={`/roster/teams/${team.id}/edit`}
-            className="self-start rounded bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500 sm:mb-1 sm:self-auto"
-          >
-            Редактировать
-          </Link>
+          {authed && (
+            <Link
+              href={`/admin/roster/teams/${team.id}/edit`}
+              className="self-start rounded bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500 sm:mb-1 sm:self-auto"
+            >
+              Редактировать
+            </Link>
+          )}
         </div>
       </section>
 

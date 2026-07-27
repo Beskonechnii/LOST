@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ImageField, SaveButton, SelectField, TextField, Label } from "../_components/form";
+import { ImageField, SaveButton, SelectField, TextField, Label } from "./form";
 import { ROLES } from "@/lib/roles";
 
 // Формы профилей. Значения приходят из серверной страницы, изменения уходят в /api/studio/*.

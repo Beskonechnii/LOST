@@ -18,6 +18,11 @@
       "name": "web-attach",
       "port": 3000,
       "url": "http://localhost:3000"
+    },
+    {
+      "name": "web-attach-4203",
+      "port": 4203,
+      "url": "http://localhost:4203"
     }
   ]
 }

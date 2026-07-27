@@ -11,9 +11,9 @@ import {
   ItemsRow,
   TalentTreeMini,
   TeamCrest,
-} from "./_components/postgame/blocks";
-import { PostgameExport } from "./_components/postgame/export-canvas";
-import { MatchArchive, useArchive } from "./_components/match-archive";
+} from "../_components/postgame/blocks";
+import { PostgameExport } from "../_components/postgame/export-canvas";
+import { MatchArchive, useArchive } from "../_components/match-archive";
 import {
   clock,
   fmt,
@@ -26,7 +26,7 @@ import {
   type Side,
   type TalentOpt,
   type TalentTier,
-} from "./_components/postgame/types";
+} from "../_components/postgame/types";
 
 // Команда из ростера — для подстановки наших лого/тегов по названию или составу матча.
 type RosterTeam = { name: string; tag: string | null; logo: string | null; accountIds: string[] };

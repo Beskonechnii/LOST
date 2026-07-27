@@ -69,6 +69,19 @@ export function emptyRow(fields: FieldDef[]): RawRow {
   return row;
 }
 
+/**
+ * Матч для автозаполнения мастера. Живёт здесь, а не в компоненте студии: тип нужен и мастеру,
+ * и выборке `getMatchOptions()` в lib/studio-refs.ts, а библиотеке незачем зависеть от UI.
+ */
+export type MatchOption = {
+  id: number;
+  label: string;
+  teamAId: number | null;
+  teamBId: number | null;
+  time: string;
+  division: string;
+};
+
 /** Хелперы чтения в компонентах рендера — без «as» на каждой строке. */
 export const asText = (v: Value | undefined): string => (typeof v === "string" ? v : "");
 export const asTeam = (v: Value | undefined): TeamRef | null =>

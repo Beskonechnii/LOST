@@ -5,20 +5,19 @@ import { domToPng } from "modern-screenshot";
 import { Canvas } from "@/studio/Canvas";
 import { getTemplate } from "@/studio/registry";
 import { resolvePayload, type Refs } from "@/studio/resolve";
-import { emptyPayload, emptyRow, type FieldDef, type RawPayload, type RawRow, type TemplateDef } from "@/studio/types";
-import { Label, SelectField, TextField } from "../../_components/form";
+import {
+  emptyPayload,
+  emptyRow,
+  type FieldDef,
+  type MatchOption,
+  type RawPayload,
+  type RawRow,
+  type TemplateDef,
+} from "@/studio/types";
+import { Label, SelectField, TextField } from "../../../_components/form";
 
 // Мастер генерации: форма строится из schema шаблона, справа — живое превью,
 // снизу — экспорт PNG в натуральном размере и сохранение payload в историю.
-
-export type MatchOption = {
-  id: number;
-  label: string;
-  teamAId: number | null;
-  teamBId: number | null;
-  time: string;
-  division: string;
-};
 
 export function Wizard(props: { templateId: string; refs: Refs; matches: MatchOption[]; initial?: RawPayload }) {
   const template = getTemplate(props.templateId);

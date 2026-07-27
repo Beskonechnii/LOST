@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getPlayerProfile } from "@/lib/roster-data";
 import { ageOf, formatBirthday, playerGaps, playerLinks, teamAccent, telegramUrl, yearsLabel } from "@/lib/profiles";
 import { roleLabel } from "@/lib/roles";
+import { isAdmin } from "@/lib/admin-session";
 import { PlayerAvatar, TeamLogo } from "../../_components/avatar";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +32,7 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
 
 export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const player = await getPlayerProfile(Number(id));
+  const [player, authed] = await Promise.all([getPlayerProfile(Number(id)), isAdmin()]);
   if (!player) notFound();
 
   // главное место — первое по порядку ролей: оно и задаёт цвет страницы, и рисуется в крошках
@@ -118,15 +119,18 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
             </div>
           </div>
 
-          <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
-            <Link
-              href={`/roster/players/${player.id}/edit`}
-              className="rounded bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500"
-            >
-              Редактировать
-            </Link>
-            <span className="text-xs text-neutral-600">slug: {player.slug}</span>
-          </div>
+          {/* Правка и служебный slug — только оператору: посетителю ни то, ни другое не нужно */}
+          {authed && (
+            <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
+              <Link
+                href={`/admin/roster/players/${player.id}/edit`}
+                className="rounded bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500"
+              >
+                Редактировать
+              </Link>
+              <span className="text-xs text-neutral-600">slug: {player.slug}</span>
+            </div>
+          )}
         </div>
 
         {gaps.length > 0 && (

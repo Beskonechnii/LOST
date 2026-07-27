@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTeam } from "@/lib/roster-data";
-import { TeamEditor } from "../../../editors";
+import { TeamEditor } from "@/app/_components/roster-editors";
 
 export const dynamic = "force-dynamic";
 

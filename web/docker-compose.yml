@@ -1,0 +1,31 @@
+# Прод-запуск LOST одной командой: docker compose up -d --build
+#
+# Два тома — это всё состояние приложения. Их и надо бэкапить:
+#   lost-data     база лиги (sqlite): составы, сетка встреч, результаты
+#   lost-uploads  картинки: лого и фото ростера, архив постгеймов, генерации
+
+services:
+  web:
+    build: .
+    image: lost-web
+    restart: unless-stopped
+    # Наружу торчит только localhost: TLS и домен вешает nginx/Caddy перед контейнером.
+    # Открыть 0.0.0.0 — значит выставить админку в интернет по голому http.
+    ports:
+      - "127.0.0.1:3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - lost-data:/app/data
+      - lost-uploads:/app/public/uploads
+    healthcheck:
+      # Тот же эндпоинт, что и для ручной проверки: отвечает только при живой связке с БД
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  lost-data:
+  lost-uploads:

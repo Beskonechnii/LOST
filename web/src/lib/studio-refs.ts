@@ -4,9 +4,9 @@
 import { prisma } from "@/lib/prisma";
 import { isCoreRole } from "@/lib/roster-spots";
 import { withPlayerUploads, withTeamUploads } from "@/lib/uploads";
-import type { PlayerRef, TeamRef } from "@/studio/types";
+import type { MatchOption, PlayerRef, TeamRef } from "@/studio/types";
 import type { Refs } from "@/studio/resolve";
-import type { MatchOption } from "@/app/studio/_components/wizard";
+
 
 export async function getRefs(): Promise<Refs> {
   const [teams, players] = await Promise.all([

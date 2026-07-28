@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { SiteNav } from "./_components/site-nav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,11 +27,9 @@ export default function RootLayout({
       lang="ru"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      {/* навигация — общая для всех разделов; внутри студии добавляется вторая строка (src/app/studio/layout.tsx) */}
-      <body className="flex min-h-full flex-col bg-neutral-950 text-neutral-100">
-        <SiteNav />
-        {children}
-      </body>
+      {/* Навигации здесь намеренно нет: она своя у каждой группы маршрутов —
+          (public)/layout.tsx для продукта и (admin)/layout.tsx для служебной части. */}
+      <body className="flex min-h-full flex-col bg-neutral-950 text-neutral-100">{children}</body>
     </html>
   );
 }

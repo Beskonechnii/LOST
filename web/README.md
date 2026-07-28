@@ -5,6 +5,8 @@
 
 Next.js 16 (App Router, Turbopack) · React 19 · Tailwind v4 · Prisma 7 + SQLite (libsql-адаптер).
 
+Выкладка на сервер — [`../DEPLOY.md`](../DEPLOY.md) (Docker или голый Node; на PHP-хостинг не ставится).
+
 ## Первый запуск на новой машине
 
 Единственное, чего нет в репозитории, — `.env`:

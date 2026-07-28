@@ -5,11 +5,41 @@
 // Полные описания талантов (с числами) — сгенерированы из Dota 2 Wiki, т.к. в константах
 // OpenDota значения {s:...} не подставлены (~59% талантов). См. scripts/build-talents.mjs.
 import talentNames from "./talents.json";
+import { localConstants, localHeroes } from "./dota-constants";
+
+// OpenDota регулярно отдаёт 429 (рейт-лимит) и 5xx от Cloudflare — чаще всего 522/524,
+// когда их бэкенд не ответил вовремя. Это не ошибка запроса, а «попробуй ещё раз»,
+// поэтому такие ответы ретраим с нарастающей паузой, а наружу отдаём текст для человека.
+const RETRY_STATUS = new Set([408, 425, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524]);
+const RETRIES = 3;
+const TIMEOUT_MS = 20_000;
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+function odError(status: number): Error {
+  if (status === 429) return new Error("OpenDota ограничил частоту запросов (429). Подожди минуту и попробуй снова.");
+  if (RETRY_STATUS.has(status))
+    return new Error(`OpenDota сейчас недоступна (${status}). Это на их стороне — попробуй через пару минут.`);
+  if (status === 404) return new Error("OpenDota не знает такой матч (404). Проверь ID.");
+  return new Error(`OpenDota ответила ${status}.`);
+}
 
 async function getJson<T>(url: string): Promise<T> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`OpenDota ${res.status} ${url}`);
-  return res.json() as Promise<T>;
+  let last: Error | null = null;
+  for (let attempt = 0; attempt <= RETRIES; attempt++) {
+    if (attempt) await sleep(500 * 2 ** (attempt - 1)); // 0.5с → 1с → 2с
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) });
+      if (res.ok) return (await res.json()) as T;
+      last = odError(res.status);
+      if (!RETRY_STATUS.has(res.status)) throw last;
+    } catch (e) {
+      // Обрыв связи и таймаут ретраим так же, как 5xx; ошибку статуса пробрасываем как есть.
+      if (e === last) throw e;
+      last = new Error("Не достучались до OpenDota — сеть или таймаут.");
+    }
+  }
+  throw last ?? new Error("OpenDota недоступна.");
 }
 
 // --- Сырые формы OpenDota (только нужные поля) ---
@@ -46,20 +76,28 @@ type RawPlayer = {
   account_id?: number | null;
   camps_stacked?: number;
   lane_role?: number | null;
+  player_slot?: number; // <128 — свет, иначе тьма; нужен для резолва событий objectives
 };
-type RawMatch = {
+type RawTeam = { name?: string; tag?: string; logo_url?: string } | null;
+type RawObjective = { type?: string; time?: number; player_slot?: number; team?: number; key?: string; killer?: number };
+export type RawMatch = {
   match_id: number;
   version?: number | null;
   radiant_win?: boolean;
   duration?: number;
+  start_time?: number; // unix-секунды начала матча — для даты в шапке отчёта
   radiant_score?: number;
   dire_score?: number;
-  radiant_team?: { name?: string } | null;
-  dire_team?: { name?: string } | null;
+  radiant_team?: RawTeam;
+  dire_team?: RawTeam;
+  tower_status_radiant?: number | null;
+  tower_status_dire?: number | null;
+  barracks_status_radiant?: number | null;
+  barracks_status_dire?: number | null;
   radiant_gold_adv?: number[] | null;
   radiant_xp_adv?: number[] | null;
   picks_bans?: { order: number; is_pick: boolean; team: number; hero_id: number }[] | null;
-  objectives?: { type?: string; player_slot?: number }[] | null;
+  objectives?: RawObjective[] | null;
   players: RawPlayer[];
 };
 
@@ -70,9 +108,9 @@ export type Entity = { name: string; slug: string };
 let heroCache: Map<number, Entity> | null = null;
 async function heroInfo(): Promise<Map<number, Entity>> {
   if (heroCache) return heroCache;
-  const arr = await getJson<{ id: number; name: string; localized_name: string }[]>(
-    "https://api.opendota.com/api/heroes",
-  );
+  const arr = localHeroes().length
+    ? localHeroes()
+    : await getJson<{ id: number; name: string; localized_name: string }[]>("https://api.opendota.com/api/heroes");
   // slug из name (npc_dota_hero_antimage → antimage) — совпадает с sync-assets.ts
   heroCache = new Map(arr.map((h) => [h.id, { name: h.localized_name, slug: h.name.replace(/^npc_dota_hero_/, "") }]));
   return heroCache;
@@ -90,6 +128,13 @@ type Constants = {
 let constsCache: Constants | null = null;
 async function constants(): Promise<Constants> {
   if (constsCache) return constsCache;
+  // Основной источник — вендоренная копия (см. lib/dota-constants.ts). Сеть остаётся
+  // запасным путём: если файл почему-то пуст, работаем как раньше, через их API.
+  const local = localConstants();
+  if (Object.keys(local.itemIds).length) {
+    constsCache = local;
+    return constsCache;
+  }
   const base = "https://api.opendota.com/api/constants/";
   const [itemIds, items, abilityIds, abilities, heroAbilities, buffs] = await Promise.all([
     getJson<Record<string, string>>(base + "item_ids"),
@@ -170,6 +215,7 @@ export type PlayerReport = {
   side: "radiant" | "dire";
   pos: number; // 1..5 (эвристика), 0 — не определена
   role: string; // "Керри" … "Хард-сап"
+  accountId: number | null; // steam32 — для распознавания команды лиги по составу
   name: string;
   hero: Entity;
   level: number;
@@ -195,21 +241,82 @@ export type PlayerReport = {
   buffs: { name: string; stacks: number }[];
 };
 export type PickBan = { order: number; isPick: boolean; side: "radiant" | "dire"; hero: Entity };
+export type Side = "radiant" | "dire";
+
+// Строения одной стороны, декодированные из битмасок tower/barracks_status.
+export type Lane = "top" | "mid" | "bot";
+export type SideBuildings = {
+  towers: { lane: Lane; tier: 1 | 2 | 3; alive: boolean }[];
+  ancient: { top: boolean; bottom: boolean }; // две башни у трона (alive)
+  racks: { lane: Lane; ranged: boolean; melee: boolean }[]; // казармы (alive)
+};
+
+// Убийца события — игрок (ник + герой) либо только герой (для курьеров резолвим по hero_id).
+export type EventActor = { name: string; hero: Entity };
+export type MatchEvents = {
+  firstBlood: { time: number; side: Side; killer: EventActor | null } | null;
+  firstTower: { time: number; side: Side; killer: EventActor | null } | null;
+  roshan: { radiant: number; dire: number; kills: { time: number; side: Side }[] };
+  couriers: { radiant: number; dire: number; kills: { time: number; victimSide: Side; killer: Entity | null }[] };
+};
+
 export type MatchReport = {
   matchId: string;
   parsed: boolean;
   radiantWin: boolean;
   durationSeconds: number;
+  startTime: number;
   radiantScore: number;
   direScore: number;
   radiantTeam: string | null;
   direTeam: string | null;
+  radiantTag: string | null;
+  direTag: string | null;
+  radiantLogo: string | null;
+  direLogo: string | null;
   aegis: { radiant: number; dire: number };
   goldAdv: number[];
   xpAdv: number[];
+  buildings: { radiant: SideBuildings; dire: SideBuildings };
+  events: MatchEvents;
   picksBans: PickBan[];
   players: PlayerReport[];
 };
+
+// --- Декод битмасок строений (бит=1 → строение цело) ---
+// Раскладка Valve (см. WebAPI/GetMatchDetails; подтверждено порядком в odota/web BuildingMap):
+// tower_status, от LSB: 0 top-t1, 1 top-t2, 2 top-t3, 3 mid-t1, 4 mid-t2, 5 mid-t3,
+// 6 bot-t1, 7 bot-t2, 8 bot-t3, 9 anc-top, 10 anc-bottom.
+function decodeTowers(mask: number | null | undefined): SideBuildings {
+  const m = mask ?? 0;
+  const bit = (n: number) => (m & (1 << n)) !== 0;
+  return {
+    ancient: { top: bit(9), bottom: bit(10) },
+    towers: [
+      { lane: "top", tier: 1, alive: bit(0) },
+      { lane: "top", tier: 2, alive: bit(1) },
+      { lane: "top", tier: 3, alive: bit(2) },
+      { lane: "mid", tier: 1, alive: bit(3) },
+      { lane: "mid", tier: 2, alive: bit(4) },
+      { lane: "mid", tier: 3, alive: bit(5) },
+      { lane: "bot", tier: 1, alive: bit(6) },
+      { lane: "bot", tier: 2, alive: bit(7) },
+      { lane: "bot", tier: 3, alive: bit(8) },
+    ],
+    // казармы дозаполним из barracks-маски отдельно
+    racks: [],
+  };
+}
+// barracks_status, от LSB: 0 top-melee, 1 top-ranged, 2 mid-melee, 3 mid-ranged, 4 bot-melee, 5 bot-ranged.
+function decodeRacks(mask: number | null | undefined): SideBuildings["racks"] {
+  const m = mask ?? 0;
+  const bit = (n: number) => (m & (1 << n)) !== 0;
+  return [
+    { lane: "top", melee: bit(0), ranged: bit(1) },
+    { lane: "mid", melee: bit(2), ranged: bit(3) },
+    { lane: "bot", melee: bit(4), ranged: bit(5) },
+  ];
+}
 
 const ROLE_LABEL: Record<number, string> = {
   1: "Керри",
@@ -248,11 +355,15 @@ function assignPositions(side: { i: number; laneRole?: number | null; nw: number
 }
 
 export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
-  const [m, heroes, c] = await Promise.all([
-    getJson<RawMatch>(`https://api.opendota.com/api/matches/${matchId}`),
-    heroInfo(),
-    constants(),
-  ]);
+  const m = await getJson<RawMatch>(`https://api.opendota.com/api/matches/${matchId}`);
+  return buildMatchReport(String(matchId), m);
+}
+
+// Сборка отчёта отделена от загрузки: форма RawMatch — это форма Valve GetMatchDetails
+// плюс поля OpenDota, поэтому второй источник (см. lib/steam-match.ts) переиспользует
+// ровно эту функцию, а не дублирует резолв имён, позиции и декод строений.
+export async function buildMatchReport(matchId: string, m: RawMatch): Promise<MatchReport> {
+  const [heroes, c] = await Promise.all([heroInfo(), constants()]);
   if (!m || !Array.isArray(m.players) || m.players.length === 0) {
     throw new Error(`Матч ${matchId} не найден или без данных`);
   }
@@ -319,6 +430,7 @@ export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
       side: p.isRadiant ? "radiant" : "dire",
       pos: posMap.get(i) ?? 0,
       role: ROLE_LABEL[posMap.get(i) ?? 0] ?? "",
+      accountId: p.account_id ?? null,
       name: p.name || p.personaname || "Аноним",
       hero,
       level: p.level ?? 0,
@@ -351,13 +463,61 @@ export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
     };
   });
 
+  const sideOfSlot = (slot: number | undefined): Side => ((slot ?? 0) < 128 ? "radiant" : "dire");
+
+  // Слот игрока → актор (ник + герой) для резолва «кто сделал». Слот есть у каждого игрока матча.
+  const slotActor = new Map<number, EventActor>();
+  m.players.forEach((p) => {
+    if (p.player_slot != null) {
+      slotActor.set(p.player_slot, { name: p.name || p.personaname || "Аноним", hero: heroEntity(p.hero_id) });
+    }
+  });
+
   const aegis = { radiant: 0, dire: 0 };
+  const events: MatchEvents = {
+    firstBlood: null,
+    firstTower: null,
+    roshan: { radiant: 0, dire: 0, kills: [] },
+    couriers: { radiant: 0, dire: 0, kills: [] },
+  };
   for (const o of m.objectives ?? []) {
-    if (typeof o.type === "string" && o.type.includes("AEGIS")) {
+    const t = o.type;
+    if (!t) continue;
+    if (t.includes("AEGIS")) {
       if ((o.player_slot ?? 0) < 128) aegis.radiant++;
       else aegis.dire++;
+    } else if (t === "CHAT_MESSAGE_FIRSTBLOOD" && !events.firstBlood) {
+      events.firstBlood = {
+        time: o.time ?? 0,
+        side: sideOfSlot(o.player_slot),
+        killer: slotActor.get(o.player_slot ?? -1) ?? null,
+      };
+    } else if (t === "building_kill" && !events.firstTower && typeof o.key === "string" && o.key.includes("tower")) {
+      // Сторона убийцы — противоположна владельцу вышки (goodguys=свет). player_slot точнее, если есть.
+      const side: Side = o.player_slot != null ? sideOfSlot(o.player_slot) : o.key.includes("goodguys") ? "dire" : "radiant";
+      events.firstTower = { time: o.time ?? 0, side, killer: slotActor.get(o.player_slot ?? -1) ?? null };
+    } else if (t === "CHAT_MESSAGE_ROSHAN_KILL") {
+      // team: 2 — рошана убил свет, 3 — тьма.
+      const side: Side = o.team === 2 ? "radiant" : "dire";
+      events.roshan[side]++;
+      events.roshan.kills.push({ time: o.time ?? 0, side });
+    } else if (t === "CHAT_MESSAGE_COURIER_LOST") {
+      // team — чей курьер погиб (2 свет / 3 тьма); убийца — противоположная сторона, killer=hero_id.
+      const victimSide: Side = o.team === 2 ? "radiant" : "dire";
+      const killerSide: Side = victimSide === "radiant" ? "dire" : "radiant";
+      events.couriers[killerSide]++;
+      events.couriers.kills.push({
+        time: o.time ?? 0,
+        victimSide,
+        killer: o.killer ? heroEntity(o.killer) : null, // killer=0 → не герой (вышка/крип)
+      });
     }
   }
+
+  const buildings = {
+    radiant: { ...decodeTowers(m.tower_status_radiant), racks: decodeRacks(m.barracks_status_radiant) },
+    dire: { ...decodeTowers(m.tower_status_dire), racks: decodeRacks(m.barracks_status_dire) },
+  };
 
   const picksBans: PickBan[] = (m.picks_bans ?? [])
     .map((pb) => ({
@@ -369,17 +529,24 @@ export async function fetchMatchReport(matchId: string): Promise<MatchReport> {
     .sort((a, b) => a.order - b.order);
 
   return {
-    matchId: String(m.match_id),
+    matchId: String(m.match_id ?? matchId),
     parsed: m.version != null,
     radiantWin: !!m.radiant_win,
     durationSeconds: m.duration ?? 0,
+    startTime: m.start_time ?? 0,
     radiantScore: m.radiant_score ?? 0,
     direScore: m.dire_score ?? 0,
     radiantTeam: m.radiant_team?.name ?? null,
     direTeam: m.dire_team?.name ?? null,
+    radiantTag: m.radiant_team?.tag || null,
+    direTag: m.dire_team?.tag || null,
+    radiantLogo: m.radiant_team?.logo_url || null,
+    direLogo: m.dire_team?.logo_url || null,
     aegis,
     goldAdv: m.radiant_gold_adv ?? [],
     xpAdv: m.radiant_xp_adv ?? [],
+    buildings,
+    events,
     picksBans,
     players,
   };

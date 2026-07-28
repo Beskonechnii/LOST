@@ -1,0 +1,15 @@
+# Секреты в образ не кладём — переменные приходят снаружи (env_file / -e)
+.env
+.env.*
+!.env.example
+
+node_modules
+.next
+.cache
+src/generated
+.git
+.gitignore
+
+# Вывод, а не ассеты релиза: генерации OpenAI и архив выгруженных постгеймов
+public/uploads/generated
+public/uploads/postgame

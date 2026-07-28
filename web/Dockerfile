@@ -42,6 +42,8 @@ ENV HOSTNAME=0.0.0.0
 # на старте контейнера — это CLI Prisma, а он живёт в devDependencies.
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
+# `next start` читает конфиг в рантайме: без этого файла отвалятся заголовки (frame-ancestors).
+COPY --from=build /app/next.config.ts ./next.config.ts
 COPY --from=build /app/prisma.config.ts ./prisma.config.ts
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public

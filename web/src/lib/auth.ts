@@ -61,6 +61,10 @@ const PROTECTED_PAGES = [
 export function needsAdmin(pathname: string, method: string): boolean {
   if (pathname.startsWith("/admin/login")) return false; // иначе войти было бы некуда
 
+  // Единственное исключение из «читать можно всем»: полка выгруженных постгеймов — черновики
+  // оператора, а не факт о лиге. Прятать её в интерфейсе и раздавать списком через API — половина работы.
+  if (pathname.startsWith("/api/postgame/archive")) return true;
+
   // Любая запись через API: POST/PATCH/PUT/DELETE. Чтение (GET) остаётся публичным.
   if (pathname.startsWith("/api/")) return method !== "GET" && method !== "HEAD";
 

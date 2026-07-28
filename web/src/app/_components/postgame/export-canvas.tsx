@@ -331,14 +331,14 @@ function ExportBlock({
   kind,
   file,
   meta,
-  onSaved,
+  canArchive,
   children,
 }: {
   title: string;
   kind: ShotKind;
   file: string;
   meta: ArchiveDraft;
-  onSaved: () => void;
+  canArchive: boolean;
   children: React.ReactNode;
 }) {
   const node = useRef<HTMLDivElement>(null);
@@ -371,8 +371,7 @@ function ExportBlock({
     try {
       const blob = await (await fetch(await shoot())).blob();
       await archiveShot(meta, kind, blob);
-      setNote("сохранено");
-      onSaved();
+      setNote("сохранено — картинка на полке в /match");
     } catch (e) {
       setNote(e instanceof Error ? e.message : String(e));
     } finally {
@@ -392,15 +391,18 @@ function ExportBlock({
         >
           {busy === "download" ? "Готовлю PNG…" : `Скачать PNG ${EXPORT_W * EXPORT_SCALE}×${EXPORT_H * EXPORT_SCALE}`}
         </button>
-        <button
-          type="button"
-          disabled={!!busy}
-          onClick={() => void toArchive()}
-          title="Положить эту картинку в архив выгрузок"
-          className="rounded border border-neutral-700 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:border-neutral-500 hover:text-white disabled:opacity-50"
-        >
-          {busy === "archive" ? "Сохраняю…" : "В архив"}
-        </button>
+        {/* Архив — операторская полка, посетителю её не показываем (и запись всё равно закрыта паролем). */}
+        {canArchive && (
+          <button
+            type="button"
+            disabled={!!busy}
+            onClick={() => void toArchive()}
+            title="Положить эту картинку в архив выгрузок"
+            className="rounded border border-neutral-700 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:border-neutral-500 hover:text-white disabled:opacity-50"
+          >
+            {busy === "archive" ? "Сохраняю…" : "В архив"}
+          </button>
+        )}
         {note && <span className="text-xs text-neutral-500">{note}</span>}
       </div>
       <div className="h-[42vh] min-h-[240px]">
@@ -415,7 +417,7 @@ function ExportBlock({
 // --- Вкладка «Экспорт»: две картинки, каждая скачивается отдельно ---
 export function PostgameExport({
   meta,
-  onSaved,
+  canArchive,
   ...props
 }: {
   match: MatchReport;
@@ -423,15 +425,15 @@ export function PostgameExport({
   tags: Names;
   logos: Logos;
   meta: ArchiveDraft;
-  onSaved: () => void;
+  canArchive: boolean;
 }) {
-  const block = { meta, onSaved };
+  const block = { meta, canArchive };
   return (
     <div className="space-y-5">
       <p className="text-xs text-neutral-500">
         Две картинки 1920×1080 на общей подложке <code className="text-neutral-400">public/templates/postgame/bg.png</code>.
         Файла нет — под контентом фирменный градиент. Названия команд и лого правятся во вкладке «Отчёт».
-        «В архив» кладёт картинку на полку под полем ввода — там она переживёт и патч Доты, и падение OpenDota.
+        {canArchive && " «В архив» кладёт картинку на полку под полем ввода — там она переживёт и патч Доты, и падение OpenDota."}
       </p>
       <ExportBlock title="Сводка матча" kind="summary" file={`postgame-${props.match.matchId}-summary`} {...block}>
         <SummaryCanvas {...props} />

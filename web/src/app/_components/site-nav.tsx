@@ -14,7 +14,7 @@ import { usePathname } from "next/navigation";
 export type NavItem = { href: string; label: string; hint?: string };
 
 const PUBLIC_SECTIONS: NavItem[] = [
-  { href: "/", label: "Матч", hint: "Разбор матча Dota 2 по ID" },
+  { href: "/match", label: "Матч", hint: "Разбор матча Dota 2 по ID" },
   { href: "/standings", label: "LOST D1", hint: "Таблица и групповая стадия дивизиона" },
   { href: "/roster", label: "Ростер", hint: "Команды и игроки лиги" },
 ];

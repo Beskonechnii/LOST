@@ -143,6 +143,21 @@ model Render {
   matchId Int?
 }
 
+/// Сессия шоу-драфта UNDERBEER 2.0. Оператор на эфире собирает команды из живого ростера:
+/// капитаны по очереди берут игроков, у каждой команды по разу есть «закрепить» и «украсть».
+/// Это НЕ ростер лиги (RosterSpot) — эфемерный вывод оператора, как Render: всё состояние
+/// лежит в payload JSON-строкой (sqlite), связей по FK с Player нет намеренно. В payload — только
+/// id игроков; их карточки (ник/фото/mmr) резолвятся из ростера при чтении (src/lib/draft-data.ts),
+/// ушедший из ростера игрок из состава просто выпадает — драфт живёт один эфир, это допустимо.
+model DraftSession {
+  id        Int      @id @default(autoincrement())
+  title     String?
+  status    String   @default("draft") // draft | done
+  payload   String // JSON всего состояния драфта (src/lib/draft.ts → DraftState)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 // Кэш статы из OpenDota (по игроку в матче) — для инфографики и подсказки MVP.
 model MatchStat {
   id           Int    @id @default(autoincrement())

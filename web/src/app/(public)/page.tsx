@@ -15,15 +15,20 @@ export const metadata: Metadata = {
     "League of Spirit — киберспортивные турниры по Dota 2 в Минске. Таблица дивизиона, составы команд и разбор любого матча Dota 2.",
 };
 
-const DIVISION = "Division 1";
 const SITE = "https://leagueofspirits.ru/lost_s1";
 
 /** Разделы продукта. Порядок тот же, что в верхней навигации, — карточки её и повторяют. */
 const SECTIONS = [
   {
-    href: "/standings",
+    href: "/standings/d1",
     title: "LOST D1",
-    text: "Таблица дивизиона с зонами выхода, сетка групповой стадии и плей-офф. Правка результата встречи двигает и сетку, и таблицу.",
+    text: "Первый дивизион: таблица с зонами выхода, сетка групповой стадии и плей-офф. Правка результата встречи двигает и сетку, и таблицу.",
+    cta: "Смотреть таблицу",
+  },
+  {
+    href: "/standings/d2",
+    title: "LOST D2",
+    text: "Второй дивизион: своя таблица, группы и плей-офф. Считается по тем же правилам, что и первый.",
     cta: "Смотреть таблицу",
   },
   {
@@ -42,11 +47,12 @@ const SECTIONS = [
 
 export default async function Home() {
   // Считаем прямо здесь: показать надо четыре числа, тянуть ради них выборки страниц незачем.
+  // Считаем по всей лиге, а не по одному дивизиону: на витрине цифры общие (D1 + D2).
   const [teams, players, series, groups] = await Promise.all([
     prisma.team.count(),
     prisma.player.count(),
-    prisma.groupSeries.count({ where: { division: DIVISION } }),
-    prisma.groupEntry.findMany({ where: { division: DIVISION }, distinct: ["group"], select: { group: true } }),
+    prisma.groupSeries.count(),
+    prisma.groupEntry.findMany({ distinct: ["division", "group"], select: { group: true } }),
   ]);
 
   const stats = [
@@ -80,7 +86,7 @@ export default async function Home() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/standings"
+              href="/standings/d1"
               className="rounded-md bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-violet-500"
             >
               Таблица дивизиона
@@ -107,7 +113,7 @@ export default async function Home() {
 
       {/* Разделы: карточка = пункт меню, чтобы «что тут вообще есть» читалось без клика */}
       <section className="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {SECTIONS.map((s) => (
             <Link
               key={s.href}

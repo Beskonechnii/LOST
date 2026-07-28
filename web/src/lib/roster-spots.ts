@@ -6,14 +6,15 @@ import { rolePosition } from "@/lib/roles";
 /** Действующий игрок — тот, кто занимает позицию 1–5. Замена и тренер действующими не считаются. */
 export const isCoreRole = (role: string | null | undefined) => rolePosition(role) !== null;
 
-export type SpotLike = { teamId: number; role: string | null };
+export type SpotLike = { teamId: number; role: string | null; division?: string | null };
 
 /**
- * Можно ли отдать игроку это место. Единственный жёсткий запрет — быть **действующим** (поз. 1–5)
- * сразу в двух командах: в матче он сыграет за одну, и вся стата с составами разъедется.
- * Замена и тренер сколько угодно раз: человек может страховать несколько команд.
+ * Можно ли отдать игроку это место. Жёсткий запрет — быть **действующим** (поз. 1–5) сразу в двух
+ * командах **одного дивизиона**: внутри дивизиона он сыграет за одну, и стата с составами разъедется.
+ * А вот в разных дивизионах (D1 и D2 — раздельные турниры) действующим быть можно: игрок нередко
+ * заявлен и в первом, и во втором. Замена и тренер — сколько угодно раз в любом дивизионе.
  *
- * @param existing  места, которые у игрока уже есть (кроме того, что сейчас меняем)
+ * @param existing  места, которые у игрока уже есть (кроме того, что сейчас меняем); дивизион — из Team.group
  * @returns текст ошибки или null, если всё в порядке
  */
 export function spotConflict(
@@ -22,9 +23,12 @@ export function spotConflict(
 ): string | null {
   if (!isCoreRole(next.role)) return null;
 
-  const clash = existing.find((s) => s.teamId !== next.teamId && isCoreRole(s.role));
+  const nextDiv = next.division ?? null;
+  const clash = existing.find(
+    (s) => s.teamId !== next.teamId && isCoreRole(s.role) && (s.division ?? null) === nextDiv,
+  );
   if (!clash) return null;
 
-  return `игрок уже действующий в составе «${clash.teamName ?? `команда #${clash.teamId}`}» — ` +
-    `действующим можно быть только в одной команде, во вторую ставьте заменой`;
+  return `игрок уже действующий в составе «${clash.teamName ?? `команда #${clash.teamId}`}» того же дивизиона — ` +
+    `действующим можно быть только в одной команде дивизиона, во вторую ставьте заменой`;
 }

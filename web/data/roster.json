@@ -52,15 +52,6 @@
         "mmr": 6400
       },
       {
-        "slug": "lonely",
-        "nickname": "Lonely",
-        "realName": "Артём Лизурчик",
-        "role": "standin",
-        "accountId": null,
-        "dotabuffUrl": null,
-        "mmr": 4997
-      },
-      {
         "slug": "brazil",
         "nickname": "BRAZIL",
         "realName": "Никита",
@@ -68,15 +59,6 @@
         "accountId": null,
         "dotabuffUrl": null,
         "mmr": null
-      },
-      {
-        "slug": "chervyak",
-        "nickname": "Chervyak",
-        "realName": "Никита Черницкий",
-        "role": "standin",
-        "accountId": null,
-        "dotabuffUrl": null,
-        "mmr": 5909
       }
     ]
   },
@@ -991,6 +973,714 @@
         "accountId": "228351925",
         "dotabuffUrl": "https://www.dotabuff.com/players/228351925",
         "mmr": 6181
+      }
+    ]
+  },
+  {
+    "slug": "slonimskiy-pachastunok",
+    "name": "Слонимский Пачастунок",
+    "tag": null,
+    "group": "Division 2",
+    "players": [
+      {
+        "slug": "1-01b",
+        "nickname": "1.01b",
+        "realName": "Евгений Антипов",
+        "mmr": 4800,
+        "role": "carry",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "npq",
+        "nickname": "NPQ",
+        "realName": "Дмитрий Приставка",
+        "mmr": 5168,
+        "role": "mid",
+        "accountId": "368509389",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/368509389"
+      },
+      {
+        "slug": "brazil",
+        "nickname": "BRAZIL",
+        "realName": "Никита Стариков",
+        "mmr": 5873,
+        "role": "offlane",
+        "accountId": "215123629",
+        "dotabuffUrl": "https://www.dotabuff.com/players/215123629"
+      },
+      {
+        "slug": "highlight-provider",
+        "nickname": "highlight provider",
+        "realName": "Павел Ларионов",
+        "mmr": 5200,
+        "role": "soft-support",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "estacada",
+        "nickname": "Estacada",
+        "realName": "Евгений Саевич",
+        "mmr": 3098,
+        "role": "hard-support",
+        "accountId": "82226499",
+        "dotabuffUrl": "https://www.dotabuff.com/players/82226499"
+      },
+      {
+        "slug": "chipollino",
+        "nickname": "Chipollino",
+        "realName": "Вадим Лукша",
+        "mmr": 4370,
+        "role": "standin",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "irishtea",
+        "nickname": "irishtea",
+        "realName": "Матвей",
+        "mmr": null,
+        "role": "coach",
+        "accountId": null,
+        "dotabuffUrl": null
+      }
+    ]
+  },
+  {
+    "slug": "acolytes",
+    "name": "ACOLYTES",
+    "tag": "ACT",
+    "group": "Division 2",
+    "players": [
+      {
+        "slug": "serhio",
+        "nickname": "Serhio",
+        "realName": "Илья Морозов",
+        "mmr": 7000,
+        "role": "carry",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "lonely",
+        "nickname": "Lonely",
+        "realName": "Артём Лизурчик",
+        "mmr": 4936,
+        "role": "mid",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "chervyak",
+        "nickname": "Chervyak",
+        "realName": "Никита Черницкий",
+        "mmr": 5909,
+        "role": "offlane",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "happysadman",
+        "nickname": "HappySadMan",
+        "realName": "Алексей Древило",
+        "mmr": 4067,
+        "role": "soft-support",
+        "accountId": "896562795",
+        "dotabuffUrl": "https://www.dotabuff.com/players/896562795"
+      },
+      {
+        "slug": "l-bionix-l",
+        "nickname": "l_BioniX_l",
+        "realName": "Виталий Карпеко",
+        "mmr": 3407,
+        "role": "hard-support",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "saldatau",
+        "nickname": "saldatau",
+        "realName": "Дмитрий Солдатов",
+        "mmr": null,
+        "role": "coach",
+        "accountId": null,
+        "dotabuffUrl": null
+      }
+    ]
+  },
+  {
+    "slug": "chubriki",
+    "name": "Chubriki",
+    "tag": null,
+    "group": "Division 2",
+    "players": [
+      {
+        "slug": "mel",
+        "nickname": "Mel",
+        "realName": "Алексей Гусейнов",
+        "mmr": 5997,
+        "role": "carry",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "egorkanoobas",
+        "nickname": "EgorkaNoobas",
+        "realName": "Егор Митасов",
+        "mmr": 6882,
+        "role": "mid",
+        "accountId": "258661729",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/258661729"
+      },
+      {
+        "slug": "cookei-1",
+        "nickname": "Cookei_1",
+        "realName": "Александр Шереметьев",
+        "mmr": 2882,
+        "role": "offlane",
+        "accountId": "157709694",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/157709694"
+      },
+      {
+        "slug": "kislomolochnyy",
+        "nickname": "КиСлОмОлОчНыЙ",
+        "realName": "Анатолий Орлов",
+        "mmr": 2882,
+        "role": "soft-support",
+        "accountId": "466902186",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/466902186"
+      },
+      {
+        "slug": "chomoske",
+        "nickname": "Chomoske",
+        "realName": "Евгений Дашкевич",
+        "mmr": 5086,
+        "role": "hard-support",
+        "accountId": "1692832135",
+        "dotabuffUrl": "https://www.dotabuff.com/players/1692832135"
+      },
+      {
+        "slug": "sett",
+        "nickname": "Sett",
+        "realName": "Дмитрий Ларин",
+        "mmr": 2854,
+        "role": "standin",
+        "accountId": null,
+        "dotabuffUrl": null
+      }
+    ]
+  },
+  {
+    "slug": "eclipse-gaming-young",
+    "name": "Eclipse Gaming Young",
+    "tag": "EG.Y",
+    "group": "Division 2",
+    "players": [
+      {
+        "slug": "pugovichka-otorvalasya",
+        "nickname": "Pugovichka otorvalasya",
+        "realName": "Даниил Семашко",
+        "mmr": 6021,
+        "role": "carry",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "smn",
+        "nickname": "smn^",
+        "realName": "Дмитрий Дидычук",
+        "mmr": 5885,
+        "role": "mid",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "flint-lockwood",
+        "nickname": "Flint Lockwood",
+        "realName": "Данила Бодров",
+        "mmr": 6585,
+        "role": "offlane",
+        "accountId": "193065263",
+        "dotabuffUrl": "https://www.dotabuff.com/players/193065263"
+      },
+      {
+        "slug": "p1rat",
+        "nickname": "p1rat",
+        "realName": "Владимир Лишаненко",
+        "mmr": 4135,
+        "role": "soft-support",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "bronepoezd",
+        "nickname": "BRONEPOEZD",
+        "realName": "Илья Лазарев",
+        "mmr": 2847,
+        "role": "hard-support",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "b-u-r-i-z-a",
+        "nickname": "B U R I Z A",
+        "realName": "Владислав Перепелкин",
+        "mmr": 4601,
+        "role": "standin",
+        "accountId": "1012138182",
+        "dotabuffUrl": "https://www.dotabuff.com/players/1012138182"
+      },
+      {
+        "slug": "v1ole",
+        "nickname": "V1ole",
+        "realName": "Данила Хитрик",
+        "mmr": 6459,
+        "role": "standin",
+        "accountId": "307662377",
+        "dotabuffUrl": "https://www.dotabuff.com/players/307662377"
+      }
+    ]
+  },
+  {
+    "slug": "dark-aria",
+    "name": "Dark Aria",
+    "tag": "DA",
+    "group": "Division 2",
+    "players": [
+      {
+        "slug": "the-one",
+        "nickname": "The One",
+        "realName": "Денис Грузневич",
+        "mmr": 5958,
+        "role": "carry",
+        "accountId": "211359650",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/211359650"
+      },
+      {
+        "slug": "nimpo",
+        "nickname": "Nimpo",
+        "realName": "Максим Курач",
+        "mmr": 4622,
+        "role": "mid",
+        "accountId": "1032418592",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/1032418592"
+      },
+      {
+        "slug": "glebasta-cmstorm",
+        "nickname": "GLEBASTA*CMSTORM",
+        "realName": "Глеб Астапенко",
+        "mmr": 4609,
+        "role": "offlane",
+        "accountId": "121416513",
+        "dotabuffUrl": "https://www.dotabuff.com/players/121416513"
+      },
+      {
+        "slug": "frvr",
+        "nickname": "FRVR",
+        "realName": "Алексей Плотников",
+        "mmr": 7009,
+        "role": "soft-support",
+        "accountId": "1257015351",
+        "dotabuffUrl": "https://www.dotabuff.com/players/1257015351"
+      },
+      {
+        "slug": "chiga",
+        "nickname": "Chiga",
+        "realName": "Владислав Чубис",
+        "mmr": 3053,
+        "role": "hard-support",
+        "accountId": "134771207",
+        "dotabuffUrl": "https://www.dotabuff.com/players/134771207"
+      }
+    ]
+  },
+  {
+    "slug": "u-s-burgers",
+    "name": "U.S.Burgers",
+    "tag": "USB",
+    "group": "Division 2",
+    "players": [
+      {
+        "slug": "devileye",
+        "nickname": "Devileye",
+        "realName": "Павел Канаш",
+        "mmr": 7013,
+        "role": "carry",
+        "accountId": "169018608",
+        "dotabuffUrl": "https://www.dotabuff.com/players/169018608"
+      },
+      {
+        "slug": "twilightnest",
+        "nickname": "TwilightNest",
+        "realName": "Ярослав Воинский",
+        "mmr": 4130,
+        "role": "mid",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "andryusha",
+        "nickname": "Андрюша",
+        "realName": "Андрей Лобач",
+        "mmr": 7020,
+        "role": "offlane",
+        "accountId": "171135579",
+        "dotabuffUrl": "https://www.dotabuff.com/players/171135579"
+      },
+      {
+        "slug": "kolpaks",
+        "nickname": "Колпакс",
+        "realName": "Влад Шитик",
+        "mmr": 4258,
+        "role": "soft-support",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "delovo1",
+        "nickname": "delovo1",
+        "realName": "Евгений Гайдельцов",
+        "mmr": 2842,
+        "role": "hard-support",
+        "accountId": "299001884",
+        "dotabuffUrl": "https://www.dotabuff.com/players/299001884"
+      }
+    ]
+  },
+  {
+    "slug": "pomidory",
+    "name": "Помидоры",
+    "tag": "P-dori",
+    "group": "Division 2",
+    "players": [
+      {
+        "slug": "let-s-dance",
+        "nickname": "let's dance",
+        "realName": "Владислав Дубаневич",
+        "mmr": 6045,
+        "role": "carry",
+        "accountId": "225420683",
+        "dotabuffUrl": "https://www.dotabuff.com/players/225420683"
+      },
+      {
+        "slug": "sexmachine",
+        "nickname": "sexmachine",
+        "realName": "Дмитрий Велесевич",
+        "mmr": 5101,
+        "role": "mid",
+        "accountId": "361022505",
+        "dotabuffUrl": "https://www.dotabuff.com/players/361022505"
+      },
+      {
+        "slug": "xrumiks",
+        "nickname": "Xrumiks",
+        "realName": "Павел Волчек",
+        "mmr": 6123,
+        "role": "offlane",
+        "accountId": "196411029",
+        "dotabuffUrl": "https://www.dotabuff.com/players/196411029"
+      },
+      {
+        "slug": "rty",
+        "nickname": "rty",
+        "realName": "Андрей Шафалович",
+        "mmr": 5118,
+        "role": "soft-support",
+        "accountId": "122641754",
+        "dotabuffUrl": "https://www.dotabuff.com/players/122641754"
+      },
+      {
+        "slug": "kungfury",
+        "nickname": "Kungfury",
+        "realName": "Алексей Титов",
+        "mmr": 3030,
+        "role": "hard-support",
+        "accountId": "118567104",
+        "dotabuffUrl": "https://www.dotabuff.com/players/118567104"
+      }
+    ]
+  },
+  {
+    "slug": "navi",
+    "name": "НАВИ",
+    "tag": null,
+    "group": "Division 2",
+    "players": [
+      {
+        "slug": "kit-ano",
+        "nickname": "KIT_ANO",
+        "realName": "Артем Захарчук",
+        "mmr": 6500,
+        "role": "carry",
+        "accountId": "246057084",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/246057084"
+      },
+      {
+        "slug": "wilkinson",
+        "nickname": "Wilkinson",
+        "realName": "Артём Шиманский",
+        "mmr": 3200,
+        "role": "mid",
+        "accountId": "206557872",
+        "dotabuffUrl": "https://www.dotabuff.com/players/206557872"
+      },
+      {
+        "slug": "beda",
+        "nickname": "Beda...",
+        "realName": "Александр Григорьев",
+        "mmr": 4974,
+        "role": "offlane",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "snorlax212",
+        "nickname": "Snorlax212",
+        "realName": "Антон Карпилов",
+        "mmr": 5200,
+        "role": "soft-support",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "nicolas-sarcozy",
+        "nickname": "Nicolas Sarcozy",
+        "realName": "Николай Голчанов",
+        "mmr": 5400,
+        "role": "hard-support",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "ya-pinayu-eti-dengi",
+        "nickname": "я пинаю эти деньги",
+        "realName": "Андрей Кузнецов",
+        "mmr": 5400,
+        "role": "standin",
+        "accountId": null,
+        "dotabuffUrl": null
+      }
+    ]
+  },
+  {
+    "slug": "alt-q-q",
+    "name": "ALT+Q+Q",
+    "tag": "AQQ",
+    "group": "Division 2",
+    "players": [
+      {
+        "slug": "tpabka",
+        "nickname": "TpaBka",
+        "realName": "Вадим Витковский",
+        "mmr": 5340,
+        "role": "carry",
+        "accountId": "119292010",
+        "dotabuffUrl": "https://www.dotabuff.com/players/119292010"
+      },
+      {
+        "slug": "gata-me-liga",
+        "nickname": "Gata me liga",
+        "realName": "Максим Вербило",
+        "mmr": 5688,
+        "role": "mid",
+        "accountId": "385004528",
+        "dotabuffUrl": "https://www.dotabuff.com/players/385004528"
+      },
+      {
+        "slug": "kislyy",
+        "nickname": "Кислый",
+        "realName": "Степан Новиков",
+        "mmr": 5546,
+        "role": "offlane",
+        "accountId": "862268643",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/862268643"
+      },
+      {
+        "slug": "shastik",
+        "nickname": "Шастик",
+        "realName": "Павел Шаститко",
+        "mmr": 2806,
+        "role": "soft-support",
+        "accountId": "133767790",
+        "dotabuffUrl": "https://www.dotabuff.com/players/133767790"
+      },
+      {
+        "slug": "da-eto-zhestko",
+        "nickname": "Да это жёстко",
+        "realName": "Роман Гуленков",
+        "mmr": 5070,
+        "role": "hard-support",
+        "accountId": "126491412",
+        "dotabuffUrl": "https://www.dotabuff.com/players/126491412"
+      }
+    ]
+  },
+  {
+    "slug": "remix-d2",
+    "name": "ReMix",
+    "tag": null,
+    "group": "Division 2",
+    "players": [
+      {
+        "slug": "44",
+        "nickname": "44",
+        "realName": "Максим Самойленко",
+        "mmr": 5246,
+        "role": "carry",
+        "accountId": "204746759",
+        "dotabuffUrl": "https://www.dotabuff.com/players/204746759"
+      },
+      {
+        "slug": "staryy-ezh",
+        "nickname": "Старый Ёж",
+        "realName": "Вадим Манаев",
+        "mmr": 6132,
+        "role": "mid",
+        "accountId": "913264608",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/913264608"
+      },
+      {
+        "slug": "mayonez1s",
+        "nickname": "Mayonez1s",
+        "realName": "Владислав Мытько",
+        "mmr": 6305,
+        "role": "offlane",
+        "accountId": "113798996",
+        "dotabuffUrl": "https://www.dotabuff.com/players/113798996"
+      },
+      {
+        "slug": "vargos",
+        "nickname": "VarGos",
+        "realName": "Иван Горошко",
+        "mmr": 4592,
+        "role": "soft-support",
+        "accountId": "480806505",
+        "dotabuffUrl": "https://www.dotabuff.com/players/480806505"
+      },
+      {
+        "slug": "mr-daddy",
+        "nickname": "Mr.Daddy",
+        "realName": "Дмитрий Шпинёв",
+        "mmr": 2930,
+        "role": "hard-support",
+        "accountId": "131935693",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/131935693"
+      }
+    ]
+  },
+  {
+    "slug": "pasechniki",
+    "name": "PASECHNIKI",
+    "tag": "PASEKA",
+    "group": "Division 2",
+    "players": [
+      {
+        "slug": "dezzare",
+        "nickname": "dezzare",
+        "realName": "Илья Сверепа",
+        "mmr": 6120,
+        "role": "carry",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "borts",
+        "nickname": "Borts",
+        "realName": "Роман Пугин",
+        "mmr": 5463,
+        "role": "mid",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "treshzor",
+        "nickname": "treshzor",
+        "realName": "Андрей Мацук",
+        "mmr": 5419,
+        "role": "offlane",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "morda",
+        "nickname": "Morda",
+        "realName": "Эдуард Ковалев",
+        "mmr": 4400,
+        "role": "soft-support",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "light",
+        "nickname": "Light-",
+        "realName": "Алексей Лавров",
+        "mmr": 3570,
+        "role": "hard-support",
+        "accountId": null,
+        "dotabuffUrl": null
+      },
+      {
+        "slug": "brokeboi",
+        "nickname": "Brokeboi..",
+        "realName": "Максим Грищенко",
+        "mmr": null,
+        "role": "coach",
+        "accountId": null,
+        "dotabuffUrl": null
+      }
+    ]
+  },
+  {
+    "slug": "team-sausages-disbanded",
+    "name": "Team Sausages DISBANDED",
+    "tag": null,
+    "group": "Division 2",
+    "players": [
+      {
+        "slug": "gommage",
+        "nickname": "Gommage",
+        "realName": "Николай Лысак",
+        "mmr": 5629,
+        "role": "carry",
+        "accountId": "1845180554",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/1845180554"
+      },
+      {
+        "slug": "moiofc",
+        "nickname": "moiofc",
+        "realName": "Женя Манузин",
+        "mmr": 6500,
+        "role": "mid",
+        "accountId": "1120525108",
+        "dotabuffUrl": "https://ru.dotabuff.com/players/1120525108"
+      },
+      {
+        "slug": "mini-bayk",
+        "nickname": "мини байк",
+        "realName": "Денис Велесевич",
+        "mmr": 6135,
+        "role": "offlane",
+        "accountId": "167518771",
+        "dotabuffUrl": "https://www.dotabuff.com/players/167518771"
+      },
+      {
+        "slug": "masterokxd",
+        "nickname": "masterokxd",
+        "realName": "Антон Никишин",
+        "mmr": 4456,
+        "role": "soft-support",
+        "accountId": "151907727",
+        "dotabuffUrl": "https://www.dotabuff.com/players/151907727"
+      },
+      {
+        "slug": "roma-shkereberd",
+        "nickname": "Рома шкеребердь",
+        "realName": "Денис Бондаренко",
+        "mmr": 2019,
+        "role": "hard-support",
+        "accountId": "1852440160",
+        "dotabuffUrl": "https://www.dotabuff.com/players/1852440160"
       }
     ]
   }

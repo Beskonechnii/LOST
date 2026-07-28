@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { getQualified } from "@/lib/group-stage";
 import { QUALIFICATION } from "@/lib/qualification";
+import { divisionBySlug } from "@/lib/divisions";
 
 export const dynamic = "force-dynamic";
 
@@ -51,8 +53,12 @@ function Pair({ a, b, waiting }: { a?: Seed; b?: Seed; waiting?: string }) {
   );
 }
 
-export default async function PlayoffPage() {
-  const { upper, lower, out } = await getQualified("Division 1");
+export default async function PlayoffPage({ params }: { params: Promise<{ div: string }> }) {
+  const { div } = await params;
+  const division = divisionBySlug(div);
+  if (!division) notFound();
+
+  const { upper, lower, out } = await getQualified(division.name);
 
   if (upper.length === 0) {
     return <p className="text-neutral-400">Групповая стадия ещё не залита — посев брать неоткуда.</p>;

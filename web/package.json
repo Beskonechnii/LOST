@@ -8,7 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "build:standings": "tsx scripts/build-standings-site.ts"
+    "build:standings": "tsx scripts/build-standings-site.ts",
+    "db:export": "tsx scripts/export-db.ts",
+    "db:import": "tsx scripts/import-db.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.17.4",

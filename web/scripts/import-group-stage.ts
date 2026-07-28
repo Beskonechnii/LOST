@@ -1,7 +1,7 @@
 // Групповая стадия из таблицы сезона (вкладка «GS») → БД: GroupEntry + GroupSeries.
 //
 // Запуск (из web/):
-//   npx tsx scripts/import-group-stage.ts --sheet <id или ссылка> [--div 1] [--dry]
+//   npx tsx scripts/import-group-stage.ts --sheet <id или ссылка> [--div 1] [--alias "GS-имя=слаг;…"] [--dry]
 //
 // Формат вкладки: четыре группы стоят В ОДНОЙ строке блоками («[1 div] Группа A» и т.д.).
 // У блока сверху таблица «# | Команда | И | В | П | О», ниже — кросс-таблица счетов серий (2:0, 2:1…).
@@ -21,6 +21,18 @@ const arg = (name: string) => (args.includes(name) ? args[args.indexOf(name) + 1
 const dry = args.includes("--dry");
 const source = arg("--sheet");
 const divFilter = arg("--div") ?? "1";
+
+// Вкладки «GS» и «Команды N div» иногда зовут команду по-разному (переименования, приписки вроде
+// «DISBANDED»). Сопоставляем руками: --alias "имя в GS=слаг или имя в БД;…". Несколько — через «;».
+const aliases = new Map(
+  (arg("--alias") ?? "")
+    .split(";")
+    .filter(Boolean)
+    .map((pair) => {
+      const [from, to] = pair.split("=");
+      return [from.trim().toLowerCase(), to.trim()];
+    }),
+);
 
 if (!source) {
   console.error('Укажите таблицу: --sheet "<ссылка или id>"');
@@ -192,7 +204,14 @@ async function main() {
 
     const dbTeams = new Map<string, number>();
     for (const t of teams) {
-      const team = await prisma.team.findFirst({ where: { name: t.name } });
+      // Сперва по алиасу (имя в GS → слаг/имя в БД), иначе по имени. Имя ищем СНАЧАЛА в своём
+      // дивизионе: одноимённые команды в D1 и D2 (например «ReMix») иначе схлопнулись бы в одну —
+      // строка D2 ушла бы на команду D1. Фолбэк на имя без дивизиона — на случай несовпадения group.
+      const alias = aliases.get(t.name.toLowerCase());
+      const team = alias
+        ? await prisma.team.findFirst({ where: { OR: [{ slug: alias }, { name: alias }] } })
+        : (await prisma.team.findFirst({ where: { name: t.name, group: division } })) ??
+          (await prisma.team.findFirst({ where: { name: t.name } }));
       if (!team) {
         console.log(`  ⚠ нет в базе: «${t.name}» — строка пропущена`);
         continue;

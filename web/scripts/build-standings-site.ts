@@ -16,10 +16,13 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { getStandings, type StandingGroup } from "@/lib/standings";
 import { QUALIFICATION, qualificationOf, type Qualification } from "@/lib/qualification";
+import { DIVISIONS, divisionBySlug } from "@/lib/divisions";
 
 const args = process.argv.slice(2);
 const outDir = path.resolve(process.cwd(), argValue("--out") ?? "dist/standings");
 const light = args.includes("--light");
+// Какой дивизион собирать: --div d1|d2 (по умолчанию первый).
+const division = (argValue("--div") && divisionBySlug(argValue("--div")!)) || DIVISIONS[0];
 
 function argValue(flag: string): string | null {
   const i = args.indexOf(flag);
@@ -147,9 +150,9 @@ ${groups.map(tableFor).join("\n")}
 }
 
 async function main() {
-  const groups = await getStandings();
+  const groups = await getStandings(division.name);
   if (groups.length === 0) {
-    console.error("В базе нет команд — сначала залей ростер (см. CLAUDE.md §7).");
+    console.error(`В базе нет команд дивизиона ${division.name} — сначала залей ростер (см. CLAUDE.md §7).`);
     process.exit(1);
   }
 

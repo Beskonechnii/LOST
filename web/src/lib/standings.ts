@@ -24,12 +24,15 @@ export type StandingGroup = { group: string; rows: StandingRow[] };
  *    сразу двигает таблицу лиги: это и есть синхронизация, отдельного копирования данных нет;
  *  • сыгранные матчи (`Match`) — плей-офф и всё, что вне групп;
  *  • реестр баллов (`PointsEntry`) — ручные начисления за места, касты и прочее.
+ *
+ * Считаем по одному дивизиону: у D1 и D2 свои группы A/B, и без фильтра их очки слились бы в один
+ * блок. Команды берём по `Team.group` (его проставляет импорт), встречи и итоги — по `division`.
  */
-export async function getStandings(): Promise<StandingGroup[]> {
+export async function getStandings(division: string): Promise<StandingGroup[]> {
   const [teams, entries, series, matches, points] = await Promise.all([
-    prisma.team.findMany(),
-    prisma.groupEntry.findMany(),
-    prisma.groupSeries.findMany(),
+    prisma.team.findMany({ where: { group: division } }),
+    prisma.groupEntry.findMany({ where: { division } }),
+    prisma.groupSeries.findMany({ where: { division } }),
     prisma.match.findMany({ where: { status: "finished" } }),
     prisma.pointsEntry.findMany({ where: { subjectType: "team" } }),
   ]);

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { RosterMember, TeamWithRoster } from "@/lib/roster-data";
+import { DIVISIONS } from "@/lib/divisions";
 import { countryCode, teamAccent, teamTag } from "@/lib/profiles";
 import { roleLabel } from "@/lib/roles";
 import { PlayerAvatar, TeamLogo } from "./avatar";
@@ -146,23 +147,59 @@ export function TeamCards({ teams }: { teams: TeamWithRoster[] }) {
   const [generation, setGeneration] = useState(0);
   const [collapsed, setCollapsed] = useState(false);
 
+  // Под-вкладки дивизионов: команды делим по Team.group, а общий пулл игроков остаётся единым
+  // (страница /roster/players его не трогает). Показываем только те дивизионы, где есть команды,
+  // в порядке справочника; безгрупповые (если появятся) сваливаем в отдельную вкладку «Прочие».
+  const divisions = DIVISIONS.filter((d) => teams.some((t) => t.group === d.name));
+  const hasOther = teams.some((t) => !divisions.some((d) => d.name === t.group));
+  const tabs = [
+    ...divisions.map((d) => ({ key: d.name, label: d.short })),
+    ...(hasOther ? [{ key: "—", label: "Прочие" }] : []),
+  ];
+  const [tab, setTab] = useState(tabs[0]?.key ?? "—");
+  const active = tabs.some((t) => t.key === tab) ? tab : (tabs[0]?.key ?? "—");
+  const shown = teams.filter((t) => (active === "—" ? !divisions.some((d) => d.name === t.group) : t.group === active));
+
   return (
     <div className="space-y-3">
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between gap-3">
+        {tabs.length > 1 ? (
+          <div className="flex gap-1 rounded-lg bg-neutral-900/60 p-1">
+            {tabs.map((t) => {
+              const count = teams.filter((x) => (t.key === "—" ? !divisions.some((d) => d.name === x.group) : x.group === t.key)).length;
+              return (
+                <button
+                  key={t.key}
+                  type="button"
+                  onClick={() => setTab(t.key)}
+                  className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                    active === t.key ? "bg-violet-600/20 text-violet-200" : "text-neutral-500 hover:text-neutral-200"
+                  }`}
+                >
+                  {t.label}
+                  <span className="ml-1.5 text-xs text-neutral-500">{count}</span>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <span />
+        )}
+
         <button
           type="button"
           onClick={() => {
             setCollapsed((v) => !v);
             setGeneration((g) => g + 1);
           }}
-          className="text-xs text-neutral-500 hover:text-violet-300"
+          className="shrink-0 text-xs text-neutral-500 hover:text-violet-300"
         >
           {collapsed ? "Развернуть все составы" : "Свернуть все составы"}
         </button>
       </div>
 
       <div className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {teams.map((t) => (
+        {shown.map((t) => (
           <TeamCard key={`${t.id}-${generation}`} team={t} defaultOpen={!collapsed} />
         ))}
       </div>

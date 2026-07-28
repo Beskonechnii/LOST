@@ -171,21 +171,24 @@ async function assertNoDuplicates(teams: TeamInput[]) {
     }
   }
 
-  // Стоять в нескольких составах можно, действующим (поз. 1–5) — только в одном:
-  // в матче человек сыграет за одну команду, иначе стата и составы разъедутся.
+  // Стоять в нескольких составах можно, действующим (поз. 1–5) — только в одной команде ДИВИЗИОНА:
+  // внутри дивизиона человек сыграет за одну, иначе стата и составы разъедутся. В разных дивизионах
+  // (D1 и D2) действующим быть можно — их турниры раздельны, поэтому ключ проверки: «дивизион + игрок».
   const coreTeam = new Map<string, string>();
   for (const t of teams) {
+    const div = clean(t.group) ?? "—";
     for (const p of t.players ?? []) {
       if (!isCoreRole(p.role)) continue;
       const slug = p.slug?.trim() || slugify(p.nickname);
-      const prev = coreTeam.get(slug);
+      const key = `${div}::${slug}`;
+      const prev = coreTeam.get(key);
       if (prev) {
         errors.push(
-          `игрок «${slug}» действующий и в «${prev}», и в «${slugOf(t)}» — ` +
-            `действующим можно быть только в одной команде, во вторую ставьте заменой`,
+          `игрок «${slug}» действующий и в «${prev}», и в «${slugOf(t)}» (дивизион ${div}) — ` +
+            `в одном дивизионе действующим можно быть только в одной команде, во вторую ставьте заменой`,
         );
       } else {
-        coreTeam.set(slug, slugOf(t));
+        coreTeam.set(key, slugOf(t));
       }
     }
   }

@@ -15,7 +15,8 @@ export type NavItem = { href: string; label: string; hint?: string };
 
 const PUBLIC_SECTIONS: NavItem[] = [
   { href: "/match", label: "Матч", hint: "Разбор матча Dota 2 по ID" },
-  { href: "/standings", label: "LOST D1", hint: "Таблица и групповая стадия дивизиона" },
+  { href: "/standings/d1", label: "LOST D1", hint: "Первый дивизион: таблица и групповая стадия" },
+  { href: "/standings/d2", label: "LOST D2", hint: "Второй дивизион: таблица и групповая стадия" },
   { href: "/roster", label: "Ростер", hint: "Команды и игроки лиги" },
 ];
 

@@ -17,8 +17,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Игрок уже в этом составе" }, { status: 409 });
   }
 
-  const existing = await prisma.rosterSpot.findMany({ where: { playerId }, include: { team: { select: { name: true } } } });
-  const conflict = spotConflict(existing.map((s) => ({ teamId: s.teamId, role: s.role, teamName: s.team.name })), { teamId, role });
+  const [existing, target] = await Promise.all([
+    prisma.rosterSpot.findMany({ where: { playerId }, include: { team: { select: { name: true, group: true } } } }),
+    prisma.team.findUnique({ where: { id: teamId }, select: { group: true } }),
+  ]);
+  const conflict = spotConflict(
+    existing.map((s) => ({ teamId: s.teamId, role: s.role, teamName: s.team.name, division: s.team.group })),
+    { teamId, role, division: target?.group ?? null },
+  );
   if (conflict) return NextResponse.json({ error: conflict }, { status: 409 });
 
   const spot = await prisma.rosterSpot.create({ data: { playerId, teamId, role } });

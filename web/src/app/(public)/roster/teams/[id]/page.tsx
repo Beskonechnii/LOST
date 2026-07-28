@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTeamProfile, type RosterMember } from "@/lib/roster-data";
 import { getStandings } from "@/lib/standings";
+import { DIVISIONS, divisionSlug } from "@/lib/divisions";
 import { countryCode, teamAccent, teamTag } from "@/lib/profiles";
 import { roleLabel } from "@/lib/roles";
 import { QUALIFICATION, qualificationOf } from "@/lib/qualification";
@@ -33,12 +34,12 @@ function Stat({
 
 export default async function TeamPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [team, standings, authed] = await Promise.all([
-    getTeamProfile(Number(id)),
-    getStandings(),
-    isAdmin(),
-  ]);
+  const team = await getTeamProfile(Number(id));
   if (!team) notFound();
+
+  // Таблицу берём по дивизиону команды — тому же, что показывает раздел «LOST D1»/«LOST D2».
+  const divSlug = divisionSlug(team.group);
+  const [standings, authed] = await Promise.all([getStandings(team.group ?? DIVISIONS[0].name), isAdmin()]);
 
   const accent = teamAccent(team);
   const core = team.players.filter((p) => p.position !== null);
@@ -112,13 +113,13 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
               {group && <span className="ml-2 text-neutral-400">группа {group.group}</span>}
             </h2>
             <div className="flex flex-wrap gap-3 text-xs">
-              <Link href="/standings" className="text-violet-400 hover:underline">
+              <Link href={`/standings/${divSlug}`} className="text-violet-400 hover:underline">
                 Таблица →
               </Link>
-              <Link href="/standings/groups" className="text-violet-400 hover:underline">
+              <Link href={`/standings/${divSlug}/groups`} className="text-violet-400 hover:underline">
                 Групповая стадия →
               </Link>
-              <Link href="/standings/playoff" className="text-violet-400 hover:underline">
+              <Link href={`/standings/${divSlug}/playoff`} className="text-violet-400 hover:underline">
                 Плей-офф →
               </Link>
             </div>

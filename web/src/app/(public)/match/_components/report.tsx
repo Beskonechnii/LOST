@@ -34,7 +34,13 @@ import {
 // Данные тянутся с клиента через /api/<src>/match/<id> — те же роуты, что и раньше.
 
 // Команда из ростера — для подстановки наших лого/тегов по названию или составу матча.
-type RosterTeam = { name: string; tag: string | null; logo: string | null; accountIds: string[] };
+type RosterTeam = {
+  name: string;
+  tag: string | null;
+  logo: string | null;
+  /** Состав команды: steam32 → ник из ростера. См. `lineupOf` в src/lib/roster-data.ts. */
+  lineup: { accountId: string; nickname: string }[];
+};
 
 export type MatchSource = "opendota" | "steam";
 
@@ -207,11 +213,13 @@ function BansStrip({ picksBans }: { picksBans: PickBan[] }) {
   const bans = picksBans.filter((pb) => !pb.isPick);
   if (bans.length === 0) return null;
   const group = (side: Side) => (
-    <div className={`flex flex-wrap items-center gap-1 ${side === "dire" ? "justify-end" : ""}`}>
+    // basis-0 flex-1 — половины делят ширину поровну, поэтому при переносе строки обе стороны
+    // ломаются одинаково, а не «пять слева, четыре справа»
+    <div className={`flex flex-1 basis-0 flex-wrap items-center gap-1 ${side === "dire" ? "justify-end" : ""}`}>
       {bans
         .filter((b) => b.side === side)
         .map((b) => (
-          <HeroFrame key={b.order} hero={b.hero} side={side} h={24} banned title={`бан ${b.order + 1}: ${b.hero.name}`} />
+          <HeroFrame key={b.order} hero={b.hero} side={side} h={32} banned title={`бан ${b.order + 1}: ${b.hero.name}`} />
         ))}
     </div>
   );
@@ -616,40 +624,75 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
   const match = loading ? null : data.match;
   const error = loading ? null : data.error;
 
-  // account_id → команда лиги: по этой карте состав матча распознаётся автоматически.
-  const teamByAccount = useMemo(() => {
-    const m = new Map<string, RosterTeam>();
-    for (const t of roster) for (const a of t.accountIds) m.set(a, t);
+  // account_id → команды лиги (СПИСОК, а не одна): один человек может стоять в двух составах
+  // (играющий за две команды, дубль-ростер). Схлопни его в одну — и распознавание стороны
+  // качнётся к случайной из них. Список сохраняем, а неоднозначность разрешаем ниже в `detected`.
+  const teamsByAccount = useMemo(() => {
+    const m = new Map<string, RosterTeam[]>();
+    for (const t of roster) for (const x of t.lineup) m.set(x.accountId, [...(m.get(x.accountId) ?? []), t]);
     return m;
   }, [roster]);
 
-  // Команда лиги по составу стороны: та, чьих игроков в пятёрке больше всего (минимум двое,
-  // чтобы случайное совпадение одного account_id не переименовало команду).
-  const detectTeam = useMemo(
-    () =>
-      (players: PlayerReport[]): RosterTeam | null => {
-        const tally = new Map<RosterTeam, number>();
-        for (const p of players) {
-          const t = p.accountId != null ? teamByAccount.get(String(p.accountId)) : undefined;
-          if (t) tally.set(t, (tally.get(t) ?? 0) + 1);
-        }
-        let best: RosterTeam | null = null;
-        let bestN = 0;
-        for (const [t, n] of tally) if (n > bestN) [best, bestN] = [t, n];
-        return bestN >= 2 ? best : null;
-      },
-    [teamByAccount],
-  );
+  // account_id → ник из ростера. В клиенте Доты человек может называться как угодно и менять имя
+  // между матчами; в лиге у него одно имя, и во всех наших разделах должно стоять именно оно.
+  // Неузнанный игрок (стендин, чужой матч) остаётся под своим именем из OpenDota.
+  const nickByAccount = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const t of roster) for (const x of t.lineup) m.set(x.accountId, x.nickname);
+    return m;
+  }, [roster]);
 
-  const radiant = (match?.players.filter((p) => p.side === "radiant") ?? []).slice().sort((a, b) => a.pos - b.pos);
-  const dire = (match?.players.filter((p) => p.side === "dire") ?? []).slice().sort((a, b) => a.pos - b.pos);
+  /** Отчёт с подменёнными на ростерные никами — дальше всё рисуется по нему. */
+  const withRosterNames = (list: PlayerReport[]) =>
+    list.map((p) => {
+      const nick = p.accountId != null ? nickByAccount.get(String(p.accountId)) : undefined;
+      return nick && nick !== p.name ? { ...p, name: nick } : p;
+    });
+
+  // Команды обеих сторон распознаём СОВМЕСТНО, а не каждую по отдельности argmax'ом — иначе
+  // дубль-ростерный игрок тянет сторону к своей второй команде (классика: игрок 300$, стоящий
+  // ещё и в U.S.Burgers, переголосовывал 300$ в «Бургеров»). Два ключа устойчивости:
+  //   • solid — сколько на стороне игроков, состоящих ТОЛЬКО в этой команде; они и есть истина,
+  //     дубль-ростерные лишь поддерживают. Ранжируем по (solid, затем всего), порог — двое своих;
+  //   • назначаем жадно от самой уверенной стороны и запрещаем одну команду обеим сторонам —
+  //     стендин из чужой команды (один голос) команду перебить не может.
+  const detected = useMemo((): { radiant: RosterTeam | null; dire: RosterTeam | null } => {
+    const rank = (players: PlayerReport[]) => {
+      const score = new Map<RosterTeam, number>();
+      const solid = new Map<RosterTeam, number>();
+      for (const p of players) {
+        const ts = p.accountId != null ? teamsByAccount.get(String(p.accountId)) : undefined;
+        if (!ts?.length) continue;
+        for (const t of ts) score.set(t, (score.get(t) ?? 0) + 1);
+        if (ts.length === 1) solid.set(ts[0], (solid.get(ts[0]) ?? 0) + 1);
+      }
+      return [...score.entries()]
+        .map(([t, n]) => ({ t, n, solid: solid.get(t) ?? 0 }))
+        .filter((x) => x.n >= 2)
+        .sort((a, b) => b.solid - a.solid || b.n - a.n);
+    };
+    const rRank = rank(match?.players.filter((p) => p.side === "radiant") ?? []);
+    const dRank = rank(match?.players.filter((p) => p.side === "dire") ?? []);
+    const rTop = rRank[0], dTop = dRank[0];
+    // Первой фиксируем более уверенную сторону (по solid, затем по числу своих), у второй её команду исключаем.
+    const radiantFirst = !dTop || (!!rTop && (rTop.solid > dTop.solid || (rTop.solid === dTop.solid && rTop.n >= dTop.n)));
+    if (radiantFirst) {
+      const radiant = rTop?.t ?? null;
+      return { radiant, dire: (dRank.find((x) => x.t !== radiant) ?? dTop)?.t ?? null };
+    }
+    const dire = dTop?.t ?? null;
+    return { dire, radiant: (rRank.find((x) => x.t !== dire) ?? rTop)?.t ?? null };
+  }, [teamsByAccount, match]);
+
+  const radiant = withRosterNames((match?.players.filter((p) => p.side === "radiant") ?? []).slice().sort((a, b) => a.pos - b.pos));
+  const dire = withRosterNames((match?.players.filter((p) => p.side === "dire") ?? []).slice().sort((a, b) => a.pos - b.pos));
   const byPos = [...radiant, ...dire];
 
   // Итоговые названия сторон — производные (не в state), поэтому распознавание срабатывает и когда
   // ростер догрузился после матча: ручной ввод → команда по составу → название из OpenDota → пусто.
   const names = {
-    radiant: manual.radiant || detectTeam(radiant)?.name || match?.radiantTeam || "",
-    dire: manual.dire || detectTeam(dire)?.name || match?.direTeam || "",
+    radiant: manual.radiant || detected.radiant?.name || match?.radiantTeam || "",
+    dire: manual.dire || detected.dire?.name || match?.direTeam || "",
   };
   const setNames = (u: (s: { radiant: string; dire: string }) => { radiant: string; dire: string }) =>
     setManual((m) => u({ radiant: m.radiant, dire: m.dire }));
@@ -766,7 +809,7 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
                   {/* карта — узкая фиксированная колонка, график забирает всю остальную ширину */}
                   <div className="grid gap-4 p-3 lg:grid-cols-[260px_minmax(0,1fr)]">
                     <div className="space-y-3">
-                      <BuildingMap buildings={match.buildings} />
+                      <BuildingMap buildings={match.buildings} radiantWin={match.radiantWin} />
                       <EventBadges events={match.events} tags={tags} />
                     </div>
                     {match.goldAdv.length >= 2 && (

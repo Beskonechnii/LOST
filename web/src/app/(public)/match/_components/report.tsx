@@ -38,6 +38,8 @@ type RosterTeam = {
   name: string;
   tag: string | null;
   logo: string | null;
+  /** Дивизион («Division 1»/«Division 2»): одноимённые команды из разных дивизионов — разные записи. */
+  group: string | null;
   /** Состав команды: steam32 → ник из ростера. См. `lineupOf` в src/lib/roster-data.ts. */
   lineup: { accountId: string; nickname: string }[];
 };
@@ -674,14 +676,24 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
     const rRank = rank(match?.players.filter((p) => p.side === "radiant") ?? []);
     const dRank = rank(match?.players.filter((p) => p.side === "dire") ?? []);
     const rTop = rRank[0], dTop = dRank[0];
-    // Первой фиксируем более уверенную сторону (по solid, затем по числу своих), у второй её команду исключаем.
+    // Вторую сторону выбираем после первой: исключаем занятую команду, а среди равных по (solid, n)
+    // предпочитаем ТОТ ЖЕ ДИВИЗИОН, что у соперника. Так ReMix D1 и ReMix D2 не путаются: если по
+    // составу вышла ничья двух одноимённых команд, дивизион уже определён другой стороной матча.
+    const pickOther = (ranked: typeof rRank, taken: RosterTeam | null): RosterTeam | null => {
+      const avail = ranked.filter((x) => x.t !== taken);
+      if (!avail.length) return null;
+      const best = avail[0];
+      const tied = avail.filter((x) => x.solid === best.solid && x.n === best.n);
+      return ((taken && tied.find((x) => x.t.group === taken.group)) ?? best).t;
+    };
+    // Первой фиксируем более уверенную сторону (по solid, затем по числу своих).
     const radiantFirst = !dTop || (!!rTop && (rTop.solid > dTop.solid || (rTop.solid === dTop.solid && rTop.n >= dTop.n)));
     if (radiantFirst) {
       const radiant = rTop?.t ?? null;
-      return { radiant, dire: (dRank.find((x) => x.t !== radiant) ?? dTop)?.t ?? null };
+      return { radiant, dire: pickOther(dRank, radiant) };
     }
     const dire = dTop?.t ?? null;
-    return { dire, radiant: (rRank.find((x) => x.t !== dire) ?? rTop)?.t ?? null };
+    return { dire, radiant: pickOther(rRank, dire) };
   }, [teamsByAccount, match]);
 
   const radiant = withRosterNames((match?.players.filter((p) => p.side === "radiant") ?? []).slice().sort((a, b) => a.pos - b.pos));
@@ -704,7 +716,13 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
     if (!q) return null;
     return roster.find((t) => t.name.toLowerCase() === q || (t.tag ?? "").toLowerCase() === q) ?? null;
   };
-  const rosterTeams = { radiant: fromRoster(names.radiant), dire: fromRoster(names.dire) };
+  // Лого и тег берём у РАСПОЗНАННОГО объекта команды, а не ищем заново по имени: две команды из
+  // разных дивизионов могут называться одинаково (ReMix в D1 и D2 — разные записи, разные лого),
+  // и поиск по строке «ReMix» взял бы первую попавшуюся. Ручной ввод имени резолвим по названию.
+  const rosterTeams = {
+    radiant: manual.radiant ? fromRoster(manual.radiant) : detected.radiant ?? fromRoster(names.radiant),
+    dire: manual.dire ? fromRoster(manual.dire) : detected.dire ?? fromRoster(names.dire),
+  };
   // Лого: наш ассет по названию → лого OpenDota → монограмма (в TeamCrest).
   const logos = {
     radiant: rosterTeams.radiant?.logo ?? match?.radiantLogo ?? null,

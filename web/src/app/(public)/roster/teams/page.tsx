@@ -1,6 +1,7 @@
 import { listTeamRosters } from "@/lib/roster-data";
 import { isAdmin } from "@/lib/admin-session";
 import { CreateForm } from "@/app/_components/roster-editors";
+import { SectionHeader } from "@/app/_components/ui";
 import { TeamCards } from "../_components/team-cards";
 
 export const dynamic = "force-dynamic";
@@ -15,13 +16,16 @@ export default async function TeamsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-baseline justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Команды</h1>
-        <span className="text-sm text-neutral-500">
-          {teams.length} шт.
-          {authed && noId > 0 && <span className="ml-2 text-amber-400">{noId} игрок(ов) без account_id</span>}
-        </span>
-      </div>
+      <SectionHeader
+        eyebrow="Ростер лиги"
+        title="Команды"
+        aside={
+          <>
+            {teams.length} команд
+            {authed && noId > 0 && <span className="ml-2 text-amber-400">{noId} без account_id</span>}
+          </>
+        }
+      />
 
       {authed && (
         <CreateForm

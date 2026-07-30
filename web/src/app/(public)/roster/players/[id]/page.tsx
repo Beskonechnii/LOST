@@ -4,14 +4,16 @@ import { getPlayerProfile } from "@/lib/roster-data";
 import { ageOf, formatBirthday, playerGaps, playerLinks, teamAccent, telegramUrl, yearsLabel } from "@/lib/profiles";
 import { roleLabel } from "@/lib/roles";
 import { isAdmin } from "@/lib/admin-session";
+import { Eyebrow } from "@/app/_components/ui";
 import { PlayerAvatar, TeamLogo } from "../../_components/avatar";
+import { PlayerMiniCard } from "../../_components/player-card";
 
 export const dynamic = "force-dynamic";
 
 /** Плашка факта: роль, MMR, возраст, город. Пустые значения не рисуем — дыр в строке быть не должно. */
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full border border-neutral-700/70 bg-neutral-900/60 px-3 py-1 text-xs text-neutral-300">
+    <span className="rounded-full border border-hairline-strong/70 bg-surface-1/60 px-3 py-1 text-xs text-ink-muted">
       {children}
     </span>
   );
@@ -23,7 +25,7 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="rounded border border-neutral-800 px-3 py-1.5 text-xs text-neutral-300 transition-colors hover:border-violet-600 hover:text-violet-300"
+      className="rounded border border-hairline px-3 py-1.5 text-xs text-ink-muted transition-colors hover:border-accent hover:text-accent-bright"
     >
       {children}
     </a>
@@ -44,24 +46,24 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-2 text-sm text-neutral-500">
-        <Link href="/roster/players" className="hover:text-neutral-300">
+      <div className="flex flex-wrap items-center gap-2 text-sm text-ink-subtle">
+        <Link href="/roster/players" className="hover:text-ink-muted">
           Игроки
         </Link>
         {main && (
           <>
-            <span className="text-neutral-700">/</span>
-            <Link href={`/roster/teams/${main.team.id}`} className="hover:text-neutral-300">
+            <span className="text-ink-subtle">/</span>
+            <Link href={`/roster/teams/${main.team.id}`} className="hover:text-ink-muted">
               {main.team.name}
             </Link>
           </>
         )}
-        <span className="text-neutral-700">/</span>
-        <span className="text-neutral-400">{player.nickname}</span>
+        <span className="text-ink-subtle">/</span>
+        <span className="text-ink-muted">{player.nickname}</span>
       </div>
 
       {/* Шапка: цвет команды задаёт настроение страницы, лого уходит в подложку водяным знаком */}
-      <section className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950">
+      <section className="relative overflow-hidden rounded-2xl border border-hairline bg-surface-1 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_24px_60px_-30px_rgba(0,0,0,0.95)]">
         <div
           className="pointer-events-none absolute inset-0"
           style={{ background: `linear-gradient(115deg, ${accent}2e, transparent 55%)` }}
@@ -82,21 +84,21 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
             <div>
               <h1 className="text-3xl font-bold tracking-tight">
                 {player.nickname}
-                {main?.isCaptain && <span className="ml-3 align-middle text-sm text-violet-400">капитан</span>}
+                {main?.isCaptain && <span className="ml-3 align-middle text-sm text-accent-bright">капитан</span>}
               </h1>
-              {player.realName && <p className="text-neutral-400">{player.realName}</p>}
+              {player.realName && <p className="text-ink-muted">{player.realName}</p>}
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
               {main && (
                 <Link
                   href={`/roster/teams/${main.team.id}`}
-                  className="flex items-center gap-2 rounded-full border px-3 py-1 text-xs transition-colors hover:border-violet-600"
+                  className="flex items-center gap-2 rounded-full border px-3 py-1 text-xs transition-colors hover:border-accent"
                   style={{ borderColor: `${accent}66` }}
                 >
                   <TeamLogo team={main.team} size={18} />
-                  <span className="font-medium text-neutral-200">{main.team.name}</span>
-                  {roleLabel(main.role) && <span className="text-neutral-500">{roleLabel(main.role)}</span>}
+                  <span className="font-medium text-ink">{main.team.name}</span>
+                  {roleLabel(main.role) && <span className="text-ink-subtle">{roleLabel(main.role)}</span>}
                 </Link>
               )}
               {player.mmr && <Chip>{player.mmr.toLocaleString("ru")} MMR</Chip>}
@@ -114,7 +116,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
               {links.stratz && <ExternalLink href={links.stratz}>Stratz</ExternalLink>}
               {links.steam && <ExternalLink href={links.steam}>Steam</ExternalLink>}
               {!links.dotabuff && !player.telegram && (
-                <span className="text-xs text-neutral-600">Ссылок нет — заполните account_id или телеграм</span>
+                <span className="text-xs text-ink-subtle">Ссылок нет — заполните account_id или телеграм</span>
               )}
             </div>
           </div>
@@ -124,17 +126,17 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
             <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
               <Link
                 href={`/admin/roster/players/${player.id}/edit`}
-                className="rounded bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500"
+                className="rounded bg-accent px-4 py-2 text-sm font-medium text-accent-contrast hover:bg-accent-bright"
               >
                 Редактировать
               </Link>
-              <span className="text-xs text-neutral-600">slug: {player.slug}</span>
+              <span className="text-xs text-ink-subtle">slug: {player.slug}</span>
             </div>
           )}
         </div>
 
         {gaps.length > 0 && (
-          <div className="relative border-t border-neutral-800/80 px-6 py-2 text-xs text-amber-400/90">
+          <div className="relative border-t border-hairline px-6 py-2 text-xs text-amber-400/90">
             Не заполнено: {gaps.join(", ")}
           </div>
         )}
@@ -144,38 +146,31 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
       {player.spots.map((spot) => (
         <section key={spot.id}>
           <div className="mb-3 flex flex-wrap items-baseline gap-2">
-            <h2 className="text-xs uppercase tracking-widest text-neutral-500">
-              {spot === player.spots[0] ? "Команда" : "Ещё в составе"}
-            </h2>
-            <Link href={`/roster/teams/${spot.team.id}`} className="text-sm text-neutral-300 hover:text-violet-300">
+            <Eyebrow>{spot === player.spots[0] ? "Команда" : "Ещё в составе"}</Eyebrow>
+            <Link href={`/roster/teams/${spot.team.id}`} className="text-sm font-medium text-ink-muted hover:text-accent-bright">
               {spot.team.name}
             </Link>
-            <span className="text-xs text-neutral-600">
+            <span className="text-xs text-ink-subtle">
               {[roleLabel(spot.role) ?? "роль не задана", spot.team.group].filter(Boolean).join(" · ")}
             </span>
           </div>
 
           {spot.teammates.length === 0 ? (
-            <p className="text-sm text-neutral-500">В составе больше никого нет.</p>
+            <p className="text-sm text-ink-subtle">В составе больше никого нет.</p>
           ) : (
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {spot.teammates.map((m) => (
-                <Link
+                <PlayerMiniCard
                   key={m.id}
-                  href={`/roster/players/${m.id}`}
-                  className="flex items-center gap-3 rounded-lg border border-neutral-800 bg-neutral-900/40 p-2 hover:border-violet-600"
-                >
-                  <PlayerAvatar photo={m.photo} nickname={m.nickname} color={teamAccent(spot.team)} size={40} className="rounded-lg" />
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-medium">
-                      {m.nickname}
-                      {m.isCaptain && <span className="ml-1.5 text-xs text-violet-400">(C)</span>}
-                    </div>
-                    <div className="truncate text-xs text-neutral-500">
-                      {[roleLabel(m.role), m.mmr ? `${m.mmr.toLocaleString("ru")} MMR` : null].filter(Boolean).join(" · ")}
-                    </div>
-                  </div>
-                </Link>
+                  id={m.id}
+                  nickname={m.nickname}
+                  photo={m.photo}
+                  accent={teamAccent(spot.team)}
+                  role={roleLabel(m.role)}
+                  mmr={m.mmr}
+                  isCaptain={m.isCaptain}
+                  size={44}
+                />
               ))}
             </div>
           )}
@@ -184,14 +179,14 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
 
       {/* Задел под статистику: модель MatchStat уже есть, матчей в базе пока нет */}
       <section>
-        <h2 className="mb-3 text-xs uppercase tracking-widest text-neutral-500">Статистика</h2>
-        <div className="rounded-lg border border-dashed border-neutral-800 p-6 text-center text-sm text-neutral-600">
+        <Eyebrow className="mb-3">Статистика</Eyebrow>
+        <div className="rounded-xl border border-dashed border-hairline p-6 text-center text-sm text-ink-subtle">
           Появится, когда в базу лягут матчи: средние K/D/A, любимые герои, MVP.
           {links.dotabuff && (
             <>
               {" "}
               Пока смотрите на{" "}
-              <a href={links.dotabuff} target="_blank" rel="noreferrer" className="text-violet-400 hover:underline">
+              <a href={links.dotabuff} target="_blank" rel="noreferrer" className="text-accent-bright hover:underline">
                 Dotabuff
               </a>
               .

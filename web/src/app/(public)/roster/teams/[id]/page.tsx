@@ -3,34 +3,15 @@ import { notFound } from "next/navigation";
 import { getTeamProfile, type RosterMember } from "@/lib/roster-data";
 import { getStandings } from "@/lib/standings";
 import { DIVISIONS, divisionSlug } from "@/lib/divisions";
-import { countryCode, teamAccent, teamTag } from "@/lib/profiles";
+import { teamAccent, teamTag } from "@/lib/profiles";
 import { roleLabel } from "@/lib/roles";
 import { QUALIFICATION, qualificationOf } from "@/lib/qualification";
 import { isAdmin } from "@/lib/admin-session";
-import { PlayerAvatar } from "../../_components/avatar";
+import { Eyebrow, StatTile } from "@/app/_components/ui";
+import { PlayerMiniCard } from "../../_components/player-card";
 import { TeamCover } from "../../_components/team-cover";
 
 export const dynamic = "force-dynamic";
-
-function Stat({
-  label,
-  value,
-  hint,
-  valueClass = "text-neutral-100",
-}: {
-  label: string;
-  value: string;
-  hint?: string;
-  valueClass?: string;
-}) {
-  return (
-    <div className="rounded-lg border border-neutral-800 bg-neutral-950/60 px-3 py-2">
-      <div className="text-[10px] uppercase tracking-widest text-neutral-500">{label}</div>
-      <div className={`text-lg font-semibold ${valueClass}`}>{value}</div>
-      {hint && <div className="text-xs text-neutral-600">{hint}</div>}
-    </div>
-  );
-}
 
 export default async function TeamPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -52,16 +33,16 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-2 text-sm text-neutral-500">
-        <Link href="/roster/teams" className="hover:text-neutral-300">
+      <div className="flex flex-wrap items-center gap-2 text-sm text-ink-subtle">
+        <Link href="/roster/teams" className="hover:text-ink-muted">
           Команды
         </Link>
-        <span className="text-neutral-700">/</span>
-        <span className="text-neutral-400">{team.name}</span>
+        <span className="text-ink-subtle">/</span>
+        <span className="text-ink-muted">{team.name}</span>
       </div>
 
       {/* Обложка: командное фото, если оно есть; иначе — градиент в цвет команды с лого водяным знаком */}
-      <section className="overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950">
+      <section className="overflow-hidden rounded-2xl border border-hairline bg-canvas">
         <TeamCover team={team} accent={accent} />
 
         {/* Лого наезжает на обложку — тот же приём, что с аватаркой игрока: шапка и тело срастаются.
@@ -69,26 +50,26 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
         {/* relative обязателен: подложки обложки позиционированные, без него они перекрывают заголовок */}
         <div className="relative -mt-12 flex flex-col gap-3 px-5 pb-5 sm:flex-row sm:items-end sm:gap-4">
           <div
-            className="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-2xl border bg-neutral-950 p-2"
+            className="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-2xl border bg-canvas p-2"
             style={{ borderColor: `${accent}66` }}
           >
             {team.logo ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={team.logo} alt={team.name} className="h-full w-full object-contain" />
             ) : (
-              <span className="text-lg font-bold text-neutral-500">{teamTag(team)}</span>
+              <span className="text-lg font-bold text-ink-subtle">{teamTag(team)}</span>
             )}
           </div>
 
           <div className="min-w-0 flex-1 sm:pb-1">
             <h1 className="text-3xl font-bold leading-tight tracking-tight break-words">{team.name}</h1>
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-ink-subtle">
               {[teamTag(team), team.group, `${team.playersCount} игрок(ов)`].filter(Boolean).join(" · ")}
             </p>
             {team.mmrAverage !== null && (
-              <p className="text-sm text-neutral-400">
-                ср. MMR основы <span className="font-medium text-neutral-200">{team.mmrAverage.toLocaleString("ru")}</span>
-                <span className="text-neutral-600"> · Σ {team.mmrTotal.toLocaleString("ru")}</span>
+              <p className="text-sm text-ink-muted">
+                ср. MMR основы <span className="font-medium text-ink">{team.mmrAverage.toLocaleString("ru")}</span>
+                <span className="text-ink-subtle"> · Σ {team.mmrTotal.toLocaleString("ru")}</span>
               </p>
             )}
           </div>
@@ -96,7 +77,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
           {authed && (
             <Link
               href={`/admin/roster/teams/${team.id}/edit`}
-              className="self-start rounded bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500 sm:mb-1 sm:self-auto"
+              className="self-start rounded bg-accent px-4 py-2 text-sm font-medium text-accent-contrast hover:bg-accent-bright sm:mb-1 sm:self-auto"
             >
               Редактировать
             </Link>
@@ -106,33 +87,33 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
 
       {/* Участие в дивизионе: цифры те же, что в разделе «LOST D1», и переходы туда же */}
       {row && (
-        <section className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-4">
-          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="text-xs uppercase tracking-widest text-neutral-500">
+        <section className="rounded-2xl border border-hairline bg-surface-1 p-5 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-24px_rgba(0,0,0,0.9)]">
+          <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+            <Eyebrow>
               {team.group ?? "Дивизион"}
-              {group && <span className="ml-2 text-neutral-400">группа {group.group}</span>}
-            </h2>
+              {group && <span className="ml-2 text-ink-muted">группа {group.group}</span>}
+            </Eyebrow>
             <div className="flex flex-wrap gap-3 text-xs">
-              <Link href={`/standings/${divSlug}`} className="text-violet-400 hover:underline">
+              <Link href={`/standings/${divSlug}`} className="font-medium text-accent-bright hover:underline">
                 Таблица →
               </Link>
-              <Link href={`/standings/${divSlug}/groups`} className="text-violet-400 hover:underline">
+              <Link href={`/standings/${divSlug}/groups`} className="font-medium text-accent-bright hover:underline">
                 Групповая стадия →
               </Link>
-              <Link href={`/standings/${divSlug}/playoff`} className="text-violet-400 hover:underline">
+              <Link href={`/standings/${divSlug}/playoff`} className="font-medium text-accent-bright hover:underline">
                 Плей-офф →
               </Link>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {row.place && (
-              <Stat label="Место" value={`${row.place}`} hint={group ? `из ${group.rows.length}` : undefined} />
+              <StatTile accent label="Место" value={`${row.place}`} hint={group ? `из ${group.rows.length}` : undefined} />
             )}
-            <Stat label="В — П" value={`${row.wins} — ${row.losses}`} hint={`${row.played} серий`} />
-            <Stat label="Очки" value={row.points.toLocaleString("ru")} />
+            <StatTile label="В — П" value={`${row.wins} — ${row.losses}`} hint={`${row.played} серий`} />
+            <StatTile label="Очки" value={row.points.toLocaleString("ru")} />
             {/* цвет зоны — общий для всех мест, где показываем группу (qualification.ts) */}
-            {zone && <Stat label="Зона" value={QUALIFICATION[zone].label} valueClass={QUALIFICATION[zone].text} />}
+            {zone && <StatTile label="Зона" value={QUALIFICATION[zone].label} valueClass={QUALIFICATION[zone].text} />}
           </div>
         </section>
       )}
@@ -156,40 +137,31 @@ function RosterSection({
 }) {
   return (
     <section>
-      <h2 className="mb-3 text-xs uppercase tracking-widest text-neutral-500">{title}</h2>
+      <Eyebrow className="mb-3">{title}</Eyebrow>
       {players.length === 0 ? (
-        <p className="text-sm text-neutral-500">{empty}</p>
+        <p className="text-sm text-ink-subtle">{empty}</p>
       ) : (
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {players.map((p) => (
-            <Link
+            <PlayerMiniCard
               key={p.id}
-              href={`/roster/players/${p.id}`}
-              className="flex items-center gap-3 rounded-lg border border-neutral-800 bg-neutral-900/40 p-2.5 transition-colors hover:border-violet-600"
-            >
-              <PlayerAvatar photo={p.photo} nickname={p.nickname} color={accent} size={64} className="rounded-xl" />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="truncate font-medium text-neutral-100">{p.nickname}</span>
-                  {p.isCaptain && <span className="text-xs text-violet-400">(C)</span>}
-                  {countryCode(p.country) && (
-                    <span className="rounded bg-neutral-800 px-1 text-[10px] text-neutral-400">
-                      {countryCode(p.country)}
-                    </span>
-                  )}
-                </div>
-                <div className="truncate text-xs text-neutral-500">
-                  {[roleLabel(p.role) ?? "роль не задана", p.mmr ? `${p.mmr.toLocaleString("ru")} MMR` : null]
-                    .filter(Boolean)
-                    .join(" · ")}
-                </div>
-              </div>
-              {p.position && (
-                <span className="grid h-6 w-6 shrink-0 place-items-center rounded bg-neutral-900 text-xs text-neutral-400">
-                  {p.position}
-                </span>
-              )}
-            </Link>
+              id={p.id}
+              nickname={p.nickname}
+              photo={p.photo}
+              accent={accent}
+              role={roleLabel(p.role) ?? "роль не задана"}
+              mmr={p.mmr}
+              isCaptain={p.isCaptain}
+              country={p.country}
+              size={56}
+              trailing={
+                p.position ? (
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-hairline bg-surface-2 text-xs font-semibold text-ink-muted">
+                    {p.position}
+                  </span>
+                ) : undefined
+              }
+            />
           ))}
         </div>
       )}

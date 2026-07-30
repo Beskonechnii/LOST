@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Eyebrow } from "@/app/_components/ui";
 import { NewDraftButton } from "./_components/new-draft-button";
 import { DraftList } from "./_components/draft-list";
 
@@ -14,8 +15,9 @@ export default async function UnderbeerHome() {
     <div className="space-y-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">UNDERBEER 2.0</h1>
-          <p className="mt-1 max-w-2xl text-sm text-ink-subtle">
+          <Eyebrow className="mb-2">Служебная часть · шоу-драфт</Eyebrow>
+          <h1 className="text-2xl font-bold tracking-tight md:text-[28px]">UNDERBEER 2.0</h1>
+          <p className="mt-1.5 max-w-2xl text-sm text-ink-subtle">
             Сборка шоу-команд из живого ростера ({players} игрок(ов)). Назначь капитанов, задай размер состава —
             и капитаны по очереди драфтят игроков. У каждой команды по разу есть «Закрепить» и «Украсть».
           </p>

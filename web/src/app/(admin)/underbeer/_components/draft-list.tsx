@@ -32,7 +32,7 @@ export function DraftList({ sessions }: { sessions: Item[] }) {
 
   if (items.length === 0) {
     return (
-      <p className="rounded border border-dashed border-hairline p-8 text-center text-sm text-ink-subtle">
+      <p className="rounded-xl border border-dashed border-hairline p-8 text-center text-sm text-ink-subtle">
         Пока нет ни одного драфта. Нажми «Новый драфт», чтобы собрать команды.
       </p>
     );
@@ -46,7 +46,7 @@ export function DraftList({ sessions }: { sessions: Item[] }) {
           <li key={s.id} className="group relative">
             <Link
               href={`/underbeer/${s.id}`}
-              className="block rounded border border-hairline bg-surface-1/40 p-4 transition-colors hover:border-amber-600"
+              className="block rounded-xl border border-hairline bg-surface-1 p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_12px_36px_-26px_rgba(0,0,0,0.9)] transition duration-200 hover:-translate-y-0.5 hover:border-amber-500/60"
             >
               <div className="flex items-center justify-between gap-2 pr-16">
                 <span className="truncate font-semibold">{label}</span>

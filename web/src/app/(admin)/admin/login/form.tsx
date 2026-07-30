@@ -17,7 +17,7 @@ export function LoginForm({ next }: { next: string }) {
         autoFocus
         autoComplete="current-password"
         placeholder="Пароль"
-        className="w-full rounded-md border border-hairline-strong bg-surface-1 px-3 py-2 text-sm outline-none focus:border-hairline-strong"
+        className="w-full rounded-lg border border-hairline bg-surface-1 px-3 py-2 text-sm outline-none transition focus:border-accent/60 focus:ring-2 focus:ring-accent/25"
       />
       <button
         type="submit"

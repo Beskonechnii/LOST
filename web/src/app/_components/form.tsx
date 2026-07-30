@@ -12,7 +12,7 @@ export function Label({ children }: { children: React.ReactNode }) {
 }
 
 const inputCls =
-  "w-full rounded border border-hairline bg-surface-1 px-3 py-2 text-sm text-ink outline-none focus:border-accent-bright";
+  "w-full rounded-lg border border-hairline bg-surface-1 px-3 py-2 text-sm text-ink outline-none transition focus:border-accent/60 focus:ring-2 focus:ring-accent/25";
 
 export function TextField(props: {
   label: string;
@@ -106,7 +106,7 @@ export function ImageField(props: {
     <div>
       <Label>{props.label}</Label>
       <div className="flex items-center gap-3">
-        <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded border border-hairline bg-surface-1">
+        <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-xl border border-hairline bg-surface-1">
           {props.value ? (
             // локальный файл из public/uploads — оптимизация next/image здесь не нужна
             // eslint-disable-next-line @next/next/no-img-element
@@ -150,7 +150,7 @@ export function SaveButton({ url, data, label = "Сохранить" }: { url: s
       <button
         type="button"
         disabled={pending}
-        className="rounded bg-accent px-4 py-2 text-sm font-medium text-accent-contrast hover:bg-accent-bright disabled:opacity-50"
+        className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-contrast shadow-[0_6px_18px_-6px_var(--color-accent)] transition hover:bg-accent-bright disabled:opacity-50"
         onClick={() => {
           setMsg(null);
           start(async () => {

@@ -13,8 +13,9 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <main className="flex-1 p-4 md:p-8">
       <div className="mx-auto max-w-sm">
-        <h1 className="text-lg font-bold tracking-tight">Админка LOST</h1>
-        <p className="mt-1 mb-5 text-sm text-ink-muted">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-300/80">Служебная часть</p>
+        <h1 className="mt-1.5 text-xl font-bold tracking-tight">Админка LOST</h1>
+        <p className="mt-1.5 mb-5 text-sm text-ink-muted">
           Пароль закрывает всё, что пишет: правку ростера, студию и запись через API. Публичная таблица,
           ростер и разбор матча открыты без него.
         </p>

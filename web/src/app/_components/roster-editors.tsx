@@ -34,10 +34,10 @@ export function TeamEditor({ id, initial }: { id: number; initial: TeamForm }) {
               type="color"
               value={v.color || "#a855f7"}
               onChange={(e) => set("color", e.target.value)}
-              className="h-10 w-12 rounded border border-hairline bg-surface-1"
+              className="h-10 w-12 rounded-lg border border-hairline bg-surface-1"
             />
             <input
-              className="w-full rounded border border-hairline bg-surface-1 px-3 py-2 text-sm text-ink outline-none focus:border-accent-bright"
+              className="w-full rounded-lg border border-hairline bg-surface-1 px-3 py-2 text-sm text-ink outline-none transition focus:border-accent/60 focus:ring-2 focus:ring-accent/25"
               value={v.color}
               placeholder="#A855F7"
               onChange={(e) => set("color", e.target.value)}
@@ -73,7 +73,7 @@ type PlayerForm = {
 
 function Fieldset({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded border border-hairline bg-surface-1/40 p-4">
+    <section className="rounded-xl border border-hairline bg-surface-1 p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_12px_36px_-26px_rgba(0,0,0,0.9)]">
       <h3 className="mb-3 text-xs uppercase tracking-widest text-ink-subtle">{title}</h3>
       {children}
     </section>
@@ -177,7 +177,7 @@ export function SpotsEditor({
       {spots.length === 0 && <p className="text-sm text-ink-subtle">Игрок не числится ни в одном составе.</p>}
 
       {spots.map((s) => (
-        <div key={s.id} className="flex flex-wrap items-end gap-3 rounded border border-hairline bg-surface-1/40 p-3">
+        <div key={s.id} className="flex flex-wrap items-end gap-3 rounded-xl border border-hairline bg-surface-1 p-3">
           <div className="min-w-40 flex-1 text-sm font-medium text-ink">{s.teamName}</div>
           <div className="w-56">
             <SelectField
@@ -199,7 +199,7 @@ export function SpotsEditor({
             type="button"
             disabled={busy}
             onClick={() => void send(`/api/roster/spots/${s.id}`, "DELETE")}
-            className="rounded border border-hairline px-3 py-2 text-sm text-ink-muted hover:border-rose-600 hover:text-rose-400 disabled:opacity-50"
+            className="rounded-lg border border-hairline px-3 py-2 text-sm text-ink-muted transition hover:border-rose-600/60 hover:text-rose-400 disabled:opacity-50"
           >
             Убрать
           </button>
@@ -207,7 +207,7 @@ export function SpotsEditor({
       ))}
 
       {free.length > 0 && (
-        <div className="flex flex-wrap items-end gap-3 rounded border border-dashed border-hairline p-3">
+        <div className="flex flex-wrap items-end gap-3 rounded-xl border border-dashed border-hairline p-3">
           <div className="w-56">
             <SelectField
               label="Добавить в состав"
@@ -223,7 +223,7 @@ export function SpotsEditor({
             type="button"
             disabled={busy || !newTeam}
             onClick={() => void send("/api/roster/spots", "POST", { playerId, teamId: Number(newTeam), role: newRole })}
-            className="rounded bg-accent px-4 py-2 text-sm font-medium text-accent-contrast hover:bg-accent-bright disabled:opacity-50"
+            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-contrast shadow-[0_6px_18px_-6px_var(--color-accent)] transition hover:bg-accent-bright disabled:opacity-50"
           >
             Добавить
           </button>
@@ -269,7 +269,7 @@ export function CreateForm({
   }
 
   return (
-    <div className="rounded border border-hairline bg-surface-1/40 p-4">
+    <div className="rounded-xl border border-hairline bg-surface-1 p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_12px_36px_-26px_rgba(0,0,0,0.9)]">
       <div className="flex flex-wrap items-end gap-3">
         {fields.map((f) => (
           <div key={f.key} className="w-48">
@@ -285,7 +285,7 @@ export function CreateForm({
           type="button"
           disabled={busy}
           onClick={() => void submit()}
-          className="rounded bg-accent px-4 py-2 text-sm font-medium text-accent-contrast hover:bg-accent-bright disabled:opacity-50"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-contrast shadow-[0_6px_18px_-6px_var(--color-accent)] transition hover:bg-accent-bright disabled:opacity-50"
         >
           {busy ? "…" : submitLabel}
         </button>

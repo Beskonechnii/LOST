@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { SeriesRow } from "@/lib/series";
 import { CUTS, PLAYOFF_ROUNDS, STAGES, cutByKey, playoffLabel, stageLabel } from "@/lib/stages";
+import { Eyebrow, SectionHeader } from "@/app/_components/ui";
 
 // Форма и список архива. Пишет через /api/series/* — тот же путь, что и у любой правки в проекте,
 // поэтому серверных экшенов здесь нет: правило «не-GET к /api закрыт паролем» одно на всё.
@@ -26,14 +27,16 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 const input =
-  "rounded-md border border-hairline bg-canvas px-2 py-1.5 text-sm outline-none focus:border-accent";
+  "rounded-lg border border-hairline bg-surface-2 px-2.5 py-1.5 text-sm outline-none transition focus:border-accent/60 focus:ring-2 focus:ring-accent/25";
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
       onClick={onClick}
-      className={`rounded-md px-2.5 py-1 text-xs transition ${
-        active ? "bg-accent font-medium text-accent-contrast" : "border border-hairline text-ink-muted hover:border-accent hover:text-ink"
+      className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+        active
+          ? "bg-gradient-to-b from-accent-bright to-accent text-white shadow-[0_5px_14px_-6px_var(--color-accent)]"
+          : "border border-hairline bg-surface-1 text-ink-muted hover:border-accent/60 hover:text-ink"
       }`}
     >
       {children}
@@ -104,7 +107,7 @@ function AttachGame({ seriesId, nextNumber, onDone }: { seriesId: number; nextNu
       <button
         onClick={submit}
         disabled={busy || !matchId.trim()}
-        className="rounded-md bg-accent px-2.5 py-1.5 text-xs font-medium disabled:opacity-40"
+        className="rounded-lg bg-accent px-2.5 py-1.5 text-xs font-semibold text-accent-contrast transition hover:bg-accent-bright disabled:opacity-40"
       >
         {busy ? "Читаю…" : "Привязать"}
       </button>
@@ -156,9 +159,11 @@ function SeriesCard({ s, onChange }: { s: SeriesRow; onChange: () => void }) {
   const cut = s.stage === "group" ? `Группа ${s.group ?? "—"}` : playoffLabel(s.bracket, s.round);
 
   return (
-    <div className={`rounded-lg border border-hairline bg-surface-1/40 p-3 ${busy ? "opacity-60" : ""}`}>
+    <div
+      className={`rounded-xl border border-hairline bg-surface-1 p-3.5 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_12px_36px_-26px_rgba(0,0,0,0.9)] transition ${busy ? "opacity-60" : ""}`}
+    >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded bg-surface-2 px-1.5 py-0.5 text-[10px] uppercase tracking-widest text-ink-muted">
+        <span className="rounded-md bg-surface-2 px-1.5 py-0.5 text-[10px] uppercase tracking-widest text-ink-muted">
           {cut || stageLabel(s.stage)}
         </span>
         <Link href={`/series/${s.slug}`} className="text-sm font-medium hover:text-accent-bright hover:underline">
@@ -292,26 +297,29 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold tracking-tight">Архив серий</h1>
-        <div className="flex flex-wrap items-center gap-4">
-          <p className="text-xs text-ink-subtle">
-            Карты, привязанные здесь, попадают в{" "}
-            <Link href="/standings/d1/stats" className="text-accent-bright hover:underline">
-              статистику турнира
-            </Link>
-          </p>
-          <button
-            onClick={() => {
-              setError(null);
-              setShowForm(true);
-            }}
-            className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-contrast transition hover:bg-accent-bright"
-          >
-            + Завести встречу
-          </button>
-        </div>
-      </div>
+      <SectionHeader
+        eyebrow="Служебная часть · архив"
+        title="Архив серий"
+        aside={
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="hidden sm:inline">
+              Карты отсюда идут в{" "}
+              <Link href="/standings/d1/stats" className="text-accent-bright hover:underline">
+                статистику
+              </Link>
+            </span>
+            <button
+              onClick={() => {
+                setError(null);
+                setShowForm(true);
+              }}
+              className="rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-accent-contrast shadow-[0_6px_18px_-6px_var(--color-accent)] transition hover:bg-accent-bright"
+            >
+              + Завести встречу
+            </button>
+          </div>
+        }
+      />
 
       {showForm && (
         // Модалка новой встречи: клик по фону закрывает, по самой плашке — нет (stopPropagation).
@@ -401,7 +409,7 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
               <button
                 onClick={create}
                 disabled={busy || !homeId || !awayId}
-                className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium transition hover:bg-accent-bright disabled:opacity-40"
+                className="rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-accent-contrast shadow-[0_6px_18px_-6px_var(--color-accent)] transition hover:bg-accent-bright disabled:opacity-40"
               >
                 {busy ? "…" : "Завести"}
               </button>
@@ -445,10 +453,10 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
       </div>
 
       {byDivision.map((d) => (
-        <section key={d.name} className="space-y-2">
-          <h2 className="text-sm uppercase tracking-widest text-ink-muted">
+        <section key={d.name} className="space-y-2.5">
+          <Eyebrow className="text-ink-muted">
             {d.label} <span className="text-ink-subtle">· встреч: {d.rows.length}</span>
-          </h2>
+          </Eyebrow>
           {d.rows.length === 0 ?
             <p className="text-xs text-ink-subtle">Пусто.</p>
           : d.rows.map((s) => <SeriesCard key={s.id} s={s} onChange={refresh} />)}

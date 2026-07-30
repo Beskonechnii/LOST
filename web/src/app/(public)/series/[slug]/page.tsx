@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Icon, TeamCrest } from "@/app/_components/postgame/blocks";
+import { Eyebrow } from "@/app/_components/ui";
 import { BackButton } from "./_components/back-button";
 import { divisionSlug } from "@/lib/divisions";
 import { getSeriesDetail, type GamePlayer, type SeriesDetail, type SeriesGameDetail } from "@/lib/series";
@@ -115,8 +116,8 @@ function GameCard({ game, home, away }: { game: SeriesGameDetail; home: Team; aw
     : away.id;
 
   return (
-    <section className="overflow-hidden rounded-xl border border-hairline bg-surface-1/40">
-      <div className="flex flex-wrap items-center gap-3 border-b border-hairline bg-surface-1/60 px-4 py-2">
+    <section className="overflow-hidden rounded-2xl border border-hairline bg-surface-1 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-26px_rgba(0,0,0,0.9)]">
+      <div className="flex flex-wrap items-center gap-3 border-b border-hairline bg-surface-2 px-4 py-2.5">
         <span className="text-sm font-bold text-ink-muted">#{game.gameNumber ?? "?"}</span>
         {game.openDotaMatchId && (
           <Link href={`/match/${game.openDotaMatchId}`} className="text-xs text-accent-bright hover:underline">
@@ -157,38 +158,41 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
     <main className="flex-1 p-4 md:p-8">
       <div className="mx-auto max-w-4xl space-y-4">
         <BackButton fallback={`/standings/${div}`} />
-        {/* шапка-крошки: дивизион и разрез — то, что на Dotabuff занимает строку лиги */}
-        <div className="!mt-3 flex flex-wrap items-center justify-between gap-2 rounded-t-xl border border-hairline bg-surface-1/60 px-4 py-2">
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <Link href={`/standings/${div}`} className="font-medium text-accent-bright hover:underline">
-              {s.division}
-            </Link>
-            <span className="text-ink-subtle">·</span>
-            <span className="text-ink-muted">{cutLabel(s)}</span>
-          </div>
-          <span className="text-xs text-ink-subtle">{s.slug}</span>
-        </div>
 
-        <div className="!mt-0 rounded-b-xl border border-t-0 border-hairline bg-surface-1/40 p-4">
-          <div className="flex items-center gap-4">
-            <SeriesSide team={s.home} winnerId={winner} align="left" />
-            <div className="shrink-0 text-center">
-              <div className="text-3xl font-black tabular-nums">
-                <span className={winner === s.home.id ? "text-emerald-400" : "text-ink-muted"}>{s.homeScore}</span>
-                <span className="mx-2 text-ink-subtle">—</span>
-                <span className={winner === s.away.id ? "text-emerald-400" : "text-ink-muted"}>{s.awayScore}</span>
-              </div>
-              <div className="mt-1 text-[11px] text-ink-subtle">
-                {bo}
-                {s.playedAt ? ` · ${dateFmt.format(s.playedAt)}` : ""}
-              </div>
-              {s.guessed && <div className="mt-1 text-[10px] text-amber-400">счёт под вопросом</div>}
+        {/* Шапка встречи: крошки разреза + счёт серии одной карточкой с мягкой тенью */}
+        <div className="overflow-hidden rounded-2xl border border-hairline shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_18px_50px_-28px_rgba(0,0,0,0.9)]">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline bg-surface-2 px-4 py-2.5">
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              <Link href={`/standings/${div}`} className="font-medium text-accent-bright hover:underline">
+                {s.division}
+              </Link>
+              <span className="text-ink-subtle">·</span>
+              <span className="text-ink-muted">{cutLabel(s)}</span>
             </div>
-            <SeriesSide team={s.away} winnerId={winner} align="right" />
+            <span className="text-xs text-ink-subtle">{s.slug}</span>
+          </div>
+
+          <div className="bg-surface-1 p-5">
+            <div className="flex items-center gap-4">
+              <SeriesSide team={s.home} winnerId={winner} align="left" />
+              <div className="shrink-0 text-center">
+                <div className="text-4xl font-black tabular-nums">
+                  <span className={winner === s.home.id ? "text-emerald-400" : "text-ink-muted"}>{s.homeScore}</span>
+                  <span className="mx-2 text-ink-subtle">—</span>
+                  <span className={winner === s.away.id ? "text-emerald-400" : "text-ink-muted"}>{s.awayScore}</span>
+                </div>
+                <div className="mt-1.5 text-[11px] text-ink-subtle">
+                  {bo}
+                  {s.playedAt ? ` · ${dateFmt.format(s.playedAt)}` : ""}
+                </div>
+                {s.guessed && <div className="mt-1 text-[10px] text-amber-400">счёт под вопросом</div>}
+              </div>
+              <SeriesSide team={s.away} winnerId={winner} align="right" />
+            </div>
           </div>
         </div>
 
-        <h2 className="pt-2 text-xs uppercase tracking-widest text-ink-muted">Карты</h2>
+        <Eyebrow className="pt-2 text-ink-muted">Карты</Eyebrow>
 
         {s.games.length === 0 && (
           <p className="rounded-lg border border-dashed border-hairline p-6 text-sm text-ink-muted">

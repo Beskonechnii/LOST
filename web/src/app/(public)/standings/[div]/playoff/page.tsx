@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getQualified } from "@/lib/group-stage";
 import { QUALIFICATION } from "@/lib/qualification";
 import { divisionBySlug } from "@/lib/divisions";
+import { Eyebrow, SectionHeader } from "@/app/_components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,7 @@ type Seed = { teamId: number; name: string; tag: string; group: string; place: n
 function Slot({ seed, waiting }: { seed?: Seed; waiting?: string }) {
   if (!seed) {
     return (
-      <div className="flex h-9 items-center rounded border border-dashed border-hairline px-2 text-xs text-ink-subtle">
+      <div className="flex h-10 items-center rounded-lg border border-dashed border-hairline px-2.5 text-xs text-ink-subtle">
         {waiting ?? "—"}
       </div>
     );
@@ -23,11 +24,11 @@ function Slot({ seed, waiting }: { seed?: Seed; waiting?: string }) {
   return (
     <Link
       href={`/roster/teams/${seed.teamId}`}
-      className="flex h-9 items-center gap-2 rounded border border-hairline bg-surface-1/60 px-2 text-sm hover:border-accent"
+      className="group flex h-10 items-center gap-2 rounded-lg border border-hairline bg-surface-2 px-2.5 text-sm transition hover:border-accent/60"
     >
       <span className="w-10 shrink-0 text-[10px] font-medium text-ink-subtle">{seed.tag}</span>
-      <span className="truncate font-medium">{seed.name}</span>
-      <span className="ml-auto shrink-0 text-[10px] text-ink-subtle">
+      <span className="truncate font-semibold transition-colors group-hover:text-accent-bright">{seed.name}</span>
+      <span className="ml-auto shrink-0 rounded bg-surface-3 px-1.5 py-0.5 text-[10px] font-medium tabular-nums text-ink-muted">
         {seed.group}
         {seed.place}
       </span>
@@ -38,7 +39,7 @@ function Slot({ seed, waiting }: { seed?: Seed; waiting?: string }) {
 function Round({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="min-w-52 space-y-3">
-      <h3 className="text-xs uppercase tracking-widest text-ink-subtle">{title}</h3>
+      <Eyebrow>{title}</Eyebrow>
       {children}
     </div>
   );
@@ -46,7 +47,7 @@ function Round({ title, children }: { title: string; children: React.ReactNode }
 
 function Pair({ a, b, waiting }: { a?: Seed; b?: Seed; waiting?: string }) {
   return (
-    <div className="space-y-1 rounded-lg border border-hairline bg-surface-1/20 p-2">
+    <div className="space-y-1.5 rounded-xl border border-hairline bg-surface-1 p-2 shadow-[0_10px_28px_-22px_rgba(0,0,0,0.9)]">
       <Slot seed={a} waiting={waiting} />
       <Slot seed={b} waiting={waiting} />
     </div>
@@ -77,15 +78,16 @@ export default async function PlayoffPage({ params }: { params: Promise<{ div: s
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-2xl font-bold tracking-tight">Плей-офф</h1>
-        <p className="text-xs text-amber-400">Черновик: посев из групп настоящий, пары — предположение под будущий регламент</p>
-      </div>
+      <SectionHeader
+        eyebrow={`${division.label} · плей-офф`}
+        title="Плей-офф"
+        aside={<span className="text-amber-400">Черновик: посев настоящий, пары — под будущий регламент</span>}
+      />
 
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <span className={`h-2.5 w-2.5 rounded-sm ${QUALIFICATION.upper.marker}`} />
-          <h2 className="text-sm uppercase tracking-widest text-ink-muted">Верхняя сетка</h2>
+          <span className={`h-2.5 w-2.5 rounded-full ${QUALIFICATION.upper.marker}`} />
+          <Eyebrow className="text-ink-muted">Верхняя сетка</Eyebrow>
           <span className="text-xs text-ink-subtle">1–4 места групп</span>
         </div>
         {/* раунды — колонки, слева направо по ходу сетки; на узком экране прокручиваются вбок */}
@@ -110,8 +112,8 @@ export default async function PlayoffPage({ params }: { params: Promise<{ div: s
 
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <span className={`h-2.5 w-2.5 rounded-sm ${QUALIFICATION.lower.marker}`} />
-          <h2 className="text-sm uppercase tracking-widest text-ink-muted">Нижняя сетка</h2>
+          <span className={`h-2.5 w-2.5 rounded-full ${QUALIFICATION.lower.marker}`} />
+          <Eyebrow className="text-ink-muted">Нижняя сетка</Eyebrow>
           <span className="text-xs text-ink-subtle">5–6 места групп + проигравшие сверху</span>
         </div>
         <div className="grid grid-cols-[repeat(3,minmax(13rem,1fr))] gap-4 overflow-x-auto pb-2">
@@ -131,15 +133,15 @@ export default async function PlayoffPage({ params }: { params: Promise<{ div: s
 
       <section className="space-y-2">
         <div className="flex items-center gap-2">
-          <span className={`h-2.5 w-2.5 rounded-sm ${QUALIFICATION.out.marker}`} />
-          <h2 className="text-sm uppercase tracking-widest text-ink-muted">Вылет</h2>
+          <span className={`h-2.5 w-2.5 rounded-full ${QUALIFICATION.out.marker}`} />
+          <Eyebrow className="text-ink-muted">Вылет</Eyebrow>
         </div>
         <div className="flex flex-wrap gap-2">
           {out.map((t) => (
             <Link
               key={t.teamId}
               href={`/roster/teams/${t.teamId}`}
-              className="rounded border border-hairline px-2 py-1 text-xs text-ink-subtle hover:border-rose-600 hover:text-rose-400"
+              className="rounded-lg border border-hairline bg-surface-1 px-2.5 py-1.5 text-xs text-ink-muted transition hover:border-rose-600/60 hover:text-rose-400"
             >
               {t.name}
               <span className="ml-1 text-ink-subtle">

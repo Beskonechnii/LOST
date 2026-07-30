@@ -47,8 +47,11 @@ export function GroupStage({ tables }: { tables: GroupTable[] }) {
 
       <div className="grid gap-5 lg:grid-cols-2">
         {tables.map((t) => (
-          <div key={t.group} className="overflow-hidden rounded-lg border border-hairline bg-surface-1/40">
-            <div className="border-b border-hairline bg-gradient-to-r from-accent/20 to-transparent px-4 py-2">
+          <div
+            key={t.group}
+            className="overflow-hidden rounded-2xl border border-hairline bg-surface-1 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_16px_44px_-26px_rgba(0,0,0,0.9)]"
+          >
+            <div className="border-b border-hairline bg-gradient-to-r from-accent/[0.14] to-transparent px-4 py-2.5">
               <span className="text-sm font-bold tracking-wide text-ink">Группа {t.group}</span>
               <span className="ml-2 text-xs text-ink-subtle">{t.rows.length} команд</span>
             </div>

@@ -25,21 +25,22 @@ export function PlayerAvatar({
   className?: string;
 }) {
   const accent = color?.trim() || ACCENT;
+  // Фото — вырезка на прозрачном фоне, поэтому подложка всегда фирменная: градиент в цвет команды.
+  // Один и тот же градиент под фото и под инициалами — карточки выглядят единым набором.
+  // Прозрачность цвета в hex-суффиксе: работает с любым значением из поля color.
+  const background = `linear-gradient(150deg, ${accent}80, ${accent}1f 58%, #0a0a0a)`;
 
   return (
     <div
-      className={`grid shrink-0 place-items-center overflow-hidden rounded-2xl border border-white/10 ${className}`}
-      style={{
-        width: size,
-        height: size,
-        // прозрачность цвета команды в hex-суффиксе: так градиент работает с любым значением из поля
-        background: photo ? "#0a0a0a" : `linear-gradient(140deg, ${accent}66, ${accent}14 60%, #0a0a0a)`,
-      }}
+      className={`relative grid shrink-0 place-items-center overflow-hidden rounded-2xl border border-white/10 ${className}`}
+      style={{ width: size, height: size, background }}
     >
       {photo ? (
+        // Вырезка «по грудь» уже кадрирована квадратом и посажена к низу (scripts обрезки) —
+        // object-bottom держит человека «стоящим» в рамке, если аватарка окажется не квадратной.
         // локальный файл из public/uploads — оптимизация next/image здесь не нужна
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={photo} alt={nickname} className="h-full w-full object-cover" />
+        <img src={photo} alt={nickname} className="h-full w-full object-cover object-bottom" />
       ) : (
         <span
           className="font-bold tracking-tight text-white/85"

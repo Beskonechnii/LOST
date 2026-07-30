@@ -36,7 +36,7 @@ export type DraftTeam = {
   usedSteal: boolean;
 };
 
-export type DraftPhase = "config" | "draft" | "done";
+export type DraftPhase = "roster" | "config" | "draft" | "done";
 
 export type DraftState = {
   version: typeof DRAFT_VERSION;
@@ -46,6 +46,9 @@ export type DraftState = {
   teams: DraftTeam[];
   order: string[]; // порядок команд по кругам (DraftTeam.id)
   turn: number; // указатель в змейку-развёртку; растёт при пике/краже (см. currentTurn)
+  // Участники турнира: отобранные из полного ростера id игроков (фаза roster). Драфт идёт только из них.
+  // Старые payload'ы поля не имеют → undefined, трактуется как «пул = весь ростер» (обратная совместимость).
+  participants?: number[];
   // Форс-добор после кражи: у кого украли — добирает игрока ВНЕ очереди, потом змейка возобновляется.
   // Старые payload'ы поля не имеют → undefined, трактуется как «нет форс-добора».
   pendingPick?: string | null;
@@ -83,7 +86,7 @@ let seq = 0;
 export const newTeamId = () => `t${Date.now().toString(36)}${(seq++).toString(36)}`;
 
 export function newDraftState(): DraftState {
-  return { version: DRAFT_VERSION, phase: "config", snake: true, targetSize: 5, teams: [], order: [], turn: 0, pendingPick: null };
+  return { version: DRAFT_VERSION, phase: "roster", snake: true, targetSize: 5, teams: [], order: [], turn: 0, participants: [], pendingPick: null };
 }
 
 export function newTeam(name: string, color: string): DraftTeam {
@@ -236,6 +239,12 @@ export function draftBlocker(state: DraftState): string | null {
   if (state.targetSize < 2) return "В составе должно быть хотя бы 2 игрока";
   if (state.teams.some((t) => t.captainId == null)) return "У каждой команды должен быть капитан";
   if (state.teams.some((t) => !t.name.trim())) return "У каждой команды должно быть название";
+  // участников должно хватать на все места; старые сессии (participants нет) не блокируем
+  if (state.participants) {
+    const need = state.teams.length * state.targetSize;
+    if (state.participants.length < need)
+      return `Участников (${state.participants.length}) меньше, чем мест в командах (${need})`;
+  }
   return null;
 }
 
@@ -243,6 +252,37 @@ export function startDraft(state: DraftState): DraftState {
   const blocker = draftBlocker(state);
   if (blocker) throw new Error(blocker);
   return { ...state, phase: "draft", order: state.teams.map((t) => t.id), turn: 0, pendingPick: null };
+}
+
+// ── Фаза «Участники» (roster → config) ──────────────────────────────────────────
+
+/** Добавить/убрать игрока из участников турнира. Убрали — вычищаем и из команд (капитан/пик/лок). */
+export function toggleParticipant(state: DraftState, playerId: number): DraftState {
+  const set = new Set(state.participants ?? []);
+  if (set.has(playerId)) {
+    set.delete(playerId);
+    const teams = state.teams.map((t) => ({
+      ...t,
+      captainId: t.captainId === playerId ? null : t.captainId,
+      picks: t.picks.filter((id) => id !== playerId),
+      locked: t.locked.filter((id) => id !== playerId),
+    }));
+    return { ...state, participants: [...set], teams };
+  }
+  set.add(playerId);
+  return { ...state, participants: [...set] };
+}
+
+/** Что мешает перейти к командам (null — можно). */
+export function participantsBlocker(state: DraftState): string | null {
+  if ((state.participants?.length ?? 0) < 2) return "Выберите хотя бы двух игроков";
+  return null;
+}
+
+export function goToConfig(state: DraftState): DraftState {
+  const blocker = participantsBlocker(state);
+  if (blocker) throw new Error(blocker);
+  return { ...state, phase: "config" };
 }
 
 // ── Config-редьюсеры (правят состав команд до старта; борд зовёт их же) ──────────

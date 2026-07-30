@@ -51,7 +51,7 @@ export default async function Home() {
   const [teams, players, series, groups] = await Promise.all([
     prisma.team.count(),
     prisma.player.count(),
-    prisma.groupSeries.count(),
+    prisma.series.count(),
     prisma.groupEntry.findMany({ distinct: ["division", "group"], select: { group: true } }),
   ]);
 

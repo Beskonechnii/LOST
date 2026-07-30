@@ -167,7 +167,7 @@ function RosterSection({
               href={`/roster/players/${p.id}`}
               className="flex items-center gap-3 rounded-lg border border-neutral-800 bg-neutral-900/40 p-2.5 transition-colors hover:border-violet-600"
             >
-              <PlayerAvatar photo={p.photo} nickname={p.nickname} color={accent} size={44} className="rounded-lg" />
+              <PlayerAvatar photo={p.photo} nickname={p.nickname} color={accent} size={64} className="rounded-xl" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="truncate font-medium text-neutral-100">{p.nickname}</span>

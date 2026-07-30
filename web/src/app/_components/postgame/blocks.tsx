@@ -70,8 +70,9 @@ export function HeroFrame({
       <Icon kind="heroes" slug={hero.slug} name={hero.name} h={h} className={`!ring-0 ${banned ? "opacity-55 grayscale" : ""}`} />
       {banned && (
         <span
-          className="pointer-events-none absolute inset-0 grid place-items-center text-[11px] font-black text-rose-500"
-          style={{ textShadow: "0 1px 2px rgba(0,0,0,.85)" }}
+          className="pointer-events-none absolute inset-0 grid place-items-center font-black text-rose-500"
+          // крестик тянется за размером иконки, иначе на крупных банах он теряется
+          style={{ fontSize: Math.round(h * 0.5), lineHeight: 1, textShadow: "0 1px 2px rgba(0,0,0,.85)" }}
         >
           ✕
         </span>
@@ -300,13 +301,6 @@ export function AdvantageChart({
             <stop offset="50%" stopColor="rgb(120 120 120)" stopOpacity="0.05" />
             <stop offset="100%" stopColor="rgb(251 113 133)" stopOpacity="0.35" />
           </linearGradient>
-          {/* подложка панели: лёгкий фиолетовый акцент сверху, к низу — в чёрный, чтобы график
-              не сидел на плоской заливке карточки */}
-          <linearGradient id="advPanel" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgb(139 92 246)" stopOpacity="0.12" />
-            <stop offset="55%" stopColor="rgb(12 10 16)" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="rgb(0 0 0)" stopOpacity="0.7" />
-          </linearGradient>
           {/* верх/низ графика — для двухцветной линии (лидирует Свет / Тьма) */}
           <clipPath id="advTop">
             <rect x={padL} y={padT - 2} width={plotW} height={plotH / 2 + 2} />
@@ -314,26 +308,18 @@ export function AdvantageChart({
           <clipPath id="advBot">
             <rect x={padL} y={mid} width={plotW} height={plotH / 2 + 2} />
           </clipPath>
-          {/* весь плот целиком — под опциональную подложку-картинку */}
-          <clipPath id="advPlot">
-            <rect x={padL} y={padT} width={plotW} height={plotH} />
-          </clipPath>
         </defs>
-        {/* фон панели: сперва фирменный градиент (работает всегда), поверх — вендоренная
-            картинка из public/assets/chart/bg.png, если она есть (иначе просто не рисуется),
-            и лёгкое затемнение сверху для читаемости сетки и подписей */}
-        <rect x={padL} y={padT} width={plotW} height={plotH} fill="url(#advPanel)" />
-        <image
-          href="/assets/chart/bg.png"
+        {/* Никакой подложки-картинки: поле графика — просто затемнение с тонкой рамкой,
+            чтобы плот отделялся от фона карточки и не спорил с линиями (реф — блок graph). */}
+        <rect
           x={padL}
           y={padT}
           width={plotW}
           height={plotH}
-          preserveAspectRatio="xMidYMid slice"
-          opacity="0.5"
-          clipPath="url(#advPlot)"
+          fill="rgba(0,0,0,0.35)"
+          stroke="rgb(38 38 38)"
+          strokeWidth="0.5"
         />
-        <rect x={padL} y={padT} width={plotW} height={plotH} fill="rgba(8,6,14,0.4)" />
         {/* сетка + подписи оси Y (без минуса: верх — Свет, низ — Тьма) */}
         {yTicks.map((v) => (
           <g key={v}>
@@ -403,50 +389,129 @@ export function AdvantageChart({
   );
 }
 
-// --- Карта строений: настоящая миникарта из игры + маркеры строений ---
-// Подложка — public/assets/map/minimap.jpg (detailed-карта из odota/web, свет — низ-лево).
-// Координаты в процентах карты (x вправо, y вниз), сняты с мировых координат вышек.
-// Позиции строений — из OpenDota (odota/web BuildingMap/buildingData733.ts, карта 7.33+),
-// выверены под ту же подложку detailed_740.jpg. Их top/left — угол иконки; здесь пересчитано
-// в центры (+полразмера иконки: вышка 16px, казармы 12px, трон 25px на карте 300px).
-const TOWER_XY: Record<Side, Record<Lane, Record<1 | 2 | 3, [number, number]>>> = {
+// --- Карта строений: миникарта из игры + иконки строений (как на OpenDota) ---
+// Подложка — public/assets/map/minimap.jpg (это detailed_740.jpg из odota/web, свет — низ-лево),
+// иконки — оттуда же: {good,bad}guys_{tower,rax,fort}[_angle].png.
+// Координаты — дословная копия odota/web BuildingMap/buildingData733.ts: доля карты до ЛЕВОГО
+// ВЕРХНЕГО угла иконки (не до центра). Пары «сверху, слева» в процентах.
+// Пересчитывать в центры нельзя — расстановка должна совпадать с референсом один в один.
+const TOWER_POS: Record<Side, Record<Lane, Record<1 | 2 | 3, [number, number]>>> = {
   radiant: {
-    top: { 1: [12.2, 38.7], 2: [11.7, 55.7], 3: [10.7, 70.7] },
-    mid: { 1: [40.7, 56.7], 2: [30.2, 65.7], 3: [21.2, 74.2] },
-    bot: { 1: [77.7, 84.7], 2: [48.7, 87.7], 3: [25.7, 86.2] },
+    top: { 1: [36, 9.5], 2: [53, 9], 3: [68, 8] },
+    mid: { 1: [54, 38], 2: [63, 27.5], 3: [71.5, 18.5] },
+    bot: { 1: [82, 75], 2: [85, 46], 3: [83.5, 23] },
   },
   dire: {
-    top: { 1: [20.7, 14.7], 2: [51.7, 13.7], 3: [72.7, 15.2] },
-    mid: { 1: [53.7, 46.2], 2: [66.7, 35.7], 3: [75.7, 26.7] },
-    bot: { 1: [86.7, 62.7], 2: [87.7, 47.7], 3: [88.2, 30.7] },
+    top: { 1: [12, 18], 2: [11, 49], 3: [12.5, 70] },
+    mid: { 1: [43.5, 51], 2: [33, 64], 3: [24, 73] },
+    bot: { 1: [60, 84], 2: [45, 85], 3: [28, 85.5] },
   },
 };
-// Казармы — за Т3 внутри базы; ranged всегда слева от melee, если смотреть в сторону противника.
-const RACK_XY: Record<Side, Record<Lane, { ranged: [number, number]; melee: [number, number] }>> = {
+// Казармы: +1% к «сверху» относительно таблицы odota. Это не правка на глаз — у них иконка
+// лежит в инлайновом span и садится на базовую линию строки, из-за чего всё, что ниже строки
+// (12px казарм против ~15px базовой линии), уезжает вниз на 3px от 300px карты. Вышки (16px)
+// и трон (25px) в строку помещаются и не смещаются. Мы позиционируем абсолютно — вносим руками.
+const RACK_POS: Record<Side, Record<Lane, { ranged: [number, number]; melee: [number, number] }>> = {
   radiant: {
-    top: { ranged: [8.5, 72.5], melee: [12.5, 72.5] },
-    mid: { ranged: [17, 74], melee: [20, 76.5] },
-    bot: { ranged: [22, 82.5], melee: [22, 86.5] },
+    top: { ranged: [71.5, 6.5], melee: [71.5, 10.5] },
+    mid: { ranged: [73, 15], melee: [75.5, 18] },
+    bot: { ranged: [81.5, 20], melee: [85.5, 20] },
   },
   dire: {
-    top: { ranged: [76, 12], melee: [76, 16] },
-    mid: { ranged: [76.5, 21.5], melee: [79.5, 24] },
-    bot: { ranged: [86, 26], melee: [90, 26] },
+    top: { ranged: [11, 74], melee: [15, 74] },
+    mid: { ranged: [20.5, 74.5], melee: [23, 77.5] },
+    bot: { ranged: [25, 84], melee: [25, 88] },
   },
 };
-// Трон (ориентир) и пара вышек 4-го тира перед ним, со стороны мида.
-const ANCIENT_XY: Record<Side, { core: [number, number]; top: [number, number]; bottom: [number, number] }> = {
-  radiant: { core: [9.2, 87.2], top: [10.7, 81.7], bottom: [14.7, 84.7] },
-  dire: { core: [88.2, 13.2], top: [83.7, 15.7], bottom: [86.7, 18.7] },
+// Вышки 4-го тира у трона (в битмаске Valve — «ancient top/bottom») и сам трон.
+const ANCIENT_POS: Record<Side, { top: [number, number]; bottom: [number, number] }> = {
+  radiant: { top: [79, 8], bottom: [82, 12] },
+  dire: { top: [13, 81], bottom: [16, 84] },
 };
+const FORT_POS: Record<Side, [number, number]> = { radiant: [83, 5], dire: [9, 84] };
+// Размер иконки в долях карты: у odota он задан в пикселях на карте 300px.
+const ICON_SIZE = { tower: (16 / 300) * 100, rax: (12 / 300) * 100, fort: (25 / 300) * 100 };
 
 // legend={false} — экспортный холст рисует свою (компактную) легенду сам.
-export function BuildingMap({ buildings, legend = true }: { buildings: MatchReport["buildings"]; legend?: boolean }) {
-  const color = (side: Side) => (side === "radiant" ? "#34d399" : "#fb7185");
-  // Целое — цвет стороны, уничтоженное — белое; тёмная обводка, чтобы читалось на карте.
-  const fill = (side: Side, alive: boolean) => (alive ? color(side) : "#ffffff");
-  const stroke = (alive: boolean) => (alive ? "rgba(0,0,0,0.65)" : "#737373");
-  const sides: Side[] = ["radiant", "dire"];
+// radiantWin нужен только для трона: в битмасках его нет, целым рисуем трон победителя.
+export function BuildingMap({
+  buildings,
+  radiantWin,
+  legend = true,
+}: {
+  buildings: MatchReport["buildings"];
+  radiantWin?: boolean;
+  legend?: boolean;
+}) {
+  type MapIcon = { key: string; kind: keyof typeof ICON_SIZE; angle: boolean; side: Side; alive: boolean; top: number; left: number; title: string };
+  const LANE_RU: Record<Lane, string> = { top: "верх", mid: "центр", bot: "низ" };
+  const icons: MapIcon[] = [];
+  for (const side of ["radiant", "dire"] as Side[]) {
+    const b = buildings[side];
+    const who = side === "radiant" ? "Свет" : "Тьма";
+    for (const t of b.towers) {
+      const [top, left] = TOWER_POS[side][t.lane][t.tier];
+      icons.push({
+        key: `${side}-tw-${t.lane}-${t.tier}`,
+        kind: "tower",
+        angle: t.lane === "mid",
+        side,
+        alive: t.alive,
+        top,
+        left,
+        title: `${who} · ${LANE_RU[t.lane]} T${t.tier}${t.alive ? "" : " (уничтожена)"}`,
+      });
+    }
+    for (const k of ["top", "bottom"] as const) {
+      const [top, left] = ANCIENT_POS[side][k];
+      icons.push({
+        key: `${side}-t4-${k}`,
+        kind: "tower",
+        angle: false,
+        side,
+        alive: b.ancient[k],
+        top,
+        left,
+        title: `${who} · вышка T4 у трона${b.ancient[k] ? "" : " (уничтожена)"}`,
+      });
+    }
+    for (const r of b.racks) {
+      const p = RACK_POS[side][r.lane];
+      icons.push({
+        key: `${side}-rax-r-${r.lane}`,
+        kind: "rax",
+        angle: r.lane === "mid",
+        side,
+        alive: r.ranged,
+        top: p.ranged[0],
+        left: p.ranged[1],
+        title: `${who} · ${LANE_RU[r.lane]} казармы (дальние)${r.ranged ? "" : " — уничтожены"}`,
+      });
+      icons.push({
+        key: `${side}-rax-m-${r.lane}`,
+        kind: "rax",
+        angle: r.lane === "mid",
+        side,
+        alive: r.melee,
+        top: p.melee[0],
+        left: p.melee[1],
+        title: `${who} · ${LANE_RU[r.lane]} казармы (ближние)${r.melee ? "" : " — уничтожены"}`,
+      });
+    }
+    // Трон: победитель — целый, проигравший — разрушенный. Без счёта считаем оба целыми.
+    const fortAlive = radiantWin === undefined ? true : (side === "radiant") === radiantWin;
+    const [ft, fl] = FORT_POS[side];
+    icons.push({
+      key: `${side}-fort`,
+      kind: "fort",
+      angle: false,
+      side,
+      alive: fortAlive,
+      top: ft,
+      left: fl,
+      title: `Трон · ${who}${fortAlive ? "" : " (разрушен)"}`,
+    });
+  }
   return (
     <div>
       {legend && (
@@ -460,94 +525,32 @@ export function BuildingMap({ buildings, legend = true }: { buildings: MatchRepo
               <span className="inline-block h-2 w-2 rounded-sm bg-rose-400" />Тьма
             </span>
             <span className="flex items-center gap-1">
-              <span className="inline-block h-2 w-2 rounded-sm bg-white" />уничтожено
+              <span className="inline-block h-2 w-2 rounded-sm bg-neutral-500" />уничтожено
             </span>
           </span>
         </div>
       )}
-      <svg viewBox="0 0 100 100" className="mx-auto block aspect-square w-full max-w-[300px] overflow-hidden rounded-lg">
-        {/* фолбэк-подложка на случай, если файл карты не свендорен */}
-        <polygon points="0,0 100,0 0,100" fill="rgba(52,211,153,0.06)" />
-        <polygon points="100,0 100,100 0,100" fill="rgba(251,113,133,0.06)" />
-        {/* сама карта + лёгкое затемнение, чтобы маркеры не терялись */}
-        <image href="/assets/map/minimap.jpg" x="0" y="0" width="100" height="100" preserveAspectRatio="none" />
-        <rect x="0" y="0" width="100" height="100" fill="black" opacity="0.25" />
-        {sides.map((side) => {
-          const b = buildings[side];
-          const anc = ANCIENT_XY[side];
-          return (
-            <g key={side}>
-              {/* казармы: кружки за Т3, ranged слева от melee (лицом к противнику) */}
-              {b.racks.map((r) => {
-                const rk = RACK_XY[side][r.lane];
-                const sideName = side === "radiant" ? "Свет" : "Тьма";
-                return (
-                  <g key={`${side}-rk-${r.lane}`}>
-                    <circle cx={rk.ranged[0]} cy={rk.ranged[1]} r="1.4" fill={fill(side, r.ranged)} stroke={stroke(r.ranged)} strokeWidth="0.4">
-                      <title>{`${sideName} · ${r.lane} казармы (ranged)${r.ranged ? "" : " — уничтожены"}`}</title>
-                    </circle>
-                    <circle cx={rk.melee[0]} cy={rk.melee[1]} r="1.4" fill={fill(side, r.melee)} stroke={stroke(r.melee)} strokeWidth="0.4">
-                      <title>{`${sideName} · ${r.lane} казармы (melee)${r.melee ? "" : " — уничтожены"}`}</title>
-                    </circle>
-                  </g>
-                );
-              })}
-              {/* вышки: квадратики */}
-              {b.towers.map((t) => {
-                const [x, y] = TOWER_XY[side][t.lane][t.tier];
-                return (
-                  <rect
-                    key={`${side}-tw-${t.lane}-${t.tier}`}
-                    x={x - 1.7}
-                    y={y - 1.7}
-                    width="3.4"
-                    height="3.4"
-                    rx="0.6"
-                    fill={fill(side, t.alive)}
-                    stroke={stroke(t.alive)}
-                    strokeWidth="0.5"
-                  >
-                    <title>{`${side === "radiant" ? "Свет" : "Тьма"} · ${t.lane} T${t.tier}${t.alive ? "" : " (уничтожена)"}`}</title>
-                  </rect>
-                );
-              })}
-              {/* трон (ромб-ориентир) + пара вышек 4-го тира перед ним */}
-              <rect
-                x={anc.core[0] - 2.4}
-                y={anc.core[1] - 2.4}
-                width="4.8"
-                height="4.8"
-                transform={`rotate(45 ${anc.core[0]} ${anc.core[1]})`}
-                fill="none"
-                stroke={color(side)}
-                strokeWidth="0.7"
-                opacity="0.8"
-              >
-                <title>{`Трон · ${side === "radiant" ? "Свет" : "Тьма"}`}</title>
-              </rect>
-              {(["top", "bottom"] as const).map((k) => {
-                const [x, y] = anc[k];
-                const alive = b.ancient[k];
-                return (
-                  <rect
-                    key={`${side}-anc-${k}`}
-                    x={x - 1.7}
-                    y={y - 1.7}
-                    width="3.4"
-                    height="3.4"
-                    rx="0.6"
-                    fill={fill(side, alive)}
-                    stroke={stroke(alive)}
-                    strokeWidth="0.5"
-                  >
-                    <title>{`${side === "radiant" ? "Свет" : "Тьма"} · вышка Т4 у трона${alive ? "" : " (уничтожена)"}`}</title>
-                  </rect>
-                );
-              })}
-            </g>
-          );
-        })}
-      </svg>
+      <div className="relative mx-auto aspect-square w-full max-w-[300px] overflow-hidden rounded-lg ring-1 ring-white/10">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/assets/map/minimap.jpg" alt="Карта Dota 2" className="absolute inset-0 h-full w-full object-cover" />
+        {icons.map((ic) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={ic.key}
+            src={`/assets/map/${ic.side === "radiant" ? "good" : "bad"}guys_${ic.kind}${ic.angle ? "_angle" : ""}.png`}
+            alt=""
+            title={ic.title}
+            className="absolute"
+            style={{
+              top: `${ic.top}%`,
+              left: `${ic.left}%`,
+              width: `${ICON_SIZE[ic.kind]}%`,
+              // как в odota: целое — контрастнее, разрушенное — обесцвечено и притушено
+              filter: ic.alive ? "contrast(150%)" : "grayscale(100%) brightness(70%)",
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }

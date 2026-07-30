@@ -162,7 +162,7 @@ function Bans({ match }: { match: MatchReport }) {
       {bans
         .filter((b) => b.side === side)
         .map((b) => (
-          <HeroFrame key={b.order} hero={b.hero} side={side} h={19} banned />
+          <HeroFrame key={b.order} hero={b.hero} side={side} h={26} banned />
         ))}
     </div>
   );
@@ -291,13 +291,13 @@ export function SummaryCanvas({ match, names, tags, logos }: { match: MatchRepor
             вместе они должны уложиться в высоту ряда (~295px), иначе события срежет */}
         <div className="flex w-[175px] shrink-0 flex-col gap-1.5">
           <div className="w-full">
-            <BuildingMap buildings={match.buildings} legend={false} />
+            <BuildingMap buildings={match.buildings} radiantWin={match.radiantWin} legend={false} />
           </div>
           {/* компактная легенда карты */}
           <div className="flex items-center justify-center gap-3 text-[9px] text-neutral-400">
             <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-sm bg-emerald-400" />Свет</span>
             <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-sm bg-rose-400" />Тьма</span>
-            <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-sm bg-white" />уничтожено</span>
+            <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-sm bg-neutral-500" />уничтожено</span>
           </div>
           <EventBadges events={match.events} tags={tags} size={30} />
         </div>

@@ -203,6 +203,7 @@ async function main() {
     console.log(`\n[${division}] Группа ${block.group}: ${teams.length} команд, матрица ${matrix.length}×${matrix[0]?.length ?? 0}`);
 
     const dbTeams = new Map<string, number>();
+    const teamSlugs = new Map<number, string>(); // id → slug: из них собирается слаг встречи
     for (const t of teams) {
       // Сперва по алиасу (имя в GS → слаг/имя в БД), иначе по имени. Имя ищем СНАЧАЛА в своём
       // дивизионе: одноимённые команды в D1 и D2 (например «ReMix») иначе схлопнулись бы в одну —
@@ -217,6 +218,7 @@ async function main() {
         continue;
       }
       dbTeams.set(t.name, team.id);
+      teamSlugs.set(team.id, team.slug);
       if (dry) continue;
       await prisma.groupEntry.upsert({
         where: { division_group_teamId: { division, group: block.group, teamId: team.id } },
@@ -268,9 +270,24 @@ async function main() {
         if (guessed) guessedCount++;
         written++;
         if (dry) continue;
-        await prisma.groupSeries.upsert({
-          where: { division_group_homeId_awayId: { division, group: block.group, homeId, awayId } },
-          create: { division, group: block.group, homeId, awayId, homeScore, awayScore, guessed },
+        // stage="group" в ключе явно: в Series лежат ещё и серии плей-офф той же пары команд.
+        await prisma.series.upsert({
+          where: {
+            division_stage_group_homeId_awayId: { division, stage: "group", group: block.group, homeId, awayId },
+          },
+          create: {
+            division,
+            stage: "group",
+            group: block.group,
+            // Слаг встречи — по слагам команд (см. src/lib/series.ts). Здесь считаем на месте:
+            // скрипт не тянет рантайм-код, а групповая пара играет ровно раз — хвост не нужен.
+            slug: `${teamSlugs.get(homeId)}-vs-${teamSlugs.get(awayId)}`,
+            homeId,
+            awayId,
+            homeScore,
+            awayScore,
+            guessed,
+          },
           update: { homeScore, awayScore, guessed },
         });
       }

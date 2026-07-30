@@ -29,6 +29,10 @@ const prisma = new PrismaClient({
 const matchKey = (m: { openDotaMatchId: string | null; scheduledAt: Date | null }, a: string, b: string) =>
   m.openDotaMatchId ?? `${a}|${b}|${m.scheduledAt?.toISOString() ?? "tbd"}`;
 
+// У серии, в отличие от матча, естественный ключ есть свой — `slug` (src/lib/series.ts). Он же
+// стоит в адресе `/series/<slug>`, поэтому важно, чтобы снимок переносил его как есть: пересчёт
+// на другой машине мог бы дать другой хвост и сломать уже отданные наружу ссылки.
+
 // Выкинуть поля явно. Через деструктуризацию (`const { id, ...rest }`) короче, но линт справедливо
 // ругается на неиспользуемую переменную — а глушить его ради стиля хуже, чем написать хелпер.
 function omit<T extends object, K extends keyof T>(row: T, ...keys: K[]): Omit<T, K> {
@@ -38,14 +42,16 @@ function omit<T extends object, K extends keyof T>(row: T, ...keys: K[]): Omit<T
 }
 
 async function main() {
-  const [teams, players, spots, matches, groupEntries, groupSeries, stats, points, renders] =
+  const [teams, players, spots, matches, groupEntries, series, stats, points, renders] =
     await Promise.all([
       prisma.team.findMany({ orderBy: { slug: "asc" } }),
       prisma.player.findMany({ orderBy: { slug: "asc" } }),
       prisma.rosterSpot.findMany({ include: { team: true, player: true } }),
-      prisma.match.findMany({ include: { teamA: true, teamB: true, winner: true, radiantTeam: true } }),
+      prisma.match.findMany({
+        include: { teamA: true, teamB: true, winner: true, radiantTeam: true, series: { select: { slug: true } } },
+      }),
       prisma.groupEntry.findMany({ include: { team: true } }),
-      prisma.groupSeries.findMany({ include: { home: true, away: true } }),
+      prisma.series.findMany({ include: { home: true, away: true } }),
       prisma.matchStat.findMany({ include: { player: true, match: { include: { teamA: true, teamB: true } } } }),
       prisma.pointsEntry.findMany({ include: { match: { include: { teamA: true, teamB: true } } } }),
       prisma.render.findMany({ include: { match: { include: { teamA: true, teamB: true } } } }),
@@ -58,7 +64,7 @@ async function main() {
     matchKey(m, m.teamA.slug, m.teamB.slug);
 
   const snapshot = {
-    version: 1,
+    version: 3, // 3 — у Series появился slug (он же ключ адреса), связи матч→серия идут по нему
     exportedAt: new Date().toISOString(),
 
     teams: teams.map((t) => omit(t, "id")),
@@ -79,6 +85,13 @@ async function main() {
         teamBSlug: m.teamB.slug,
         winnerSlug: m.winner?.slug ?? null,
         radiantSlug: m.radiantTeam?.slug ?? null,
+        startedAt: m.startedAt,
+        durationSec: m.durationSec,
+        radiantScore: m.radiantScore,
+        direScore: m.direScore,
+        firstPickRadiant: m.firstPickRadiant,
+        seriesSlug: m.series?.slug ?? null,
+        gameNumber: m.gameNumber,
       }))
       .sort((a, b) => a.key.localeCompare(b.key)),
 
@@ -86,9 +99,9 @@ async function main() {
       .map((g) => ({ ...omit(g, "id", "teamId", "team"), teamSlug: g.team.slug }))
       .sort((a, b) => `${a.division}${a.group}${a.place}`.localeCompare(`${b.division}${b.group}${b.place}`)),
 
-    groupSeries: groupSeries
+    series: series
       .map((s) => ({ ...omit(s, "id", "homeId", "awayId", "home", "away"), homeSlug: s.home.slug, awaySlug: s.away.slug }))
-      .sort((a, b) => `${a.division}${a.group}${a.homeSlug}${a.awaySlug}`.localeCompare(`${b.division}${b.group}${b.homeSlug}${b.awaySlug}`)),
+      .sort((a, b) => a.slug.localeCompare(b.slug)),
 
     matchStats: stats
       .map((s) => ({ ...omit(s, "id", "matchId", "playerId", "match", "player"), matchKey: keyOfMatch(s.match), playerSlug: s.player.slug }))
@@ -121,7 +134,7 @@ async function main() {
     составы: snapshot.rosterSpots.length,
     матчи: snapshot.matches.length,
     "группы (строки)": snapshot.groupEntries.length,
-    "группы (встречи)": snapshot.groupSeries.length,
+    встречи: snapshot.series.length,
     "стата матчей": snapshot.matchStats.length,
     баллы: snapshot.pointsEntries.length,
     генерации: snapshot.renders.length,

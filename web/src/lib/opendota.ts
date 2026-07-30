@@ -75,6 +75,8 @@ type RawPlayer = {
   permanent_buffs?: { permanent_buff: number; stack_count: number }[] | null;
   account_id?: number | null;
   camps_stacked?: number;
+  obs_placed?: number; // парс
+  sen_placed?: number; // парс
   lane_role?: number | null;
   player_slot?: number; // <128 — свет, иначе тьма; нужен для резолва событий objectives
 };
@@ -158,41 +160,7 @@ const cleanTalent = (s: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
-// --- Стата для синка (match-sync) ---
-export type OdPlayerStat = {
-  accountId: number;
-  isRadiant: boolean;
-  kills: number;
-  deaths: number;
-  assists: number;
-  lastHits: number;
-  heroDamage: number;
-  netWorth: number;
-  campsStacked: number;
-};
-export type OdMatch = { matchId: string; radiantWin: boolean; players: OdPlayerStat[] };
-
-export async function fetchOpenDotaMatch(matchId: string): Promise<OdMatch> {
-  const m = await getJson<RawMatch>(`https://api.opendota.com/api/matches/${matchId}`);
-  return {
-    matchId: String(m.match_id),
-    radiantWin: !!m.radiant_win,
-    players: (m.players ?? [])
-      .filter((p) => p.account_id != null)
-      .map((p) => ({
-        accountId: p.account_id as number,
-        isRadiant: !!p.isRadiant,
-        kills: p.kills ?? 0,
-        deaths: p.deaths ?? 0,
-        assists: p.assists ?? 0,
-        lastHits: p.last_hits ?? 0,
-        heroDamage: p.hero_damage ?? 0,
-        netWorth: p.net_worth ?? 0,
-        campsStacked: p.camps_stacked ?? 0,
-      })),
-  };
-}
-
+// Подсказка MVP. Форма параметра структурная — считается и от строки MatchStat, и от PlayerReport.
 export function mvpScore(s: {
   kills: number;
   deaths: number;
@@ -230,6 +198,10 @@ export type PlayerReport = {
   heroDamage: number;
   towerDamage: number;
   heroHealing: number;
+  // Только у распарсенных матчей — иначе нули. В архив уходят как есть, честнее нуля-заглушки.
+  campsStacked: number;
+  obsPlaced: number;
+  senPlaced: number;
   items: Entity[];
   backpack: Entity[];
   neutral: Entity | null;
@@ -445,6 +417,9 @@ export async function buildMatchReport(matchId: string, m: RawMatch): Promise<Ma
       heroDamage: p.hero_damage ?? 0,
       towerDamage: p.tower_damage ?? 0,
       heroHealing: p.hero_healing ?? 0,
+      campsStacked: p.camps_stacked ?? 0,
+      obsPlaced: p.obs_placed ?? 0,
+      senPlaced: p.sen_placed ?? 0,
       items,
       backpack,
       neutral: itemEntity(p.item_neutral),

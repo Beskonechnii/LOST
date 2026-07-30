@@ -76,7 +76,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
         )}
 
         <div className="relative flex flex-col gap-6 p-6 sm:flex-row sm:items-start">
-          <PlayerAvatar photo={player.photo} nickname={player.nickname} color={accent} size={160} />
+          <PlayerAvatar photo={player.photo} nickname={player.nickname} color={accent} size={200} />
 
           <div className="min-w-0 flex-1 space-y-3">
             <div>

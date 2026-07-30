@@ -20,10 +20,13 @@ export type StandingGroup = { group: string; rows: StandingRow[] };
 
 /**
  * Standings не храним — считаем. Три слагаемых:
- *  • групповая стадия (`GroupSeries`) — очки по формуле Bo3, поэтому правка встречи в сетке
+ *  • встречи (`Series`) любой стадии — очки по формуле Bo3, поэтому правка счёта в сетке
  *    сразу двигает таблицу лиги: это и есть синхронизация, отдельного копирования данных нет;
- *  • сыгранные матчи (`Match`) — плей-офф и всё, что вне групп;
+ *  • одиночные матчи (`Match`) **без серии** — всё, что завели до архива или мимо него;
  *  • реестр баллов (`PointsEntry`) — ручные начисления за места, касты и прочее.
+ *
+ * Матчи с `seriesId` намеренно пропускаем: карта серии уже посчитана в самой серии, иначе один
+ * Bo3 дал бы четыре сыгранных вместо одного.
  *
  * Считаем по одному дивизиону: у D1 и D2 свои группы A/B, и без фильтра их очки слились бы в один
  * блок. Команды берём по `Team.group` (его проставляет импорт), встречи и итоги — по `division`.
@@ -32,8 +35,8 @@ export async function getStandings(division: string): Promise<StandingGroup[]> {
   const [teams, entries, series, matches, points] = await Promise.all([
     prisma.team.findMany({ where: { group: division } }),
     prisma.groupEntry.findMany({ where: { division } }),
-    prisma.groupSeries.findMany({ where: { division } }),
-    prisma.match.findMany({ where: { status: "finished" } }),
+    prisma.series.findMany({ where: { division } }),
+    prisma.match.findMany({ where: { status: "finished", seriesId: null } }),
     prisma.pointsEntry.findMany({ where: { subjectType: "team" } }),
   ]);
 
@@ -65,7 +68,8 @@ export async function getStandings(division: string): Promise<StandingGroup[]> {
       wins,
       losses: played - wins,
       points: pts,
-      stageGroup: entry?.group ?? (mine.length ? mine[0].group : null),
+      // Группа команды: из таблицы сезона, иначе — из первой групповой встречи (у плей-офф её нет).
+      stageGroup: entry?.group ?? mine.find((s) => s.group)?.group ?? null,
       place: entry?.place ?? null,
     };
     // Делим по группе группового этапа: команды из разных групп между собой не играли,

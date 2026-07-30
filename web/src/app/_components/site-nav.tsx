@@ -21,6 +21,7 @@ const PUBLIC_SECTIONS: NavItem[] = [
 ];
 
 const ADMIN_SECTIONS: NavItem[] = [
+  { href: "/admin/series", label: "Архив серий", hint: "Встречи турнира и карты в них" },
   { href: "/studio", label: "Студия", hint: "Графика к матчам" },
   { href: "/underbeer", label: "UNDERBEER 2.0", hint: "Сборка шоу-команд драфтом" },
   { href: "/admin/login", label: "Доступ", hint: "Вход и выход из админки" },

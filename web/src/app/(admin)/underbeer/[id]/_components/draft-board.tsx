@@ -21,9 +21,11 @@ import {
   canSteal,
   currentTurn,
   draftBlocker,
+  goToConfig,
   isTeamFull,
   memberIds,
   lockPlayer,
+  participantsBlocker,
   patchTeam,
   pickPlayer,
   removeTeam,
@@ -33,6 +35,7 @@ import {
   stealPlayer,
   takenIds,
   teamById,
+  toggleParticipant,
   type DraftState,
   type DraftTeam,
   type PoolPlayer,
@@ -46,6 +49,10 @@ import {
 const PALETTE = ["#f59e0b", "#8b5cf6", "#ef4444", "#10b981", "#3b82f6", "#ec4899", "#14b8a6", "#f97316"];
 const SHORT = new Map<string, string>(ROLES.map((r) => [r.key, r.short]));
 const roleShort = (role: string | null) => (role ? SHORT.get(role) ?? role : "—");
+
+// Тёмный тонкий скроллбар вместо светлого дефолтного (просили в прокрутке игроков).
+const SCROLL =
+  "[scrollbar-width:thin] [scrollbar-color:#404040_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-700 hover:[&::-webkit-scrollbar-thumb]:bg-neutral-600";
 
 export function DraftBoard({
   sessionId,
@@ -66,7 +73,16 @@ export function DraftBoard({
   const [dragPid, setDragPid] = useState<number | null>(null);
 
   const poolById = useMemo(() => new Map(pool.map((p) => [p.id, p])), [pool]);
-  const segments = useMemo(() => segmentPool(pool), [pool]);
+  // Участники: пул команд/драфта — только отобранные (старые сессии без participants → весь ростер).
+  const participantSet = useMemo(
+    () => (state.participants ? new Set(state.participants) : null),
+    [state.participants],
+  );
+  const activePool = useMemo(
+    () => (participantSet ? pool.filter((p) => participantSet.has(p.id)) : pool),
+    [pool, participantSet],
+  );
+  const segments = useMemo(() => segmentPool(activePool), [activePool]);
   const taken = useMemo(() => takenIds(state), [state]);
   const cur = currentTurn(state);
 
@@ -212,21 +228,38 @@ export function DraftBoard({
 
       {state.phase === "draft" && <TurnBanner state={state} />}
 
+      {state.phase === "roster" ? (
+        <RosterSelect
+          pool={pool}
+          selected={participantSet}
+          blocker={participantsBlocker(state)}
+          onToggle={(pid) => run((s) => toggleParticipant(s, pid))}
+          onNext={() => run((s) => goToConfig(s))}
+        />
+      ) : (
       <div className="mt-4 space-y-6">
         {/* ── Команды (сверху) ── */}
         <section className="space-y-4">
           {state.phase === "config" && (
-            <ConfigControls
-              state={state}
-              activeTeamId={activeTeam?.id ?? null}
-              blocker={blocker}
-              onAddTeam={() =>
-                run((s) => addTeam(s, `Команда ${s.teams.length + 1}`, PALETTE[s.teams.length % PALETTE.length]))
-              }
-              onTargetSize={(n) => run((s) => ({ ...s, targetSize: n }))}
-              onSnake={(v) => run((s) => ({ ...s, snake: v }))}
-              onStart={() => run((s) => startDraft(s))}
-            />
+            <>
+              <button
+                onClick={() => run((s) => ({ ...s, phase: "roster" }))}
+                className="text-sm text-neutral-500 hover:text-neutral-300"
+              >
+                ← Изменить участников ({state.participants?.length ?? 0})
+              </button>
+              <ConfigControls
+                state={state}
+                activeTeamId={activeTeam?.id ?? null}
+                blocker={blocker}
+                onAddTeam={() =>
+                  run((s) => addTeam(s, `Команда ${s.teams.length + 1}`, PALETTE[s.teams.length % PALETTE.length]))
+                }
+                onTargetSize={(n) => run((s) => ({ ...s, targetSize: n }))}
+                onSnake={(v) => run((s) => ({ ...s, snake: v }))}
+                onStart={() => run((s) => startDraft(s))}
+              />
+            </>
           )}
 
           {state.phase === "done" && (
@@ -283,7 +316,7 @@ export function DraftBoard({
                     <span className="truncate">{seg.label}</span>
                     <span className="shrink-0 text-neutral-600">{remaining}</span>
                   </div>
-                  <div className="max-h-[56vh] space-y-1.5 overflow-y-auto pr-0.5">
+                  <div className={`max-h-[56vh] space-y-1.5 overflow-y-auto pr-0.5 ${SCROLL}`}>
                     {seg.players.map((p) => (
                       <PoolCard
                         key={p.id}
@@ -300,6 +333,7 @@ export function DraftBoard({
           </div>
         </section>
       </div>
+      )}
 
       <DragOverlay>
         {dragPlayer ? (
@@ -316,12 +350,104 @@ export function DraftBoard({
 
 function PhaseBadge({ phase }: { phase: DraftState["phase"] }) {
   const map = {
-    config: ["Настройка", "bg-neutral-700/40 text-neutral-300"],
+    roster: ["Выбор участников", "bg-sky-500/15 text-sky-300"],
+    config: ["Настройка команд", "bg-neutral-700/40 text-neutral-300"],
     draft: ["Идёт драфт", "bg-amber-500/15 text-amber-300"],
     done: ["Собран", "bg-emerald-500/15 text-emerald-300"],
   } as const;
   const [label, cls] = map[phase];
   return <span className={`rounded-full px-2.5 py-1 text-xs ${cls}`}>{label}</span>;
+}
+
+/** Фаза выбора участников: полный ростер с поиском, клик по карточке — включить/выключить из турнира. */
+function RosterSelect({
+  pool,
+  selected,
+  blocker,
+  onToggle,
+  onNext,
+}: {
+  pool: PoolPlayer[];
+  selected: Set<number> | null;
+  blocker: string | null;
+  onToggle: (pid: number) => void;
+  onNext: () => void;
+}) {
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+  const count = selected?.size ?? 0;
+
+  const segments = useMemo(() => segmentPool(pool), [pool]);
+  const filtered = useMemo(
+    () =>
+      segments
+        .map((seg) => ({
+          ...seg,
+          players: q
+            ? seg.players.filter(
+                (p) => p.nickname.toLowerCase().includes(q) || (p.realName ?? "").toLowerCase().includes(q),
+              )
+            : seg.players,
+        }))
+        .filter((seg) => seg.players.length > 0),
+    [segments, q],
+  );
+
+  return (
+    <div className="mt-4 space-y-4">
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-neutral-800 bg-neutral-900/40 p-3">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Поиск по нику или имени…"
+          className="min-w-48 flex-1 rounded border border-neutral-800 bg-neutral-950 px-3 py-1.5 text-sm outline-none focus:border-sky-600"
+        />
+        <span className="text-sm text-neutral-400">
+          Выбрано: <b className="text-neutral-100">{count}</b>
+        </span>
+        <button
+          onClick={onNext}
+          disabled={!!blocker}
+          title={blocker ?? "Перейти к командам"}
+          className="rounded-md bg-sky-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-sky-500 disabled:opacity-40"
+        >
+          Далее к командам →
+        </button>
+      </div>
+      <p className="text-xs text-neutral-500">
+        {blocker ?? "Отметьте игроков, которые участвуют в турнире — из них и будет идти драфт."}
+      </p>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+        {filtered.map((seg) => (
+          <div key={String(seg.position)} className="rounded-lg border border-neutral-800 bg-neutral-900/30 p-2">
+            <div className="mb-1.5 flex items-center justify-between px-0.5 text-[11px] uppercase tracking-wide text-neutral-500">
+              <span className="truncate">{seg.label}</span>
+              <span className="shrink-0 text-neutral-600">{seg.players.filter((p) => selected?.has(p.id)).length}</span>
+            </div>
+            <div className={`max-h-[60vh] space-y-1.5 overflow-y-auto pr-0.5 ${SCROLL}`}>
+              {seg.players.map((p) => {
+                const on = selected?.has(p.id) ?? false;
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => onToggle(p.id)}
+                    className={`w-full rounded-md border text-left transition-colors ${
+                      on
+                        ? "border-sky-500 bg-sky-500/10"
+                        : "border-neutral-800 bg-neutral-900/60 hover:border-neutral-600"
+                    }`}
+                  >
+                    <PlayerRow player={p} />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function TurnBanner({ state }: { state: DraftState }) {

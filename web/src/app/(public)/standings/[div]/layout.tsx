@@ -22,6 +22,7 @@ export default async function DivisionLayout({
     { href: base, label: "Таблицы", hint: "Общая таблица лиги" },
     { href: `${base}/groups`, label: "Групповая стадия", hint: "Группы A и B с сеткой встреч" },
     { href: `${base}/playoff`, label: "Плей-офф", hint: "Черновик сетки: посев из групп" },
+    { href: `${base}/stats`, label: "Статистика", hint: "Рейтинги игроков и команд по стадиям" },
   ];
 
   return (

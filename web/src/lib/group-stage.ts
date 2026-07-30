@@ -58,7 +58,7 @@ export async function getGroupStage(division: string): Promise<GroupTable[]> {
       include: { team: { select: { id: true, slug: true, name: true, tag: true, logo: true } } },
       orderBy: [{ group: "asc" }, { place: "asc" }],
     }),
-    prisma.groupSeries.findMany({ where: { division } }),
+    prisma.series.findMany({ where: { division, stage: "group" } }),
   ]);
 
   // Лого разрешаем разом до сборки таблиц: дальше идёт синхронный расчёт очков, асинхронность туда не тащим.

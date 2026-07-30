@@ -3,6 +3,9 @@
 // Оба роута делают одно и то же и отличаются только источником, поэтому порядок «проверить id →
 // отдать с полки → занять слот лимита → сходить наружу → положить на полку» описан здесь один раз:
 // разъехаться кэшу с лимитом в двух копиях — вопрос времени.
+//
+// Отсюда же отчёт берёт архив серий (src/lib/match-sync.ts): привязка карты и постгейм читают
+// один и тот же кэш, поэтому запись в базу не стоит лишнего похода в OpenDota.
 
 import { NextResponse } from "next/server";
 import { isFinalReport, readCachedReport, writeCachedReport, type MatchSource } from "./match-cache";
@@ -15,6 +18,19 @@ const LOADERS: Record<MatchSource, (matchId: string) => Promise<MatchReport>> = 
   // в память на каждый запрос к OpenDota.
   steam: async (matchId) => (await import("./steam-match")).fetchSteamMatchReport(matchId),
 };
+
+/**
+ * Отчёт с полки, иначе из сети (и на полку). Без лимита по IP: лимит стережёт публичные роуты,
+ * а внутренние вызовы (привязка карты к серии) идут от оператора и их единицы.
+ */
+export async function loadMatchReport(source: MatchSource, matchId: string): Promise<MatchReport> {
+  if (!/^\d{1,20}$/.test(matchId)) throw new Error("ID матча — это число, например 8907510684");
+  const cached = await readCachedReport(source, matchId);
+  if (cached) return cached;
+  const match = await LOADERS[source](matchId);
+  await writeCachedReport(source, matchId, match);
+  return match;
+}
 
 /** Финальный отчёт неизменен — пусть браузер и прокси тоже его подержат. */
 const cacheHeader = (final: boolean) =>

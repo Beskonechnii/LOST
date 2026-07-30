@@ -19,7 +19,7 @@ export function GroupStage({ tables }: { tables: GroupTable[] }) {
   async function save(id: number, score: string, flipped: boolean) {
     setBusy(true);
     setError(null);
-    const res = await fetch(`/api/standings/series/${id}`, {
+    const res = await fetch(`/api/series/${id}`, {
       method: "PATCH",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ score, flipped }),

@@ -59,8 +59,8 @@ export default async function PlayersPage() {
                 photo={p.photo}
                 nickname={p.nickname}
                 color={p.main ? teamAccent(p.main.team) : null}
-                size={40}
-                className="rounded-lg"
+                size={56}
+                className="rounded-xl"
               />
               <div className="min-w-0">
                 <div className="truncate text-sm font-medium">

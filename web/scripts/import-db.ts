@@ -28,7 +28,12 @@ const d = (v: string | Date | null | undefined) => (v ? new Date(v) : null);
 
 async function main() {
   const snap = JSON.parse(readFileSync(input, "utf8"));
-  if (snap.version !== 1) throw new Error(`Неизвестная версия снимка: ${snap.version}`);
+  if (snap.version !== 3) {
+    throw new Error(
+      `Снимок версии ${snap.version}, а нужен 3. Снимки не мигрируются: пересними базу свежим ` +
+        `scripts/export-db.ts на той машине, где данные актуальны.`,
+    );
+  }
 
   console.log(`Снимок ${input}, снят ${snap.exportedAt}`);
 
@@ -47,6 +52,25 @@ async function main() {
     for (const p of gonePlayers) console.log(`  игрок    ${p.nickname} (${p.slug})`);
   }
 
+  // Производные строки сносятся и создаются заново, поэтому «в снимке их меньше, чем в базе»
+  // проходит молча и выглядит как обычный импорт. Молча терять руками введённую сетку встреч
+  // нельзя — печатаем сверку до записи, чтобы это было видно (и остановило, если снимок не тот).
+  const shrink: string[] = [];
+  for (const [label, inDb, inSnap] of [
+    ["встречи", await prisma.series.count(), snap.series.length],
+    ["матчи", await prisma.match.count(), snap.matches.length],
+    ["группы (строки)", await prisma.groupEntry.count(), snap.groupEntries.length],
+    ["составы", await prisma.rosterSpot.count(), snap.rosterSpots.length],
+    ["стата матчей", await prisma.matchStat.count(), snap.matchStats.length],
+  ] as const) {
+    if (inSnap < inDb) shrink.push(`  ${label}: в базе ${inDb} → в снимке ${inSnap} (минус ${inDb - inSnap})`);
+  }
+  if (shrink.length) {
+    console.log("\n⚠ В снимке СТРОК МЕНЬШЕ, чем в базе — импорт их удалит:");
+    for (const line of shrink) console.log(line);
+    console.log("  Если снимок снят не с той машины или устарел — прервите (Ctrl+C) и переснимите.");
+  }
+
   if (dry) {
     console.log("\n--dry: база не тронута.");
     return;
@@ -57,10 +81,11 @@ async function main() {
   await prisma.render.deleteMany();
   await prisma.pointsEntry.deleteMany();
   await prisma.matchStat.deleteMany();
-  await prisma.groupSeries.deleteMany();
+  // Матчи строго раньше серий: на серию ссылается карта, обратный порядок упрётся во внешний ключ.
+  await prisma.match.deleteMany();
+  await prisma.series.deleteMany();
   await prisma.groupEntry.deleteMany();
   await prisma.rosterSpot.deleteMany();
-  await prisma.match.deleteMany();
   await prisma.team.deleteMany({ where: { slug: { notIn: keepTeams } } });
   await prisma.player.deleteMany({ where: { slug: { notIn: keepPlayers } } });
 
@@ -101,18 +126,40 @@ async function main() {
     });
   }
 
+  // Серии — раньше матчей: карта ссылается на серию по ключу из снимка.
+  const seriesId = new Map<string, number>();
+  for (const s of snap.series) {
+    const { homeSlug, awaySlug, playedAt, ...rest } = s;
+    const row = await prisma.series.create({
+      data: {
+        ...rest,
+        playedAt: d(playedAt),
+        homeId: need(teamId, homeSlug, "Команда"),
+        awayId: need(teamId, awaySlug, "Команда"),
+      },
+    });
+    seriesId.set(row.slug, row.id);
+  }
+
   const matchId = new Map<string, number>();
   for (const m of snap.matches) {
     const row = await prisma.match.create({
       data: {
         openDotaMatchId: m.openDotaMatchId,
         scheduledAt: d(m.scheduledAt),
+        startedAt: d(m.startedAt),
+        durationSec: m.durationSec ?? null,
+        radiantScore: m.radiantScore ?? null,
+        direScore: m.direScore ?? null,
+        firstPickRadiant: m.firstPickRadiant ?? null,
         status: m.status,
         createdAt: d(m.createdAt) ?? new Date(),
         teamAId: need(teamId, m.teamASlug, "Команда"),
         teamBId: need(teamId, m.teamBSlug, "Команда"),
         winnerTeamId: m.winnerSlug ? need(teamId, m.winnerSlug, "Команда") : null,
         radiantTeamId: m.radiantSlug ? need(teamId, m.radiantSlug, "Команда") : null,
+        seriesId: m.seriesSlug ? seriesId.get(m.seriesSlug) ?? null : null,
+        gameNumber: m.seriesSlug ? m.gameNumber ?? null : null,
       },
     });
     matchId.set(m.key, row.id);
@@ -121,13 +168,6 @@ async function main() {
   for (const g of snap.groupEntries) {
     const { teamSlug, ...rest } = g;
     await prisma.groupEntry.create({ data: { ...rest, teamId: need(teamId, teamSlug, "Команда") } });
-  }
-
-  for (const s of snap.groupSeries) {
-    const { homeSlug, awaySlug, ...rest } = s;
-    await prisma.groupSeries.create({
-      data: { ...rest, homeId: need(teamId, homeSlug, "Команда"), awayId: need(teamId, awaySlug, "Команда") },
-    });
   }
 
   for (const s of snap.matchStats) {
@@ -167,7 +207,7 @@ async function main() {
     составы: await prisma.rosterSpot.count(),
     матчи: await prisma.match.count(),
     "группы (строки)": await prisma.groupEntry.count(),
-    "группы (встречи)": await prisma.groupSeries.count(),
+    встречи: await prisma.series.count(),
     "стата матчей": await prisma.matchStat.count(),
     баллы: await prisma.pointsEntry.count(),
     генерации: await prisma.render.count(),

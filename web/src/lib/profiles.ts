@@ -67,6 +67,28 @@ export function uploadUrl(kind: UploadKind, file: string): string {
   return `/uploads/${kind}/${file}`;
 }
 
+/**
+ * account_id игрока «по всему, что о нём известно»: своё поле, иначе выведенное из любой ссылки
+ * на профиль. Анкеты приходят из CRM неровно — у части людей заполнена только ссылка на Dotabuff,
+ * и матчить их по пустому `accountId` значит терять их статистику на ровном месте.
+ *
+ * Одно место правды: этим пользуются и распознавание команд на странице матча, и синк статы.
+ * Возвращает null, если id взять неоткуда — такого игрока в архиве матча просто не будет.
+ */
+export function playerAccountId(p: {
+  accountId?: string | null;
+  dotabuffUrl?: string | null;
+  stratzUrl?: string | null;
+  steamUrl?: string | null;
+}): string | null {
+  if (p.accountId?.trim()) return p.accountId.trim();
+  for (const url of [p.dotabuffUrl, p.stratzUrl, p.steamUrl]) {
+    const id = url ? accountIdFromUrl(url) : null;
+    if (id) return id;
+  }
+  return null;
+}
+
 /** Ссылки на внешние профили: считаем из accountId, если в БД не задана своя. */
 export const dotabuffOf = (accountId: string) => `https://www.dotabuff.com/players/${accountId}`;
 export const stratzOf = (accountId: string) => `https://stratz.com/players/${accountId}`;

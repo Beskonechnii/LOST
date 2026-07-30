@@ -2,6 +2,7 @@
 // Пишет — только API-роуты (/api/studio/*), здесь только выборки.
 
 import { prisma } from "@/lib/prisma";
+import { playerAccountId } from "@/lib/profiles";
 import { rolePosition, roleOrder } from "@/lib/roles";
 import { withPlayerUploads, withTeamUploads } from "@/lib/uploads";
 
@@ -31,14 +32,27 @@ export type TeamCard = {
   /** Средний MMR основы (поз. 1–5); null, если MMR не проставлен ни у кого. */
   mmrAverage: number | null;
   mmrTotal: number;
-  /** steam32 игроков команды — для распознавания команды лиги по составу матча (страница «Матч»). */
-  accountIds: string[];
+  /**
+   * Состав в форме «steam32 → ник из ростера»: по нему страница матча узнаёт команду лиги
+   * и подписывает игроков нашими никами, а не теми, что стоят в клиенте Доты.
+   * id берётся и из ссылок на профиль, не только из своего поля (см. `playerAccountId`).
+   */
+  lineup: { accountId: string; nickname: string }[];
 };
 
 export async function listTeams(): Promise<TeamCard[]> {
   const teams = await prisma.team.findMany({
     orderBy: [{ group: "asc" }, { name: "asc" }],
-    include: { roster: { select: { role: true, player: { select: { accountId: true, mmr: true } } } } },
+    include: {
+      roster: {
+        select: {
+          role: true,
+          player: {
+            select: { id: true, slug: true, nickname: true, photo: true, mmr: true, country: true, accountId: true, dotabuffUrl: true, stratzUrl: true, steamUrl: true },
+          },
+        },
+      },
+    },
   });
   return Promise.all(
     teams.map(async ({ roster, ...t }) => {
@@ -46,10 +60,11 @@ export async function listTeams(): Promise<TeamCard[]> {
       return {
         ...(await withTeamUploads(t)),
         playersCount: roster.length,
-        noAccountIdCount: roster.filter((s) => !s.player.accountId).length,
+        // «Без account_id» — это когда id не выводится вообще ниоткуда, а не когда пусто поле.
+        noAccountIdCount: roster.filter((s) => !playerAccountId(s.player)).length,
         mmrAverage: mmr.average,
         mmrTotal: mmr.total,
-        accountIds: roster.map((s) => s.player.accountId).filter((a): a is string => !!a),
+        lineup: lineupOf(roster),
       };
     }),
   );
@@ -70,7 +85,24 @@ export type RosterMember = {
 export type TeamWithRoster = TeamCard & { players: RosterMember[] };
 
 type SpotWithPlayer = { role: string | null; isCaptain: boolean; player: PlayerRecord };
-type PlayerRecord = { id: number; slug: string; nickname: string; photo: string | null; mmr: number | null; country: string | null; accountId: string | null };
+type PlayerRecord = {
+  id: number;
+  slug: string;
+  nickname: string;
+  photo: string | null;
+  mmr: number | null;
+  country: string | null;
+  accountId: string | null;
+  dotabuffUrl?: string | null;
+  stratzUrl?: string | null;
+  steamUrl?: string | null;
+};
+
+/** Состав в форме «account_id → ник». Игроки, у которых id взять неоткуда, выпадают. */
+const lineupOf = (roster: { player: PlayerRecord }[]) =>
+  roster
+    .map((s) => ({ accountId: playerAccountId(s.player), nickname: s.player.nickname }))
+    .filter((x): x is { accountId: string; nickname: string } => !!x.accountId);
 
 /** Место в составе → строка ростера. Один вид данных для списка команд и для страницы команды. */
 async function toRosterMember(spot: SpotWithPlayer): Promise<RosterMember> {
@@ -84,7 +116,7 @@ async function toRosterMember(spot: SpotWithPlayer): Promise<RosterMember> {
     position: rolePosition(spot.role),
     isCaptain: spot.isCaptain,
     country: player.country,
-    accountId: player.accountId,
+    accountId: playerAccountId(player),
   };
 }
 
@@ -95,16 +127,25 @@ const byRole = (a: SpotWithPlayer, b: SpotWithPlayer) =>
 async function withRoster<T extends { slug: string; logo: string | null; wordmark?: string | null; photo?: string | null }>(
   team: T,
   roster: SpotWithPlayer[],
-): Promise<T & { players: RosterMember[]; playersCount: number; noAccountIdCount: number; mmrAverage: number | null; mmrTotal: number; accountIds: string[] }> {
+): Promise<
+  T & {
+    players: RosterMember[];
+    playersCount: number;
+    noAccountIdCount: number;
+    mmrAverage: number | null;
+    mmrTotal: number;
+    lineup: { accountId: string; nickname: string }[];
+  }
+> {
   const mmr = teamMmr(roster.map((s) => ({ role: s.role, mmr: s.player.mmr })));
   return {
     ...(await withTeamUploads(team)),
     players: await Promise.all([...roster].sort(byRole).map(toRosterMember)),
     playersCount: roster.length,
-    noAccountIdCount: roster.filter((s) => !s.player.accountId).length,
+    noAccountIdCount: roster.filter((s) => !playerAccountId(s.player)).length,
     mmrAverage: mmr.average,
     mmrTotal: mmr.total,
-    accountIds: roster.map((s) => s.player.accountId).filter((a): a is string => !!a),
+    lineup: lineupOf(roster),
   };
 }
 

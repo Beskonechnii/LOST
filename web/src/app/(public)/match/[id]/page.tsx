@@ -28,7 +28,7 @@ export default async function MatchReportPage({ params }: Props) {
   return (
     // useSearchParams внутри требует границы Suspense — иначе Next не отдаст оболочку страницы.
     // key по id: переход на другой матч сбрасывает ручные правки названий, они относились к прошлому.
-    <Suspense fallback={<p className="p-8 text-sm text-neutral-500">Загружаю матч #{id}…</p>}>
+    <Suspense fallback={<p className="p-8 text-sm text-ink-subtle">Загружаю матч #{id}…</p>}>
       <MatchReportView key={id} matchId={id} canArchive={admin} />
     </Suspense>
   );

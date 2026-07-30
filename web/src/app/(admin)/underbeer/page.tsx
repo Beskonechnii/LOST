@@ -15,7 +15,7 @@ export default async function UnderbeerHome() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">UNDERBEER 2.0</h1>
-          <p className="mt-1 max-w-2xl text-sm text-neutral-500">
+          <p className="mt-1 max-w-2xl text-sm text-ink-subtle">
             Сборка шоу-команд из живого ростера ({players} игрок(ов)). Назначь капитанов, задай размер состава —
             и капитаны по очереди драфтят игроков. У каждой команды по разу есть «Закрепить» и «Украсть».
           </p>

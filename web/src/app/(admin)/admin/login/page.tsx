@@ -14,7 +14,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     <main className="flex-1 p-4 md:p-8">
       <div className="mx-auto max-w-sm">
         <h1 className="text-lg font-bold tracking-tight">Админка LOST</h1>
-        <p className="mt-1 mb-5 text-sm text-neutral-400">
+        <p className="mt-1 mb-5 text-sm text-ink-muted">
           Пароль закрывает всё, что пишет: правку ростера, студию и запись через API. Публичная таблица,
           ростер и разбор матча открыты без него.
         </p>
@@ -30,7 +30,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             </p>
             <button
               type="submit"
-              className="rounded-md border border-neutral-700 px-4 py-2 text-sm font-medium text-neutral-300 hover:border-neutral-500 hover:text-white"
+              className="rounded-md border border-hairline-strong px-4 py-2 text-sm font-medium text-ink-muted hover:border-hairline-strong hover:text-white"
             >
               Выйти
             </button>

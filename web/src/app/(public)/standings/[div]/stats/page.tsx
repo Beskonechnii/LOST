@@ -21,7 +21,7 @@ function Chip({ href, active, children }: { href: string; active: boolean; child
     <Link
       href={href}
       className={`rounded-md px-2.5 py-1 text-xs transition ${
-        active ? "bg-violet-600 font-medium text-white" : "border border-neutral-800 text-neutral-400 hover:border-violet-600 hover:text-neutral-200"
+        active ? "bg-accent font-medium text-accent-contrast" : "border border-hairline text-ink-muted hover:border-accent hover:text-ink"
       }`}
     >
       {children}
@@ -44,34 +44,34 @@ function Board({
 }) {
   const top = rows[0]?.value ?? 0;
   return (
-    <section className="overflow-hidden rounded-lg border border-neutral-800 bg-neutral-900/40">
-      <div className="border-b border-neutral-800 bg-gradient-to-r from-violet-600/20 to-transparent px-3 py-2">
-        <div className="text-sm font-bold tracking-wide text-neutral-100">{title}</div>
-        <div className="text-[11px] text-neutral-500">{hint}</div>
+    <section className="overflow-hidden rounded-lg border border-hairline bg-surface-1/40">
+      <div className="border-b border-hairline bg-gradient-to-r from-accent/20 to-transparent px-3 py-2">
+        <div className="text-sm font-bold tracking-wide text-ink">{title}</div>
+        <div className="text-[11px] text-ink-subtle">{hint}</div>
       </div>
       {rows.length === 0 ?
-        <p className="px-3 py-4 text-xs text-neutral-500">Нет карт в этом разрезе.</p>
-      : <ol className="divide-y divide-neutral-900">
+        <p className="px-3 py-4 text-xs text-ink-subtle">Нет карт в этом разрезе.</p>
+      : <ol className="divide-y divide-hairline">
           {rows.map((r, i) => (
             <li key={`${r.subject.kind}-${r.subject.id}`} className="relative flex items-center gap-2 px-3 py-1.5">
               {/* полоса-доля от лидера: строку читаешь глазами, не сравнивая цифры */}
               <span
-                className="absolute inset-y-0 left-0 bg-violet-600/10"
+                className="absolute inset-y-0 left-0 bg-accent/10"
                 style={{ width: `${top > 0 ? Math.max(2, (r.value / top) * 100) : 0}%` }}
                 aria-hidden
               />
-              <span className="relative w-4 shrink-0 text-right text-[11px] tabular-nums text-neutral-600">{i + 1}</span>
-              <span className="relative w-9 shrink-0 truncate text-[10px] font-medium text-neutral-500">{r.subject.tag}</span>
+              <span className="relative w-4 shrink-0 text-right text-[11px] tabular-nums text-ink-subtle">{i + 1}</span>
+              <span className="relative w-9 shrink-0 truncate text-[10px] font-medium text-ink-subtle">{r.subject.tag}</span>
               <Link
                 href={r.subject.kind === "team" ? `/roster/teams/${r.subject.id}` : `/roster/players/${r.subject.id}`}
-                className="relative truncate text-sm font-medium hover:text-violet-400 hover:underline"
+                className="relative truncate text-sm font-medium hover:text-accent-bright hover:underline"
               >
                 {r.subject.name}
               </Link>
               <span className="relative ml-auto shrink-0 text-right">
                 <span className="block text-sm font-bold tabular-nums">{fmt(r.value, decimals)}</span>
                 {r.per != null && perLabel && (
-                  <span className="block text-[10px] tabular-nums text-neutral-500">
+                  <span className="block text-[10px] tabular-nums text-ink-subtle">
                     {/* дробная часть осмысленна у «убийств за карту», а у «урона за карту» — шум */}
                     {fmt(r.per, r.per < 100 ? 1 : 0)} {perLabel}
                   </span>
@@ -121,8 +121,8 @@ export default async function StatsPage({
     <div className="space-y-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h1 className="text-2xl font-bold tracking-tight">Статистика</h1>
-        <p className="text-xs text-neutral-500">
-          Карт в разрезе: <span className="text-neutral-300">{data.games}</span>
+        <p className="text-xs text-ink-subtle">
+          Карт в разрезе: <span className="text-ink-muted">{data.games}</span>
           {data.games > 0 && data.parsedGames < data.games && (
             <span className="text-amber-400"> · распарсено {data.parsedGames} (варды и стаки только по ним)</span>
           )}
@@ -131,7 +131,7 @@ export default async function StatsPage({
 
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="mr-1 text-[10px] uppercase tracking-widest text-neutral-600">Кто</span>
+          <span className="mr-1 text-[10px] uppercase tracking-widest text-ink-subtle">Кто</span>
           <Chip href={link({ kind: undefined })} active={kind === "players"}>
             Игроки
           </Chip>
@@ -141,7 +141,7 @@ export default async function StatsPage({
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="mr-1 text-[10px] uppercase tracking-widest text-neutral-600">Стадия</span>
+          <span className="mr-1 text-[10px] uppercase tracking-widest text-ink-subtle">Стадия</span>
           <Chip href={link({ stage: undefined, group: undefined, bracket: undefined })} active={!stage}>
             Весь турнир
           </Chip>
@@ -154,7 +154,7 @@ export default async function StatsPage({
 
         {stage === "group" && (
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="mr-1 text-[10px] uppercase tracking-widest text-neutral-600">Группа</span>
+            <span className="mr-1 text-[10px] uppercase tracking-widest text-ink-subtle">Группа</span>
             <Chip href={link({ group: undefined })} active={!group}>
               Обе
             </Chip>
@@ -168,7 +168,7 @@ export default async function StatsPage({
 
         {stage === "playoff" && (
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="mr-1 text-[10px] uppercase tracking-widest text-neutral-600">Сетка</span>
+            <span className="mr-1 text-[10px] uppercase tracking-widest text-ink-subtle">Сетка</span>
             <Chip href={link({ bracket: undefined })} active={!bracket}>
               Вся
             </Chip>
@@ -182,9 +182,9 @@ export default async function StatsPage({
       </div>
 
       {data.games === 0 ?
-        <p className="rounded-lg border border-dashed border-neutral-800 p-6 text-sm text-neutral-400">
+        <p className="rounded-lg border border-dashed border-hairline p-6 text-sm text-ink-muted">
           В этом разрезе нет ни одной карты. Карты попадают сюда, когда их привязывают к встрече —{" "}
-          <Link href="/admin/series" className="text-violet-400 hover:underline">
+          <Link href="/admin/series" className="text-accent-bright hover:underline">
             архив серий
           </Link>
           .

@@ -75,14 +75,14 @@ function TeamSide({
         onBlur={onCommit}
         onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
         placeholder="Название команды"
-        className={`w-full bg-transparent text-base font-bold text-neutral-100 outline-none placeholder:text-neutral-600 md:text-lg ${
+        className={`w-full bg-transparent text-base font-bold text-ink outline-none placeholder:text-ink-subtle md:text-lg ${
           align === "right" ? "text-right" : ""
         }`}
       />
       <div className={`mt-1 flex flex-wrap items-center gap-1 ${align === "right" ? "justify-end" : ""}`}>
         <span
           className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
-            won ? "bg-violet-600 text-white" : "bg-neutral-800 text-neutral-400"
+            won ? "bg-accent text-accent-contrast" : "bg-surface-2 text-ink-muted"
           }`}
         >
           {won ? "Победа" : "Поражение"}
@@ -152,13 +152,13 @@ function ScoreHeader({
         align="left"
       />
       <div className="flex shrink-0 flex-col items-center px-2">
-        <div className="text-[10px] uppercase tracking-widest text-neutral-500">⏱ {clock(match.durationSeconds)}</div>
+        <div className="text-[10px] uppercase tracking-widest text-ink-subtle">⏱ {clock(match.durationSeconds)}</div>
         <div className="text-3xl font-black tabular-nums md:text-4xl">
           <span className="text-emerald-400">{match.radiantScore}</span>
-          <span className="text-neutral-600"> – </span>
+          <span className="text-ink-subtle"> – </span>
           <span className="text-rose-400">{match.direScore}</span>
         </div>
-        <div className="text-[10px] text-neutral-600">
+        <div className="text-[10px] text-ink-subtle">
           {d
             ? `${d.toLocaleDateString("ru-RU")} в ${d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })} · `
             : ""}
@@ -190,14 +190,14 @@ function HeroStrip({ radiant, dire }: { radiant: PlayerReport[]; dire: PlayerRep
           <div key={i} className="flex min-w-0 flex-col items-center gap-1">
             <HeroPortrait hero={p.hero} />
             <span
-              className="w-full truncate text-center text-[11px] font-semibold text-neutral-200"
+              className="w-full truncate text-center text-[11px] font-semibold text-ink"
               title={`${p.name}${p.role ? ` · ${p.role}` : ""}`}
             >
               {p.name}
             </span>
           </div>
         ) : (
-          <div key={i} className="aspect-video w-full rounded-md bg-neutral-800/40" />
+          <div key={i} className="aspect-video w-full rounded-md bg-surface-2/40" />
         ),
       )}
     </div>
@@ -228,7 +228,7 @@ function BansStrip({ picksBans }: { picksBans: PickBan[] }) {
   return (
     <div className="flex items-center justify-between gap-4">
       {group("radiant")}
-      <span className="shrink-0 text-[10px] uppercase tracking-widest text-neutral-500">Баны</span>
+      <span className="shrink-0 text-[10px] uppercase tracking-widest text-ink-subtle">Баны</span>
       {group("dire")}
     </div>
   );
@@ -239,10 +239,10 @@ function Draft({ picksBans, names }: { picksBans: PickBan[]; names: { radiant: s
   const Row = ({ pb }: { pb: PickBan }) => (
     <div
       className={`flex items-center gap-1.5 rounded border py-0.5 pl-1 pr-1.5 text-[11px] ${
-        pb.isPick ? "border-neutral-600" : "border-neutral-800 opacity-60"
+        pb.isPick ? "border-hairline-strong" : "border-hairline opacity-60"
       } ${pb.side === "radiant" ? "text-emerald-300" : "text-rose-300"}`}
     >
-      <span className="w-4 shrink-0 text-right tabular-nums text-neutral-500">{pb.order + 1}.</span>
+      <span className="w-4 shrink-0 text-right tabular-nums text-ink-subtle">{pb.order + 1}.</span>
       <HeroFrame hero={pb.hero} side={pb.side} h={18} banned={!pb.isPick} />
       <span className="truncate">
         {pb.isPick ? "" : "бан "}
@@ -252,7 +252,7 @@ function Draft({ picksBans, names }: { picksBans: PickBan[]; names: { radiant: s
   );
   return (
     <div>
-      <div className="mb-2 text-xs uppercase tracking-widest text-neutral-400">Пики и баны (по очереди)</div>
+      <div className="mb-2 text-xs uppercase tracking-widest text-ink-muted">Пики и баны (по очереди)</div>
       <div className="grid grid-cols-2 gap-4">
         {(["radiant", "dire"] as const).map((side) => (
           <div key={side}>
@@ -296,8 +296,8 @@ function HeroCard({
       ? "border-emerald-900/40 bg-emerald-950/15 hover:bg-emerald-950/25"
       : "border-rose-900/40 bg-rose-950/15 hover:bg-rose-950/25";
   const box = (label: string, v: number) => (
-    <span key={label} className="rounded bg-neutral-800/70 px-1.5 py-0.5 text-[10px] tabular-nums text-neutral-200">
-      <span className="text-neutral-500">{label} </span>
+    <span key={label} className="rounded bg-surface-2/70 px-1.5 py-0.5 text-[10px] tabular-nums text-ink">
+      <span className="text-ink-subtle">{label} </span>
       <span className="font-bold">{v}</span>
     </span>
   );
@@ -308,7 +308,7 @@ function HeroCard({
         <div className="relative w-14 shrink-0">
           <HeroPortrait hero={p.hero} />
           <span
-            className="absolute -bottom-1 -left-1 grid h-5 w-5 place-items-center rounded-full bg-neutral-950 text-[10px] font-bold tabular-nums text-amber-300 ring-1 ring-amber-500/50"
+            className="absolute -bottom-1 -left-1 grid h-5 w-5 place-items-center rounded-full bg-canvas text-[10px] font-bold tabular-nums text-amber-300 ring-1 ring-amber-500/50"
             title={`Уровень ${p.level}`}
           >
             {p.level}
@@ -320,25 +320,25 @@ function HeroCard({
             <span className={`shrink-0 text-[10px] font-black uppercase ${side === "radiant" ? "text-emerald-400" : "text-rose-400"}`}>
               {tag}
             </span>
-            <span className="truncate text-sm font-semibold text-neutral-100" title={p.name}>
+            <span className="truncate text-sm font-semibold text-ink" title={p.name}>
               {p.name}
             </span>
-            {p.role && <span className="ml-auto shrink-0 text-[10px] uppercase tracking-wide text-neutral-500">{p.role}</span>}
+            {p.role && <span className="ml-auto shrink-0 text-[10px] uppercase tracking-wide text-ink-subtle">{p.role}</span>}
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-1.5">
             {box("XPM", p.xpm)}
             {box("GPM", p.gpm)}
             <span className="text-[11px] font-semibold tabular-nums" title="Убийства / смерти / помощь">
-              <span className="text-neutral-500">KDA </span>
+              <span className="text-ink-subtle">KDA </span>
               <span className="text-emerald-400">{p.kills}</span>
-              <span className="text-neutral-600">/</span>
+              <span className="text-ink-subtle">/</span>
               <span className="text-rose-400">{p.deaths}</span>
-              <span className="text-neutral-600">/</span>
+              <span className="text-ink-subtle">/</span>
               <span className="text-sky-300">{p.assists}</span>
             </span>
           </div>
           <div className="mt-1.5 flex items-center gap-2">
-            <div className="relative h-4 min-w-0 flex-1 overflow-hidden rounded bg-neutral-800/60" title="Ценность (net worth)">
+            <div className="relative h-4 min-w-0 flex-1 overflow-hidden rounded bg-surface-2/60" title="Ценность (net worth)">
               <div
                 className="absolute inset-y-0 left-0 rounded bg-gradient-to-r from-amber-600 to-amber-400"
                 style={{ width: `${Math.max(4, (p.netWorth / maxNet) * 100)}%` }}
@@ -350,12 +350,12 @@ function HeroCard({
                 {fmt(p.netWorth)}
               </span>
             </div>
-            <span className="shrink-0 text-[10px] tabular-nums text-neutral-400" title="Урон по героям">
-              <span className="text-neutral-500">УРОН </span>
+            <span className="shrink-0 text-[10px] tabular-nums text-ink-muted" title="Урон по героям">
+              <span className="text-ink-subtle">УРОН </span>
               {fmt(p.heroDamage)}
             </span>
-            <span className="shrink-0 text-[10px] tabular-nums text-neutral-400" title="Ласт-хиты / денаи">
-              <span className="text-neutral-500">ЛХ/ДН </span>
+            <span className="shrink-0 text-[10px] tabular-nums text-ink-muted" title="Ласт-хиты / денаи">
+              <span className="text-ink-subtle">ЛХ/ДН </span>
               {p.lastHits}/{p.denies}
             </span>
           </div>
@@ -366,7 +366,7 @@ function HeroCard({
         </div>
       </div>
       {/* предметы */}
-      <div className="mt-2 overflow-x-auto border-t border-neutral-800/60 pt-2">
+      <div className="mt-2 overflow-x-auto border-t border-hairline pt-2">
         <ItemsRow p={p} />
       </div>
     </div>
@@ -397,7 +397,7 @@ function CardTeam({
   const accent = side === "radiant" ? "text-emerald-400" : "text-rose-400";
   const bar = side === "radiant" ? "bg-emerald-500" : "bg-rose-500";
   return (
-    <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-3">
+    <div className="rounded-xl border border-hairline bg-surface-1/40 p-3">
       <div className="mb-2 flex items-center gap-2">
         <span className={`h-4 w-1 rounded ${bar}`} />
         {logo && (
@@ -406,11 +406,11 @@ function CardTeam({
         )}
         <span className={`truncate text-sm font-bold ${accent}`}>{teamName || fallback}</span>
         {won && (
-          <span className="rounded bg-violet-600 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+          <span className="rounded bg-accent px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent-contrast">
             Победа
           </span>
         )}
-        <span className="ml-auto text-lg font-black tabular-nums text-neutral-100">{score}</span>
+        <span className="ml-auto text-lg font-black tabular-nums text-ink">{score}</span>
       </div>
       <div className="space-y-2">
         {players.map((p, i) => (
@@ -478,7 +478,7 @@ function TalentTree({ talents }: { talents: TalentTier[] }) {
     <div
       title={opt?.name}
       className={`flex-1 self-stretch px-2 py-1 text-[11px] leading-tight ${align === "right" ? "text-right" : "text-left"} ${
-        opt?.picked ? "bg-amber-500/10 font-semibold text-amber-200" : "text-neutral-400"
+        opt?.picked ? "bg-amber-500/10 font-semibold text-amber-200" : "text-ink-muted"
       }`}
     >
       {opt?.name ?? ""}
@@ -486,16 +486,16 @@ function TalentTree({ talents }: { talents: TalentTier[] }) {
   );
   return (
     <div className="mb-2">
-      <div className="mb-1 text-neutral-500">Таланты</div>
+      <div className="mb-1 text-ink-subtle">Таланты</div>
       <div className="flex flex-col gap-1.5">
         {talents.map((t) => (
           <div
             key={t.heroLevel}
-            className="flex items-center overflow-hidden rounded bg-gradient-to-r from-amber-500/5 via-black/30 to-amber-500/5 ring-1 ring-neutral-800"
+            className="flex items-center overflow-hidden rounded bg-gradient-to-r from-amber-500/5 via-black/30 to-amber-500/5 ring-1 ring-hairline"
           >
             <Side opt={t.left} align="right" />
             <div
-              className="grid h-6 w-6 flex-none place-items-center rounded-full bg-neutral-950 text-[11px] font-bold tabular-nums text-amber-300 ring-1 ring-amber-500/40"
+              className="grid h-6 w-6 flex-none place-items-center rounded-full bg-canvas text-[11px] font-bold tabular-nums text-amber-300 ring-1 ring-amber-500/40"
               style={{ boxShadow: "0 0 8px rgba(183,154,0,0.5)" }}
             >
               {t.heroLevel}
@@ -511,27 +511,27 @@ function TalentTree({ talents }: { talents: TalentTier[] }) {
 // --- Доп. информация: скиллы и покупки ---
 function PlayerDetails({ p }: { p: PlayerReport }) {
   return (
-    <div className="rounded-md border border-neutral-800 bg-neutral-900/40 p-3 text-xs">
+    <div className="rounded-md border border-hairline bg-surface-1/40 p-3 text-xs">
       <div className="mb-2 flex items-center gap-2">
         <Icon kind="heroes" slug={p.hero.slug} name={p.hero.name} h={22} />
-        <span className="font-semibold text-neutral-100">{p.name}</span>
-        <span className="text-neutral-500">
+        <span className="font-semibold text-ink">{p.name}</span>
+        <span className="text-ink-subtle">
           {p.role} · {p.hero.name}
         </span>
       </div>
       {p.buffs.length > 0 && (
-        <div className="mb-2 text-neutral-400">
+        <div className="mb-2 text-ink-muted">
           Баффы: {p.buffs.map((b) => `${b.name}${b.stacks ? ` ×${b.stacks}` : ""}`).join(", ")}
         </div>
       )}
       <TalentTree talents={p.talents} />
       {p.abilityOrder.length > 0 && (
         <div className="mb-2">
-          <div className="mb-1 text-neutral-500">Порядок способностей</div>
+          <div className="mb-1 text-ink-subtle">Порядок способностей</div>
           <ol className="flex flex-wrap gap-1">
             {p.abilityOrder.map((a, i) => (
-              <li key={i} className="flex items-center gap-1 rounded bg-neutral-800/70 px-1 py-0.5">
-                <span className="text-[10px] text-neutral-500">{i + 1}</span>
+              <li key={i} className="flex items-center gap-1 rounded bg-surface-2/70 px-1 py-0.5">
+                <span className="text-[10px] text-ink-subtle">{i + 1}</span>
                 <Icon kind="abilities" slug={a.slug} name={a.name} h={18} />
               </li>
             ))}
@@ -540,12 +540,12 @@ function PlayerDetails({ p }: { p: PlayerReport }) {
       )}
       {p.purchases.length > 0 && (
         <div>
-          <div className="mb-1 text-neutral-500">Покупки (время)</div>
+          <div className="mb-1 text-ink-subtle">Покупки (время)</div>
           <div className="flex flex-wrap gap-x-2 gap-y-1">
             {p.purchases.map((q, i) => (
               <span key={i} className="inline-flex items-center gap-1">
                 <Icon kind="items" slug={q.slug} name={q.name} h={18} />
-                <span className="text-neutral-500">{clock(q.time)}</span>
+                <span className="text-ink-subtle">{clock(q.time)}</span>
               </span>
             ))}
           </div>
@@ -740,17 +740,17 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
     <main className="flex-1 p-4 md:p-8">
       <div className="mx-auto max-w-6xl space-y-4">
         {/* Шапка отчёта: возврат к форме, номер матча и переключатель источника. */}
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-900/60 px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-hairline bg-surface-1/60 px-4 py-3">
           <div className="flex min-w-0 items-center gap-3">
             <Link
               href="/match"
               title="К вводу другого матча"
-              className="rounded-md border border-neutral-800 px-2 py-1 text-xs text-neutral-400 transition-colors hover:border-neutral-600 hover:text-neutral-100"
+              className="rounded-md border border-hairline px-2 py-1 text-xs text-ink-muted transition-colors hover:border-hairline-strong hover:text-ink"
             >
               ← Другой матч
             </Link>
             <h1 className="truncate text-lg font-black uppercase tracking-tight md:text-xl">
-              Postgame <span className="tabular-nums text-neutral-500">#{matchId}</span>
+              Postgame <span className="tabular-nums text-ink-subtle">#{matchId}</span>
             </h1>
             {match && !match.parsed && (
               <span className="text-[11px] text-amber-400" title="OpenDota ещё не разобрала реплей">
@@ -759,14 +759,14 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
             )}
           </div>
           {/* Источник — часть адреса: «почему тут пустой график» видно и в ссылке, и в интерфейсе. */}
-          <div className="flex gap-1 rounded-lg bg-neutral-950/60 p-1">
+          <div className="flex gap-1 rounded-lg bg-canvas/60 p-1">
             {SOURCES.map((s) => (
               <button
                 key={s.key}
                 onClick={() => patchUrl({ src: s.key === "opendota" ? null : s.key })}
                 title={s.hint}
                 className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                  src === s.key ? "bg-neutral-800 text-neutral-100" : "text-neutral-500 hover:text-neutral-200"
+                  src === s.key ? "bg-surface-2 text-ink" : "text-ink-subtle hover:text-ink"
                 }`}
               >
                 {s.label}
@@ -776,7 +776,7 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
         </div>
 
         {loading && (
-          <p className="rounded-md border border-neutral-800 bg-neutral-900/40 px-3 py-2 text-sm text-neutral-400">
+          <p className="rounded-md border border-hairline bg-surface-1/40 px-3 py-2 text-sm text-ink-muted">
             Загружаю матч из {src === "steam" ? "Steam" : "OpenDota"}…
           </p>
         )}
@@ -796,13 +796,13 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
 
         {match && (
           <>
-            <div className="flex gap-1 rounded-lg bg-neutral-950/60 p-1">
+            <div className="flex gap-1 rounded-lg bg-canvas/60 p-1">
               {TABS.map((t) => (
                 <button
                   key={t.key}
                   onClick={() => patchUrl({ tab: t.key === "report" ? null : t.key })}
                   className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                    tab === t.key ? "bg-violet-600 text-white" : "text-neutral-400 hover:text-neutral-100"
+                    tab === t.key ? "bg-accent text-accent-contrast" : "text-ink-muted hover:text-ink"
                   }`}
                 >
                   {t.label}
@@ -814,7 +814,7 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
               <>
                 {/* Блок 1 — сводка матча единым блоком (по референсу):
                     шапка → герои → баны → низ: карта строений + события | график преимущества */}
-                <div className="divide-y divide-neutral-800 rounded-xl border border-neutral-800 bg-neutral-900/50">
+                <div className="divide-y divide-hairline rounded-xl border border-hairline bg-surface-1/50">
                   <div className="p-3 md:p-4">
                     <ScoreHeader match={match} names={names} setNames={setNames} commitNames={commitNames} logos={logos} />
                   </div>
@@ -854,22 +854,22 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
 
             {tab === "extra" && (
               <>
-                <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-4">
-                  <div className="mb-3 text-sm font-medium text-neutral-300">Скиллы и покупки (по игрокам)</div>
+                <div className="rounded-xl border border-hairline bg-surface-1/40 p-4">
+                  <div className="mb-3 text-sm font-medium text-ink-muted">Скиллы и покупки (по игрокам)</div>
                   <div className="grid gap-2 md:grid-cols-2">
                     {byPos.map((p, i) => (
                       <PlayerDetails key={i} p={p} />
                     ))}
                   </div>
                 </div>
-                <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-4">
+                <div className="rounded-xl border border-hairline bg-surface-1/40 p-4">
                   <Draft picksBans={match.picksBans} names={names} />
                 </div>
               </>
             )}
 
             {tab === "export" && (
-              <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-4">
+              <div className="rounded-xl border border-hairline bg-surface-1/40 p-4">
                 {/* В архив уходит подпись ровно с теми названиями, что нарисованы на картинке. */}
                 <PostgameExport
                   match={match}

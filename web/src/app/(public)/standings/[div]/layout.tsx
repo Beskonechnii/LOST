@@ -25,10 +25,18 @@ export default async function DivisionLayout({
     { href: `${base}/stats`, label: "Статистика", hint: "Рейтинги игроков и команд по стадиям" },
   ];
 
+  // Акцент секции = цвет дивизиона. D1 держит бренд-фиолетовый (дефолт токенов), D2 — бирюзовый
+  // с тёмным текстом на плашках. Задаём CSS-переменные на обёртке — весь `accent`-хром внутри
+  // (вкладки, кнопки, ссылки) перекрашивается сам, без дублирования классов на каждой странице.
+  const accentVars =
+    division.slug === "d2"
+      ? ({ "--accent": "#14c6cb", "--accent-bright": "#5eead4", "--accent-contrast": "#000000" } as React.CSSProperties)
+      : undefined;
+
   return (
-    <>
+    <div style={accentVars}>
       <SubNav items={tabs} />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-6">{children}</main>
-    </>
+    </div>
   );
 }

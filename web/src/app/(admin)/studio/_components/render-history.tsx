@@ -32,16 +32,16 @@ export function RenderHistory({ renders }: { renders: Item[] }) {
 
   return (
     <section>
-      <h2 className="mb-3 text-sm uppercase tracking-widest text-neutral-500">История</h2>
+      <h2 className="mb-3 text-sm uppercase tracking-widest text-ink-subtle">История</h2>
       <ul className="space-y-2 text-sm">
         {items.map((r) => {
           const label = r.title ?? r.templateId;
           return (
             <li key={r.id} className="flex items-center gap-2">
-              <Link href={`/studio/new/${r.templateId}?render=${r.id}`} className="text-violet-400 hover:underline">
+              <Link href={`/studio/new/${r.templateId}?render=${r.id}`} className="text-accent-bright hover:underline">
                 {label}
               </Link>
-              <span className="text-xs text-neutral-600">{r.created}</span>
+              <span className="text-xs text-ink-subtle">{r.created}</span>
               {confirmId === r.id ? (
                 <span className="ml-1 flex items-center gap-1">
                   <button
@@ -51,7 +51,7 @@ export function RenderHistory({ renders }: { renders: Item[] }) {
                   >
                     {busy === r.id ? "…" : "Удалить"}
                   </button>
-                  <button onClick={() => setConfirmId(null)} className="text-[11px] text-neutral-500 hover:text-neutral-300">
+                  <button onClick={() => setConfirmId(null)} className="text-[11px] text-ink-subtle hover:text-ink-muted">
                     Отмена
                   </button>
                 </span>
@@ -59,7 +59,7 @@ export function RenderHistory({ renders }: { renders: Item[] }) {
                 <button
                   onClick={() => setConfirmId(r.id)}
                   title="Удалить из истории"
-                  className="ml-1 rounded p-0.5 text-xs text-neutral-600 transition-colors hover:text-red-400"
+                  className="ml-1 rounded p-0.5 text-xs text-ink-subtle transition-colors hover:text-red-400"
                 >
                   ✕
                 </button>

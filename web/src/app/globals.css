@@ -1,26 +1,63 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* Дизайн-система LOST — перенос канвы HashiCorp на нашу тёмную тему.
+   Три идеи, которые берём:
+     1. Ступени поверхности (canvas → surface-1 → surface-2), а не россыпь neutral-9xx.
+     2. Строго три оттенка текста: ink / ink-muted / ink-subtle.
+     3. Акцент = идентичность секции. У нас это дивизион: D1 фиолетовый, D2 бирюзовый.
+   Возвышение — сменой поверхности и 1px hairline, а не тенью. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* Поверхности: чёрная канва и «приподнятые» над ней уголь-карточки */
+  --color-canvas: #000000;
+  --color-surface-1: #15181e;
+  --color-surface-2: #1f232b;
+  --color-surface-3: #3b3d45;
+
+  /* Границы: почти невидимая молочная линия и её плотный вариант */
+  --color-hairline: rgba(178, 182, 189, 0.1);
+  --color-hairline-strong: #3b3d45;
+
+  /* Текст — только эти три ступени, без промежуточных серых */
+  --color-ink: #ffffff;
+  --color-ink-muted: #b2b6bd;
+  --color-ink-subtle: #656a76;
+
+  /* Акценты дивизионов (per-division identity вместо per-product у HashiCorp).
+     D1 держит бренд-фиолетовый LOST (совпал с Terraform-фиолетовым), D2 — бирюзовый. */
+  --color-d1: #7c3aed;
+  --color-d1-bright: #a78bfa;
+  --color-d2: #14c6cb;
+  --color-d2-bright: #5eead4;
+
+  /* Текущий акцент секции. По умолчанию бренд-фиолетовый; слой дивизиона (standings/[div])
+     переопределяет `--accent` на цвет D2 — и весь хром внутри перекрашивается сам.
+     Так одна кнопка/вкладка «знает», в каком дивизионе находится, без дублирования классов. */
+  --color-accent: var(--accent, #7c3aed);
+  --color-accent-bright: var(--accent-bright, #a78bfa);
+  --color-accent-contrast: var(--accent-contrast, #ffffff);
+
+  /* Совместимость со старым кодом: background/foreground ещё используются кое-где */
+  --color-background: var(--color-canvas);
+  --color-foreground: var(--color-ink);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  /* Одно семейство на весь проект, как в HashiCorp: Geist вместо hashicorpSans.
+     Раньше здесь по недосмотру стоял Arial — Geist грузился, но до текста не доходил. */
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Eyebrow — надпись-категория над каждой секцией: 12px, uppercase, положительный трекинг.
+   В HashiCorp это обязательный элемент ритма страницы. */
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.23;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }

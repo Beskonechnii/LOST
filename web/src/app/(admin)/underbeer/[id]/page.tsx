@@ -28,7 +28,7 @@ export default async function DraftPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="space-y-6">
-      <Link href="/underbeer" className="text-sm text-neutral-500 hover:text-neutral-300">
+      <Link href="/underbeer" className="text-sm text-ink-subtle hover:text-ink-muted">
         ← Все драфты
       </Link>
       <DraftBoard sessionId={sessionId} initialTitle={session.title} initialState={state} pool={pool} />

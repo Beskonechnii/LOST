@@ -32,7 +32,7 @@ function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-const focus = "outline-none focus-visible:ring-2 focus-visible:ring-violet-500";
+const focus = "outline-none focus-visible:ring-2 focus-visible:ring-accent-bright";
 
 /** Общая раскладка верхней строки — отличаются только наполнением и акцентом. */
 function Bar({
@@ -49,7 +49,7 @@ function Bar({
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-neutral-800/80 bg-neutral-950/85 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-hairline bg-canvas/85 backdrop-blur">
       <div className="mx-auto flex h-12 max-w-6xl items-center gap-4 px-4 md:px-6">
         {brand}
 
@@ -63,7 +63,7 @@ function Bar({
                 title={s.hint}
                 aria-current={active ? "page" : undefined}
                 className={`shrink-0 rounded-md px-3 py-1.5 text-sm transition-colors ${focus} ${
-                  active ? accent : "text-neutral-400 hover:bg-neutral-900 hover:text-neutral-100"
+                  active ? accent : "text-ink-muted hover:bg-surface-1 hover:text-ink"
                 }`}
               >
                 {s.label}
@@ -83,13 +83,13 @@ export function PublicNav() {
   return (
     <Bar
       sections={PUBLIC_SECTIONS}
-      accent="bg-violet-600/15 font-medium text-violet-300"
+      accent="bg-accent/15 font-medium text-accent-bright"
       brand={
         <Link href="/" className={`flex shrink-0 items-center gap-2 rounded ${focus}`} title="League of Spirit">
-          <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-600 text-sm font-black text-white">
+          <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-accent to-fuchsia-600 text-sm font-black text-white">
             L
           </span>
-          <span className="hidden text-xs font-bold uppercase tracking-[0.2em] text-neutral-300 sm:block">LOST</span>
+          <span className="hidden text-xs font-bold uppercase tracking-[0.2em] text-ink-muted sm:block">LOST</span>
         </Link>
       }
       aside={
@@ -97,7 +97,7 @@ export function PublicNav() {
         <Link
           href="/admin/login"
           title="Вход в админку"
-          className={`shrink-0 rounded-md px-2 py-1.5 text-xs text-neutral-600 transition-colors hover:text-neutral-300 ${focus}`}
+          className={`shrink-0 rounded-md px-2 py-1.5 text-xs text-ink-subtle transition-colors hover:text-ink-muted ${focus}`}
         >
           Админ
         </Link>
@@ -126,7 +126,7 @@ export function AdminNav() {
         <Link
           href="/"
           title="Вернуться на публичный сайт"
-          className={`shrink-0 rounded-md px-2 py-1.5 text-xs text-neutral-500 transition-colors hover:text-neutral-200 ${focus}`}
+          className={`shrink-0 rounded-md px-2 py-1.5 text-xs text-ink-subtle transition-colors hover:text-ink ${focus}`}
         >
           ← На сайт
         </Link>
@@ -144,7 +144,7 @@ export function SubNav({ items }: { items: NavItem[] }) {
 
   return (
     // 49px = высота верхней строки (h-12) вместе с её нижней границей — иначе при скролле щель в 1px
-    <div className="sticky top-[49px] z-40 border-b border-neutral-900 bg-neutral-950/85 backdrop-blur">
+    <div className="sticky top-[49px] z-40 border-b border-hairline bg-canvas/85 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl gap-4 overflow-x-auto px-4 md:px-6">
         {items.map((t) => (
           <Link
@@ -154,8 +154,8 @@ export function SubNav({ items }: { items: NavItem[] }) {
             aria-current={t.href === active ? "page" : undefined}
             className={`shrink-0 border-b-2 px-1 py-2 text-sm transition-colors ${focus} ${
               t.href === active
-                ? "border-violet-500 text-neutral-100"
-                : "border-transparent text-neutral-500 hover:text-neutral-200"
+                ? "border-accent-bright text-ink"
+                : "border-transparent text-ink-subtle hover:text-ink"
             }`}
           >
             {t.label}

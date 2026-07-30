@@ -16,21 +16,21 @@ export default async function PlayerEditPage({ params }: { params: Promise<{ id:
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-2 text-sm text-neutral-500">
-        <Link href="/roster/players" className="hover:text-neutral-300">
+      <div className="flex flex-wrap items-center gap-2 text-sm text-ink-subtle">
+        <Link href="/roster/players" className="hover:text-ink-muted">
           Игроки
         </Link>
-        <span className="text-neutral-700">/</span>
-        <Link href={`/roster/players/${player.id}`} className="hover:text-neutral-300">
+        <span className="text-ink-subtle">/</span>
+        <Link href={`/roster/players/${player.id}`} className="hover:text-ink-muted">
           {player.nickname}
         </Link>
-        <span className="text-neutral-700">/</span>
-        <span className="text-neutral-400">правка</span>
+        <span className="text-ink-subtle">/</span>
+        <span className="text-ink-muted">правка</span>
       </div>
 
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h1 className="text-2xl font-bold tracking-tight">{player.nickname}</h1>
-        <Link href={`/roster/players/${player.id}`} className="text-sm text-neutral-400 hover:text-violet-300">
+        <Link href={`/roster/players/${player.id}`} className="text-sm text-ink-muted hover:text-accent-bright">
           ← к профилю
         </Link>
       </div>
@@ -52,7 +52,7 @@ export default async function PlayerEditPage({ params }: { params: Promise<{ id:
       />
 
       <section>
-        <h2 className="mb-3 text-xs uppercase tracking-widest text-neutral-500">Составы</h2>
+        <h2 className="mb-3 text-xs uppercase tracking-widest text-ink-subtle">Составы</h2>
         <SpotsEditor
           playerId={player.id}
           teams={teams.map((t) => ({ id: t.id, name: t.name }))}

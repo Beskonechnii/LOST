@@ -52,7 +52,7 @@ const roleShort = (role: string | null) => (role ? SHORT.get(role) ?? role : "�
 
 // Тёмный тонкий скроллбар вместо светлого дефолтного (просили в прокрутке игроков).
 const SCROLL =
-  "[scrollbar-width:thin] [scrollbar-color:#404040_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-700 hover:[&::-webkit-scrollbar-thumb]:bg-neutral-600";
+  "[scrollbar-width:thin] [scrollbar-color:#404040_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-surface-3 hover:[&::-webkit-scrollbar-thumb]:bg-surface-3";
 
 export function DraftBoard({
   sessionId,
@@ -201,22 +201,22 @@ export function DraftBoard({
   return (
     <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
       {/* Шапка: название, статус сохранения, старт/оверлей */}
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-neutral-800 bg-neutral-900/40 p-3">
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-hairline bg-surface-1/40 p-3">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onBlur={() => saveTitle(title)}
           placeholder={`Драфт #${sessionId}`}
-          className="min-w-40 flex-1 rounded border border-neutral-800 bg-neutral-950 px-3 py-1.5 text-sm outline-none focus:border-amber-600"
+          className="min-w-40 flex-1 rounded border border-hairline bg-canvas px-3 py-1.5 text-sm outline-none focus:border-amber-600"
         />
-        <span className="text-xs text-neutral-500">
+        <span className="text-xs text-ink-subtle">
           {saving === "saving" ? "Сохраняю…" : saving === "error" ? "Ошибка сохранения" : "Сохранено"}
         </span>
         <PhaseBadge phase={state.phase} />
         <Link
           href={`/overlay/underbeer/${sessionId}`}
           target="_blank"
-          className="rounded-md border border-neutral-700 px-3 py-1.5 text-xs text-neutral-300 hover:border-amber-600"
+          className="rounded-md border border-hairline-strong px-3 py-1.5 text-xs text-ink-muted hover:border-amber-600"
         >
           Оверлей для OBS ↗
         </Link>
@@ -244,7 +244,7 @@ export function DraftBoard({
             <>
               <button
                 onClick={() => run((s) => ({ ...s, phase: "roster" }))}
-                className="text-sm text-neutral-500 hover:text-neutral-300"
+                className="text-sm text-ink-subtle hover:text-ink-muted"
               >
                 ← Изменить участников ({state.participants?.length ?? 0})
               </button>
@@ -299,22 +299,22 @@ export function DraftBoard({
               />
             ))}
             {state.phase === "config" && state.teams.length === 0 && (
-              <p className="text-sm text-neutral-600">Добавьте команды кнопкой выше.</p>
+              <p className="text-sm text-ink-subtle">Добавьте команды кнопкой выше.</p>
             )}
           </div>
         </section>
 
         {/* ── Пул игроков: каждая позиция — отдельная колонка ── */}
         <section>
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-neutral-400">Пул игроков</h2>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-ink-muted">Пул игроков</h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
             {segments.map((seg) => {
               const remaining = seg.players.filter((p) => !taken.has(p.id)).length;
               return (
-                <div key={String(seg.position)} className="rounded-lg border border-neutral-800 bg-neutral-900/30 p-2">
-                  <div className="mb-1.5 flex items-center justify-between px-0.5 text-[11px] uppercase tracking-wide text-neutral-500">
+                <div key={String(seg.position)} className="rounded-lg border border-hairline bg-surface-1/30 p-2">
+                  <div className="mb-1.5 flex items-center justify-between px-0.5 text-[11px] uppercase tracking-wide text-ink-subtle">
                     <span className="truncate">{seg.label}</span>
-                    <span className="shrink-0 text-neutral-600">{remaining}</span>
+                    <span className="shrink-0 text-ink-subtle">{remaining}</span>
                   </div>
                   <div className={`max-h-[56vh] space-y-1.5 overflow-y-auto pr-0.5 ${SCROLL}`}>
                     {seg.players.map((p) => (
@@ -337,7 +337,7 @@ export function DraftBoard({
 
       <DragOverlay>
         {dragPlayer ? (
-          <div className="w-64 rounded-md border border-amber-500 bg-neutral-900 opacity-95">
+          <div className="w-64 rounded-md border border-amber-500 bg-surface-1 opacity-95">
             <PlayerRow player={dragPlayer} />
           </div>
         ) : null}
@@ -351,7 +351,7 @@ export function DraftBoard({
 function PhaseBadge({ phase }: { phase: DraftState["phase"] }) {
   const map = {
     roster: ["Выбор участников", "bg-sky-500/15 text-sky-300"],
-    config: ["Настройка команд", "bg-neutral-700/40 text-neutral-300"],
+    config: ["Настройка команд", "bg-surface-3/40 text-ink-muted"],
     draft: ["Идёт драфт", "bg-amber-500/15 text-amber-300"],
     done: ["Собран", "bg-emerald-500/15 text-emerald-300"],
   } as const;
@@ -395,15 +395,15 @@ function RosterSelect({
 
   return (
     <div className="mt-4 space-y-4">
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-neutral-800 bg-neutral-900/40 p-3">
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-hairline bg-surface-1/40 p-3">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Поиск по нику или имени…"
-          className="min-w-48 flex-1 rounded border border-neutral-800 bg-neutral-950 px-3 py-1.5 text-sm outline-none focus:border-sky-600"
+          className="min-w-48 flex-1 rounded border border-hairline bg-canvas px-3 py-1.5 text-sm outline-none focus:border-sky-600"
         />
-        <span className="text-sm text-neutral-400">
-          Выбрано: <b className="text-neutral-100">{count}</b>
+        <span className="text-sm text-ink-muted">
+          Выбрано: <b className="text-ink">{count}</b>
         </span>
         <button
           onClick={onNext}
@@ -414,16 +414,16 @@ function RosterSelect({
           Далее к командам →
         </button>
       </div>
-      <p className="text-xs text-neutral-500">
+      <p className="text-xs text-ink-subtle">
         {blocker ?? "Отметьте игроков, которые участвуют в турнире — из них и будет идти драфт."}
       </p>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
         {filtered.map((seg) => (
-          <div key={String(seg.position)} className="rounded-lg border border-neutral-800 bg-neutral-900/30 p-2">
-            <div className="mb-1.5 flex items-center justify-between px-0.5 text-[11px] uppercase tracking-wide text-neutral-500">
+          <div key={String(seg.position)} className="rounded-lg border border-hairline bg-surface-1/30 p-2">
+            <div className="mb-1.5 flex items-center justify-between px-0.5 text-[11px] uppercase tracking-wide text-ink-subtle">
               <span className="truncate">{seg.label}</span>
-              <span className="shrink-0 text-neutral-600">{seg.players.filter((p) => selected?.has(p.id)).length}</span>
+              <span className="shrink-0 text-ink-subtle">{seg.players.filter((p) => selected?.has(p.id)).length}</span>
             </div>
             <div className={`max-h-[60vh] space-y-1.5 overflow-y-auto pr-0.5 ${SCROLL}`}>
               {seg.players.map((p) => {
@@ -435,7 +435,7 @@ function RosterSelect({
                     className={`w-full rounded-md border text-left transition-colors ${
                       on
                         ? "border-sky-500 bg-sky-500/10"
-                        : "border-neutral-800 bg-neutral-900/60 hover:border-neutral-600"
+                        : "border-hairline bg-surface-1/60 hover:border-hairline-strong"
                     }`}
                   >
                     <PlayerRow player={p} />
@@ -468,7 +468,7 @@ function TurnBanner({ state }: { state: DraftState }) {
       ) : (
         <>
           Ход команды <b>{team.name}</b>: перетащите игрока из пула в состав или кликните по нему.
-          {team.usedSteal ? null : <span className="text-neutral-500">· «Украсть» ещё доступно</span>}
+          {team.usedSteal ? null : <span className="text-ink-subtle">· «Украсть» ещё доступно</span>}
         </>
       )}
     </div>
@@ -482,14 +482,14 @@ function PlayerRow({ player }: { player: PoolPlayer }) {
       <PlayerAvatar photo={player.photo} nickname={player.nickname} color={player.teamColor} size={34} className="!rounded-md" />
       <div className="min-w-0 flex-1">
         <div className="truncate text-sm font-medium">{player.nickname}</div>
-        <div className="truncate text-[11px] text-neutral-500">
+        <div className="truncate text-[11px] text-ink-subtle">
           {player.realName ? `${player.realName} · ` : ""}
           {roleShort(player.role)}
         </div>
       </div>
-      <div className="shrink-0 text-right text-[11px] text-neutral-400">
+      <div className="shrink-0 text-right text-[11px] text-ink-muted">
         {player.mmr ? `${player.mmr.toLocaleString("ru-RU")}` : "—"}
-        <div className="text-[10px] text-neutral-600">MMR</div>
+        <div className="text-[10px] text-ink-subtle">MMR</div>
       </div>
     </div>
   );
@@ -512,10 +512,10 @@ function PoolCard({
       ref={setNodeRef}
       {...(draggable ? { ...listeners, ...attributes } : {})}
       onClick={taken ? undefined : onTap}
-      className={`rounded-md border bg-neutral-900/60 transition-colors ${
+      className={`rounded-md border bg-surface-1/60 transition-colors ${
         taken
-          ? "border-neutral-900 opacity-40"
-          : `cursor-pointer border-neutral-800 hover:border-amber-600 ${draggable ? "active:cursor-grabbing" : ""}`
+          ? "border-hairline opacity-40"
+          : `cursor-pointer border-hairline hover:border-amber-600 ${draggable ? "active:cursor-grabbing" : ""}`
       } ${isDragging ? "opacity-30" : ""}`}
     >
       <PlayerRow player={player} />
@@ -556,28 +556,28 @@ function TeamColumn({
     <div
       ref={setNodeRef}
       onClick={state.phase === "config" ? onSelectActive : undefined}
-      className={`flex flex-col rounded-lg border bg-neutral-900/40 transition-colors ${
-        isOver && isCurrent ? "border-amber-400" : isCurrent ? "border-amber-600" : "border-neutral-800"
+      className={`flex flex-col rounded-lg border bg-surface-1/40 transition-colors ${
+        isOver && isCurrent ? "border-amber-400" : isCurrent ? "border-amber-600" : "border-hairline"
       } ${isActiveConfig ? "ring-1 ring-amber-500" : ""} ${state.phase === "config" ? "cursor-pointer" : ""}`}
     >
       {/* Заголовок команды */}
-      <div className="flex items-center gap-2 border-b border-neutral-800 p-2.5" style={{ borderTopColor: team.color }}>
+      <div className="flex items-center gap-2 border-b border-hairline p-2.5" style={{ borderTopColor: team.color }}>
         <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: team.color }} />
         {state.phase === "config" ? (
           <input
             value={team.name}
             onChange={(e) => onRename(e.target.value)}
             onClick={(e) => e.stopPropagation()}
-            className="min-w-0 flex-1 rounded bg-transparent text-sm font-semibold outline-none focus:bg-neutral-950 focus:px-1"
+            className="min-w-0 flex-1 rounded bg-transparent text-sm font-semibold outline-none focus:bg-canvas focus:px-1"
           />
         ) : (
           <span className="min-w-0 flex-1 truncate text-sm font-semibold">{team.name}</span>
         )}
-        <span className="shrink-0 text-xs text-neutral-500">
+        <span className="shrink-0 text-xs text-ink-subtle">
           {members.length}/{state.targetSize}
         </span>
         {state.phase === "config" && (
-          <button onClick={(e) => (e.stopPropagation(), onRemove())} className="shrink-0 text-neutral-600 hover:text-red-400" title="Удалить команду">
+          <button onClick={(e) => (e.stopPropagation(), onRemove())} className="shrink-0 text-ink-subtle hover:text-red-400" title="Удалить команду">
             ✕
           </button>
         )}
@@ -586,10 +586,10 @@ function TeamColumn({
       {/* Значки использованных спец-действий */}
       {state.phase !== "config" && (
         <div className="flex gap-1.5 px-2.5 pt-2 text-[10px]">
-          <span className={`rounded px-1.5 py-0.5 ${team.usedLock ? "bg-neutral-800 text-neutral-500 line-through" : "bg-sky-500/15 text-sky-300"}`}>
+          <span className={`rounded px-1.5 py-0.5 ${team.usedLock ? "bg-surface-2 text-ink-subtle line-through" : "bg-sky-500/15 text-sky-300"}`}>
             Закрепить
           </span>
-          <span className={`rounded px-1.5 py-0.5 ${team.usedSteal ? "bg-neutral-800 text-neutral-500 line-through" : "bg-fuchsia-500/15 text-fuchsia-300"}`}>
+          <span className={`rounded px-1.5 py-0.5 ${team.usedSteal ? "bg-surface-2 text-ink-subtle line-through" : "bg-fuchsia-500/15 text-fuchsia-300"}`}>
             Украсть
           </span>
         </div>
@@ -597,7 +597,7 @@ function TeamColumn({
 
       {/* Состав */}
       <div className="flex-1 space-y-1 p-2">
-        {members.length === 0 && <div className="px-1 py-3 text-center text-xs text-neutral-600">Нет игроков</div>}
+        {members.length === 0 && <div className="px-1 py-3 text-center text-xs text-ink-subtle">Нет игроков</div>}
         {members.map((pid) => {
           const p = poolById.get(pid);
           if (!p) return null;
@@ -607,7 +607,7 @@ function TeamColumn({
           // украсть можно, когда сейчас ходит ДРУГАЯ команда и правило разрешает
           const stealable = curTeamId != null && curTeamId !== team.id && canSteal(state, team.id, pid);
           return (
-            <div key={pid} className="flex items-center gap-1 rounded-md border border-neutral-800 bg-neutral-950/50">
+            <div key={pid} className="flex items-center gap-1 rounded-md border border-hairline bg-canvas/50">
               <div className="min-w-0 flex-1">
                 <PlayerRow player={p} />
               </div>
@@ -632,7 +632,7 @@ function TeamColumn({
           );
         })}
         {!full && state.phase === "draft" && (
-          <div className="rounded border border-dashed border-neutral-800 px-1 py-2 text-center text-[11px] text-neutral-600">
+          <div className="rounded border border-dashed border-hairline px-1 py-2 text-center text-[11px] text-ink-subtle">
             {isCurrent ? "Перетащите сюда игрока" : "Ждёт своей очереди"}
           </div>
         )}
@@ -661,7 +661,7 @@ function ConfigControls({
 }) {
   const activeName = activeTeamId ? teamById(state, activeTeamId)?.name : null;
   return (
-    <div className="space-y-3 rounded-lg border border-neutral-800 bg-neutral-900/40 p-3">
+    <div className="space-y-3 rounded-lg border border-hairline bg-surface-1/40 p-3">
       <div className="flex flex-wrap items-center gap-4">
         <label className="flex items-center gap-2 text-sm">
           Размер состава
@@ -671,14 +671,14 @@ function ConfigControls({
             max={5}
             value={state.targetSize}
             onChange={(e) => onTargetSize(Math.max(2, Math.min(5, Number(e.target.value) || 2)))}
-            className="w-16 rounded border border-neutral-800 bg-neutral-950 px-2 py-1 text-sm"
+            className="w-16 rounded border border-hairline bg-canvas px-2 py-1 text-sm"
           />
         </label>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={state.snake} onChange={(e) => onSnake(e.target.checked)} />
           Змейка (1→N, N→1)
         </label>
-        <button onClick={onAddTeam} className="rounded-md border border-neutral-700 px-3 py-1.5 text-sm hover:border-amber-600">
+        <button onClick={onAddTeam} className="rounded-md border border-hairline-strong px-3 py-1.5 text-sm hover:border-amber-600">
           + Команда
         </button>
         <button
@@ -690,7 +690,7 @@ function ConfigControls({
           Начать драфт
         </button>
       </div>
-      <p className="text-xs text-neutral-500">
+      <p className="text-xs text-ink-subtle">
         {blocker
           ? blocker
           : `Кликните по команде, чтобы выбрать активную${

@@ -72,7 +72,7 @@ export function Generator() {
           options={Array.from({ length: MAX_IMAGES }, (_, i) => ({ value: String(i + 1), label: String(i + 1) }))}
         />
 
-        <div className="rounded border border-neutral-800 bg-neutral-900/40 p-3">
+        <div className="rounded border border-hairline bg-surface-1/40 p-3">
           <label className="flex cursor-pointer items-center gap-2">
             <input
               type="checkbox"
@@ -80,9 +80,9 @@ export function Generator() {
               onChange={(e) => setUseRefs(e.target.checked)}
               className="h-4 w-4 accent-violet-600"
             />
-            <span className="text-sm text-neutral-200">Использовать как референс</span>
+            <span className="text-sm text-ink">Использовать как референс</span>
           </label>
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-ink-subtle">
             С референсом модель правит присланные картинки, а не рисует с нуля. До {MAX_REFERENCES} файлов.
           </p>
 
@@ -92,11 +92,11 @@ export function Generator() {
                 type="file"
                 multiple
                 accept="image/png,image/jpeg,image/webp"
-                className="block w-full text-xs text-neutral-400 file:mr-3 file:rounded file:border-0 file:bg-neutral-800 file:px-3 file:py-1.5 file:text-neutral-200"
+                className="block w-full text-xs text-ink-muted file:mr-3 file:rounded file:border-0 file:bg-surface-2 file:px-3 file:py-1.5 file:text-ink"
                 onChange={(e) => setRefs(Array.from(e.target.files ?? []).slice(0, MAX_REFERENCES))}
               />
               {refs.length > 0 && (
-                <ul className="mt-2 space-y-0.5 text-xs text-neutral-500">
+                <ul className="mt-2 space-y-0.5 text-xs text-ink-subtle">
                   {refs.map((f) => (
                     <li key={f.name} className="truncate">
                       {f.name}
@@ -113,11 +113,11 @@ export function Generator() {
             type="button"
             disabled={!canRun}
             onClick={() => void run()}
-            className="rounded bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-50"
+            className="rounded bg-accent px-4 py-2 text-sm font-medium text-accent-contrast hover:bg-accent-bright disabled:opacity-50"
           >
             {busy ? "Рисую…" : `Сгенерировать${n > 1 ? ` ×${n}` : ""}`}
           </button>
-          {busy && <span className="text-sm text-neutral-500">высокое качество считается до минуты</span>}
+          {busy && <span className="text-sm text-ink-subtle">высокое качество считается до минуты</span>}
         </div>
 
         {error && (
@@ -127,21 +127,21 @@ export function Generator() {
 
       <div>
         {results.length === 0 ? (
-          <div className="grid h-[45vh] place-items-center rounded border border-dashed border-neutral-800 text-sm text-neutral-600 lg:h-[calc(100vh-14rem)]">
+          <div className="grid h-[45vh] place-items-center rounded border border-dashed border-hairline text-sm text-ink-subtle lg:h-[calc(100vh-14rem)]">
             Здесь появятся картинки
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             {results.map((src) => (
-              <figure key={src} className="overflow-hidden rounded border border-neutral-800 bg-neutral-950">
+              <figure key={src} className="overflow-hidden rounded border border-hairline bg-canvas">
                 {/* локальный файл из public/uploads — оптимизация next/image здесь не нужна */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={src} alt="" className="block w-full" />
                 <figcaption className="flex items-center justify-between px-3 py-2 text-xs">
-                  <a href={src} download className="text-violet-400 hover:underline">
+                  <a href={src} download className="text-accent-bright hover:underline">
                     скачать
                   </a>
-                  <a href={src} target="_blank" rel="noreferrer" className="text-neutral-500 hover:text-neutral-300">
+                  <a href={src} target="_blank" rel="noreferrer" className="text-ink-subtle hover:text-ink-muted">
                     открыть
                   </a>
                 </figcaption>
@@ -150,7 +150,7 @@ export function Generator() {
           </div>
         )}
         {results.length > 0 && (
-          <p className="mt-2 text-xs text-neutral-600">
+          <p className="mt-2 text-xs text-ink-subtle">
             Файлы лежат в <code>public/uploads/generated/</code> — они вне git, чистить вручную.
           </p>
         )}

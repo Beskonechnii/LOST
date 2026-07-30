@@ -29,7 +29,7 @@ export default function RootLayout({
     >
       {/* Навигации здесь намеренно нет: она своя у каждой группы маршрутов —
           (public)/layout.tsx для продукта и (admin)/layout.tsx для служебной части. */}
-      <body className="flex min-h-full flex-col bg-neutral-950 text-neutral-100">{children}</body>
+      <body className="flex min-h-full flex-col bg-canvas font-sans text-ink">{children}</body>
     </html>
   );
 }

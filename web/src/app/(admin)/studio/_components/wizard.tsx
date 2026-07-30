@@ -110,10 +110,10 @@ function WizardForm({
     <div className="grid items-start gap-8 lg:grid-cols-[minmax(300px,380px)_minmax(0,1fr)]">
       <div className="space-y-5">
         {matches.length > 0 && (
-          <div className="rounded border border-neutral-800 bg-neutral-900/40 p-3">
+          <div className="rounded border border-hairline bg-surface-1/40 p-3">
             <Label>Взять из матча</Label>
             <select
-              className="w-full rounded border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-violet-500"
+              className="w-full rounded border border-hairline bg-surface-1 px-3 py-2 text-sm text-ink outline-none focus:border-accent-bright"
               defaultValue=""
               onChange={(e) => {
                 const m = matches.find((x) => String(x.id) === e.target.value);
@@ -162,18 +162,18 @@ function WizardForm({
             type="button"
             disabled={busy}
             onClick={() => void exportPng()}
-            className="rounded bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-50"
+            className="rounded bg-accent px-4 py-2 text-sm font-medium text-accent-contrast hover:bg-accent-bright disabled:opacity-50"
           >
             {busy ? "Готовлю PNG…" : `Скачать PNG ${size.w}×${size.h}`}
           </button>
           <button
             type="button"
             onClick={() => void save()}
-            className="rounded border border-neutral-700 px-4 py-2 text-sm text-neutral-300 hover:border-neutral-500"
+            className="rounded border border-hairline-strong px-4 py-2 text-sm text-ink-muted hover:border-hairline-strong"
           >
             Сохранить в историю
           </button>
-          {saved && <span className="text-sm text-neutral-400">{saved}</span>}
+          {saved && <span className="text-sm text-ink-muted">{saved}</span>}
         </div>
       </div>
 
@@ -184,7 +184,7 @@ function WizardForm({
             <Render data={data} />
           </Canvas>
         </div>
-        <p className="mt-2 text-center text-xs text-neutral-600">
+        <p className="mt-2 text-center text-xs text-ink-subtle">
           Превью масштабировано; PNG выгружается в натуральных {size.w}×{size.h}.
         </p>
       </div>
@@ -262,14 +262,14 @@ function GroupField({
       <div className="flex items-center justify-between">
         <Label>{field.label}</Label>
         {rows.length < field.max && (
-          <button type="button" onClick={onAdd} className="text-xs text-violet-400 hover:underline">
+          <button type="button" onClick={onAdd} className="text-xs text-accent-bright hover:underline">
             + добавить
           </button>
         )}
       </div>
       {rows.map((row, i) => (
-        <div key={i} className="space-y-3 rounded border border-neutral-800 bg-neutral-900/40 p-3">
-          <div className="flex items-center justify-between text-xs text-neutral-500">
+        <div key={i} className="space-y-3 rounded border border-hairline bg-surface-1/40 p-3">
+          <div className="flex items-center justify-between text-xs text-ink-subtle">
             <span>#{i + 1}</span>
             <button type="button" onClick={() => onRemove(i)} className="hover:text-rose-400">
               убрать

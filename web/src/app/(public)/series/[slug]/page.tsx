@@ -37,13 +37,13 @@ function SeriesSide({ team, winnerId, align }: { team: Team; winnerId: number | 
     <div className={`flex min-w-0 flex-1 items-center gap-3 ${align === "right" ? "flex-row-reverse text-right" : ""}`}>
       <TeamCrest logo={team.logo} name={team.name} size={56} />
       <div className="min-w-0">
-        <div className="text-[11px] uppercase tracking-widest text-neutral-500">{team.tag}</div>
+        <div className="text-[11px] uppercase tracking-widest text-ink-subtle">{team.tag}</div>
         <Link
           href={`/roster/teams/${team.id}`}
           className={`block truncate text-lg font-bold hover:underline ${
             winnerId === team.id ? "text-emerald-400"
-            : winnerId ? "text-neutral-400"
-            : "text-neutral-200"
+            : winnerId ? "text-ink-muted"
+            : "text-ink"
           }`}
         >
           {team.name}
@@ -58,16 +58,16 @@ function PlayerRow({ p, won }: { p: GamePlayer; won: boolean }) {
     <div className="flex items-center gap-2 py-1">
       {p.heroSlug ?
         <Icon kind="heroes" slug={p.heroSlug} name={p.heroSlug} h={22} />
-      : <span className="h-[22px] w-[39px] shrink-0 rounded-sm bg-neutral-800" />}
-      <span className="w-5 shrink-0 text-center text-[11px] tabular-nums text-neutral-500" title="уровень">
+      : <span className="h-[22px] w-[39px] shrink-0 rounded-sm bg-surface-2" />}
+      <span className="w-5 shrink-0 text-center text-[11px] tabular-nums text-ink-subtle" title="уровень">
         {p.level || "—"}
       </span>
-      <span className={`truncate text-sm ${won ? "text-neutral-200" : "text-neutral-400"}`}>{p.nickname}</span>
+      <span className={`truncate text-sm ${won ? "text-ink" : "text-ink-muted"}`}>{p.nickname}</span>
       <span className="ml-auto shrink-0 text-xs tabular-nums">
         <span className="text-emerald-400">{p.kills}</span>
-        <span className="text-neutral-600"> / </span>
+        <span className="text-ink-subtle"> / </span>
         <span className="text-rose-400">{p.deaths}</span>
-        <span className="text-neutral-600"> / </span>
+        <span className="text-ink-subtle"> / </span>
         <span className="text-sky-400">{p.assists}</span>
       </span>
     </div>
@@ -81,22 +81,22 @@ function GameTeam({ team, game, firstPickTeamId }: { team: Team; game: SeriesGam
   const players = game.byTeam[team.id] ?? [];
   return (
     <div className="min-w-0 flex-1">
-      <div className="mb-1 flex flex-wrap items-baseline gap-2 border-b border-neutral-800 pb-1">
-        <span className={`text-sm font-bold ${won ? "text-emerald-400" : "text-neutral-400"}`}>{team.name}</span>
+      <div className="mb-1 flex flex-wrap items-baseline gap-2 border-b border-hairline pb-1">
+        <span className={`text-sm font-bold ${won ? "text-emerald-400" : "text-ink-muted"}`}>{team.name}</span>
         {game.radiantTeamId != null && (
           <span className={`text-[10px] uppercase tracking-widest ${isRadiant ? "text-emerald-500/80" : "text-rose-500/80"}`}>
             {isRadiant ? "Свет" : "Тьма"}
           </span>
         )}
-        {firstPickTeamId === team.id && <span className="text-[10px] text-neutral-500">первый пик</span>}
+        {firstPickTeamId === team.id && <span className="text-[10px] text-ink-subtle">первый пик</span>}
         {won && <span className="ml-auto text-[10px] uppercase tracking-widest text-emerald-500">победа</span>}
       </div>
       {players.length ?
         players.map((p) => <PlayerRow key={p.playerId} p={p} won={won} />)
-      : <p className="py-2 text-[11px] text-neutral-600">Игроков этой команды нет в ростере — стата не легла.</p>}
+      : <p className="py-2 text-[11px] text-ink-subtle">Игроков этой команды нет в ростере — стата не легла.</p>}
       {/* В архив попадают только игроки лиги: у стендина нет анкеты, а значит и строки статы. */}
       {players.length > 0 && players.length < 5 && (
-        <p className="pt-1 text-[10px] text-neutral-600">
+        <p className="pt-1 text-[10px] text-ink-subtle">
           ещё {5 - players.length} в ростере не заведён{5 - players.length > 1 ? "ы" : ""}
         </p>
       )}
@@ -115,23 +115,23 @@ function GameCard({ game, home, away }: { game: SeriesGameDetail; home: Team; aw
     : away.id;
 
   return (
-    <section className="overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900/40">
-      <div className="flex flex-wrap items-center gap-3 border-b border-neutral-800 bg-neutral-900/60 px-4 py-2">
-        <span className="text-sm font-bold text-neutral-300">#{game.gameNumber ?? "?"}</span>
+    <section className="overflow-hidden rounded-xl border border-hairline bg-surface-1/40">
+      <div className="flex flex-wrap items-center gap-3 border-b border-hairline bg-surface-1/60 px-4 py-2">
+        <span className="text-sm font-bold text-ink-muted">#{game.gameNumber ?? "?"}</span>
         {game.openDotaMatchId && (
-          <Link href={`/match/${game.openDotaMatchId}`} className="text-xs text-violet-400 hover:underline">
+          <Link href={`/match/${game.openDotaMatchId}`} className="text-xs text-accent-bright hover:underline">
             {game.openDotaMatchId}
           </Link>
         )}
-        <span className="text-xs tabular-nums text-neutral-500">{clock(game.durationSec)}</span>
+        <span className="text-xs tabular-nums text-ink-subtle">{clock(game.durationSec)}</span>
         {homeKills != null && awayKills != null && (
           <span className="text-sm font-bold tabular-nums">
-            <span className={game.winnerTeamId === home.id ? "text-emerald-400" : "text-neutral-500"}>{homeKills}</span>
-            <span className="mx-1 text-neutral-700">—</span>
-            <span className={game.winnerTeamId === away.id ? "text-emerald-400" : "text-neutral-500"}>{awayKills}</span>
+            <span className={game.winnerTeamId === home.id ? "text-emerald-400" : "text-ink-subtle"}>{homeKills}</span>
+            <span className="mx-1 text-ink-subtle">—</span>
+            <span className={game.winnerTeamId === away.id ? "text-emerald-400" : "text-ink-subtle"}>{awayKills}</span>
           </span>
         )}
-        {game.startedAt && <span className="ml-auto text-[11px] text-neutral-600">{dateFmt.format(game.startedAt)}</span>}
+        {game.startedAt && <span className="ml-auto text-[11px] text-ink-subtle">{dateFmt.format(game.startedAt)}</span>}
       </div>
       <div className="flex flex-col gap-4 p-4 md:flex-row md:gap-8">
         <GameTeam team={home} game={game} firstPickTeamId={firstPickTeamId} />
@@ -158,27 +158,27 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
       <div className="mx-auto max-w-4xl space-y-4">
         <BackButton fallback={`/standings/${div}`} />
         {/* шапка-крошки: дивизион и разрез — то, что на Dotabuff занимает строку лиги */}
-        <div className="!mt-3 flex flex-wrap items-center justify-between gap-2 rounded-t-xl border border-neutral-800 bg-neutral-900/60 px-4 py-2">
+        <div className="!mt-3 flex flex-wrap items-center justify-between gap-2 rounded-t-xl border border-hairline bg-surface-1/60 px-4 py-2">
           <div className="flex flex-wrap items-center gap-2 text-sm">
-            <Link href={`/standings/${div}`} className="font-medium text-violet-400 hover:underline">
+            <Link href={`/standings/${div}`} className="font-medium text-accent-bright hover:underline">
               {s.division}
             </Link>
-            <span className="text-neutral-700">·</span>
-            <span className="text-neutral-400">{cutLabel(s)}</span>
+            <span className="text-ink-subtle">·</span>
+            <span className="text-ink-muted">{cutLabel(s)}</span>
           </div>
-          <span className="text-xs text-neutral-600">{s.slug}</span>
+          <span className="text-xs text-ink-subtle">{s.slug}</span>
         </div>
 
-        <div className="!mt-0 rounded-b-xl border border-t-0 border-neutral-800 bg-neutral-900/40 p-4">
+        <div className="!mt-0 rounded-b-xl border border-t-0 border-hairline bg-surface-1/40 p-4">
           <div className="flex items-center gap-4">
             <SeriesSide team={s.home} winnerId={winner} align="left" />
             <div className="shrink-0 text-center">
               <div className="text-3xl font-black tabular-nums">
-                <span className={winner === s.home.id ? "text-emerald-400" : "text-neutral-400"}>{s.homeScore}</span>
-                <span className="mx-2 text-neutral-700">—</span>
-                <span className={winner === s.away.id ? "text-emerald-400" : "text-neutral-400"}>{s.awayScore}</span>
+                <span className={winner === s.home.id ? "text-emerald-400" : "text-ink-muted"}>{s.homeScore}</span>
+                <span className="mx-2 text-ink-subtle">—</span>
+                <span className={winner === s.away.id ? "text-emerald-400" : "text-ink-muted"}>{s.awayScore}</span>
               </div>
-              <div className="mt-1 text-[11px] text-neutral-500">
+              <div className="mt-1 text-[11px] text-ink-subtle">
                 {bo}
                 {s.playedAt ? ` · ${dateFmt.format(s.playedAt)}` : ""}
               </div>
@@ -188,10 +188,10 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
           </div>
         </div>
 
-        <h2 className="pt-2 text-xs uppercase tracking-widest text-neutral-400">Карты</h2>
+        <h2 className="pt-2 text-xs uppercase tracking-widest text-ink-muted">Карты</h2>
 
         {s.games.length === 0 && (
-          <p className="rounded-lg border border-dashed border-neutral-800 p-6 text-sm text-neutral-400">
+          <p className="rounded-lg border border-dashed border-hairline p-6 text-sm text-ink-muted">
             К этой встрече ещё не привязано ни одной карты — известен только счёт серии.
           </p>
         )}

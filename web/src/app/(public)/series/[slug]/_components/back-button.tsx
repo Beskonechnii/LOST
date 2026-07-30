@@ -10,7 +10,7 @@ export function BackButton({ fallback }: { fallback: string }) {
   return (
     <button
       onClick={() => (typeof window !== "undefined" && window.history.length > 1 ? router.back() : router.push(fallback))}
-      className="inline-flex items-center gap-1 rounded-md border border-neutral-800 px-2.5 py-1 text-xs text-neutral-400 transition hover:border-violet-500 hover:bg-violet-500/10 hover:text-violet-200"
+      className="inline-flex items-center gap-1 rounded-md border border-hairline px-2.5 py-1 text-xs text-ink-muted transition hover:border-accent-bright hover:bg-accent-bright/10 hover:text-accent-bright"
     >
       ← Назад
     </button>

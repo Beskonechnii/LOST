@@ -32,7 +32,7 @@ export function DraftList({ sessions }: { sessions: Item[] }) {
 
   if (items.length === 0) {
     return (
-      <p className="rounded border border-dashed border-neutral-800 p-8 text-center text-sm text-neutral-600">
+      <p className="rounded border border-dashed border-hairline p-8 text-center text-sm text-ink-subtle">
         Пока нет ни одного драфта. Нажми «Новый драфт», чтобы собрать команды.
       </p>
     );
@@ -46,7 +46,7 @@ export function DraftList({ sessions }: { sessions: Item[] }) {
           <li key={s.id} className="group relative">
             <Link
               href={`/underbeer/${s.id}`}
-              className="block rounded border border-neutral-800 bg-neutral-900/40 p-4 transition-colors hover:border-amber-600"
+              className="block rounded border border-hairline bg-surface-1/40 p-4 transition-colors hover:border-amber-600"
             >
               <div className="flex items-center justify-between gap-2 pr-16">
                 <span className="truncate font-semibold">{label}</span>
@@ -58,7 +58,7 @@ export function DraftList({ sessions }: { sessions: Item[] }) {
                   {s.status === "done" ? "Собран" : "Черновик"}
                 </span>
               </div>
-              <div className="mt-2 text-xs text-neutral-600">Обновлён {s.updated}</div>
+              <div className="mt-2 text-xs text-ink-subtle">Обновлён {s.updated}</div>
             </Link>
 
             {/* Удаление — кнопки поверх карточки, отдельно от ссылки (кнопку в ссылку вкладывать нельзя) */}
@@ -73,7 +73,7 @@ export function DraftList({ sessions }: { sessions: Item[] }) {
                 </button>
                 <button
                   onClick={() => setConfirmId(null)}
-                  className="rounded px-1.5 py-0.5 text-[11px] text-neutral-400 hover:text-neutral-200"
+                  className="rounded px-1.5 py-0.5 text-[11px] text-ink-muted hover:text-ink"
                 >
                   Отмена
                 </button>
@@ -82,7 +82,7 @@ export function DraftList({ sessions }: { sessions: Item[] }) {
               <button
                 onClick={() => setConfirmId(s.id)}
                 title="Удалить драфт"
-                className="absolute right-2 top-2 rounded p-1 text-neutral-600 opacity-0 transition-opacity hover:text-red-400 focus-visible:opacity-100 group-hover:opacity-100"
+                className="absolute right-2 top-2 rounded p-1 text-ink-subtle opacity-0 transition-opacity hover:text-red-400 focus-visible:opacity-100 group-hover:opacity-100"
               >
                 ✕
               </button>

@@ -19,21 +19,21 @@ const clock = (sec: number | null) => (sec ? `${Math.floor(sec / 60)}:${String(s
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="text-[10px] uppercase tracking-widest text-neutral-500">{label}</span>
+      <span className="text-[10px] uppercase tracking-widest text-ink-subtle">{label}</span>
       {children}
     </label>
   );
 }
 
 const input =
-  "rounded-md border border-neutral-800 bg-neutral-950 px-2 py-1.5 text-sm outline-none focus:border-violet-600";
+  "rounded-md border border-hairline bg-canvas px-2 py-1.5 text-sm outline-none focus:border-accent";
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
       onClick={onClick}
       className={`rounded-md px-2.5 py-1 text-xs transition ${
-        active ? "bg-violet-600 font-medium text-white" : "border border-neutral-800 text-neutral-400 hover:border-violet-600 hover:text-neutral-200"
+        active ? "bg-accent font-medium text-accent-contrast" : "border border-hairline text-ink-muted hover:border-accent hover:text-ink"
       }`}
     >
       {children}
@@ -55,8 +55,8 @@ function ActionBtn({
   children: React.ReactNode;
 }) {
   const tones = {
-    neutral: "border-neutral-700 text-neutral-300 hover:border-violet-500 hover:bg-violet-500/10 hover:text-violet-200",
-    danger: "border-neutral-700 text-neutral-400 hover:border-rose-500 hover:bg-rose-500/10 hover:text-rose-300",
+    neutral: "border-hairline-strong text-ink-muted hover:border-accent-bright hover:bg-accent-bright/10 hover:text-accent-bright",
+    danger: "border-hairline-strong text-ink-muted hover:border-rose-500 hover:bg-rose-500/10 hover:text-rose-300",
     armed: "border-rose-500 bg-rose-500/15 text-rose-300",
   };
   return (
@@ -93,7 +93,7 @@ function AttachGame({ seriesId, nextNumber, onDone }: { seriesId: number; nextNu
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="text-[11px] text-neutral-500">карта {nextNumber}:</span>
+      <span className="text-[11px] text-ink-subtle">карта {nextNumber}:</span>
       <input
         value={matchId}
         onChange={(e) => setMatchId(e.target.value)}
@@ -104,7 +104,7 @@ function AttachGame({ seriesId, nextNumber, onDone }: { seriesId: number; nextNu
       <button
         onClick={submit}
         disabled={busy || !matchId.trim()}
-        className="rounded-md bg-violet-600 px-2.5 py-1.5 text-xs font-medium disabled:opacity-40"
+        className="rounded-md bg-accent px-2.5 py-1.5 text-xs font-medium disabled:opacity-40"
       >
         {busy ? "Читаю…" : "Привязать"}
       </button>
@@ -156,20 +156,20 @@ function SeriesCard({ s, onChange }: { s: SeriesRow; onChange: () => void }) {
   const cut = s.stage === "group" ? `Группа ${s.group ?? "—"}` : playoffLabel(s.bracket, s.round);
 
   return (
-    <div className={`rounded-lg border border-neutral-800 bg-neutral-900/40 p-3 ${busy ? "opacity-60" : ""}`}>
+    <div className={`rounded-lg border border-hairline bg-surface-1/40 p-3 ${busy ? "opacity-60" : ""}`}>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded bg-neutral-800 px-1.5 py-0.5 text-[10px] uppercase tracking-widest text-neutral-400">
+        <span className="rounded bg-surface-2 px-1.5 py-0.5 text-[10px] uppercase tracking-widest text-ink-muted">
           {cut || stageLabel(s.stage)}
         </span>
-        <Link href={`/series/${s.slug}`} className="text-sm font-medium hover:text-violet-400 hover:underline">
+        <Link href={`/series/${s.slug}`} className="text-sm font-medium hover:text-accent-bright hover:underline">
           {s.home.name}
-          <span className="mx-2 font-bold tabular-nums text-neutral-200">
+          <span className="mx-2 font-bold tabular-nums text-ink">
             {s.homeScore}:{s.awayScore}
           </span>
           {s.away.name}
         </Link>
         {s.guessed && <span className="text-[10px] text-amber-400">счёт под вопросом</span>}
-        {s.games.length > 0 && <span className="text-[10px] text-neutral-600">карт: {s.games.length}</span>}
+        {s.games.length > 0 && <span className="text-[10px] text-ink-subtle">карт: {s.games.length}</span>}
 
         <span className="ml-auto flex items-center gap-2">
           {confirming && (
@@ -186,17 +186,17 @@ function SeriesCard({ s, onChange }: { s: SeriesRow; onChange: () => void }) {
       {error && <p className="mt-1 text-xs text-rose-400">{error}</p>}
 
       <div className="mt-2 space-y-1">
-        {s.games.length === 0 && <p className="text-[11px] text-neutral-600">Карт пока нет — стата в рейтинги не идёт.</p>}
+        {s.games.length === 0 && <p className="text-[11px] text-ink-subtle">Карт пока нет — стата в рейтинги не идёт.</p>}
         {s.games.map((g) => (
-          <div key={g.matchId} className="flex flex-wrap items-center gap-2 text-xs text-neutral-400">
-            <span className="w-12 shrink-0 text-neutral-600">карта {g.gameNumber ?? "?"}</span>
+          <div key={g.matchId} className="flex flex-wrap items-center gap-2 text-xs text-ink-muted">
+            <span className="w-12 shrink-0 text-ink-subtle">карта {g.gameNumber ?? "?"}</span>
             {g.openDotaMatchId ?
-              <Link href={`/match/${g.openDotaMatchId}`} className="text-violet-400 hover:underline">
+              <Link href={`/match/${g.openDotaMatchId}`} className="text-accent-bright hover:underline">
                 #{g.openDotaMatchId}
               </Link>
-            : <span className="text-neutral-600">без id</span>}
-            <span className="tabular-nums text-neutral-500">{clock(g.durationSec)}</span>
-            <span className={g.statsCount ? "text-neutral-500" : "text-amber-400"}>
+            : <span className="text-ink-subtle">без id</span>}
+            <span className="tabular-nums text-ink-subtle">{clock(g.durationSec)}</span>
+            <span className={g.statsCount ? "text-ink-subtle" : "text-amber-400"}>
               {g.statsCount ? `стата: ${g.statsCount} игроков` : "стата не легла — игроков нет в ростере"}
             </span>
             <span className="ml-auto flex items-center gap-2">
@@ -295,9 +295,9 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold tracking-tight">Архив серий</h1>
         <div className="flex flex-wrap items-center gap-4">
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-ink-subtle">
             Карты, привязанные здесь, попадают в{" "}
-            <Link href="/standings/d1/stats" className="text-violet-400 hover:underline">
+            <Link href="/standings/d1/stats" className="text-accent-bright hover:underline">
               статистику турнира
             </Link>
           </p>
@@ -306,7 +306,7 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
               setError(null);
               setShowForm(true);
             }}
-            className="rounded-md bg-violet-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-violet-500"
+            className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-contrast transition hover:bg-accent-bright"
           >
             + Завести встречу
           </button>
@@ -320,15 +320,15 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
           onClick={() => setShowForm(false)}
         >
           <section
-            className="mt-16 w-full max-w-3xl rounded-xl border border-neutral-800 bg-neutral-900 p-5 shadow-2xl"
+            className="mt-16 w-full max-w-3xl rounded-xl border border-hairline bg-surface-1 p-5 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-neutral-200">Новая встреча</h2>
+              <h2 className="text-base font-semibold text-ink">Новая встреча</h2>
               <button
                 onClick={() => setShowForm(false)}
                 aria-label="Закрыть"
-                className="rounded-md border border-neutral-700 px-2 py-0.5 text-sm text-neutral-400 transition hover:border-neutral-500 hover:text-neutral-200"
+                className="rounded-md border border-hairline-strong px-2 py-0.5 text-sm text-ink-muted transition hover:border-hairline-strong hover:text-ink"
               >
                 ✕
               </button>
@@ -401,7 +401,7 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
               <button
                 onClick={create}
                 disabled={busy || !homeId || !awayId}
-                className="rounded-md bg-violet-600 px-3 py-1.5 text-sm font-medium transition hover:bg-violet-500 disabled:opacity-40"
+                className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium transition hover:bg-accent-bright disabled:opacity-40"
               >
                 {busy ? "…" : "Завести"}
               </button>
@@ -413,7 +413,7 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
 
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="mr-1 text-[10px] uppercase tracking-widest text-neutral-600">Разрез</span>
+          <span className="mr-1 text-[10px] uppercase tracking-widest text-ink-subtle">Разрез</span>
           <Chip active={!cutKey} onClick={() => setCutKey(null)}>
             Весь турнир
           </Chip>
@@ -446,11 +446,11 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
 
       {byDivision.map((d) => (
         <section key={d.name} className="space-y-2">
-          <h2 className="text-sm uppercase tracking-widest text-neutral-400">
-            {d.label} <span className="text-neutral-600">· встреч: {d.rows.length}</span>
+          <h2 className="text-sm uppercase tracking-widest text-ink-muted">
+            {d.label} <span className="text-ink-subtle">· встреч: {d.rows.length}</span>
           </h2>
           {d.rows.length === 0 ?
-            <p className="text-xs text-neutral-600">Пусто.</p>
+            <p className="text-xs text-ink-subtle">Пусто.</p>
           : d.rows.map((s) => <SeriesCard key={s.id} s={s} onChange={refresh} />)}
         </section>
       ))}

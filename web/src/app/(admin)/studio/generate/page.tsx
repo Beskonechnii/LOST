@@ -10,7 +10,7 @@ export default function GeneratePage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Генерация по API</h1>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-ink-subtle">
           Картинки от OpenAI по промту. Каждая генерация — платная, счёт идёт на аккаунт из ключа.
         </p>
       </div>

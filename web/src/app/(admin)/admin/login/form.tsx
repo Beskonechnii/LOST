@@ -17,12 +17,12 @@ export function LoginForm({ next }: { next: string }) {
         autoFocus
         autoComplete="current-password"
         placeholder="Пароль"
-        className="w-full rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-neutral-500"
+        className="w-full rounded-md border border-hairline-strong bg-surface-1 px-3 py-2 text-sm outline-none focus:border-hairline-strong"
       />
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-md bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-50"
+        className="w-full rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-contrast hover:bg-accent-bright disabled:opacity-50"
       >
         {pending ? "Проверяю…" : "Войти"}
       </button>

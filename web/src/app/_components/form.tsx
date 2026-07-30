@@ -8,11 +8,11 @@ import type { UploadKind } from "@/lib/profiles";
 // Данные читают серверные страницы, пишут — эти компоненты через /api/studio/*.
 
 export function Label({ children }: { children: React.ReactNode }) {
-  return <span className="mb-1 block text-xs uppercase tracking-widest text-neutral-500">{children}</span>;
+  return <span className="mb-1 block text-xs uppercase tracking-widest text-ink-subtle">{children}</span>;
 }
 
 const inputCls =
-  "w-full rounded border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-violet-500";
+  "w-full rounded border border-hairline bg-surface-1 px-3 py-2 text-sm text-ink outline-none focus:border-accent-bright";
 
 export function TextField(props: {
   label: string;
@@ -32,7 +32,7 @@ export function TextField(props: {
         placeholder={props.placeholder}
         onChange={(e) => props.onChange(e.target.value)}
       />
-      {props.hint && <span className="mt-1 block text-xs text-neutral-600">{props.hint}</span>}
+      {props.hint && <span className="mt-1 block text-xs text-ink-subtle">{props.hint}</span>}
     </label>
   );
 }
@@ -106,30 +106,30 @@ export function ImageField(props: {
     <div>
       <Label>{props.label}</Label>
       <div className="flex items-center gap-3">
-        <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded border border-neutral-800 bg-neutral-900">
+        <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded border border-hairline bg-surface-1">
           {props.value ? (
             // локальный файл из public/uploads — оптимизация next/image здесь не нужна
             // eslint-disable-next-line @next/next/no-img-element
             <img src={props.value} alt="" className="h-full w-full object-contain" />
           ) : (
-            <span className="text-xs text-neutral-600">пусто</span>
+            <span className="text-xs text-ink-subtle">пусто</span>
           )}
         </div>
         <div className="text-sm">
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp"
-            className="block w-full text-xs text-neutral-400 file:mr-3 file:rounded file:border-0 file:bg-neutral-800 file:px-3 file:py-1.5 file:text-neutral-200"
+            className="block w-full text-xs text-ink-muted file:mr-3 file:rounded file:border-0 file:bg-surface-2 file:px-3 file:py-1.5 file:text-ink"
             onChange={(e) => {
               const f = e.target.files?.[0];
               if (f) void upload(f);
             }}
           />
-          {props.hint && <p className="mt-1 text-xs text-neutral-600">{props.hint}</p>}
-          {busy && <p className="mt-1 text-xs text-violet-400">Загружаю…</p>}
+          {props.hint && <p className="mt-1 text-xs text-ink-subtle">{props.hint}</p>}
+          {busy && <p className="mt-1 text-xs text-accent-bright">Загружаю…</p>}
           {error && <p className="mt-1 text-xs text-rose-400">{error}</p>}
           {props.value && (
-            <button type="button" className="mt-1 text-xs text-neutral-500 underline" onClick={() => props.onChange(null)}>
+            <button type="button" className="mt-1 text-xs text-ink-subtle underline" onClick={() => props.onChange(null)}>
               убрать
             </button>
           )}
@@ -150,7 +150,7 @@ export function SaveButton({ url, data, label = "Сохранить" }: { url: s
       <button
         type="button"
         disabled={pending}
-        className="rounded bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-50"
+        className="rounded bg-accent px-4 py-2 text-sm font-medium text-accent-contrast hover:bg-accent-bright disabled:opacity-50"
         onClick={() => {
           setMsg(null);
           start(async () => {
@@ -171,7 +171,7 @@ export function SaveButton({ url, data, label = "Сохранить" }: { url: s
       >
         {pending ? "…" : label}
       </button>
-      {msg && <span className="text-sm text-neutral-400">{msg}</span>}
+      {msg && <span className="text-sm text-ink-muted">{msg}</span>}
     </div>
   );
 }

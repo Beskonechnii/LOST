@@ -18,7 +18,7 @@ export default async function MatchPage() {
     <main className="flex-1 p-4 md:p-8">
       <div className="mx-auto max-w-6xl">
         <h1 className="text-lg font-bold tracking-tight">Разбор матча Dota 2</h1>
-        <p className="mt-1 max-w-2xl text-sm text-neutral-400">
+        <p className="mt-1 max-w-2xl text-sm text-ink-muted">
           Вставь ID матча — соберём постгейм-отчёт: счёт, драфт, скорборд, таланты, предметы и график
           преимущества. Данные из OpenDota, а если она лежит — из Steam. У отчёта постоянная ссылка,
           ей можно поделиться.

@@ -53,7 +53,7 @@ function Card({ entry, onOpen, onDropped }: { entry: ArchiveEntry; onOpen: () =>
   const date = new Date(entry.savedAt).toLocaleDateString("ru-RU");
 
   return (
-    <div className="group relative w-44 shrink-0 overflow-hidden rounded-lg border border-neutral-800 bg-neutral-900/60 transition-colors hover:border-neutral-600">
+    <div className="group relative w-44 shrink-0 overflow-hidden rounded-lg border border-hairline bg-surface-1/60 transition-colors hover:border-hairline-strong">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={cover}
@@ -63,17 +63,17 @@ function Card({ entry, onOpen, onDropped }: { entry: ArchiveEntry; onOpen: () =>
       />
       <div className="p-1.5 text-[11px] leading-tight">
         <div className="flex items-baseline gap-1">
-          <span className={`min-w-0 flex-1 truncate ${entry.radiantWin ? "text-neutral-100" : "text-neutral-500"}`}>
+          <span className={`min-w-0 flex-1 truncate ${entry.radiantWin ? "text-ink" : "text-ink-subtle"}`}>
             {entry.radiant}
           </span>
-          <span className="shrink-0 tabular-nums text-neutral-400">
+          <span className="shrink-0 tabular-nums text-ink-muted">
             {entry.radiantScore}–{entry.direScore}
           </span>
-          <span className={`min-w-0 flex-1 truncate text-right ${entry.radiantWin ? "text-neutral-500" : "text-neutral-100"}`}>
+          <span className={`min-w-0 flex-1 truncate text-right ${entry.radiantWin ? "text-ink-subtle" : "text-ink"}`}>
             {entry.dire}
           </span>
         </div>
-        <div className="mt-1 flex items-center gap-1.5 text-[10px] text-neutral-600">
+        <div className="mt-1 flex items-center gap-1.5 text-[10px] text-ink-subtle">
           <span>{date}</span>
           {/* Источник помечаем только у Steam: OpenDota — путь по умолчанию, метка была бы шумом. */}
           {entry.source === "steam" && <span>STEAM</span>}
@@ -85,7 +85,7 @@ function Card({ entry, onOpen, onDropped }: { entry: ArchiveEntry; onOpen: () =>
                 target="_blank"
                 rel="noreferrer"
                 title={`Открыть PNG: ${KIND_LABEL[kind]}`}
-                className="rounded bg-neutral-800 px-1 text-neutral-400 hover:text-neutral-100"
+                className="rounded bg-surface-2 px-1 text-ink-muted hover:text-ink"
               >
                 {KIND_LABEL[kind]}
               </a>
@@ -99,7 +99,7 @@ function Card({ entry, onOpen, onDropped }: { entry: ArchiveEntry; onOpen: () =>
         <button
           onClick={onOpen}
           title={`Разобрать матч #${entry.matchId} заново`}
-          className="rounded bg-black/70 px-1.5 py-0.5 text-[11px] text-neutral-300 hover:text-white"
+          className="rounded bg-black/70 px-1.5 py-0.5 text-[11px] text-ink-muted hover:text-white"
         >
           ↻
         </button>
@@ -107,7 +107,7 @@ function Card({ entry, onOpen, onDropped }: { entry: ArchiveEntry; onOpen: () =>
           onClick={() => void dropEntry(entry.matchId).then(onDropped)}
           title="Убрать из архива (удалит картинки)"
           aria-label={`Убрать матч ${entry.matchId} из архива`}
-          className="rounded bg-black/70 px-1.5 py-0.5 text-[11px] text-neutral-400 hover:text-rose-400"
+          className="rounded bg-black/70 px-1.5 py-0.5 text-[11px] text-ink-muted hover:text-rose-400"
         >
           ✕
         </button>
@@ -129,7 +129,7 @@ export function MatchArchive({
 
   return (
     <div className="mb-6">
-      <div className="mb-1.5 text-xs uppercase tracking-widest text-neutral-500">Архив выгрузок</div>
+      <div className="mb-1.5 text-xs uppercase tracking-widest text-ink-subtle">Архив выгрузок</div>
       <div className="flex gap-2 overflow-x-auto pb-1">
         {items.map((e) => (
           <Card key={e.matchId} entry={e} onOpen={() => onOpen(e)} onDropped={onChanged} />

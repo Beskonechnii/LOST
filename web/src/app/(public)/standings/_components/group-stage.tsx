@@ -47,16 +47,16 @@ export function GroupStage({ tables }: { tables: GroupTable[] }) {
 
       <div className="grid gap-5 lg:grid-cols-2">
         {tables.map((t) => (
-          <div key={t.group} className="overflow-hidden rounded-lg border border-neutral-800 bg-neutral-900/40">
-            <div className="border-b border-neutral-800 bg-gradient-to-r from-violet-600/20 to-transparent px-4 py-2">
-              <span className="text-sm font-bold tracking-wide text-neutral-100">Группа {t.group}</span>
-              <span className="ml-2 text-xs text-neutral-500">{t.rows.length} команд</span>
+          <div key={t.group} className="overflow-hidden rounded-lg border border-hairline bg-surface-1/40">
+            <div className="border-b border-hairline bg-gradient-to-r from-accent/20 to-transparent px-4 py-2">
+              <span className="text-sm font-bold tracking-wide text-ink">Группа {t.group}</span>
+              <span className="ml-2 text-xs text-ink-subtle">{t.rows.length} команд</span>
             </div>
 
             <div className="overflow-x-auto p-3">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="text-neutral-500">
+                  <tr className="text-ink-subtle">
                     <th className="w-10 py-1 text-left text-xs font-medium">#</th>
                     <th className="py-1 text-left text-xs font-medium">Команда</th>
                     {t.rows.map((r) => (
@@ -73,11 +73,11 @@ export function GroupStage({ tables }: { tables: GroupTable[] }) {
                   {t.rows.map((r, i) => {
                     const zone = QUALIFICATION[qualificationOf(r.place, t.rows.length)];
                     return (
-                    <tr key={r.teamId} className="border-t border-neutral-900">
+                    <tr key={r.teamId} className="border-t border-hairline">
                       <td className="py-1">
                         <span className="flex items-center gap-1.5">
                           <span className={`h-3.5 w-1 rounded-sm ${zone.marker}`} title={zone.label} />
-                          <span className="text-xs text-neutral-500">{r.place}</span>
+                          <span className="text-xs text-ink-subtle">{r.place}</span>
                         </span>
                       </td>
                       <td className="max-w-32 truncate py-1" title={r.name}>
@@ -88,19 +88,19 @@ export function GroupStage({ tables }: { tables: GroupTable[] }) {
                       {t.grid[i].map((cell, j) => (
                         <td key={t.rows[j].teamId} className="p-0.5 text-center">
                           {cell === null ? (
-                            <span className="block rounded bg-neutral-900 py-1 text-neutral-700">·</span>
+                            <span className="block rounded bg-surface-1 py-1 text-ink-subtle">·</span>
                           ) : (
                             <select
                               disabled={busy}
                               value={cell.score}
                               onChange={(e) => void save(cell.id, e.target.value, cell.flipped)}
                               title={`${r.name} — ${t.rows[j].name}`}
-                              className={`w-full cursor-pointer rounded border-0 bg-transparent px-0 py-1 text-center text-xs outline-none focus:ring-1 focus:ring-violet-500 ${
-                                cell.score.startsWith("2") ? "text-emerald-400" : "text-neutral-500"
+                              className={`w-full cursor-pointer rounded border-0 bg-transparent px-0 py-1 text-center text-xs outline-none focus:ring-1 focus:ring-accent-bright ${
+                                cell.score.startsWith("2") ? "text-emerald-400" : "text-ink-subtle"
                               }`}
                             >
                               {OUTCOMES.map((o) => (
-                                <option key={o} value={o} className="bg-neutral-900">
+                                <option key={o} value={o} className="bg-surface-1">
                                   {o}
                                 </option>
                               ))}
@@ -113,7 +113,7 @@ export function GroupStage({ tables }: { tables: GroupTable[] }) {
                         {r.wins}
                         {r.wins !== r.sheet.wins && <span className="ml-1 text-[10px] text-rose-400">({r.sheet.wins})</span>}
                       </td>
-                      <td className="py-1 text-center text-neutral-500">{r.losses}</td>
+                      <td className="py-1 text-center text-ink-subtle">{r.losses}</td>
                       <td className="py-1 text-center font-bold">
                         {r.points}
                         {r.points !== r.sheet.points && (
@@ -131,7 +131,7 @@ export function GroupStage({ tables }: { tables: GroupTable[] }) {
       </div>
 
       {error && <p className="text-sm text-rose-400">{error}</p>}
-      <p className="text-xs text-neutral-600">
+      <p className="text-xs text-ink-subtle">
         В/П/очки считаются из сетки; в скобках — исходное число из таблицы сезона, если разошлось.
         Очки за серию: 2:0 — 3, 2:1 — 2, 1:2 — 1, 0:2 — 0.
       </p>

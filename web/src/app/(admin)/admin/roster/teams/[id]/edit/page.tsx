@@ -13,24 +13,24 @@ export default async function TeamEditPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-2 text-sm text-neutral-500">
-        <Link href="/roster/teams" className="hover:text-neutral-300">
+      <div className="flex flex-wrap items-center gap-2 text-sm text-ink-subtle">
+        <Link href="/roster/teams" className="hover:text-ink-muted">
           Команды
         </Link>
-        <span className="text-neutral-700">/</span>
-        <Link href={`/roster/teams/${team.id}`} className="hover:text-neutral-300">
+        <span className="text-ink-subtle">/</span>
+        <Link href={`/roster/teams/${team.id}`} className="hover:text-ink-muted">
           {team.name}
         </Link>
-        <span className="text-neutral-700">/</span>
-        <span className="text-neutral-400">правка</span>
+        <span className="text-ink-subtle">/</span>
+        <span className="text-ink-muted">правка</span>
       </div>
 
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{team.name}</h1>
-          <p className="text-xs text-neutral-600">slug: {team.slug} — ключ импорта составов и подбора файлов</p>
+          <p className="text-xs text-ink-subtle">slug: {team.slug} — ключ импорта составов и подбора файлов</p>
         </div>
-        <Link href={`/roster/teams/${team.id}`} className="text-sm text-neutral-400 hover:text-violet-300">
+        <Link href={`/roster/teams/${team.id}`} className="text-sm text-ink-muted hover:text-accent-bright">
           ← к команде
         </Link>
       </div>
@@ -48,7 +48,7 @@ export default async function TeamEditPage({ params }: { params: Promise<{ id: s
         }}
       />
 
-      <p className="text-sm text-neutral-500">
+      <p className="text-sm text-ink-subtle">
         Состав правится на карточках игроков: роль и капитанство принадлежат месту в составе.
       </p>
     </div>

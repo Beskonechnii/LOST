@@ -69,7 +69,7 @@ export function TeamLogo({
         // eslint-disable-next-line @next/next/no-img-element
         <img src={team.logo} alt={team.name} className="h-full w-full object-contain" />
       ) : (
-        <span className="text-xs font-semibold text-neutral-500">{teamTag(team)}</span>
+        <span className="text-xs font-semibold text-ink-subtle">{teamTag(team)}</span>
       )}
     </div>
   );

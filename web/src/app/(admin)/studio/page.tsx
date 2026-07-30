@@ -16,9 +16,9 @@ export default async function StudioHome() {
     <div className="space-y-10">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Студия</h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm text-ink-subtle">
           Графика собирается по данным ростера: {teams} команд(ы) и {players} игрок(ов). Лого, фото и составы правятся в{" "}
-          <Link href="/roster/teams" className="text-violet-400 hover:underline">
+          <Link href="/roster/teams" className="text-accent-bright hover:underline">
             разделе «Ростер»
           </Link>
           .
@@ -30,11 +30,11 @@ export default async function StudioHome() {
           <Link
             key={t.id}
             href={`/studio/new/${t.id}`}
-            className="rounded border border-neutral-800 bg-neutral-900/40 p-5 hover:border-violet-600"
+            className="rounded border border-hairline bg-surface-1/40 p-5 hover:border-accent"
           >
             <div className="text-lg font-semibold">{t.title}</div>
-            <div className="mt-1 text-sm text-neutral-400">{t.description}</div>
-            <div className="mt-3 text-xs uppercase tracking-widest text-neutral-600">
+            <div className="mt-1 text-sm text-ink-muted">{t.description}</div>
+            <div className="mt-3 text-xs uppercase tracking-widest text-ink-subtle">
               {t.size.w}×{t.size.h}
             </div>
           </Link>

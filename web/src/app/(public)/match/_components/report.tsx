@@ -397,7 +397,7 @@ function CardTeam({
   const accent = side === "radiant" ? "text-emerald-400" : "text-rose-400";
   const bar = side === "radiant" ? "bg-emerald-500" : "bg-rose-500";
   return (
-    <div className="rounded-xl border border-hairline bg-surface-1/40 p-3">
+    <div className="rounded-2xl border border-hairline bg-surface-1 p-3 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-28px_rgba(0,0,0,0.9)]">
       <div className="mb-2 flex items-center gap-2">
         <span className={`h-4 w-1 rounded ${bar}`} />
         {logo && (
@@ -740,7 +740,7 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
     <main className="flex-1 p-4 md:p-8">
       <div className="mx-auto max-w-6xl space-y-4">
         {/* Шапка отчёта: возврат к форме, номер матча и переключатель источника. */}
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-hairline bg-surface-1/60 px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-hairline bg-surface-1 px-4 py-3 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-26px_rgba(0,0,0,0.9)]">
           <div className="flex min-w-0 items-center gap-3">
             <Link
               href="/match"
@@ -759,14 +759,14 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
             )}
           </div>
           {/* Источник — часть адреса: «почему тут пустой график» видно и в ссылке, и в интерфейсе. */}
-          <div className="flex gap-1 rounded-lg bg-canvas/60 p-1">
+          <div className="flex gap-1 rounded-full border border-hairline bg-surface-2 p-1">
             {SOURCES.map((s) => (
               <button
                 key={s.key}
                 onClick={() => patchUrl({ src: s.key === "opendota" ? null : s.key })}
                 title={s.hint}
-                className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                  src === s.key ? "bg-surface-2 text-ink" : "text-ink-subtle hover:text-ink"
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                  src === s.key ? "bg-surface-3 text-ink shadow-[inset_0_0_0_1px_var(--color-hairline-strong)]" : "text-ink-subtle hover:text-ink"
                 }`}
               >
                 {s.label}
@@ -796,13 +796,15 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
 
         {match && (
           <>
-            <div className="flex gap-1 rounded-lg bg-canvas/60 p-1">
+            <div className="flex flex-wrap gap-1.5">
               {TABS.map((t) => (
                 <button
                   key={t.key}
                   onClick={() => patchUrl({ tab: t.key === "report" ? null : t.key })}
-                  className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                    tab === t.key ? "bg-accent text-accent-contrast" : "text-ink-muted hover:text-ink"
+                  className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${
+                    tab === t.key
+                      ? "bg-gradient-to-b from-accent-bright to-accent text-white shadow-[0_6px_18px_-6px_var(--color-accent)]"
+                      : "border border-hairline bg-surface-1 text-ink-muted hover:text-ink"
                   }`}
                 >
                   {t.label}
@@ -814,7 +816,7 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
               <>
                 {/* Блок 1 — сводка матча единым блоком (по референсу):
                     шапка → герои → баны → низ: карта строений + события | график преимущества */}
-                <div className="divide-y divide-hairline rounded-xl border border-hairline bg-surface-1/50">
+                <div className="divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface-1 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_16px_44px_-26px_rgba(0,0,0,0.9)]">
                   <div className="p-3 md:p-4">
                     <ScoreHeader match={match} names={names} setNames={setNames} commitNames={commitNames} logos={logos} />
                   </div>
@@ -854,7 +856,7 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
 
             {tab === "extra" && (
               <>
-                <div className="rounded-xl border border-hairline bg-surface-1/40 p-4">
+                <div className="rounded-2xl border border-hairline bg-surface-1 p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-28px_rgba(0,0,0,0.9)]">
                   <div className="mb-3 text-sm font-medium text-ink-muted">Скиллы и покупки (по игрокам)</div>
                   <div className="grid gap-2 md:grid-cols-2">
                     {byPos.map((p, i) => (
@@ -862,7 +864,7 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
                     ))}
                   </div>
                 </div>
-                <div className="rounded-xl border border-hairline bg-surface-1/40 p-4">
+                <div className="rounded-2xl border border-hairline bg-surface-1 p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-28px_rgba(0,0,0,0.9)]">
                   <Draft picksBans={match.picksBans} names={names} />
                 </div>
               </>

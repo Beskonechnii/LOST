@@ -112,11 +112,12 @@ export default async function Home() {
             </Link>
           </div>
 
-          <dl className="mt-12 grid max-w-2xl grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4">
+          {/* Цифры сезона — единой панелью с 1px-разделителями (gap-px на цвет hairline) */}
+          <dl className="mt-12 grid max-w-2xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-hairline bg-hairline shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_16px_44px_-28px_rgba(0,0,0,0.9)] sm:grid-cols-4">
             {stats.map((s) => (
-              <div key={s.label}>
+              <div key={s.label} className="bg-surface-1 px-5 py-4">
                 <dt className="sr-only">{s.label}</dt>
-                <dd className="text-3xl font-bold tabular-nums text-ink">{s.value}</dd>
+                <dd className="text-3xl font-extrabold tabular-nums tracking-tight text-ink">{s.value}</dd>
                 <p className="eyebrow mt-1 text-ink-subtle">{s.label}</p>
               </div>
             ))}
@@ -125,7 +126,7 @@ export default async function Home() {
       </section>
 
       {/* Разделы: карточка = пункт меню, чтобы «что тут вообще есть» читалось без клика.
-          Возвышение — сменой поверхности (canvas → surface-1 → surface-2) и hairline, без тени. */}
+          Возвышение — surface-lift + мягкая тень, при наведении карточка приподнимается. */}
       <section className="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
         <p className="eyebrow mb-6 text-ink-subtle">Разделы</p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -135,13 +136,16 @@ export default async function Home() {
               <Link
                 key={s.href}
                 href={s.href}
-                className={`group relative flex flex-col overflow-hidden rounded-xl border border-hairline bg-surface-1 p-5 transition-colors hover:bg-surface-2 ${a.hover}`}
+                className={`group relative flex flex-col overflow-hidden rounded-2xl border border-hairline bg-surface-1 p-5 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-26px_rgba(0,0,0,0.9)] transition duration-200 hover:-translate-y-0.5 hover:bg-surface-2 ${a.hover}`}
               >
                 {/* тонкая цветная рейка сверху — секция «краем глаза» читается как D1/D2 */}
                 <span aria-hidden className={`absolute inset-x-0 top-0 h-0.5 ${a.rail}`} />
                 <h2 className="text-lg font-semibold tracking-[-0.01em] text-ink">{s.title}</h2>
                 <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-muted">{s.text}</p>
-                <span className={`mt-4 text-sm font-semibold transition-colors ${a.cta}`}>{s.cta} →</span>
+                <span className={`mt-4 inline-flex items-center gap-1 text-sm font-semibold transition-colors ${a.cta}`}>
+                  {s.cta}
+                  <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+                </span>
               </Link>
             );
           })}

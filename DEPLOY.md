@@ -51,8 +51,8 @@ docker --version && docker compose version
 ### 2. Забрать код
 
 ```bash
-git clone https://github.com/Beskonechnii/League-of-spirit.git
-cd League-of-spirit/web
+git clone https://github.com/Beskonechnii/LOST.git
+cd LOST/web
 ```
 
 ### 3. Создать `.env`
@@ -116,7 +116,7 @@ systemctl reload caddy
 ### 6. Обновление после правок
 
 ```bash
-cd League-of-spirit && git pull && cd web && docker compose up -d --build
+cd LOST && git pull && cd web && docker compose up -d --build
 ```
 
 ---
@@ -127,8 +127,8 @@ cd League-of-spirit && git pull && cd web && docker compose up -d --build
 # Node 24 LTS
 curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && apt install -y nodejs
 
-git clone https://github.com/Beskonechnii/League-of-spirit.git
-cd League-of-spirit/web
+git clone https://github.com/Beskonechnii/LOST.git
+cd LOST/web
 cp .env.example .env && nano .env      # заполнить ADMIN_PASSWORD
 
 npm ci                                  # postinstall сам сделает prisma generate
@@ -146,8 +146,8 @@ Description=LOST
 After=network.target
 
 [Service]
-WorkingDirectory=/root/League-of-spirit/web
-EnvironmentFile=/root/League-of-spirit/web/.env
+WorkingDirectory=/root/LOST/web
+EnvironmentFile=/root/LOST/web/.env
 ExecStart=/usr/bin/npm run start
 Restart=always
 

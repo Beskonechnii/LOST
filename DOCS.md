@@ -1,6 +1,6 @@
 # Docs — League of Spirit (LOST)
 
-Knowledge base проекта. Без воды: что за проект, как что устроено и почему.
+Knowledge base проекта
 
 ## Что за проект
 

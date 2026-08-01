@@ -18,9 +18,9 @@ export default async function DivisionLayout({
   if (!division) notFound();
 
   const base = `/standings/${division.slug}`;
+  // «Таблицы» и «Групповая стадия» слиты в один раздел: таблица групп и сетка встреч на одной странице.
   const tabs = [
-    { href: base, label: "Таблицы", hint: "Общая таблица лиги" },
-    { href: `${base}/groups`, label: "Групповая стадия", hint: "Группы A и B с сеткой встреч" },
+    { href: base, label: "Групповая стадия", hint: "Таблицы групп и сетка личных встреч" },
     { href: `${base}/playoff`, label: "Плей-офф", hint: "Черновик сетки: посев из групп" },
     { href: `${base}/stats`, label: "Статистика", hint: "Рейтинги игроков и команд по стадиям" },
   ];
@@ -33,10 +33,11 @@ export default async function DivisionLayout({
       ? ({ "--accent": "#14c6cb", "--accent-bright": "#5eead4", "--accent-contrast": "#000000" } as React.CSSProperties)
       : undefined;
 
+  // Раздел шире прочих (~+20%): в сетке групповой стадии много колонок личных встреч, им нужно место.
   return (
     <div style={accentVars}>
-      <SubNav items={tabs} />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-6">{children}</main>
+      <SubNav items={tabs} maxWidthClass="max-w-[86rem]" />
+      <main className="mx-auto w-full max-w-[86rem] flex-1 px-4 py-8 md:px-6">{children}</main>
     </div>
   );
 }

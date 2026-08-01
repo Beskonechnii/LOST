@@ -136,7 +136,9 @@ export function AdminNav() {
 }
 
 /** Подразделы секции. Подсвечивается самый конкретный подходящий пункт. */
-export function SubNav({ items }: { items: NavItem[] }) {
+// maxWidthClass — ширина ряда вкладок; по умолчанию как у большинства секций. Секция может расширить
+// её, чтобы подложка вкладок совпадала с более широким контентом (напр. групповая стадия).
+export function SubNav({ items, maxWidthClass = "max-w-6xl" }: { items: NavItem[]; maxWidthClass?: string }) {
   const pathname = usePathname();
   const active = items
     .filter((t) => isActive(pathname, t.href))
@@ -145,7 +147,7 @@ export function SubNav({ items }: { items: NavItem[] }) {
   return (
     // 49px = высота верхней строки (h-12) вместе с её нижней границей — иначе при скролле щель в 1px
     <div className="sticky top-[49px] z-40 border-b border-hairline bg-canvas/85 backdrop-blur">
-      <nav className="mx-auto flex max-w-6xl gap-4 overflow-x-auto px-4 md:px-6">
+      <nav className={`mx-auto flex ${maxWidthClass} gap-4 overflow-x-auto px-4 md:px-6`}>
         {items.map((t) => (
           <Link
             key={t.href}

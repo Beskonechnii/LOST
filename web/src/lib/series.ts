@@ -218,6 +218,27 @@ export async function getSeriesDetail(key: string | number): Promise<SeriesDetai
   };
 }
 
+/**
+ * Пересчёт счёта серии по победителям привязанных карт — счёт больше не вводят руками.
+ * Считаем только карты, где победитель — одна из двух команд серии. Если карт нет или у какой-то
+ * победитель ещё не определён (отчёт не дозрел, игроков нет в ростере), счёт не трогаем: у неявок
+ * карт нет вовсе, а недосчитанную карту нельзя молча свести к нулю поверх заданного руками.
+ */
+async function recomputeSeriesScore(seriesId: number) {
+  const series = await prisma.series.findUnique({ where: { id: seriesId }, select: { homeId: true, awayId: true } });
+  if (!series) return;
+  const games = await prisma.match.findMany({ where: { seriesId }, select: { winnerTeamId: true } });
+  if (games.length === 0) return; // неявка/пусто — счёт держит то, что задали руками
+  let home = 0;
+  let away = 0;
+  for (const g of games) {
+    if (g.winnerTeamId === series.homeId) home++;
+    else if (g.winnerTeamId === series.awayId) away++;
+    else return; // карта без победителя серии — не считаем, чтобы не затереть счёт нулём
+  }
+  await prisma.series.update({ where: { id: seriesId }, data: { homeScore: home, awayScore: away } });
+}
+
 export type NewSeries = {
   division: string;
   stage: string;
@@ -292,6 +313,9 @@ export async function attachGame(seriesId: number, gameNumber: number, openDotaM
 
   const synced = await syncMatch(prisma, match.id);
 
+  // Счёт серии — по победителям карт, руками его больше не задают.
+  await recomputeSeriesScore(seriesId);
+
   // Дата серии — по первой карте: вводить её руками смысла нет, она уже есть в отчёте.
   if (!series.playedAt) {
     const first = await prisma.match.findFirst({
@@ -308,9 +332,13 @@ export async function attachGame(seriesId: number, gameNumber: number, openDotaM
 export async function detachGame(matchId: number) {
   const match = await prisma.match.findUnique({ where: { id: matchId }, include: { renders: true, pointsEntries: true } });
   if (!match) throw new Error(`Матч ${matchId} не найден`);
+  const seriesId = match.seriesId;
   // На матче могут висеть генерации и баллы — их удалять нельзя, поэтому просто снимаем с серии.
-  if (match.renders.length || match.pointsEntries.length) {
-    return prisma.match.update({ where: { id: matchId }, data: { seriesId: null, gameNumber: null } });
-  }
-  return prisma.match.delete({ where: { id: matchId } });
+  const result =
+    match.renders.length || match.pointsEntries.length
+      ? await prisma.match.update({ where: { id: matchId }, data: { seriesId: null, gameNumber: null } })
+      : await prisma.match.delete({ where: { id: matchId } });
+  // Счёт серии пересчитываем по оставшимся картам. Если карт не осталось — счёт держим прежним.
+  if (seriesId) await recomputeSeriesScore(seriesId);
+  return result;
 }

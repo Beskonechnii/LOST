@@ -2,8 +2,14 @@
 // «Фаза A», снимается браузером из-за Cloudflare). Карты и стату по каждому match id тянет OpenDota.
 //
 // Запуск (из web/):
-//   npx tsx scripts/import-series.ts [--file data/series-19700.json] [--group-until 2026-07-16]
-//                                    [--write] [--verify] [--limit N] [--delay 800]
+//   npx tsx scripts/import-series.ts [--file data/series-19700.json] [--division "Division 1"]
+//                                    [--group-until 2026-07-16] [--write] [--verify] [--limit N] [--delay 800]
+//
+// --division — в какой дивизион лить: манифест лиги D2 — отдельный файл (своя лига Dotabuff),
+// команды и группы (GroupEntry) матчер берёт из этого дивизиона. Без флага — Division 1.
+// --alias "имя на Dotabuff=слаг или имя в БД;…" — ручной маппинг для команд, чьё имя/тег на Dotabuff
+//   не совпадает с базой (переименования, приписки «DISBANDED»). Несколько пар — через «;».
+//   Значение «-» (например "КЕФИР=-") явно пропускает команду: её серии не грузятся, без варнинга.
 //
 // Почему так. OpenDota список матчей этой лиги не отдаёт (tier «excluded»), а STRATZ её вовсе не
 // индексирует — проверено. Dotabuff данные держит, но за Cloudflare, поэтому список снимается
@@ -42,7 +48,18 @@ const file = arg("--file", "data/series-19700.json")!;
 const groupUntil = new Date(arg("--group-until", "2026-07-16")! + "T23:59:59Z");
 const limit = arg("--limit") ? Number(arg("--limit")) : Infinity;
 const delayMs = Number(arg("--delay", "800"));
-const DIVISION = "Division 1";
+const DIVISION = arg("--division", "Division 1")!;
+
+// Ручной маппинг имён Dotabuff → БД (или «-» = пропустить). Ключ нормализуем так же, как имена команд.
+const aliases = new Map(
+  (arg("--alias") ?? "")
+    .split(";")
+    .filter(Boolean)
+    .map((pair) => {
+      const [from, to] = pair.split("=");
+      return [from.trim().toLowerCase().replace(/\s+/g, ""), to.trim()];
+    }),
+);
 
 const prisma = new PrismaClient({ adapter: new PrismaLibSql({ url: process.env.DATABASE_URL ?? "file:./prisma/dev.db" }) });
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -68,9 +85,14 @@ async function buildMatcher() {
     if (t.tag) byTag.set(norm(t.tag), row);
     bySlug.set(t.slug, row);
   }
-  // Имя → тег → слаг из имени. Покрывает PSIXDISPANSER/PSIXDISPANCER (по тегу) и MoLoKo/MOLOKO (регистр).
-  return (mt: ManifestTeam): DbTeam | null =>
-    byName.get(norm(mt.name)) ?? (mt.tag ? byTag.get(norm(mt.tag)) : undefined) ?? bySlug.get(slugify(mt.name)) ?? null;
+  // Сперва ручной алиас (имя Dotabuff → слаг/имя в БД или «-» = пропустить), потом имя → тег → слаг
+  // из имени. Покрывает PSIXDISPANSER/PSIXDISPANCER (по тегу) и MoLoKo/MOLOKO (регистр).
+  return (mt: ManifestTeam): DbTeam | null | "skip" => {
+    const alias = aliases.get(norm(mt.name));
+    if (alias === "-") return "skip";
+    if (alias) return bySlug.get(alias) ?? byName.get(norm(alias)) ?? null;
+    return byName.get(norm(mt.name)) ?? (mt.tag ? byTag.get(norm(mt.tag)) : undefined) ?? bySlug.get(slugify(mt.name)) ?? null;
+  };
 }
 
 // --- Классификация серии ---
@@ -197,6 +219,8 @@ async function main() {
   for (const s of series) {
     const home = match(s.t1);
     const away = match(s.t2);
+    // «skip» — команда явно исключена алиасом «-» (снялась/распалась): серия молча выпадает.
+    if (home === "skip" || away === "skip") continue;
     if (!home || !away) { unmatched.push(`${s.sid}: ${s.t1.name} / ${s.t2.name}`); continue; }
     const plan = classify(s, home, away, seenPair);
     seenPair.add([Math.min(home.id, away.id), Math.max(home.id, away.id)].join("-"));

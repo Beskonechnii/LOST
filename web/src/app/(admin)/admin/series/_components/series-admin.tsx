@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { SeriesRow } from "@/lib/series";
-import { CUTS, PLAYOFF_ROUNDS, STAGES, cutByKey, playoffLabel, stageLabel } from "@/lib/stages";
-import { Eyebrow, SectionHeader } from "@/app/_components/ui";
+import { BRACKETS, PLAYOFF_ROUNDS, STAGES, playoffLabel, stageLabel } from "@/lib/stages";
+import { SectionHeader } from "@/app/_components/ui";
 
 // Форма и список архива. Пишет через /api/series/* — тот же путь, что и у любой правки в проекте,
 // поэтому серверных экшенов здесь нет: правило «не-GET к /api закрыт паролем» одно на всё.
@@ -221,12 +221,17 @@ function SeriesCard({ s, onChange }: { s: SeriesRow; onChange: () => void }) {
   );
 }
 
+/** Порядок половин сетки для сортировки плей-оффа: верхняя → нижняя → гранд. */
+const bracketOrder = (b: string | null) => BRACKETS.findIndex((x) => x.key === b);
+
 export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[]; teams: TeamOpt[]; series: SeriesRow[] }) {
   const router = useRouter();
   const refresh = () => router.refresh();
 
+  // Дивизион — верхняя вкладка (как в ростере команд): D1 и D2 играют раздельно, поэтому список
+  // всегда показывает ровно один дивизион. Он же — дивизион по умолчанию в форме новой встречи.
   const [division, setDivision] = useState(divisions[0]?.name ?? "");
-  const [stage, setStage] = useState<string>("playoff");
+  const [stage, setStage] = useState<string>("group");
   const [group, setGroup] = useState("A");
   const [round, setRound] = useState(PLAYOFF_ROUNDS[0].label);
   const [homeId, setHomeId] = useState("");
@@ -274,29 +279,44 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
     return () => window.removeEventListener("keydown", onKey);
   }, [showForm]);
 
-  // Встреч под сотню (вся групповая стадия двух дивизионов), поэтому список без фильтра
+  // Встреч под сотню (вся групповая стадия двух дивизионов), поэтому список без разбивки
   // бесполезен: оператор приходит сюда за одной конкретной серией.
-  const [cutKey, setCutKey] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [only, setOnly] = useState<"all" | "withGames" | "empty">("all");
+  // Подраздел внутри дивизиона: группа A/B, плей-офф — или всё, что не легло в них («Прочее»).
+  // Набор вкладок строится из данных, поэтому новая группа или стадия появляется в интерфейсе сама.
+  const [sub, setSub] = useState<string>("g:A");
 
-  const match = (s: SeriesRow) => {
-    const cut = cutByKey(cutKey);
-    if (cut) {
-      if (s.stage !== cut.stage) return false;
-      if (cut.group && s.group !== cut.group) return false;
-      if (cut.bracket && s.bracket !== cut.bracket) return false;
-    }
+  const textMatch = (s: SeriesRow) => {
+    if (only === "withGames" && s.games.length === 0) return false;
+    if (only === "empty" && s.games.length > 0) return false;
+    if (!q.trim()) return true;
     const text = `${s.home.name} ${s.away.name} ${s.home.tag} ${s.away.tag} ${s.round ?? ""}`.toLowerCase();
-    if (q.trim() && !text.includes(q.trim().toLowerCase())) return false;
-    if (only === "withGames") return s.games.length > 0;
-    if (only === "empty") return s.games.length === 0;
-    return true;
+    return text.includes(q.trim().toLowerCase());
   };
-  const byDivision = divisions.map((d) => ({ ...d, rows: series.filter((s) => s.division === d.name && match(s)) }));
+
+  // Встречи активного дивизиона — база для вкладок подраздела и для списка.
+  const inDivision = series.filter((s) => s.division === division);
+
+  // Вкладки подраздела строим по факту: сколько групп есть — столько вкладок «Группа X»,
+  // плюс «Плей-офф», плюс «Прочее» для всего, что не групповая стадия и не плей-офф.
+  const isOther = (s: SeriesRow) => s.stage !== "group" && s.stage !== "playoff";
+  const groups = [...new Set(inDivision.filter((s) => s.stage === "group").map((s) => s.group ?? "—"))].sort();
+  const subTabs = [
+    ...groups.map((g) => ({ key: `g:${g}`, label: `Группа ${g}`, test: (s: SeriesRow) => s.stage === "group" && (s.group ?? "—") === g })),
+    ...(inDivision.some((s) => s.stage === "playoff") ? [{ key: "playoff", label: "Плей-офф", test: (s: SeriesRow) => s.stage === "playoff" }] : []),
+    ...(inDivision.some(isOther) ? [{ key: "other", label: "Прочее", test: isOther }] : []),
+  ];
+  const activeSub = subTabs.find((t) => t.key === sub) ?? subTabs[0];
+
+  // Список: встречи активного дивизиона и подраздела, прошедшие текст-фильтр. Плей-офф сортируем
+  // по половине сетки (верхняя → нижняя → гранд), чтобы стадии шли в турнирном порядке.
+  const rows = inDivision
+    .filter((s) => (activeSub ? activeSub.test(s) : true) && textMatch(s))
+    .sort((a, b) => (activeSub?.key === "playoff" ? bracketOrder(a.bracket) - bracketOrder(b.bracket) : 0));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <SectionHeader
         eyebrow="Служебная часть · архив"
         title="Архив серий"
@@ -419,24 +439,35 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
         </div>
       )}
 
-      <div className="space-y-2">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="mr-1 text-[10px] uppercase tracking-widest text-ink-subtle">Разрез</span>
-          <Chip active={!cutKey} onClick={() => setCutKey(null)}>
-            Весь турнир
-          </Chip>
-          {CUTS.map((c) => (
-            <Chip key={c.key} active={cutKey === c.key} onClick={() => setCutKey(c.key)}>
-              {c.label}
-            </Chip>
-          ))}
-        </div>
-        <div className="flex flex-wrap items-center gap-1.5">
+      {/* Дивизион — крупные пилюли, как в ростере команд: наверху весь фильтр по разделам. */}
+      <div className="flex flex-wrap items-center gap-2">
+        {divisions.map((d) => {
+          const count = series.filter((s) => s.division === d.name).length;
+          const active = division === d.name;
+          return (
+            <button
+              key={d.name}
+              type="button"
+              onClick={() => setDivision(d.name)}
+              className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition ${
+                active
+                  ? "bg-gradient-to-b from-accent-bright to-accent text-white shadow-[0_6px_18px_-6px_rgba(124,58,237,0.7)]"
+                  : "border border-hairline bg-surface-1 text-ink-muted hover:text-ink"
+              }`}
+            >
+              {d.label}
+              <span className={`ml-1.5 text-xs ${active ? "text-white/70" : "text-ink-subtle"}`}>{count}</span>
+            </button>
+          );
+        })}
+
+        {/* Поиск и фильтр по картам — на той же строке, справа: разрезы больше не занимают ряд. */}
+        <div className="ml-auto flex flex-wrap items-center gap-1.5">
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Поиск по командам или раунду"
-            className={`${input} mr-1 w-64`}
+            placeholder="Поиск по командам"
+            className={`${input} w-52`}
           />
           {(
             [
@@ -452,16 +483,36 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
         </div>
       </div>
 
-      {byDivision.map((d) => (
-        <section key={d.name} className="space-y-2.5">
-          <Eyebrow className="text-ink-muted">
-            {d.label} <span className="text-ink-subtle">· встреч: {d.rows.length}</span>
-          </Eyebrow>
-          {d.rows.length === 0 ?
-            <p className="text-xs text-ink-subtle">Пусто.</p>
-          : d.rows.map((s) => <SeriesCard key={s.id} s={s} onChange={refresh} />)}
-        </section>
-      ))}
+      {/* Подраздел внутри дивизиона: группы и плей-офф. Счётчик — по дивизиону, без учёта текста. */}
+      <div className="flex flex-wrap items-center gap-1.5 border-b border-hairline pb-3">
+        {subTabs.length === 0 ?
+          <span className="text-xs text-ink-subtle">В дивизионе пока нет встреч.</span>
+        : subTabs.map((t) => {
+            const count = inDivision.filter(t.test).length;
+            const active = activeSub?.key === t.key;
+            return (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setSub(t.key)}
+                className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                  active
+                    ? "bg-surface-3 text-ink shadow-[inset_0_0_0_1px_var(--color-hairline-strong)]"
+                    : "text-ink-subtle hover:text-ink-muted"
+                }`}
+              >
+                {t.label}
+                <span className={`ml-1.5 ${active ? "text-ink-muted" : "text-ink-subtle"}`}>{count}</span>
+              </button>
+            );
+          })}
+      </div>
+
+      <div className="space-y-2">
+        {rows.length === 0 ?
+          <p className="text-xs text-ink-subtle">Пусто — ни одной встречи в этом разделе.</p>
+        : rows.map((s) => <SeriesCard key={s.id} s={s} onChange={refresh} />)}
+      </div>
     </div>
   );
 }

@@ -6,8 +6,8 @@ import { PublicNav } from "../_components/site-nav";
 // навигация и свои метаданные, не общие со служебной частью.
 
 export const metadata: Metadata = {
-  title: { default: "LOST — League of Spirit", template: "%s — LOST" },
-  description: "Разбор матчей Dota 2, таблица и составы League of Spirit",
+  title: { default: "League of Spirits", template: "%s — League of Spirits" },
+  description: "Разбор матчей Dota 2, таблица и составы League of Spirits",
 };
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {

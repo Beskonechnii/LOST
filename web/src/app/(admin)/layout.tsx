@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AdminNav } from "../_components/site-nav";
+import { AdminNav, AdminSubNav } from "../_components/site-nav";
 
 // Служебная часть: студия графики, правка ростера, вход. Всё это закрыто паролем
 // (`needsAdmin()` в src/lib/auth.ts) и посетителю не показывается.
@@ -15,6 +15,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <>
       <AdminNav />
+      <AdminSubNav />
       {children}
     </>
   );

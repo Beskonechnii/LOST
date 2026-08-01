@@ -192,7 +192,8 @@ export function TeamCards({ teams }: { teams: TeamWithRoster[] }) {
   // Ключ по «свёрнутости всех» — самый дешёвый способ разом переоткрыть карточки:
   // меняем ключ, React пересоздаёт их с нужным начальным состоянием.
   const [generation, setGeneration] = useState(0);
-  const [collapsed, setCollapsed] = useState(false);
+  // По умолчанию составы свёрнуты: сначала виден список команд, состав разворачивается по клику.
+  const [collapsed, setCollapsed] = useState(true);
 
   // Под-вкладки дивизионов: команды делим по Team.group, а общий пулл игроков остаётся единым
   // (страница /roster/players его не трогает). Показываем только те дивизионы, где есть команды,

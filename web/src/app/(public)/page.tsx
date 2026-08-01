@@ -48,13 +48,6 @@ const SECTIONS = [
     cta: "Открыть команды",
     accent: "none",
   },
-  {
-    href: "/match",
-    title: "Разбор матча",
-    text: "Постгейм по ID любого матча Dota 2 — счёт, драфт, скорборд, таланты, предметы и график преимущества. Не только матчи лиги.",
-    cta: "Разобрать матч",
-    accent: "none",
-  },
 ] as const;
 
 export default async function Home() {
@@ -93,8 +86,7 @@ export default async function Home() {
             Больше чем турнир — это твоё киберспортивное комьюнити.
           </p>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-ink-subtle">
-            Сезонные турниры по Dota 2 с собственным кастом. Здесь живут таблица дивизиона, составы команд
-            и разбор матчей.
+            Сезонные турниры по Dota 2 с собственным кастом. Здесь живут таблица дивизиона и составы команд.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -105,10 +97,10 @@ export default async function Home() {
               Таблица дивизиона
             </Link>
             <Link
-              href="/match"
+              href="/roster/teams"
               className="rounded-md border border-hairline-strong px-5 py-2.5 text-sm font-semibold text-ink-muted transition-colors hover:border-ink-subtle hover:text-ink"
             >
-              Разобрать матч
+              Составы команд
             </Link>
           </div>
 

@@ -34,16 +34,16 @@ if [ ! -x "$CF" ]; then
   rm -rf "$tmp"
 fi
 
-# 2. контейнер — поднять, если /api/health не отвечает
+# 2. контейнер — всегда пересобрать из текущего кода и поднять.
+# Пересборка обязательна: иначе туннель отдаёт старый образ, а свежие коммиты
+# в него не попадают (образ — снимок кода на момент прошлой сборки, не рабочая папка).
 cd "$WEB_DIR"
-if ! curl -fsS -o /dev/null "http://127.0.0.1:$PORT/api/health" 2>/dev/null; then
-  echo "→ поднимаю контейнер (docker compose up -d)"
-  docker compose up -d
-  for _ in $(seq 1 20); do
-    curl -fsS -o /dev/null "http://127.0.0.1:$PORT/api/health" 2>/dev/null && break
-    sleep 2
-  done
-fi
+echo "→ пересобираю контейнер (docker compose up -d --build)"
+docker compose up -d --build
+for _ in $(seq 1 20); do
+  curl -fsS -o /dev/null "http://127.0.0.1:$PORT/api/health" 2>/dev/null && break
+  sleep 2
+done
 curl -fsS -o /dev/null "http://127.0.0.1:$PORT/api/health" 2>/dev/null \
   || { echo "контейнер не отвечает на /api/health — смотри docker compose logs web"; exit 1; }
 echo "✓ контейнер живой на :$PORT"

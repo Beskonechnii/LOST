@@ -11,25 +11,55 @@ import { usePathname } from "next/navigation";
 // Разделять важно не ради красоты: пока навигация была общей, посетитель видел в меню студию
 // и админку, а оператор не видел границы между «это увидят все» и «это только моё».
 
-export type NavItem = { href: string; label: string; hint?: string };
+// match — дополнительные префиксы, при которых пункт считается активным. Нужно секции, которая в URL
+// живёт не под своим href: «LOST S2» ведёт на /standings/d1, но подсвечивается и на /roster.
+export type NavItem = { href: string; label: string; hint?: string; match?: string[] };
 
-const PUBLIC_SECTIONS: NavItem[] = [
-  { href: "/match", label: "Матч", hint: "Разбор матча Dota 2 по ID" },
-  { href: "/standings/d1", label: "LOST D1", hint: "Первый дивизион: таблица и групповая стадия" },
-  { href: "/standings/d2", label: "LOST D2", hint: "Второй дивизион: таблица и групповая стадия" },
+// Верхняя строка — одна на весь сайт: продукт (LOST S2) и операторская (Админ) стоят рядом.
+// Обе группы маршрутов рисуют эти же вкладки, поэтому переход между ними бесшовный: строка
+// не меняется, меняется только второй ряд (подвкладки сезона / инструменты админки).
+const TOP_SECTIONS: NavItem[] = [
+  {
+    href: "/standings/d1",
+    label: "LOST S2",
+    hint: "Второй сезон: дивизионы и ростер",
+    match: ["/standings", "/roster", "/series"],
+  },
+  {
+    href: "/admin/series",
+    label: "Админ",
+    hint: "Операторская: серии, студия, драфты, разбор матча",
+    match: ["/admin", "/studio", "/underbeer", "/match"],
+  },
+];
+
+// Подвкладки сезона LOST S2 — общий второй ряд для дивизионов и ростера. Живёт над собственным
+// SubNav каждого раздела (этапы дивизиона / команды-игроки ростера).
+const SEASON_SECTIONS: NavItem[] = [
+  { href: "/standings/d1", label: "Дивизион 1", hint: "Первый дивизион: таблица, плей-офф, статистика" },
+  { href: "/standings/d2", label: "Дивизион 2", hint: "Второй дивизион: таблица, плей-офф, статистика" },
   { href: "/roster", label: "Ростер", hint: "Команды и игроки лиги" },
 ];
 
+// Инструменты админки — второй ряд под вкладкой «Админ». Порядок как просил оператор.
+// 1х1 и fearless draft пока заглушки («в разработке»), но место в навигации держат.
 const ADMIN_SECTIONS: NavItem[] = [
+  { href: "/underbeer", label: "UNDERBEER 2.0", hint: "Сборка шоу-команд драфтом" },
   { href: "/admin/series", label: "Архив серий", hint: "Встречи турнира и карты в них" },
   { href: "/studio", label: "Студия", hint: "Графика к матчам" },
-  { href: "/underbeer", label: "UNDERBEER 2.0", hint: "Сборка шоу-команд драфтом" },
-  { href: "/admin/login", label: "Доступ", hint: "Вход и выход из админки" },
+  { href: "/match", label: "Матч", hint: "Разбор матча Dota 2 по ID" },
+  { href: "/admin/1x1", label: "1х1", hint: "Турнир 1х1 — в разработке" },
+  { href: "/admin/fearless-draft", label: "fearless draft", hint: "Fearless draft — в разработке" },
 ];
 
 /** Активен раздел, если путь совпадает или лежит внутри него («/» — только точное совпадение). */
-function isActive(pathname: string, href: string) {
+function matchesHref(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+}
+
+/** Пункт активен по своему href или по любому из дополнительных префиксов match. */
+function isActive(pathname: string, item: NavItem) {
+  return matchesHref(pathname, item.href) || (item.match ?? []).some((m) => matchesHref(pathname, m));
 }
 
 const focus = "outline-none focus-visible:ring-2 focus-visible:ring-accent-bright";
@@ -55,7 +85,7 @@ function Bar({
 
         <nav className="-mx-1 flex flex-1 gap-1 overflow-x-auto">
           {sections.map((s) => {
-            const active = isActive(pathname, s.href);
+            const active = isActive(pathname, s);
             return (
               <Link
                 key={s.href}
@@ -78,75 +108,81 @@ function Bar({
   );
 }
 
-/** Навигация продукта: только то, что показываем посетителю. */
-export function PublicNav() {
-  return (
-    <Bar
-      sections={PUBLIC_SECTIONS}
-      accent="bg-accent/15 font-medium text-accent-bright"
-      brand={
-        <Link href="/" className={`flex shrink-0 items-center gap-2 rounded ${focus}`} title="League of Spirit">
-          <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-accent to-fuchsia-600 text-sm font-black text-white">
-            L
-          </span>
-          <span className="hidden text-xs font-bold uppercase tracking-[0.2em] text-ink-muted sm:block">LOST</span>
-        </Link>
-      }
-      aside={
-        // Неприметная дверь для оператора: посетителю она ни о чём не говорит.
-        <Link
-          href="/admin/login"
-          title="Вход в админку"
-          className={`shrink-0 rounded-md px-2 py-1.5 text-xs text-ink-subtle transition-colors hover:text-ink-muted ${focus}`}
-        >
-          Админ
-        </Link>
-      }
-    />
-  );
+/** Логотип-ссылка на главную — один для всего сайта. */
+const brand = (
+  <Link href="/" className={`flex shrink-0 items-center gap-2 rounded ${focus}`} title="League of Spirits">
+    <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-accent to-fuchsia-600 text-sm font-black text-white">
+      L
+    </span>
+    <span className="hidden text-xs font-bold uppercase tracking-[0.2em] text-ink-muted sm:block">
+      League&nbsp;of&nbsp;Spirits
+    </span>
+  </Link>
+);
+
+/** Неприметная дверь для входа/выхода оператора — справа, одна на весь сайт. */
+const accessLink = (
+  <Link
+    href="/admin/login"
+    title="Вход в админку"
+    className={`shrink-0 rounded-md px-2 py-1.5 text-xs text-ink-subtle transition-colors hover:text-ink-muted ${focus}`}
+  >
+    Доступ
+  </Link>
+);
+
+// Верхняя строка теперь единая: LOST S2 и Админ стоят рядом, обе группы рисуют её одинаково.
+// PublicNav/AdminNav оставлены отдельными функциями лишь потому, что их зовут разные layout'ы —
+// содержимое у них общее.
+function TopBar() {
+  return <Bar sections={TOP_SECTIONS} accent="bg-accent/15 font-medium text-accent-bright" brand={brand} aside={accessLink} />;
 }
 
-/** Навигация служебной части. Янтарный акцент — чтобы «где я» читалось с одного взгляда. */
-export function AdminNav() {
-  return (
-    <Bar
-      sections={ADMIN_SECTIONS}
-      accent="bg-amber-500/15 font-medium text-amber-300"
-      brand={
-        <span className="flex shrink-0 items-center gap-2" title="Служебная часть — её не видит посетитель">
-          <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 text-sm font-black text-neutral-950">
-            L
-          </span>
-          <span className="hidden text-xs font-bold uppercase tracking-[0.2em] text-amber-300/80 sm:block">
-            Админка
-          </span>
-        </span>
-      }
-      aside={
-        <Link
-          href="/"
-          title="Вернуться на публичный сайт"
-          className={`shrink-0 rounded-md px-2 py-1.5 text-xs text-ink-subtle transition-colors hover:text-ink ${focus}`}
-        >
-          ← На сайт
-        </Link>
-      }
-    />
-  );
+/** Навигация продукта (группа public). */
+export function PublicNav() {
+  return <TopBar />;
 }
+
+/** Навигация служебной части (группа admin) — та же строка, второй ряд добавляет layout админки. */
+export function AdminNav() {
+  return <TopBar />;
+}
+
+/** Первый ряд подвкладок сезона LOST S2: дивизионы и ростер. Общий для /standings и /roster. */
+export function SeasonNav({ maxWidthClass }: { maxWidthClass?: string }) {
+  return <SubNav items={SEASON_SECTIONS} maxWidthClass={maxWidthClass} />;
+}
+
+/** Второй ряд под вкладкой «Админ»: инструменты оператора. */
+export function AdminSubNav() {
+  return <SubNav items={ADMIN_SECTIONS} />;
+}
+
+// Второй ряд вкладок (SubNav под SeasonNav) липнет на высоту первого ниже — их два, наедут иначе.
+export const SUBNAV_SECOND_ROW = "top-[89px]";
 
 /** Подразделы секции. Подсвечивается самый конкретный подходящий пункт. */
 // maxWidthClass — ширина ряда вкладок; по умолчанию как у большинства секций. Секция может расширить
 // её, чтобы подложка вкладок совпадала с более широким контентом (напр. групповая стадия).
-export function SubNav({ items, maxWidthClass = "max-w-6xl" }: { items: NavItem[]; maxWidthClass?: string }) {
+// topClass — липкая привязка ряда. По умолчанию под верхней строкой (49px); второй ряд (SubNav под
+// SeasonNav) сдвигается ниже на высоту первого — иначе они наедут друг на друга при скролле.
+export function SubNav({
+  items,
+  maxWidthClass = "max-w-6xl",
+  topClass = "top-[49px]",
+}: {
+  items: NavItem[];
+  maxWidthClass?: string;
+  topClass?: string;
+}) {
   const pathname = usePathname();
   const active = items
-    .filter((t) => isActive(pathname, t.href))
+    .filter((t) => isActive(pathname, t))
     .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   return (
     // 49px = высота верхней строки (h-12) вместе с её нижней границей — иначе при скролле щель в 1px
-    <div className="sticky top-[49px] z-40 border-b border-hairline bg-canvas/85 backdrop-blur">
+    <div className={`sticky ${topClass} z-40 border-b border-hairline bg-canvas/85 backdrop-blur`}>
       <nav className={`mx-auto flex ${maxWidthClass} gap-4 overflow-x-auto px-4 md:px-6`}>
         {items.map((t) => (
           <Link

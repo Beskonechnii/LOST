@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { SubNav } from "../../../_components/site-nav";
+import { SeasonNav, SubNav, SUBNAV_SECOND_ROW } from "../../../_components/site-nav";
 import { divisionBySlug } from "@/lib/divisions";
 
 // Раздел дивизиона. Один шаблон на оба дивизиона: слаг в URL (d1/d2) выбирает дивизион, а подразделы —
@@ -34,10 +34,15 @@ export default async function DivisionLayout({
       : undefined;
 
   // Раздел шире прочих (~+20%): в сетке групповой стадии много колонок личных встреч, им нужно место.
+  // Первый ряд — сезон (дивизионы + ростер), всегда бренд-фиолетовый: он вне accentVars.
+  // Второй ряд и контент красятся в цвет дивизиона, поэтому обёрнуты в div со стилем.
   return (
-    <div style={accentVars}>
-      <SubNav items={tabs} maxWidthClass="max-w-[86rem]" />
-      <main className="mx-auto w-full max-w-[86rem] flex-1 px-4 py-8 md:px-6">{children}</main>
-    </div>
+    <>
+      <SeasonNav maxWidthClass="max-w-[86rem]" />
+      <div style={accentVars}>
+        <SubNav items={tabs} maxWidthClass="max-w-[86rem]" topClass={SUBNAV_SECOND_ROW} />
+        <main className="mx-auto w-full max-w-[86rem] flex-1 px-4 py-8 md:px-6">{children}</main>
+      </div>
+    </>
   );
 }

@@ -310,14 +310,18 @@ export function DraftBoard({
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
             {segments.map((seg) => {
               const remaining = seg.players.filter((p) => !taken.has(p.id)).length;
+              // Выбранных опускаем в низ колонки — сверху остаются доступные, глазу просторнее.
+              const ordered = [...seg.players].sort(
+                (a, b) => Number(taken.has(a.id)) - Number(taken.has(b.id)),
+              );
               return (
                 <div key={String(seg.position)} className="rounded-lg border border-hairline bg-surface-1/30 p-2">
                   <div className="mb-1.5 flex items-center justify-between px-0.5 text-[11px] uppercase tracking-wide text-ink-subtle">
                     <span className="truncate">{seg.label}</span>
                     <span className="shrink-0 text-ink-subtle">{remaining}</span>
                   </div>
-                  <div className={`max-h-[56vh] space-y-1.5 overflow-y-auto pr-0.5 ${SCROLL}`}>
-                    {seg.players.map((p) => (
+                  <div className="space-y-1.5 pr-0.5">
+                    {ordered.map((p) => (
                       <PoolCard
                         key={p.id}
                         player={p}

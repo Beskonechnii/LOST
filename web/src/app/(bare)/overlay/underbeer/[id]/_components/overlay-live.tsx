@@ -45,8 +45,14 @@ export function OverlayLive({
   return (
     <div className="min-h-screen p-6">
       <div
-        className="mx-auto grid max-w-7xl gap-4"
-        style={{ gridTemplateColumns: `repeat(${Math.max(1, state.teams.length)}, minmax(0, 1fr))` }}
+        className="mx-auto grid gap-4"
+        style={{
+          // auto-fit + минимум 240px: команды переносятся на новую строку, а не схлопываются
+          // в нечитаемо-узкие колонки при большом их числе. Ширину контейнера ограничиваем по
+          // числу команд, чтобы 2–3 команды не растягивались на весь экран.
+          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          maxWidth: `min(100%, ${Math.max(1, state.teams.length) * 340}px)`,
+        }}
       >
         {state.teams.map((team) => {
           const members = memberIds(team)

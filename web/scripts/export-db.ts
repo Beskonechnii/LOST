@@ -64,7 +64,7 @@ async function main() {
     matchKey(m, m.teamA.slug, m.teamB.slug);
 
   const snapshot = {
-    version: 3, // 3 — у Series появился slug (он же ключ адреса), связи матч→серия идут по нему
+    version: 4, // 4 — у Series появился slot (позиция в сетке плей-офф, src/lib/playoff-bracket.ts)
     exportedAt: new Date().toISOString(),
 
     teams: teams.map((t) => omit(t, "id")),

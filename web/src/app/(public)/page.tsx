@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { SITE_MAX_W } from "@/app/_components/ui";
 
 // Входная дверь продукта. До этого на `/` стояло поле ввода id матча — посетитель попадал
 // в операторский инструмент и не понимал, куда пришёл. Здесь: что за лига и что тут можно сделать.
@@ -76,7 +77,7 @@ export default async function Home() {
           aria-hidden
           className="pointer-events-none absolute -top-40 left-1/2 h-96 w-[48rem] -translate-x-1/2 rounded-full bg-gradient-to-br from-d1/25 to-d2/15 blur-3xl"
         />
-        <div className="relative mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
+        <div className={`relative mx-auto ${SITE_MAX_W} px-4 py-16 md:px-6 md:py-24`}>
           <p className="eyebrow text-d1-bright">Dota 2 · Минск</p>
           {/* display-тип: плотный line-height + отрицательный трекинг — «голос» системы */}
           <h1 className="mt-4 text-5xl font-bold uppercase leading-[1.05] tracking-[-0.03em] md:text-7xl">
@@ -119,7 +120,7 @@ export default async function Home() {
 
       {/* Разделы: карточка = пункт меню, чтобы «что тут вообще есть» читалось без клика.
           Возвышение — surface-lift + мягкая тень, при наведении карточка приподнимается. */}
-      <section className="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
+      <section className={`mx-auto ${SITE_MAX_W} px-4 py-12 md:px-6 md:py-16`}>
         <p className="eyebrow mb-6 text-ink-subtle">Разделы</p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {SECTIONS.map((s) => {

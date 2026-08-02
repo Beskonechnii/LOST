@@ -149,7 +149,11 @@ model Series {
   stage     String    @default("group") // group | playoff (src/lib/stages.ts)
   group     String? // «A» | «B» — только у групповой стадии
   bracket   String? // плей-офф: upper | lower | grand — по нему режут архив и статистику
-  round     String? // плей-офф: подпись слота сетки («Четвертьфинал», «Гранд-финал»)
+  round     String? // плей-офф: подпись раунда сетки («Четвертьфинал», «Гранд-финал»)
+  /// Позиция в сетке плей-офф — ключ слота из src/lib/playoff-bracket.ts («ub-qf1», «gf»).
+  /// Он связывает серию с местом в сетке: страница плей-офф раскладывает серии по слотам, а из
+  /// исходов вычисляет участников поздних слотов. У групповых серий пусто.
+  slot      String?
   playedAt  DateTime?
   homeScore Int
   awayScore Int
@@ -163,6 +167,9 @@ model Series {
   games Match[]
 
   @@unique([division, stage, group, homeId, awayId])
+  /// Один слот сетки — одна серия. У групповых slot=NULL, а NULL в sqlite-уникальности различны,
+  /// поэтому групповую стадию это не ограничивает.
+  @@unique([division, slot])
 }
 
 // Сохранённая генерация графики: id шаблона + payload формы (JSON строкой, sqlite).

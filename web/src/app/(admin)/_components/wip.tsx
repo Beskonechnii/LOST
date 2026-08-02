@@ -1,10 +1,10 @@
-import { SectionHeader } from "@/app/_components/ui";
+import { SectionHeader, SITE_MAX_W } from "@/app/_components/ui";
 
 // Заглушка раздела в разработке. Место в навигации уже держится (см. ADMIN_SECTIONS в site-nav),
 // а самого инструмента ещё нет — показываем честное «в стадии разработки», а не пустую страницу.
 export function WorkInProgress({ title, note }: { title: string; note?: string }) {
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-6">
+    <main className={`mx-auto w-full ${SITE_MAX_W} flex-1 px-4 py-8 md:px-6`}>
       <SectionHeader
         eyebrow="Админка"
         title={title}

@@ -15,6 +15,7 @@ import {
   TeamCrest,
 } from "@/app/_components/postgame/blocks";
 import { PostgameExport } from "@/app/_components/postgame/export-canvas";
+import { SITE_MAX_W } from "@/app/_components/ui";
 import {
   clock,
   fmt,
@@ -738,7 +739,7 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
 
   return (
     <main className="flex-1 p-4 md:p-8">
-      <div className="mx-auto max-w-6xl space-y-4">
+      <div className={`mx-auto ${SITE_MAX_W} space-y-4`}>
         {/* Шапка отчёта: возврат к форме, номер матча и переключатель источника. */}
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-hairline bg-surface-1 px-4 py-3 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-26px_rgba(0,0,0,0.9)]">
           <div className="flex min-w-0 items-center gap-3">

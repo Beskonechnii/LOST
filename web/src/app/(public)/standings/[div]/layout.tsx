@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { SeasonNav, SubNav, SUBNAV_SECOND_ROW } from "../../../_components/site-nav";
+import { SITE_MAX_W } from "../../../_components/ui";
 import { divisionBySlug } from "@/lib/divisions";
 
 // Раздел дивизиона. Один шаблон на оба дивизиона: слаг в URL (d1/d2) выбирает дивизион, а подразделы —
@@ -33,15 +34,15 @@ export default async function DivisionLayout({
       ? ({ "--accent": "#14c6cb", "--accent-bright": "#5eead4", "--accent-contrast": "#000000" } as React.CSSProperties)
       : undefined;
 
-  // Раздел шире прочих (~+20%): в сетке групповой стадии много колонок личных встреч, им нужно место.
+  // Ширина — единая на весь сайт (SITE_MAX_W): шапка, подменю и контент совпадают по краю.
   // Первый ряд — сезон (дивизионы + ростер), всегда бренд-фиолетовый: он вне accentVars.
   // Второй ряд и контент красятся в цвет дивизиона, поэтому обёрнуты в div со стилем.
   return (
     <>
-      <SeasonNav maxWidthClass="max-w-[86rem]" />
+      <SeasonNav />
       <div style={accentVars}>
-        <SubNav items={tabs} maxWidthClass="max-w-[86rem]" topClass={SUBNAV_SECOND_ROW} />
-        <main className="mx-auto w-full max-w-[86rem] flex-1 px-4 py-8 md:px-6">{children}</main>
+        <SubNav items={tabs} topClass={SUBNAV_SECOND_ROW} />
+        <main className={`mx-auto w-full ${SITE_MAX_W} flex-1 px-4 py-8 md:px-6`}>{children}</main>
       </div>
     </>
   );

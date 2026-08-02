@@ -156,7 +156,9 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
 
   return (
     <main className="flex-1 p-4 md:p-8">
-      <div className="mx-auto max-w-4xl space-y-4">
+      {/* Уже, чем остальной сайт (SITE_MAX_W), намеренно: это читательская страница одной встречи —
+          счёт и составы по карте. На всю ширину экрана строки состава растянулись бы некрасиво. */}
+      <div className="mx-auto max-w-6xl space-y-4">
         <BackButton fallback={`/standings/${div}`} />
 
         {/* Шапка встречи: крошки разреза + счёт серии одной карточкой с мягкой тенью */}

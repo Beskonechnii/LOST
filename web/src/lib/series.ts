@@ -7,7 +7,8 @@
 import { prisma } from "@/lib/prisma";
 import { syncMatch } from "@/lib/match-sync";
 import { teamTag } from "@/lib/profiles";
-import { bracketOfRound, isStage, type Bracket, type Stage } from "@/lib/stages";
+import { isStage, type Bracket, type Stage } from "@/lib/stages";
+import { slotByKey, validScores } from "@/lib/playoff-bracket";
 import { resolveUpload } from "@/lib/uploads";
 
 export type SeriesGame = {
@@ -29,6 +30,8 @@ export type SeriesRow = {
   group: string | null;
   bracket: string | null;
   round: string | null;
+  /** Позиция в сетке плей-офф — ключ слота (src/lib/playoff-bracket.ts). У групповых пусто. */
+  slot: string | null;
   playedAt: Date | null;
   guessed: boolean;
   home: { id: number; name: string; tag: string; logo: string | null };
@@ -91,6 +94,7 @@ export async function listSeries(filter: SeriesFilter = {}): Promise<SeriesRow[]
     group: r.group,
     bracket: r.bracket,
     round: r.round,
+    slot: r.slot,
     playedAt: r.playedAt,
     guessed: r.guessed,
     home: team(r.home),
@@ -243,7 +247,8 @@ export type NewSeries = {
   division: string;
   stage: string;
   group?: string | null;
-  round?: string | null;
+  /** Плей-офф: ключ слота сетки (src/lib/playoff-bracket.ts). Из него выводятся bracket и round. */
+  slot?: string | null;
   playedAt?: Date | null;
   homeId: number;
   awayId: number;
@@ -253,11 +258,25 @@ export type NewSeries = {
 /** Завести встречу руками. Групповые уже залиты импортом — это в первую очередь про плей-офф. */
 export async function createSeries(input: NewSeries) {
   if (!isStage(input.stage)) throw new Error(`Неизвестная стадия: «${input.stage}»`);
-  if (!VALID_SCORES.includes(input.score)) {
-    throw new Error(`Счёт серии должен быть ${VALID_SCORES.join(", ")} — не «${input.score}»`);
-  }
   if (input.homeId === input.awayId) throw new Error("Команда не играет сама с собой");
   if (input.stage === "group" && !input.group) throw new Error("У групповой встречи должна быть группа");
+
+  // Плей-офф привязывается к слоту сетки: он задаёт и половину (bracket), и подпись раунда, и Bo.
+  const slot = input.stage === "playoff" ? slotByKey(input.slot) : null;
+  if (input.stage === "playoff" && !slot) throw new Error("У плей-офф встречи должен быть слот сетки");
+
+  // Bo3 в группе, Bo слота — в плей-офф: гранд-финал играется до трёх побед, остальное до двух.
+  const allowed = slot ? validScores(slot.bestOf) : VALID_SCORES;
+  if (!allowed.includes(input.score)) {
+    throw new Error(`Счёт серии должен быть ${allowed.join(", ")} — не «${input.score}»`);
+  }
+
+  // Слот занят? Один слот — одна серия (в БД это @@unique([division, slot])), но проверяем заранее,
+  // чтобы отдать понятную ошибку вместо сырого нарушения индекса.
+  if (slot) {
+    const taken = await prisma.series.findFirst({ where: { division: input.division, slot: slot.key } });
+    if (taken) throw new Error(`Слот «${slot.label}» уже занят другой встречей`);
+  }
 
   const [homeScore, awayScore] = input.score.split(":").map(Number);
   return prisma.series.create({
@@ -267,9 +286,9 @@ export async function createSeries(input: NewSeries) {
       stage: input.stage,
       // У плей-офф группы нет — пустую строку из формы приводим к NULL, иначе сломается @@unique.
       group: input.stage === "group" ? input.group! : null,
-      // Половину сетки не спрашиваем отдельно: её однозначно задаёт выбранный раунд.
-      bracket: input.stage === "playoff" && input.round ? bracketOfRound(input.round) : null,
-      round: input.round || null,
+      bracket: slot?.bracket ?? null,
+      round: slot?.round ?? null,
+      slot: slot?.key ?? null,
       playedAt: input.playedAt ?? null,
       homeId: input.homeId,
       awayId: input.awayId,

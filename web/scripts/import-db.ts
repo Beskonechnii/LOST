@@ -28,9 +28,9 @@ const d = (v: string | Date | null | undefined) => (v ? new Date(v) : null);
 
 async function main() {
   const snap = JSON.parse(readFileSync(input, "utf8"));
-  if (snap.version !== 3) {
+  if (snap.version !== 4) {
     throw new Error(
-      `Снимок версии ${snap.version}, а нужен 3. Снимки не мигрируются: пересними базу свежим ` +
+      `Снимок версии ${snap.version}, а нужен 4. Снимки не мигрируются: пересними базу свежим ` +
         `scripts/export-db.ts на той машине, где данные актуальны.`,
     );
   }

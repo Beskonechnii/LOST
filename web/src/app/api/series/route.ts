@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       division: String(body.division ?? ""),
       stage: String(body.stage ?? ""),
       group: body.group ? String(body.group) : null,
-      round: body.round ? String(body.round) : null,
+      slot: body.slot ? String(body.slot) : null,
       playedAt: body.playedAt ? new Date(body.playedAt) : null,
       homeId: Number(body.homeId),
       awayId: Number(body.awayId),

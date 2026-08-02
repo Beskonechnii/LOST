@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { SeriesRow } from "@/lib/series";
-import { BRACKETS, PLAYOFF_ROUNDS, STAGES, playoffLabel, stageLabel } from "@/lib/stages";
+import { BRACKETS, STAGES, playoffLabel, stageLabel } from "@/lib/stages";
+import { slotByKey, validScores } from "@/lib/playoff-bracket";
 import { SectionHeader } from "@/app/_components/ui";
 
 // Форма и список архива. Пишет через /api/series/* — тот же путь, что и у любой правки в проекте,
@@ -12,6 +13,20 @@ import { SectionHeader } from "@/app/_components/ui";
 
 type TeamOpt = { id: number; name: string; tag: string; division: string | null };
 type DivOpt = { name: string; label: string };
+
+/** Слот сетки для формы: подпись, команды (когда известны) и «занят ли». Считается на сервере. */
+export type SlotOption = {
+  key: string;
+  label: string;
+  round: string;
+  bestOf: 3 | 5;
+  aTeamId: number | null;
+  bTeamId: number | null;
+  aName: string;
+  bName: string;
+  taken: boolean;
+};
+export type SlotOptions = Record<string, SlotOption[]>;
 
 const SCORES = ["2:0", "2:1", "1:2", "0:2"];
 
@@ -156,7 +171,10 @@ function SeriesCard({ s, onChange }: { s: SeriesRow; onChange: () => void }) {
 
   const used = new Set(s.games.map((g) => g.gameNumber));
   const nextNumber = [1, 2, 3, 4, 5].find((n) => !used.has(n)) ?? 1;
-  const cut = s.stage === "group" ? `Группа ${s.group ?? "—"}` : playoffLabel(s.bracket, s.round);
+  // В плей-офф показываем подпись слота («ЧФ-1»), а не общий раунд: иначе четыре четвертьфинала
+  // в списке неотличимы. Слот знает свою половину сетки, поэтому даёт полную «Верхняя · ЧФ-1».
+  const cut =
+    s.stage === "group" ? `Группа ${s.group ?? "—"}` : playoffLabel(s.bracket, slotByKey(s.slot)?.label ?? s.round);
 
   return (
     <div
@@ -224,7 +242,17 @@ function SeriesCard({ s, onChange }: { s: SeriesRow; onChange: () => void }) {
 /** Порядок половин сетки для сортировки плей-оффа: верхняя → нижняя → гранд. */
 const bracketOrder = (b: string | null) => BRACKETS.findIndex((x) => x.key === b);
 
-export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[]; teams: TeamOpt[]; series: SeriesRow[] }) {
+export function SeriesAdmin({
+  divisions,
+  teams,
+  series,
+  slots,
+}: {
+  divisions: DivOpt[];
+  teams: TeamOpt[];
+  series: SeriesRow[];
+  slots: SlotOptions;
+}) {
   const router = useRouter();
   const refresh = () => router.refresh();
 
@@ -233,12 +261,29 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
   const [division, setDivision] = useState(divisions[0]?.name ?? "");
   const [stage, setStage] = useState<string>("group");
   const [group, setGroup] = useState("A");
-  const [round, setRound] = useState(PLAYOFF_ROUNDS[0].label);
+  const [slot, setSlot] = useState("");
   const [homeId, setHomeId] = useState("");
   const [awayId, setAwayId] = useState("");
   const [score, setScore] = useState(SCORES[0]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  // Слоты сетки выбранного дивизиона и выбранный слот; счёт ограничен его Bo (гранд-финал — Bo5).
+  const divSlots = slots[division] ?? [];
+  const selSlot = divSlots.find((s) => s.key === slot) ?? null;
+  const scoreOptions = stage === "playoff" && selSlot ? validScores(selSlot.bestOf) : SCORES;
+
+  // Выбор слота подставляет команды из сетки (когда исход предыдущего раунда уже известен) —
+  // оператору остаётся только счёт. Счёт сбрасываем на первый допустимый для Bo слота.
+  const pickSlot = (key: string) => {
+    setSlot(key);
+    const s = divSlots.find((x) => x.key === key);
+    if (s) {
+      if (s.aTeamId) setHomeId(String(s.aTeamId));
+      if (s.bTeamId) setAwayId(String(s.bTeamId));
+      setScore(validScores(s.bestOf)[0]);
+    }
+  };
   // Форма новой встречи держалась раскрытой всегда и занимала пол-экрана над списком, ради которого
   // сюда и приходят. Прячем её за кнопку и показываем модалкой по клику.
   const [showForm, setShowForm] = useState(false);
@@ -256,7 +301,7 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
         division,
         stage,
         group: stage === "group" ? group : null,
-        round: stage === "playoff" ? round : null,
+        slot: stage === "playoff" ? slot : null,
         homeId: Number(homeId),
         awayId: Number(awayId),
         score,
@@ -372,7 +417,16 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
             </select>
           </Field>
           <Field label="Стадия">
-            <select value={stage} onChange={(e) => setStage(e.target.value)} className={input}>
+            <select
+              value={stage}
+              onChange={(e) => {
+                const v = e.target.value;
+                setStage(v);
+                // При переходе в плей-офф сразу берём первый свободный слот сетки — с командами.
+                if (v === "playoff" && !slot) pickSlot((divSlots.find((s) => !s.taken) ?? divSlots[0])?.key ?? "");
+              }}
+              className={input}
+            >
               {STAGES.map((s) => (
                 <option key={s.key} value={s.key}>
                   {s.label}
@@ -388,12 +442,13 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
                 ))}
               </select>
             </Field>
-          : <Field label="Раунд">
-              {/* половина сетки не спрашивается: её задаёт сам раунд (см. src/lib/stages.ts) */}
-              <select value={round} onChange={(e) => setRound(e.target.value)} className={input}>
-                {PLAYOFF_ROUNDS.map((r) => (
-                  <option key={r.label} value={r.label}>
-                    {r.label}
+          : <Field label="Слот сетки">
+              {/* половину сетки и раунд не спрашиваем: их задаёт слот (см. src/lib/playoff-bracket.ts) */}
+              <select value={slot} onChange={(e) => pickSlot(e.target.value)} className={`${input} w-56`}>
+                {divSlots.map((s) => (
+                  <option key={s.key} value={s.key}>
+                    {s.label} · {s.aName} — {s.bName}
+                    {s.taken ? " (занят)" : ""}
                   </option>
                 ))}
               </select>
@@ -411,7 +466,7 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
           </Field>
           <Field label="Счёт">
             <select value={score} onChange={(e) => setScore(e.target.value)} className={input}>
-              {SCORES.map((s) => (
+              {scoreOptions.map((s) => (
                 <option key={s}>{s}</option>
               ))}
             </select>
@@ -428,7 +483,7 @@ export function SeriesAdmin({ divisions, teams, series }: { divisions: DivOpt[];
           </Field>
               <button
                 onClick={create}
-                disabled={busy || !homeId || !awayId}
+                disabled={busy || !homeId || !awayId || (stage === "playoff" && !slot)}
                 className="rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-accent-contrast shadow-[0_6px_18px_-6px_var(--color-accent)] transition hover:bg-accent-bright disabled:opacity-40"
               >
                 {busy ? "…" : "Завести"}

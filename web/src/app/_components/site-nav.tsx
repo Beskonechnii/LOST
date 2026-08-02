@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SITE_MAX_W } from "./ui";
 
 // Навигация. Две верхние строки, по одной на группу маршрутов:
 //   PublicNav — продукт (src/app/(public)): разбор матча, таблица, витрина ростера;
@@ -80,7 +81,7 @@ function Bar({
 
   return (
     <header className="sticky top-0 z-50 border-b border-hairline bg-canvas/85 backdrop-blur">
-      <div className="mx-auto flex h-12 max-w-6xl items-center gap-4 px-4 md:px-6">
+      <div className={`mx-auto flex h-12 ${SITE_MAX_W} items-center gap-4 px-4 md:px-6`}>
         {brand}
 
         <nav className="-mx-1 flex flex-1 gap-1 overflow-x-auto">
@@ -162,13 +163,12 @@ export function AdminSubNav() {
 export const SUBNAV_SECOND_ROW = "top-[89px]";
 
 /** Подразделы секции. Подсвечивается самый конкретный подходящий пункт. */
-// maxWidthClass — ширина ряда вкладок; по умолчанию как у большинства секций. Секция может расширить
-// её, чтобы подложка вкладок совпадала с более широким контентом (напр. групповая стадия).
+// maxWidthClass — ширина ряда вкладок; по умолчанию единая ширина сайта (совпадает с контентом).
 // topClass — липкая привязка ряда. По умолчанию под верхней строкой (49px); второй ряд (SubNav под
 // SeasonNav) сдвигается ниже на высоту первого — иначе они наедут друг на друга при скролле.
 export function SubNav({
   items,
-  maxWidthClass = "max-w-6xl",
+  maxWidthClass = SITE_MAX_W,
   topClass = "top-[49px]",
 }: {
   items: NavItem[];

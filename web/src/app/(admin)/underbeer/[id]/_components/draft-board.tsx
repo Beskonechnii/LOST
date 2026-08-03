@@ -14,6 +14,7 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { PlayerAvatar } from "@/app/(public)/roster/_components/avatar";
+import { Button } from "@/components/ui/button";
 import { ROLES } from "@/lib/roles";
 import {
   addTeam,
@@ -682,17 +683,18 @@ function ConfigControls({
           <input type="checkbox" checked={state.snake} onChange={(e) => onSnake(e.target.checked)} />
           Змейка (1→N, N→1)
         </label>
-        <button onClick={onAddTeam} className="rounded-md border border-hairline-strong px-3 py-1.5 text-sm hover:border-amber-600">
+        <Button variant="outline" size="sm" onClick={onAddTeam} className="hover:border-amber-600">
           + Команда
-        </button>
-        <button
+        </Button>
+        <Button
+          size="sm"
           onClick={onStart}
           disabled={!!blocker}
           title={blocker ?? "Начать драфт"}
-          className="ml-auto rounded-md bg-amber-600 px-4 py-1.5 text-sm font-medium text-neutral-950 hover:bg-amber-500 disabled:opacity-40"
+          className="ml-auto bg-amber-600 text-neutral-950 hover:bg-amber-500"
         >
           Начать драфт
-        </button>
+        </Button>
       </div>
       <p className="text-xs text-ink-subtle">
         {blocker

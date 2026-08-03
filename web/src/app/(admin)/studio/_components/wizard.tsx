@@ -15,6 +15,8 @@ import {
   type TemplateDef,
 } from "@/studio/types";
 import { Label, SelectField, TextField } from "../../../_components/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 // Мастер генерации: форма строится из schema шаблона, справа — живое превью,
 // снизу — экспорт PNG в натуральном размере и сохранение payload в историю.
@@ -112,22 +114,26 @@ function WizardForm({
         {matches.length > 0 && (
           <div className="rounded border border-hairline bg-surface-1/40 p-3">
             <Label>Взять из матча</Label>
-            <select
-              className="w-full rounded border border-hairline bg-surface-1 px-3 py-2 text-sm text-ink outline-none focus:border-accent-bright"
-              defaultValue=""
-              onChange={(e) => {
-                const m = matches.find((x) => String(x.id) === e.target.value);
+            {/* Пикер-действие, а не поле: контролируемый value="" держит плейсхолдер после выбора,
+                поэтому список сам «сбрасывается» — как раньше делал e.currentTarget.value = "". */}
+            <Select
+              value=""
+              onValueChange={(v) => {
+                const m = matches.find((x) => String(x.id) === v);
                 if (m) prefill(m, groupKey);
-                e.currentTarget.value = "";
               }}
             >
-              <option value="">— выбрать матч —</option>
-              {matches.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.label}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="— выбрать матч —" />
+              </SelectTrigger>
+              <SelectContent>
+                {matches.map((m) => (
+                  <SelectItem key={m.id} value={String(m.id)}>
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
 
@@ -158,21 +164,12 @@ function WizardForm({
         )}
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => void exportPng()}
-            className="rounded bg-accent px-4 py-2 text-sm font-medium text-accent-contrast hover:bg-accent-bright disabled:opacity-50"
-          >
+          <Button type="button" disabled={busy} onClick={() => void exportPng()}>
             {busy ? "Готовлю PNG…" : `Скачать PNG ${size.w}×${size.h}`}
-          </button>
-          <button
-            type="button"
-            onClick={() => void save()}
-            className="rounded border border-hairline-strong px-4 py-2 text-sm text-ink-muted hover:border-hairline-strong"
-          >
+          </Button>
+          <Button type="button" variant="outline" onClick={() => void save()}>
             Сохранить в историю
-          </button>
+          </Button>
           {saved && <span className="text-sm text-ink-muted">{saved}</span>}
         </div>
       </div>

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { IMAGE_MODELS, IMAGE_QUALITIES, IMAGE_SIZES, MAX_IMAGES, MAX_REFERENCES } from "@/lib/image-options";
 import { SelectField, TextAreaField } from "../../../_components/form";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Генерация картинок по API. Настройки → POST /api/studio/generate → готовые файлы в public/uploads/generated.
 // Ключ OpenAI живёт только на сервере, сюда не приходит.
@@ -74,12 +76,7 @@ export function Generator() {
 
         <div className="rounded border border-hairline bg-surface-1/40 p-3">
           <label className="flex cursor-pointer items-center gap-2">
-            <input
-              type="checkbox"
-              checked={useRefs}
-              onChange={(e) => setUseRefs(e.target.checked)}
-              className="h-4 w-4 accent-violet-600"
-            />
+            <Checkbox checked={useRefs} onCheckedChange={(v) => setUseRefs(v === true)} />
             <span className="text-sm text-ink">Использовать как референс</span>
           </label>
           <p className="mt-1 text-xs text-ink-subtle">
@@ -109,14 +106,9 @@ export function Generator() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
-          <button
-            type="button"
-            disabled={!canRun}
-            onClick={() => void run()}
-            className="rounded bg-accent px-4 py-2 text-sm font-medium text-accent-contrast hover:bg-accent-bright disabled:opacity-50"
-          >
+          <Button type="button" disabled={!canRun} onClick={() => void run()}>
             {busy ? "Рисую…" : `Сгенерировать${n > 1 ? ` ×${n}` : ""}`}
-          </button>
+          </Button>
           {busy && <span className="text-sm text-ink-subtle">высокое качество считается до минуты</span>}
         </div>
 

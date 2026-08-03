@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Badge } from "@/components/ui/badge";
 
 // Переиспользуемые презентационные примитивы UI. Без "use client" — можно тянуть в серверные
 // страницы. Задают единый ритм заголовков, чипов и плашек, чтобы страницы выглядели одним набором,
@@ -41,14 +42,16 @@ export function SectionHeader({
   );
 }
 
-/** Небольшой чип-метка (роль, тег, статус). */
+/** Небольшой чип-метка (роль, тег, статус). База — shadcn Badge; вид LOST задаём поверх:
+    капсула rounded-full, surface-2, приглушённый текст, 10px. */
 export function Chip({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full border border-hairline bg-surface-2 px-2 py-0.5 text-[10px] font-medium text-ink-muted ${className}`}
+    <Badge
+      variant="secondary"
+      className={`gap-1 rounded-full border-hairline bg-surface-2 px-2 py-0.5 text-[10px] font-medium text-ink-muted ${className}`}
     >
       {children}
-    </span>
+    </Badge>
   );
 }
 

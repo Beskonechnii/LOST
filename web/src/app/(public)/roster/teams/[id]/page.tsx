@@ -4,6 +4,7 @@ import { getTeamProfile, type RosterMember } from "@/lib/roster-data";
 import { getStandings } from "@/lib/standings";
 import { DIVISIONS, divisionSlug } from "@/lib/divisions";
 import { teamAccent, teamTag } from "@/lib/profiles";
+import { Button } from "@/components/ui/button";
 import { roleLabel } from "@/lib/roles";
 import { QUALIFICATION, qualificationOf } from "@/lib/qualification";
 import { isAdmin } from "@/lib/admin-session";
@@ -75,12 +76,9 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
           </div>
 
           {authed && (
-            <Link
-              href={`/admin/roster/teams/${team.id}/edit`}
-              className="self-start rounded bg-accent px-4 py-2 text-sm font-medium text-accent-contrast hover:bg-accent-bright sm:mb-1 sm:self-auto"
-            >
-              Редактировать
-            </Link>
+            <Button asChild className="self-start sm:mb-1 sm:self-auto">
+              <Link href={`/admin/roster/teams/${team.id}/edit`}>Редактировать</Link>
+            </Button>
           )}
         </div>
       </section>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,11 @@ export default function RootLayout({
     >
       {/* Навигации здесь намеренно нет: она своя у каждой группы маршрутов —
           (public)/layout.tsx для продукта и (admin)/layout.tsx для служебной части. */}
-      <body className="flex min-h-full flex-col bg-canvas font-sans text-ink">{children}</body>
+      <body className="flex min-h-full flex-col bg-canvas font-sans text-ink">
+        {children}
+        {/* Тосты (sonner) — один хост на весь сайт; заменяют webview-глохнущий alert(). */}
+        <Toaster position="bottom-right" richColors />
+      </body>
     </html>
   );
 }

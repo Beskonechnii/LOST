@@ -4,6 +4,7 @@ import { getPlayerProfile } from "@/lib/roster-data";
 import { ageOf, formatBirthday, playerGaps, playerLinks, teamAccent, telegramUrl, yearsLabel } from "@/lib/profiles";
 import { roleLabel } from "@/lib/roles";
 import { isAdmin } from "@/lib/admin-session";
+import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/app/_components/ui";
 import { PlayerAvatar, TeamLogo } from "../../_components/avatar";
 import { PlayerMiniCard } from "../../_components/player-card";
@@ -124,12 +125,9 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
           {/* Правка и служебный slug — только оператору: посетителю ни то, ни другое не нужно */}
           {authed && (
             <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
-              <Link
-                href={`/admin/roster/players/${player.id}/edit`}
-                className="rounded bg-accent px-4 py-2 text-sm font-medium text-accent-contrast hover:bg-accent-bright"
-              >
-                Редактировать
-              </Link>
+              <Button asChild>
+                <Link href={`/admin/roster/players/${player.id}/edit`}>Редактировать</Link>
+              </Button>
               <span className="text-xs text-ink-subtle">slug: {player.slug}</span>
             </div>
           )}

@@ -9,6 +9,7 @@
 import { useRef, useState } from "react";
 import { domToPng } from "modern-screenshot";
 import { Canvas } from "@/studio/Canvas";
+import { Button } from "@/components/ui/button";
 import { archiveShot, type ArchiveDraft, type ShotKind } from "../match-archive";
 import { AdvantageChart, BuildingMap, EventBadges, HeroFrame, HeroPortrait, ItemsRow, TeamCrest } from "./blocks";
 import { clock, fmt, kFmt1, pad, type MatchReport, type PlayerReport, type Side } from "./types";
@@ -383,25 +384,21 @@ function ExportBlock({
     <div className="space-y-2">
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-sm font-medium text-neutral-200">{title}</span>
-        <button
-          type="button"
-          disabled={!!busy}
-          onClick={() => void download()}
-          className="rounded bg-violet-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-500 disabled:opacity-50"
-        >
+        <Button type="button" size="sm" disabled={!!busy} onClick={() => void download()}>
           {busy === "download" ? "Готовлю PNG…" : `Скачать PNG ${EXPORT_W * EXPORT_SCALE}×${EXPORT_H * EXPORT_SCALE}`}
-        </button>
+        </Button>
         {/* Архив — операторская полка, посетителю её не показываем (и запись всё равно закрыта паролем). */}
         {canArchive && (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             disabled={!!busy}
             onClick={() => void toArchive()}
             title="Положить эту картинку в архив выгрузок"
-            className="rounded border border-neutral-700 px-3 py-1.5 text-xs font-medium text-neutral-300 hover:border-neutral-500 hover:text-white disabled:opacity-50"
           >
             {busy === "archive" ? "Сохраняю…" : "В архив"}
-          </button>
+          </Button>
         )}
         {note && <span className="text-xs text-neutral-500">{note}</span>}
       </div>

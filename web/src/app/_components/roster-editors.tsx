@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ImageField, SaveButton, SelectField, TextField, Label } from "./form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ROLES } from "@/lib/roles";
 
 // Формы профилей. Значения приходят из серверной страницы, изменения уходят в /api/studio/*.
@@ -36,12 +39,7 @@ export function TeamEditor({ id, initial }: { id: number; initial: TeamForm }) {
               onChange={(e) => set("color", e.target.value)}
               className="h-10 w-12 rounded-lg border border-hairline bg-surface-1"
             />
-            <input
-              className="w-full rounded-lg border border-hairline bg-surface-1 px-3 py-2 text-sm text-ink outline-none transition focus:border-accent/60 focus:ring-2 focus:ring-accent/25"
-              value={v.color}
-              placeholder="#A855F7"
-              onChange={(e) => set("color", e.target.value)}
-            />
+            <Input value={v.color} placeholder="#A855F7" onChange={(e) => set("color", e.target.value)} />
           </div>
         </label>
       </div>
@@ -188,21 +186,21 @@ export function SpotsEditor({
             />
           </div>
           <label className="flex items-center gap-2 pb-2 text-sm text-ink-muted">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={s.isCaptain}
-              onChange={(e) => void send(`/api/roster/spots/${s.id}`, "PATCH", { isCaptain: e.target.checked })}
+              onCheckedChange={(v) => void send(`/api/roster/spots/${s.id}`, "PATCH", { isCaptain: v === true })}
             />
             Капитан
           </label>
-          <button
+          <Button
             type="button"
+            variant="outline"
             disabled={busy}
             onClick={() => void send(`/api/roster/spots/${s.id}`, "DELETE")}
-            className="rounded-lg border border-hairline px-3 py-2 text-sm text-ink-muted transition hover:border-rose-600/60 hover:text-rose-400 disabled:opacity-50"
+            className="hover:border-rose-600/60 hover:bg-transparent hover:text-rose-400"
           >
             Убрать
-          </button>
+          </Button>
         </div>
       ))}
 
@@ -219,14 +217,13 @@ export function SpotsEditor({
           <div className="w-56">
             <SelectField label="Роль" value={newRole} onChange={setNewRole} options={ROLE_OPTIONS} />
           </div>
-          <button
+          <Button
             type="button"
             disabled={busy || !newTeam}
             onClick={() => void send("/api/roster/spots", "POST", { playerId, teamId: Number(newTeam), role: newRole })}
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-contrast shadow-[0_6px_18px_-6px_var(--color-accent)] transition hover:bg-accent-bright disabled:opacity-50"
           >
             Добавить
-          </button>
+          </Button>
         </div>
       )}
 
@@ -281,14 +278,9 @@ export function CreateForm({
             />
           </div>
         ))}
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => void submit()}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-contrast shadow-[0_6px_18px_-6px_var(--color-accent)] transition hover:bg-accent-bright disabled:opacity-50"
-        >
+        <Button type="button" disabled={busy} onClick={() => void submit()}>
           {busy ? "…" : submitLabel}
-        </button>
+        </Button>
       </div>
       {error && <p className="mt-2 text-sm text-rose-400">{error}</p>}
     </div>

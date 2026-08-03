@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { ADMIN_COOKIE, adminConfigured, verifyToken } from "@/lib/auth";
 import { LoginForm } from "./form";
 import { logout } from "./actions";
+import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
@@ -29,12 +30,9 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             <p className="rounded-md border border-emerald-900 bg-emerald-950/40 px-3 py-2 text-sm text-emerald-300">
               Вход выполнен.
             </p>
-            <button
-              type="submit"
-              className="rounded-md border border-hairline-strong px-4 py-2 text-sm font-medium text-ink-muted hover:border-hairline-strong hover:text-white"
-            >
+            <Button type="submit" variant="outline">
               Выйти
-            </button>
+            </Button>
           </form>
         ) : (
           <LoginForm next={next ?? "/"} />

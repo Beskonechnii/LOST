@@ -3,6 +3,10 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { UploadKind } from "@/lib/profiles";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 // Мелкие клиентские кирпичики студии: поля, загрузка картинок, кнопка сохранения.
 // Данные читают серверные страницы, пишут — эти компоненты через /api/studio/*.
@@ -10,9 +14,6 @@ import type { UploadKind } from "@/lib/profiles";
 export function Label({ children }: { children: React.ReactNode }) {
   return <span className="mb-1 block text-xs uppercase tracking-widest text-ink-subtle">{children}</span>;
 }
-
-const inputCls =
-  "w-full rounded-lg border border-hairline bg-surface-1 px-3 py-2 text-sm text-ink outline-none transition focus:border-accent/60 focus:ring-2 focus:ring-accent/25";
 
 export function TextField(props: {
   label: string;
@@ -25,8 +26,7 @@ export function TextField(props: {
   return (
     <label className="block">
       <Label>{props.label}</Label>
-      <input
-        className={inputCls}
+      <Input
         type={props.type ?? "text"}
         value={props.value}
         placeholder={props.placeholder}
@@ -47,8 +47,8 @@ export function TextAreaField(props: {
   return (
     <label className="block">
       <Label>{props.label}</Label>
-      <textarea
-        className={`${inputCls} resize-y leading-relaxed`}
+      <Textarea
+        className="resize-y leading-relaxed"
         rows={props.rows ?? 5}
         value={props.value}
         placeholder={props.placeholder}
@@ -64,16 +64,27 @@ export function SelectField(props: {
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
 }) {
+  // Radix Select запрещает SelectItem с пустым value (пустая строка = «ничего не выбрано»).
+  // Поэтому опцию-плейсхолдер (value: "") не рендерим пунктом, а показываем её label в триггере,
+  // а пустое текущее значение отдаём как undefined — тогда Radix сам покажет плейсхолдер. API обёртки
+  // не меняется: потребители по-прежнему передают {value, onChange, options} со строками.
+  const placeholder = props.options.find((o) => o.value === "")?.label;
+  const items = props.options.filter((o) => o.value !== "");
   return (
     <label className="block">
       <Label>{props.label}</Label>
-      <select className={inputCls} value={props.value} onChange={(e) => props.onChange(e.target.value)}>
-        {props.options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
+      <Select value={props.value || undefined} onValueChange={props.onChange}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {items.map((o) => (
+            <SelectItem key={o.value} value={o.value}>
+              {o.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </label>
   );
 }
@@ -147,10 +158,9 @@ export function SaveButton({ url, data, label = "Сохранить" }: { url: s
 
   return (
     <div className="flex items-center gap-3">
-      <button
+      <Button
         type="button"
         disabled={pending}
-        className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-contrast shadow-[0_6px_18px_-6px_var(--color-accent)] transition hover:bg-accent-bright disabled:opacity-50"
         onClick={() => {
           setMsg(null);
           start(async () => {
@@ -170,7 +180,7 @@ export function SaveButton({ url, data, label = "Сохранить" }: { url: s
         }}
       >
         {pending ? "…" : label}
-      </button>
+      </Button>
       {msg && <span className="text-sm text-ink-muted">{msg}</span>}
     </div>
   );

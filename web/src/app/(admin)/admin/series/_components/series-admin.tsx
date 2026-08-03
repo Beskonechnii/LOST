@@ -7,6 +7,10 @@ import type { SeriesRow } from "@/lib/series";
 import { BRACKETS, STAGES, playoffLabel, stageLabel } from "@/lib/stages";
 import { slotByKey, validScores } from "@/lib/playoff-bracket";
 import { SectionHeader } from "@/app/_components/ui";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 // Форма и список архива. Пишет через /api/series/* — тот же путь, что и у любой правки в проекте,
 // поэтому серверных экшенов здесь нет: правило «не-GET к /api закрыт паролем» одно на всё.
@@ -41,8 +45,30 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-const input =
-  "rounded-lg border border-hairline bg-surface-2 px-2.5 py-1.5 text-sm outline-none transition focus:border-accent/60 focus:ring-2 focus:ring-accent/25";
+// Локальная обёртка над shadcn Select: пустое значение → плейсхолдер (Radix не даёт пустой value у пункта).
+// Оставляет per-select ширину и произвольные SelectItem детьми — их разметка у каждого своя.
+function Sel({
+  value,
+  onChange,
+  placeholder,
+  className,
+  children,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Select value={value || undefined} onValueChange={onChange}>
+      <SelectTrigger className={className}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>{children}</SelectContent>
+    </Select>
+  );
+}
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
@@ -72,19 +98,17 @@ function ActionBtn({
   tone?: "neutral" | "danger" | "armed";
   children: React.ReactNode;
 }) {
+  // База — shadcn Button (variant outline, size xs): общий бордер/радиус/фокус-кольцо/дизейбл.
+  // tone добавляет семантику цветом поверх; tailwind-merge оставляет наши классы там, где спорят.
   const tones = {
     neutral: "border-hairline-strong text-ink-muted hover:border-accent-bright hover:bg-accent-bright/10 hover:text-accent-bright",
     danger: "border-hairline-strong text-ink-muted hover:border-rose-500 hover:bg-rose-500/10 hover:text-rose-300",
-    armed: "border-rose-500 bg-rose-500/15 text-rose-300",
+    armed: "border-rose-500 bg-rose-500/15 text-rose-300 hover:bg-rose-500/15",
   };
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`rounded-md border px-2 py-1 text-[11px] font-medium transition disabled:opacity-40 ${tones[tone]}`}
-    >
+    <Button variant="outline" size="xs" onClick={onClick} disabled={disabled} className={`text-[11px] ${tones[tone]}`}>
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -112,20 +136,16 @@ function AttachGame({ seriesId, nextNumber, onDone }: { seriesId: number; nextNu
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span className="text-[11px] text-ink-subtle">карта {nextNumber}:</span>
-      <input
+      <Input
         value={matchId}
         onChange={(e) => setMatchId(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && matchId.trim() && submit()}
         placeholder="ID матча OpenDota"
-        className={`${input} w-44`}
+        className="h-8 w-44"
       />
-      <button
-        onClick={submit}
-        disabled={busy || !matchId.trim()}
-        className="rounded-lg bg-accent px-2.5 py-1.5 text-xs font-semibold text-accent-contrast transition hover:bg-accent-bright disabled:opacity-40"
-      >
+      <Button onClick={submit} disabled={busy || !matchId.trim()} size="sm">
         {busy ? "Читаю…" : "Привязать"}
-      </button>
+      </Button>
       {error && <span className="text-xs text-rose-400">{error}</span>}
     </div>
   );
@@ -373,126 +393,107 @@ export function SeriesAdmin({
                 статистику
               </Link>
             </span>
-            <button
+            <Button
               onClick={() => {
                 setError(null);
                 setShowForm(true);
               }}
-              className="rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-accent-contrast shadow-[0_6px_18px_-6px_var(--color-accent)] transition hover:bg-accent-bright"
             >
               + Завести встречу
-            </button>
+            </Button>
           </div>
         }
       />
 
-      {showForm && (
-        // Модалка новой встречи: клик по фону закрывает, по самой плашке — нет (stopPropagation).
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm"
-          onClick={() => setShowForm(false)}
-        >
-          <section
-            className="mt-16 w-full max-w-3xl rounded-xl border border-hairline bg-surface-1 p-5 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-base font-semibold text-ink">Новая встреча</h2>
-              <button
-                onClick={() => setShowForm(false)}
-                aria-label="Закрыть"
-                className="rounded-md border border-hairline-strong px-2 py-0.5 text-sm text-ink-muted transition hover:border-hairline-strong hover:text-ink"
-              >
-                ✕
-              </button>
-            </div>
+      {/* Модалка новой встречи на Radix Dialog: Esc, фокус-ловушка и крестик — из коробки.
+          bg-card (surface-1) поднимает плашку над чёрной канвой; sm:max-w-3xl под широкую форму. */}
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto border-hairline bg-card sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Новая встреча</DialogTitle>
+          </DialogHeader>
             <div className="flex flex-wrap items-end gap-3">
           <Field label="Дивизион">
-            <select value={division} onChange={(e) => setDivision(e.target.value)} className={input}>
+            <Sel value={division} onChange={setDivision}>
               {divisions.map((d) => (
-                <option key={d.name} value={d.name}>
+                <SelectItem key={d.name} value={d.name}>
                   {d.label}
-                </option>
+                </SelectItem>
               ))}
-            </select>
+            </Sel>
           </Field>
           <Field label="Стадия">
-            <select
+            <Sel
               value={stage}
-              onChange={(e) => {
-                const v = e.target.value;
+              onChange={(v) => {
                 setStage(v);
                 // При переходе в плей-офф сразу берём первый свободный слот сетки — с командами.
                 if (v === "playoff" && !slot) pickSlot((divSlots.find((s) => !s.taken) ?? divSlots[0])?.key ?? "");
               }}
-              className={input}
             >
               {STAGES.map((s) => (
-                <option key={s.key} value={s.key}>
+                <SelectItem key={s.key} value={s.key}>
                   {s.label}
-                </option>
+                </SelectItem>
               ))}
-            </select>
+            </Sel>
           </Field>
           {stage === "group" ?
             <Field label="Группа">
-              <select value={group} onChange={(e) => setGroup(e.target.value)} className={input}>
+              <Sel value={group} onChange={setGroup}>
                 {["A", "B"].map((g) => (
-                  <option key={g}>{g}</option>
+                  <SelectItem key={g} value={g}>
+                    {g}
+                  </SelectItem>
                 ))}
-              </select>
+              </Sel>
             </Field>
           : <Field label="Слот сетки">
               {/* половину сетки и раунд не спрашиваем: их задаёт слот (см. src/lib/playoff-bracket.ts) */}
-              <select value={slot} onChange={(e) => pickSlot(e.target.value)} className={`${input} w-56`}>
+              <Sel value={slot} onChange={pickSlot} className="w-56">
                 {divSlots.map((s) => (
-                  <option key={s.key} value={s.key}>
+                  <SelectItem key={s.key} value={s.key}>
                     {s.label} · {s.aName} — {s.bName}
                     {s.taken ? " (занят)" : ""}
-                  </option>
+                  </SelectItem>
                 ))}
-              </select>
+              </Sel>
             </Field>
           }
           <Field label="Хозяева">
-            <select value={homeId} onChange={(e) => setHomeId(e.target.value)} className={`${input} w-48`}>
-              <option value="">—</option>
+            <Sel value={homeId} onChange={setHomeId} placeholder="—" className="w-48">
               {options.map((t) => (
-                <option key={t.id} value={t.id}>
+                <SelectItem key={t.id} value={String(t.id)}>
                   {t.name}
-                </option>
+                </SelectItem>
               ))}
-            </select>
+            </Sel>
           </Field>
           <Field label="Счёт">
-            <select value={score} onChange={(e) => setScore(e.target.value)} className={input}>
+            <Sel value={score} onChange={setScore}>
               {scoreOptions.map((s) => (
-                <option key={s}>{s}</option>
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
               ))}
-            </select>
+            </Sel>
           </Field>
           <Field label="Гости">
-            <select value={awayId} onChange={(e) => setAwayId(e.target.value)} className={`${input} w-48`}>
-              <option value="">—</option>
+            <Sel value={awayId} onChange={setAwayId} placeholder="—" className="w-48">
               {options.map((t) => (
-                <option key={t.id} value={t.id}>
+                <SelectItem key={t.id} value={String(t.id)}>
                   {t.name}
-                </option>
+                </SelectItem>
               ))}
-            </select>
+            </Sel>
           </Field>
-              <button
-                onClick={create}
-                disabled={busy || !homeId || !awayId || (stage === "playoff" && !slot)}
-                className="rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-accent-contrast shadow-[0_6px_18px_-6px_var(--color-accent)] transition hover:bg-accent-bright disabled:opacity-40"
-              >
+              <Button onClick={create} disabled={busy || !homeId || !awayId || (stage === "playoff" && !slot)}>
                 {busy ? "…" : "Завести"}
-              </button>
+              </Button>
             </div>
             {error && <p className="mt-3 text-xs text-rose-400">{error}</p>}
-          </section>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* Дивизион — крупные пилюли, как в ростере команд: наверху весь фильтр по разделам. */}
       <div className="flex flex-wrap items-center gap-2">
@@ -518,11 +519,11 @@ export function SeriesAdmin({
 
         {/* Поиск и фильтр по картам — на той же строке, справа: разрезы больше не занимают ряд. */}
         <div className="ml-auto flex flex-wrap items-center gap-1.5">
-          <input
+          <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Поиск по командам"
-            className={`${input} w-52`}
+            className="h-8 w-52"
           />
           {(
             [

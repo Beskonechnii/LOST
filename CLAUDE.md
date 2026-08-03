@@ -23,6 +23,7 @@
     │                   и postgame/ (архив выгруженных картинок матча)
     └── src/
         ├── app/        роуты (Next App Router) + API
+        ├── components/ui/  примитивы shadcn/ui (Radix, интерактив) — на токенах LOST, см. §3 и ARCHITECTURE.md
         ├── lib/        серверная логика и доменные справочники
         ├── studio/     движок шаблонов графики (отдельно от страниц студии)
         └── generated/  Prisma-клиент, генерится, в .gitignore

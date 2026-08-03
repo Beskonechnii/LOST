@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 // Ввод id матча. Форма ничего не грузит — она только собирает адрес отчёта:
 // весь разбор живёт на /match/<id>, поэтому ссылкой на него можно поделиться.
@@ -30,7 +32,7 @@ export function MatchForm() {
   return (
     <div>
       <div className="flex flex-wrap items-center gap-2">
-        <input
+        <Input
           value={input}
           onChange={(e) => {
             setInput(e.target.value);
@@ -40,24 +42,20 @@ export function MatchForm() {
           placeholder="ID матча Dota 2, напр. 8907510684"
           inputMode="numeric"
           aria-label="ID матча Dota 2"
-          className="w-full max-w-xs rounded-md border border-hairline-strong bg-surface-1 px-3 py-2 text-sm outline-none focus:border-hairline-strong"
+          className="max-w-xs"
         />
-        <button
-          onClick={() => open("opendota")}
-          disabled={!input.trim()}
-          className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-canvas hover:bg-white disabled:opacity-50"
-        >
+        <Button onClick={() => open("opendota")} disabled={!input.trim()}>
           Разобрать
-        </button>
+        </Button>
         {/* Запасной источник: беднее данными, но живёт независимо от аварий OpenDota. */}
-        <button
+        <Button
+          variant="outline"
           onClick={() => open("steam")}
           disabled={!input.trim()}
           title="Первоисточник Valve: без графика золота, таймингов покупок, событий и ников"
-          className="rounded-md border border-hairline-strong px-4 py-2 text-sm font-medium text-ink-muted hover:border-hairline-strong hover:text-white disabled:opacity-50"
         >
           Из Steam
-        </button>
+        </Button>
       </div>
       {error && <p className="mt-2 text-sm text-rose-300">{error}</p>}
     </div>

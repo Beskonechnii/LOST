@@ -738,8 +738,8 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
   const maxNet = Math.max(1, ...(match?.players.map((p) => p.netWorth) ?? [1]));
 
   return (
-    <main className="flex-1 p-4 md:p-8">
-      <div className={`mx-auto ${SITE_MAX_W} space-y-4`}>
+    <main className="flex-1 px-4 py-8 md:px-6">
+      <div className={`mx-auto w-full ${SITE_MAX_W} space-y-4`}>
         {/* Шапка отчёта: возврат к форме, номер матча и переключатель источника. */}
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-hairline bg-surface-1 px-4 py-3 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-26px_rgba(0,0,0,0.9)]">
           <div className="flex min-w-0 items-center gap-3">

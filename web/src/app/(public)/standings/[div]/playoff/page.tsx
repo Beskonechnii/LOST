@@ -30,12 +30,10 @@ export default async function PlayoffPage({ params }: { params: Promise<{ div: s
         aside={<span className="text-ink-subtle">Сетка и счёт — из архива серий</span>}
       />
 
-      {/* Сетку выносим на всю ширину экрана: страница живёт в колонке SITE_MAX_W, а сетке нужен весь
-          экран, чтобы не быть намного мельче его. Приём full-bleed: ширина 100vw, левый край — к краю
-          окна (calc(50% - 50vw)). Логические отступы даём внутренними px. */}
-      <div className="ml-[calc(50%-50vw)] w-screen px-4 md:px-8">
-        <BracketView slots={bracket.slots} />
-      </div>
+      {/* Сетка живёт в общей колонке SITE_MAX_W, как и весь сайт: её край совпадает с шапкой,
+          подменю и заголовком. AutoScale подгоняет сетку под ширину колонки (натуральная ширина
+          ≈ ширине колонки, поэтому масштаб близок к 1:1). */}
+      <BracketView slots={bracket.slots} />
 
       {/* Не прошедшие из групп — вылет ещё до сетки. */}
       {bracket.out.length > 0 && (

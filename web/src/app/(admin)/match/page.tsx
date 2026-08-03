@@ -16,8 +16,8 @@ export default async function MatchPage() {
   const admin = await isAdmin();
 
   return (
-    <main className="flex-1 p-4 md:p-8">
-      <div className={`mx-auto ${SITE_MAX_W}`}>
+    <main className="flex-1 px-4 py-8 md:px-6">
+      <div className={`mx-auto w-full ${SITE_MAX_W}`}>
         <h1 className="text-lg font-bold tracking-tight">Разбор матча Dota 2</h1>
         <p className="mt-1 max-w-2xl text-sm text-ink-muted">
           Вставь ID матча — соберём постгейм-отчёт: счёт, драфт, скорборд, таланты, предметы и график

@@ -7,6 +7,7 @@ import { SITE_MAX_W } from "../../_components/ui";
 
 const TABS = [
   { href: "/studio", label: "Шаблоны", hint: "Сборка графики по данным лиги" },
+  { href: "/studio/editor", label: "Редактор", hint: "Свободный холст: ручная расстановка элементов" },
   { href: "/studio/generate", label: "Генерация", hint: "Картинки по промту через OpenAI" },
 ];
 

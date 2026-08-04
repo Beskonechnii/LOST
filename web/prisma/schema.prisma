@@ -185,6 +185,31 @@ model Render {
   matchId Int?
 }
 
+/// Документ визуального редактора студии (canvas-конструктор). В отличие от Render (payload формы
+/// под фиксированный кодовый шаблон) — это свободная раскладка: массив элементов с координатами.
+/// Всё состояние в doc JSON-строкой (sqlite), тип — DesignDoc в src/studio/editor/model.ts.
+/// Экспорт PNG клиентский (modern-screenshot), в БД хранится документ, а не картинка — переоткрыть и править.
+model Design {
+  id        Int      @id @default(autoincrement())
+  title     String?
+  doc       String // DesignDoc в JSON
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Материал медиатеки редактора: загруженная картинка (надпись, фон, декор) для расстановки на холст.
+/// Файл лежит локально в public/uploads/library — modern-screenshot инлайнит только локальные картинки.
+/// Отдельно от ростера (лого/фото команд): это самостоятельная библиотека графики, а не данные лиги.
+model MediaAsset {
+  id        Int      @id @default(autoincrement())
+  name      String
+  url       String // /uploads/library/<file>
+  category  String   @default("material") // фаза 1: одна категория; далее — категории/теги
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now())
+}
+
 /// Сессия шоу-драфта UNDERBEER 2.0. Оператор на эфире собирает команды из живого ростера:
 /// капитаны по очереди берут игроков, у каждой команды по разу есть «закрепить» и «украсть».
 /// Это НЕ ростер лиги (RosterSpot) — эфемерный вывод оператора, как Render: всё состояние

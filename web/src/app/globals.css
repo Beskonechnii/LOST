@@ -3,6 +3,12 @@
    tailwindcss-animate под Tailwind v4 — плагин на чистом CSS, без JS-конфига. */
 @import "tw-animate-css";
 
+/* Дизайн-система 1st-Pouf («claymorphism») — только токены/утилиты/keyframes.
+   Из файла вырезаны повторный @import tailwindcss и глобальный base-reset, а
+   токены --color-ink/--color-muted переименованы в clay-*, чтобы не конфликтовать
+   с нашими. Используется точечно на страницах, где обёртка несёт data-theme. */
+@import "../components/pouf/pouf.css";
+
 /* Дизайн-система LOST — перенос канвы HashiCorp на нашу тёмную тему.
    Три идеи, которые берём:
      1. Ступени поверхности (canvas → surface-1 → surface-2), а не россыпь neutral-9xx.
@@ -121,4 +127,38 @@ body {
   line-height: 1.23;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/* ============================================================================
+   Скоуп 1st-Pouf для страниц, целиком отрисованных в стиле «claymorphism».
+   На элементе стоят одновременно классы `pouf-lost` и `data-theme="dark"`:
+   второй включает тёмные «подушки» pouf, первый — правит три вещи под LOST:
+     • акцент перекрашен из пастельного #c9a8ff в бренд-violet #7c3aed;
+     • --on-accent = белый (тёмный ink на насыщенном фиолете нечитаем);
+     • --color-muted = muted-ТЕКСТ pouf (#b8afcb). Наш глобальный --color-muted
+       это цвет ПОВЕРХНОСТИ (shadcn), для утилиты text-muted он не годится.
+   Правило идёт после @import pouf.css, поэтому при равной специфичности с
+   [data-theme='dark'] выигрывает наш --on-accent. */
+/* Плюс классы порталов Radix (Sheet/меню): они рендерятся в <body> вне .pouf-lost,
+   поэтому перекраску и базовый цвет текста получают отдельным адресом. --color-muted
+   здесь локальный (pouf muted-ТЕКСТ) — на глобальный shadcn --color-muted не влияет. */
+.pouf-lost,
+.pouf-overlay,
+.pouf-sheet-dialog,
+.pouf-menu {
+  color: var(--ink);
+  --purple: #7c3aed;
+  --color-purple: #7c3aed;
+  --on-accent: #ffffff;
+}
+
+/* pouf-компоненты зовут утилиту text-muted, а наш @theme inline печёт в неё цвет
+   ПОВЕРХНОСТИ (тёмный) литералом — на тёмной подушке он невидим, и var-переопределение
+   инлайновую утилиту не берёт. Внутри pouf-скоупов перекрываем её на pouf muted-ТЕКСТ
+   (--muted = #b8afcb в тёмной теме); специфичности 0,2,0 против 0,1,0 утилиты хватает. */
+.pouf-lost .text-muted,
+.pouf-overlay .text-muted,
+.pouf-sheet-dialog .text-muted,
+.pouf-menu .text-muted {
+  color: var(--muted);
 }

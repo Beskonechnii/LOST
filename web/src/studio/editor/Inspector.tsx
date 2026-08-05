@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ColorField, NumberField } from "./controls";
 import type { FontDef } from "./fonts";
-import type { Element } from "./model";
+import type { Binding, BindingField, Element } from "./model";
 
 // Правая панель: свойства выделенного элемента. Патчит одно поле — workspace сливает в документ.
 // Общие поля (позиция/размер/поворот/прозрачность) сверху, типовые — ниже.
@@ -104,6 +104,10 @@ export function Inspector({
             <Checkbox checked={el.uppercase} onCheckedChange={(v) => onChange({ uppercase: v === true })} />
             ПРОПИСНЫЕ
           </label>
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-ink-muted">
+            <Checkbox checked={el.autoFit === true} onCheckedChange={(v) => onChange({ autoFit: v === true })} />
+            Вписать в бокс (авто-кегль)
+          </label>
         </div>
       )}
 
@@ -119,6 +123,20 @@ export function Inspector({
             ]}
           />
           <NumberField label="Скругление" value={el.radius} min={0} onChange={(v) => onChange({ radius: v })} />
+        </div>
+      )}
+
+      {(el.type === "text" || el.type === "image") && (
+        <div className="space-y-2 border-t border-hairline pt-3">
+          <SelectField
+            label="Данные (шаблон)"
+            value={el.binding ? `${el.binding.source}:${el.binding.field}` : ""}
+            onChange={(v) => onChange({ binding: parseBinding(v) })}
+            options={bindingOptions(el.type)}
+          />
+          <p className="text-xs text-ink-subtle">
+            Привязанный элемент подставится при заполнении серией. Без привязки — рисуется как есть.
+          </p>
         </div>
       )}
 
@@ -161,4 +179,43 @@ export function Inspector({
 
 function typeLabel(el: Element): string {
   return el.type === "text" ? "Текст" : el.type === "image" ? "Картинка" : el.type === "rect" ? "Прямоугольник" : "Эллипс";
+}
+
+// Поля-картинки идут в src, остальные — в текст: под текстовый элемент показываем одни, под картинку другие.
+const IMAGE_FIELDS: BindingField[] = ["logo", "wordmark", "photo", "stageLabel", "winnerBadge"];
+
+const BINDING_LABELS: Record<string, string> = {
+  "teamA:name": "Команда слева — название",
+  "teamB:name": "Команда справа — название",
+  "teamA:logo": "Команда слева — лого",
+  "teamB:logo": "Команда справа — лого",
+  "teamA:wordmark": "Команда слева — вордмарк",
+  "teamB:wordmark": "Команда справа — вордмарк",
+  "playerA:nickname": "Игрок слева — ник",
+  "playerB:nickname": "Игрок справа — ник",
+  "playerA:teamName": "Игрок слева — команда",
+  "playerB:teamName": "Игрок справа — команда",
+  "playerA:photo": "Игрок слева — фото",
+  "playerB:photo": "Игрок справа — фото",
+  "series:scoreA": "Серия — счёт слева",
+  "series:scoreB": "Серия — счёт справа",
+  "series:time": "Серия — время",
+  "series:format": "Серия — формат",
+  "series:stageLabel": "Серия — ярлык стадии",
+  "series:winnerBadge": "Серия — бейдж победителя",
+};
+
+/** Варианты привязки под тип элемента: картинке — поля-картинки, тексту — текстовые. */
+function bindingOptions(type: "text" | "image"): { value: string; label: string }[] {
+  const wantImage = type === "image";
+  const opts = Object.keys(BINDING_LABELS)
+    .filter((k) => IMAGE_FIELDS.includes(k.split(":")[1] as BindingField) === wantImage)
+    .map((value) => ({ value, label: BINDING_LABELS[value] }));
+  return [{ value: "", label: "— нет привязки —" }, ...opts];
+}
+
+function parseBinding(v: string): Binding | undefined {
+  if (!v) return undefined;
+  const [source, field] = v.split(":");
+  return { source: source as Binding["source"], field: field as BindingField };
 }

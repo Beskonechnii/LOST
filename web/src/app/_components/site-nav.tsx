@@ -47,7 +47,7 @@ const SEASON_SECTIONS: NavItem[] = [
 const ADMIN_SECTIONS: NavItem[] = [
   { href: "/underbeer", label: "UNDERBEER 2.0", hint: "Сборка шоу-команд драфтом" },
   { href: "/admin/series", label: "Архив серий", hint: "Встречи турнира и карты в них" },
-  { href: "/studio", label: "Студия", hint: "Графика к матчам" },
+  { href: "/studio/editor", label: "Студия", hint: "Графика к матчам" },
   { href: "/match", label: "Матч", hint: "Разбор матча Dota 2 по ID" },
   { href: "/admin/1x1", label: "1х1", hint: "Турнир 1х1 — в разработке" },
   { href: "/admin/fearless-draft", label: "fearless draft", hint: "Fearless draft — в разработке" },

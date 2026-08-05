@@ -8,6 +8,7 @@ import { LibraryPanel } from "@/studio/editor/LibraryPanel";
 import { Toolbar } from "@/studio/editor/Toolbar";
 import { LayersPanel } from "@/studio/editor/LayersPanel";
 import { fontFaceCss, type FontDef } from "@/studio/editor/fonts";
+import type { TeamGroup } from "@/studio/editor/LibraryPanel";
 import { makeElement, newId, scaleDoc, type DesignDoc, type Element, type ElementType } from "@/studio/editor/model";
 
 // Воркспейс редактора: всё состояние документа в useState, три панели вокруг холста.
@@ -19,11 +20,13 @@ export function Workspace({
   initialTitle,
   initialDoc,
   fonts,
+  teams,
 }: {
   id: number;
   initialTitle: string;
   initialDoc: DesignDoc;
   fonts: FontDef[];
+  teams: TeamGroup[];
 }) {
   const [doc, setDoc] = useState<DesignDoc>(initialDoc);
   const [title, setTitle] = useState(initialTitle);
@@ -150,10 +153,11 @@ export function Workspace({
         onConstrain={setConstrain}
       />
 
-      <div className="grid items-start gap-4 lg:grid-cols-[220px_minmax(0,1fr)_300px]">
+      <div className="grid items-start gap-4 lg:grid-cols-[300px_minmax(0,1fr)_300px]">
         <div className="space-y-4">
           <div className="rounded-lg border border-hairline bg-surface-1/40 p-3">
             <LibraryPanel
+              teams={teams}
               onAdd={(type) => addEl(type)}
               onAddImage={(src, w, h) => {
                 // сохраняем пропорции материала: вписываем в ~40% ширины холста

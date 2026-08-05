@@ -9,6 +9,26 @@ import { DEFAULT_FONT } from "./fonts";
 
 export type ElementType = "text" | "image" | "rect" | "ellipse";
 
+// Привязка элемента к данным лиги — то, что превращает свободный Design в шаблон. При «заполнении»
+// серией привязанный text/image берёт значение из ростера и счёта (src/studio/editor/resolve),
+// а элементы без привязки (фон, VS, декор) остаются ровно как нарисованы.
+export type BindingSource = "teamA" | "teamB" | "playerA" | "playerB" | "series";
+// Поля-строки идут в text.text, поля-картинки — в image.src (см. bindingFieldKind).
+export type BindingField =
+  | "name" // команда: название
+  | "logo" // команда: лого
+  | "wordmark" // команда: вордмарк
+  | "nickname" // игрок: ник
+  | "teamName" // игрок: его команда
+  | "photo" // игрок: фото
+  | "scoreA" // серия: счёт слева
+  | "scoreB" // серия: счёт справа
+  | "time" // серия: время начала
+  | "format" // серия: формат bo
+  | "stageLabel" // серия: картинка-ярлык стадии (PLAY-OFF / GROUP A / GROUP B)
+  | "winnerBadge"; // серия: бейдж над победителем — ставится над левой, при победе правой зеркалится
+export type Binding = { source: BindingSource; field: BindingField };
+
 /** Общие поля любого элемента: бокс в натуральных пикселях, поворот, прозрачность. */
 export type ElBase = {
   id: string;
@@ -20,6 +40,7 @@ export type ElBase = {
   opacity: number; // 0..1
   hidden?: boolean; // скрыт в панели слоёв: не рисуется ни в превью, ни в PNG
   name?: string; // имя слоя, задаётся в панели слоёв (иначе показываем тип/текст)
+  binding?: Binding; // привязка к данным серии; нет — элемент рисуется как задан
 };
 
 export type TextEl = ElBase & {
@@ -33,6 +54,7 @@ export type TextEl = ElBase & {
   letterSpacing: number; // px
   lineHeight: number; // множитель
   uppercase: boolean;
+  autoFit?: boolean; // ужимать кегль до одной строки по ширине бокса (имя команды в окошке рамки)
 };
 
 export type ImageEl = ElBase & {

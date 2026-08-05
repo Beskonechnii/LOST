@@ -155,6 +155,8 @@ model Series {
   /// исходов вычисляет участников поздних слотов. У групповых серий пусто.
   slot      String?
   playedAt  DateTime?
+  startAt   DateTime? // запланированное время начала серии — кормит анонс (привязка «Серия → время»)
+  format    String? // bo1 | bo3 | bo5 — кормит анонс (привязка «Серия → формат»)
   homeScore Int
   awayScore Int
   guessed   Boolean   @default(true)
@@ -164,7 +166,8 @@ model Series {
   away   Team @relation("SeriesAway", fields: [awayId], references: [id], onDelete: Cascade)
   awayId Int
 
-  games Match[]
+  games   Match[]
+  designs Design[]
 
   @@unique([division, stage, group, homeId, awayId])
   /// Один слот сетки — одна серия. У групповых slot=NULL, а NULL в sqlite-уникальности различны,
@@ -193,6 +196,14 @@ model Design {
   id        Int      @id @default(autoincrement())
   title     String?
   doc       String // DesignDoc в JSON
+  /// Тип графики серии: announce | score | result. Пустой seriesId = мастер-шаблон этого типа,
+  /// заполненный seriesId = готовая графика конкретной серии (клон мастера с подставленными данными).
+  kind      String?
+  series    Series?  @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  seriesId  Int?
+  /// Только для kind=score: номер карты, после которой сделан снимок счёта. Счёт накопительный —
+  /// после карты 2 это 1:1, а не только текущий тотал. Позволяет держать графику счёта по каждой карте.
+  mapNumber Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

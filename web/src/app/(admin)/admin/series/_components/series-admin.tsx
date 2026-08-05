@@ -189,6 +189,30 @@ function SeriesCard({ s, onChange }: { s: SeriesRow; onChange: () => void }) {
     onChange();
   };
 
+  // Графика серии: клон мастер-шаблона нужного типа с подставленными данными, открываем в редакторе.
+  // Повторное нажатие открывает уже созданную графику (endpoint не плодит дубли).
+  const makeGraphic = async (kind: "announce" | "announce2" | "score" | "result", mapNumber?: number) => {
+    setBusy(true);
+    setError(null);
+    // окно открываем синхронно в жесте клика — иначе попап-блокер режет открытие после await;
+    // так можно наделать несколько графов подряд, каждый в своей вкладке
+    const win = window.open("", "_blank");
+    const res = await fetch("/api/studio/series-graphic", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ seriesId: s.id, kind, mapNumber }),
+    });
+    const json = (await res.json().catch(() => ({}))) as { id?: number; error?: string };
+    setBusy(false);
+    if (!res.ok || !json.id) {
+      win?.close();
+      return setError(json.error ?? "Не вышло собрать графику");
+    }
+    const url = `/studio/editor/${json.id}`;
+    if (win) win.location.href = url;
+    else window.open(url, "_blank"); // фолбэк, если окно не открылось
+  };
+
   const used = new Set(s.games.map((g) => g.gameNumber));
   const nextNumber = [1, 2, 3, 4, 5].find((n) => !used.has(n)) ?? 1;
   // В плей-офф показываем подпись слота («ЧФ-1»), а не общий раунд: иначе четыре четвертьфинала
@@ -228,6 +252,19 @@ function SeriesCard({ s, onChange }: { s: SeriesRow; onChange: () => void }) {
 
       {error && <p className="mt-1 text-xs text-rose-400">{error}</p>}
 
+      <div className="mt-2 flex items-center gap-2">
+        <span className="text-[11px] uppercase tracking-widest text-ink-subtle">графика</span>
+        <ActionBtn tone="neutral" disabled={busy} onClick={() => makeGraphic("announce")}>
+          анонс
+        </ActionBtn>
+        <ActionBtn tone="neutral" disabled={busy} onClick={() => makeGraphic("announce2")}>
+          анонс 2
+        </ActionBtn>
+        <ActionBtn tone="neutral" disabled={busy} onClick={() => makeGraphic("result")}>
+          итог
+        </ActionBtn>
+      </div>
+
       <div className="mt-2 space-y-1">
         {s.games.length === 0 && <p className="text-[11px] text-ink-subtle">Карт пока нет — стата в рейтинги не идёт.</p>}
         {s.games.map((g) => (
@@ -243,6 +280,12 @@ function SeriesCard({ s, onChange }: { s: SeriesRow; onChange: () => void }) {
               {g.statsCount ? `стата: ${g.statsCount} игроков` : "стата не легла — игроков нет в ростере"}
             </span>
             <span className="ml-auto flex items-center gap-2">
+              {/* счёт серии на момент этой карты (накопительный): графика-заглушка между картами */}
+              {g.gameNumber != null && (
+                <ActionBtn tone="neutral" disabled={busy} onClick={() => makeGraphic("score", g.gameNumber!)}>
+                  счёт
+                </ActionBtn>
+              )}
               {/* отчёт дозревает: непарсенный матч позже обрастает вардами и таймингами */}
               <ActionBtn tone="neutral" disabled={busy} onClick={() => resync(g.matchId)}>
                 перечитать

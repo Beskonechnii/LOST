@@ -43,12 +43,12 @@ export function LayersPanel({
       {rows.length === 0 ? (
         <p className="mt-1 text-xs text-ink-subtle">Пока пусто.</p>
       ) : (
-        <ul className="mt-1 space-y-1">
+        <ul className="scroll-dark mt-1 max-h-64 space-y-1 overflow-y-auto pr-1">
           {rows.map((el) => (
             <li
               key={el.id}
               onClick={() => onSelect(el.id)}
-              className={`flex items-center gap-1.5 rounded px-2 py-1 text-sm ${
+              className={`group flex items-center gap-1.5 rounded px-2 py-1 text-sm ${
                 el.id === selectedId ? "bg-accent/15 text-accent-bright" : "text-ink-muted hover:bg-surface-2"
               } ${el.hidden ? "opacity-50" : ""}`}
             >
@@ -91,45 +91,52 @@ export function LayersPanel({
                   {layerName(el)}
                 </span>
               )}
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-xs"
-                title="Выше"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onOrder(el.id, "up");
-                }}
-                className="shrink-0 text-ink-subtle hover:text-ink"
+              {/* Действия по слою — по наведению или у выделенного; иначе имя занимает всю строку */}
+              <div
+                className={`shrink-0 items-center gap-0.5 ${
+                  el.id === selectedId ? "flex" : "hidden group-hover:flex"
+                }`}
               >
-                <ArrowUpIcon />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-xs"
-                title="Ниже"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onOrder(el.id, "down");
-                }}
-                className="shrink-0 text-ink-subtle hover:text-ink"
-              >
-                <ArrowDownIcon />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-xs"
-                title="Удалить"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRemove(el.id);
-                }}
-                className="shrink-0 text-ink-subtle hover:text-rose-400"
-              >
-                <TrashIcon />
-              </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
+                  title="Выше"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOrder(el.id, "up");
+                  }}
+                  className="text-ink-subtle hover:text-ink"
+                >
+                  <ArrowUpIcon />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
+                  title="Ниже"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOrder(el.id, "down");
+                  }}
+                  className="text-ink-subtle hover:text-ink"
+                >
+                  <ArrowDownIcon />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
+                  title="Удалить"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemove(el.id);
+                  }}
+                  className="text-ink-subtle hover:text-rose-400"
+                >
+                  <TrashIcon />
+                </Button>
+              </div>
             </li>
           ))}
         </ul>

@@ -5,14 +5,16 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { FORMAT_PRESETS } from "@/studio/editor/model";
 
-// Создание нового документа: выбор формата → POST /api/studio/designs → переход в редактор.
+// Создание новой публикации → POST /api/studio/designs → переход в редактор.
+// Формат по умолчанию — первый пресет (пост 1920×1080), дальше меняется в самом редакторе.
 
 export function CreateDesign() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
-  async function create(w: number, h: number) {
+  async function create() {
     setBusy(true);
+    const { w, h } = FORMAT_PRESETS[0];
     const res = await fetch("/api/studio/designs", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -27,12 +29,8 @@ export function CreateDesign() {
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {FORMAT_PRESETS.map((p) => (
-        <Button key={p.label} type="button" variant="outline" size="sm" disabled={busy} onClick={() => void create(p.w, p.h)}>
-          + {p.label}
-        </Button>
-      ))}
-    </div>
+    <Button type="button" disabled={busy} onClick={() => void create()}>
+      + Создать публикацию
+    </Button>
   );
 }

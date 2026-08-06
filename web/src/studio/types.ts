@@ -22,11 +22,42 @@ export type PlayerRef = {
   teamName: string | null;
 };
 
+// Скорборд карты — данные для пост-гейм шаблона. Разворачивается из matchId на сервере
+// (src/lib/scoreboard.ts): полный отчёт матча (герои, KDA, урон, предметы) + лого/цвета из ростера.
+// Живёт здесь, потому что и серверная сборка, и клиентский рендер шаблона должны знать его форму.
+export type BoardItem = { slug: string; name: string };
+export type BoardPlayer = {
+  pos: number; // 1..5 — порядок в составе
+  role: string; // подпись роли из отчёта
+  heroSlug: string;
+  heroName: string;
+  nick: string;
+  level: number;
+  kills: number;
+  deaths: number;
+  assists: number;
+  heroDamage: number;
+  netWorth: number;
+  items: BoardItem[]; // до 6 основных
+  backpack: BoardItem[]; // до 3
+  neutral: BoardItem | null;
+};
+export type BoardTeam = {
+  name: string;
+  tag: string | null;
+  logo: string | null;
+  color: string | null;
+  won: boolean;
+  players: BoardPlayer[];
+};
+export type ScoreBoard = { teamTop: BoardTeam; teamBottom: BoardTeam };
+
 export type FieldDef =
   | { kind: "text"; key: string; label: string; default?: string; placeholder?: string }
   | { kind: "select"; key: string; label: string; options: string[]; default?: string }
   | { kind: "team"; key: string; label: string }
   | { kind: "player"; key: string; label: string }
+  | { kind: "match"; key: string; label: string } // пикер матча → разворачивается в ScoreBoard
   | { kind: "group"; key: string; label: string; max: number; fields: FieldDef[] };
 
 /** Что хранится в форме и в БД (Render.payload): ссылки на команды/игроков — id строкой. */
@@ -34,8 +65,8 @@ export type RawValue = string | RawRow[];
 export type RawRow = Record<string, string>;
 export type RawPayload = Record<string, RawValue>;
 
-/** Что приходит в компонент рендера: team/player уже развёрнуты в объекты. */
-export type Scalar = string | TeamRef | PlayerRef | null;
+/** Что приходит в компонент рендера: team/player/match уже развёрнуты в объекты. */
+export type Scalar = string | TeamRef | PlayerRef | ScoreBoard | null;
 export type ResolvedRow = Record<string, Scalar>;
 export type Value = Scalar | ResolvedRow[];
 export type Data = Record<string, Value>;
@@ -88,4 +119,6 @@ export const asTeam = (v: Value | undefined): TeamRef | null =>
   v && typeof v === "object" && !Array.isArray(v) && "name" in v ? (v as TeamRef) : null;
 export const asPlayer = (v: Value | undefined): PlayerRef | null =>
   v && typeof v === "object" && !Array.isArray(v) && "nickname" in v ? (v as PlayerRef) : null;
+export const asBoard = (v: Value | undefined): ScoreBoard | null =>
+  v && typeof v === "object" && !Array.isArray(v) && "teamTop" in v ? (v as ScoreBoard) : null;
 export const asRows = (v: Value | undefined): ResolvedRow[] => (Array.isArray(v) ? v : []);

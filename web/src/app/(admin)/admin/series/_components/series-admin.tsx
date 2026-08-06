@@ -310,6 +310,16 @@ function SeriesCard({ s, onChange }: { s: SeriesRow; onChange: () => void }) {
                     счёт
                   </ActionBtn>
                 )}
+                {/* пост-гейм скорборд карты в студии: матч уже выбран, борд соберётся из отчёта */}
+                {g.openDotaMatchId && (
+                  <ActionBtn
+                    tone="neutral"
+                    disabled={busy}
+                    onClick={() => window.open(`/studio/new/postgame-board?match=${g.matchId}`, "_blank")}
+                  >
+                    скорборд
+                  </ActionBtn>
+                )}
                 {/* отчёт дозревает: непарсенный матч позже обрастает вардами и таймингами */}
                 <ActionBtn tone="neutral" disabled={busy} onClick={() => resync(g.matchId)}>
                   перечитать

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getTemplate } from "@/studio/registry";
 import { resolvePayload } from "@/studio/resolve";
 import type { RawPayload } from "@/studio/types";
-import { getRefs } from "@/lib/studio-refs";
+import { getBoardsForPayload, getRefs } from "@/lib/studio-refs";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +31,8 @@ export default async function RenderPage({
     payload = JSON.parse(Buffer.from(p, "base64url").toString("utf8")) as RawPayload;
   }
 
-  const data = resolvePayload(template.fields, payload, await getRefs());
+  const [refs, boards] = await Promise.all([getRefs(), getBoardsForPayload(template.fields, payload)]);
+  const data = resolvePayload(template.fields, payload, { ...refs, boards });
   const { Render, size } = template;
 
   return (

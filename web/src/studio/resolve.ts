@@ -2,9 +2,11 @@
 // Используется и в живом превью (клиент, справочники уже загружены), и на серверной
 // странице /studio/render/[templateId] — источник один, расхождений между превью и PNG нет.
 
-import type { Data, FieldDef, PlayerRef, RawPayload, RawRow, ResolvedRow, TeamRef } from "./types";
+import type { Data, FieldDef, PlayerRef, RawPayload, RawRow, ResolvedRow, ScoreBoard, TeamRef } from "./types";
 
-export type Refs = { teams: TeamRef[]; players: PlayerRef[] };
+// boards: скорборды карт по matchId (строкой). Их не грузят заранее скопом (отчёт тяжёлый) —
+// мастер догружает по выбору матча, серверный рендер собирает по matchId из payload.
+export type Refs = { teams: TeamRef[]; players: PlayerRef[]; boards?: Record<string, ScoreBoard> };
 
 export function resolvePayload(fields: FieldDef[], payload: RawPayload, refs: Refs): Data {
   const teamById = new Map(refs.teams.map((t) => [String(t.id), t]));
@@ -13,6 +15,7 @@ export function resolvePayload(fields: FieldDef[], payload: RawPayload, refs: Re
   const one = (f: FieldDef, raw: string | undefined) => {
     if (f.kind === "team") return teamById.get(raw ?? "") ?? null;
     if (f.kind === "player") return playerById.get(raw ?? "") ?? null;
+    if (f.kind === "match") return refs.boards?.[raw ?? ""] ?? null;
     return raw ?? "";
   };
 

@@ -8,7 +8,7 @@
 
 import raw from "./dota-constants.json";
 
-export type LocalHero = { id: number; name: string; localized_name: string };
+export type LocalHero = { id: number; name: string; localized_name: string; primary_attr: "str" | "agi" | "int" | "all" };
 export type LocalConstants = {
   itemIds: Record<string, string>;
   items: Record<string, { dname?: string }>;

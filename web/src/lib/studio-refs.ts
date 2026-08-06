@@ -3,8 +3,9 @@
 
 import { prisma } from "@/lib/prisma";
 import { isCoreRole } from "@/lib/roster-spots";
+import { buildScoreboard } from "@/lib/scoreboard";
 import { withPlayerUploads, withTeamUploads } from "@/lib/uploads";
-import type { MatchOption, PlayerRef, TeamRef } from "@/studio/types";
+import type { FieldDef, MatchOption, PlayerRef, RawPayload, ScoreBoard, TeamRef } from "@/studio/types";
 import type { Refs } from "@/studio/resolve";
 
 
@@ -44,6 +45,25 @@ export async function getRefs(): Promise<Refs> {
   );
 
   return { teams: teamRefs, players: playerRefs };
+}
+
+/**
+ * Скорборды для полей kind:"match" в payload — для серверного рендера («голая» страница /studio/render).
+ * В мастере борды догружает клиент по выбору матча; здесь их надо собрать по matchId из payload.
+ */
+export async function getBoardsForPayload(fields: FieldDef[], payload: RawPayload): Promise<Record<string, ScoreBoard>> {
+  const ids = fields
+    .filter((f) => f.kind === "match")
+    .map((f) => (typeof payload[f.key] === "string" ? (payload[f.key] as string) : ""))
+    .filter(Boolean);
+  const boards: Record<string, ScoreBoard> = {};
+  await Promise.all(
+    ids.map(async (id) => {
+      const board = await buildScoreboard(Number(id));
+      if (board) boards[id] = board;
+    }),
+  );
+  return boards;
 }
 
 export async function getMatchOptions(): Promise<MatchOption[]> {

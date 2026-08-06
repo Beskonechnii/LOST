@@ -38,6 +38,8 @@ async function main() {
     id: h.id,
     name: h.name,
     localized_name: h.localized_name,
+    // primary_attr: str|agi|int|all — нужен single draft (герой по каждой характеристике).
+    primary_attr: h.primary_attr,
   }));
   const broken = heroList.filter((h) => !h.id || !h.name || !h.localized_name);
   if (broken.length) throw new Error(`Герои без обязательных полей: ${broken.length}`);

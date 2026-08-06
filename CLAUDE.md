@@ -75,6 +75,7 @@ layout, навигация и метаданные. Почему так, а не
 | `rate-limit.ts` | **только сервер**: окно запросов по IP. Расходуют его **только промахи кэша** — отдача с полки бесплатна |
 | `steam-match.ts` | **только сервер**: запасной источник матча — Steam Web API (`STEAM_API_KEY`). Приводит ответ Valve к `RawMatch` и отдаёт в общую сборку из `opendota.ts` |
 | `match-sync.ts` | **только сервер**: отчёт матча → `MatchStat` + длительность + авто-победитель + подсказка MVP. Отчёт берёт из `match-api.ts`, то есть из того же кэша, что и постгейм |
+| `scoreboard.ts` | **только сервер**: сборка `ScoreBoard` карты для шаблона `postgame-board` — отчёт (`loadMatchReport`, с предметами) + лого/цвета из ростера. Кормит поле `kind:"match"` студии |
 | `series.ts` | **только сервер**: архив серий — список/создание встреч и привязка карт (`attachGame` заводит `Match` и зовёт синк). Всё, что пишет в архив, идёт отсюда |
 | `leaders.ts` | **только сервер**: рейтинги турнира из `MatchStat`. Ничего не хранит — суммирует в памяти по фильтру «дивизион / стадия / группа» |
 | `stages.ts` | стадии турнира (`group`/`playoff`), половины сетки (`upper`/`lower`/`grand`), раунды плей-офф и `CUTS` — разрезы, которыми режут архив и статистику. Без БД, годится на клиенте — как `divisions.ts` |
@@ -103,9 +104,9 @@ layout, навигация и метаданные. Почему так, а не
 
 | Файл | Роль |
 |---|---|
-| `types.ts` | контракт: `FieldDef` (text/select/team/player/group), `TemplateDef`, хелперы `asText/asTeam/asPlayer/asRows` |
+| `types.ts` | контракт: `FieldDef` (text/select/team/player/match/group), `TemplateDef`, `ScoreBoard`, хелперы `asText/asTeam/asPlayer/asBoard/asRows` |
 | `registry.ts` | единственная точка регистрации шаблонов |
-| `resolve.ts` | payload формы (id строкой) → развёрнутые объекты для рендера |
+| `resolve.ts` | payload формы (id строкой) → развёрнутые объекты для рендера. Поле `match` разворачивается через `Refs.boards` (скорборд карты, см. `lib/scoreboard.ts`) |
 | `Canvas.tsx` | превью: натуральные пиксели под `transform: scale`, contain по обеим сторонам |
 | `templates/parts.tsx` | общие куски шаблонов |
 

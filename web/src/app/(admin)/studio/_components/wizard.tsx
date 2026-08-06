@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { domToPng } from "modern-screenshot";
 import { Canvas } from "@/studio/Canvas";
 import { getTemplate } from "@/studio/registry";
@@ -12,6 +12,7 @@ import {
   type MatchOption,
   type RawPayload,
   type RawRow,
+  type ScoreBoard,
   type TemplateDef,
 } from "@/studio/types";
 import { Label, SelectField, TextField } from "../../../_components/form";
@@ -41,9 +42,49 @@ function WizardForm({
   const [payload, setPayload] = useState<RawPayload>(() => initial ?? emptyPayload(template.fields));
   const [saved, setSaved] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Скорборды карт (kind:"match") догружаются по выбору матча — отчёт тяжёлый и серверный.
+  const [boards, setBoards] = useState<Record<string, ScoreBoard>>({});
+  const [boardError, setBoardError] = useState<string | null>(null);
+  const [boardBusy, setBoardBusy] = useState(false);
   const node = useRef<HTMLDivElement>(null);
 
-  const data = useMemo(() => resolvePayload(template.fields, payload, refs), [template, payload, refs]);
+  // matchId'ы, выбранные в полях kind:"match" (у наших шаблонов такое поле одно).
+  const matchIds = useMemo(() => {
+    const keys = template.fields.filter((f) => f.kind === "match").map((f) => f.key);
+    return keys.map((k) => (typeof payload[k] === "string" ? (payload[k] as string) : "")).filter(Boolean);
+  }, [template, payload]);
+
+  // Догрузка недостающих бордов при выборе матча (в т.ч. из initial payload, ?match=).
+  useEffect(() => {
+    const missing = matchIds.filter((id) => !(id in boards));
+    if (missing.length === 0) return;
+    let cancelled = false;
+    const load = async () => {
+      setBoardBusy(true);
+      setBoardError(null);
+      try {
+        const pairs = await Promise.all(
+          missing.map(async (id) => {
+            const res = await fetch(`/api/studio/match-board?matchId=${id}`);
+            if (!res.ok) throw new Error((await res.json().catch(() => ({})))?.error ?? "Не удалось собрать скорборд");
+            return [id, (await res.json()) as ScoreBoard] as const;
+          }),
+        );
+        if (!cancelled) setBoards((b) => ({ ...b, ...Object.fromEntries(pairs) }));
+      } catch (e) {
+        if (!cancelled) setBoardError(e instanceof Error ? e.message : "Ошибка");
+      } finally {
+        if (!cancelled) setBoardBusy(false);
+      }
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [matchIds, boards]);
+
+  const mergedRefs = useMemo<Refs>(() => ({ ...refs, boards }), [refs, boards]);
+  const data = useMemo(() => resolvePayload(template.fields, payload, mergedRefs), [template, payload, mergedRefs]);
   const { size, Render } = template;
 
   const setField = (key: string, value: string) => setPayload((p) => ({ ...p, [key]: value }));
@@ -98,10 +139,12 @@ function WizardForm({
 
   async function save() {
     setSaved(null);
+    // Привязываем сохранённый рендер к матчу — так он виден в архиве серий по своей карте.
+    const matchId = matchIds.length ? Number(matchIds[0]) : undefined;
     const res = await fetch("/api/studio/renders", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ templateId: template.id, payload }),
+      body: JSON.stringify({ templateId: template.id, payload, matchId }),
     });
     setSaved(res.ok ? "Сохранено в историю" : "Не удалось сохранить");
   }
@@ -144,6 +187,7 @@ function WizardForm({
               field={f}
               rows={(payload[f.key] as RawRow[]) ?? []}
               refs={refs}
+              matches={matches}
               onChange={(i, sub, v) => setRow(f.key, i, sub, v)}
               onAdd={() =>
                 setPayload((p) => ({ ...p, [f.key]: [...((p[f.key] as RawRow[]) ?? []), emptyRow(f.fields)] }))
@@ -158,10 +202,14 @@ function WizardForm({
               field={f}
               value={(payload[f.key] as string) ?? ""}
               refs={refs}
+              matches={matches}
               onChange={(v) => setField(f.key, v)}
             />
           ),
         )}
+
+        {boardBusy && <p className="text-sm text-ink-subtle">Собираю скорборд…</p>}
+        {boardError && <p className="text-sm text-rose-400">{boardError}</p>}
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <Button type="button" disabled={busy} onClick={() => void exportPng()}>
@@ -193,13 +241,25 @@ function PlainField({
   field,
   value,
   refs,
+  matches,
   onChange,
 }: {
   field: FieldDef;
   value: string;
   refs: Refs;
+  matches: MatchOption[];
   onChange: (v: string) => void;
 }) {
+  if (field.kind === "match") {
+    return (
+      <SelectField
+        label={field.label}
+        value={value}
+        onChange={onChange}
+        options={[{ value: "", label: "— матч —" }, ...matches.map((m) => ({ value: String(m.id), label: m.label }))]}
+      />
+    );
+  }
   if (field.kind === "team") {
     return (
       <SelectField
@@ -243,6 +303,7 @@ function GroupField({
   field,
   rows,
   refs,
+  matches,
   onChange,
   onAdd,
   onRemove,
@@ -250,6 +311,7 @@ function GroupField({
   field: Extract<FieldDef, { kind: "group" }>;
   rows: RawRow[];
   refs: Refs;
+  matches: MatchOption[];
   onChange: (i: number, sub: string, v: string) => void;
   onAdd: () => void;
   onRemove: (i: number) => void;
@@ -278,6 +340,7 @@ function GroupField({
               field={sub}
               value={row[sub.key] ?? ""}
               refs={refs}
+              matches={matches}
               onChange={(v) => onChange(i, sub.key, v)}
             />
           ))}

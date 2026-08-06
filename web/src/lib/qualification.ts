@@ -12,12 +12,17 @@ export const QUALIFICATION: Record<Qualification, { label: string; text: string;
 };
 
 /**
- * Регламент: 1–4 место — верхняя сетка, 5–6 — нижняя, два последних вылетают.
- * Считаем от низа, а не по фиксированным 7–8: в группе может быть не восемь команд.
+ * Регламент отличается по дивизионам:
+ *  - Division 1 (8 команд в группе): 1–4 — верхняя, 5–6 — нижняя, два последних вылетают.
+ *  - Division 2 (6 команд в группе): 1–4 — верхняя, все остальные — нижняя, вылета из группы нет.
+ * Дивизион — имя из Team.group ("Division 1"/"Division 2"), как в divisions.ts.
+ * Считаем от низа, а не по фиксированным местам: в группе может быть не восемь команд.
  */
-export function qualificationOf(place: number, groupSize: number): Qualification {
-  if (place > groupSize - 2) return "out";
-  return place <= 4 ? "upper" : "lower";
+export function qualificationOf(place: number, groupSize: number, division: string): Qualification {
+  if (place <= 4) return "upper";
+  // В D2 нижние команды не вылетают, а падают в нижнюю сетку.
+  if (division === "Division 2") return "lower";
+  return place > groupSize - 2 ? "out" : "lower";
 }
 
 /**

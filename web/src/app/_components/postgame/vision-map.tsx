@@ -195,7 +195,7 @@ export function VisionMap({
                   setPlaying(false);
                   setTime(Number(e.target.value));
                 }}
-                className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-surface-2 accent-accent"
+                className="vision-slider w-full"
               />
               {/* Деления: 0, 10, 20… минут. Клик по метке — перейти к ней. */}
               <div className="relative mt-1 h-4">

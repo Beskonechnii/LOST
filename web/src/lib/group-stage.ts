@@ -39,7 +39,7 @@ export type GroupTable = {
 export async function getQualified(division: string) {
   const tables = await getGroupStage(division);
   const seeded = tables.flatMap((t) =>
-    t.rows.map((r) => ({ ...r, group: t.group, zone: qualificationOf(r.place, t.rows.length) })),
+    t.rows.map((r) => ({ ...r, group: t.group, zone: qualificationOf(r.place, t.rows.length, t.division) })),
   );
   const byPlace = (a: { place: number; group: string }, b: { place: number; group: string }) =>
     a.place - b.place || a.group.localeCompare(b.group);

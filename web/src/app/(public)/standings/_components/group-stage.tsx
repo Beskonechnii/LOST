@@ -38,7 +38,7 @@ export function GroupStage({ tables }: { tables: GroupTable[] }) {
               </thead>
               <tbody>
                 {t.rows.map((r, i) => {
-                  const zone = QUALIFICATION[qualificationOf(r.place, t.rows.length)];
+                  const zone = QUALIFICATION[qualificationOf(r.place, t.rows.length, t.division)];
                   const leader = r.place === 1;
                   return (
                     <tr key={r.teamId} className="border-t border-hairline">

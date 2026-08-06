@@ -30,7 +30,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
   // Место берём из общей таблицы, а не считаем заново: один источник с разделом «LOST D1».
   const group = standings.find((g) => g.rows.some((r) => r.teamId === team.id));
   const row = group?.rows.find((r) => r.teamId === team.id) ?? null;
-  const zone = row?.place ? qualificationOf(row.place, group!.rows.length) : null;
+  const zone = row?.place ? qualificationOf(row.place, group!.rows.length, team.group ?? DIVISIONS[0].name) : null;
 
   return (
     <div className="space-y-6">

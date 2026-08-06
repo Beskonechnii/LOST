@@ -2,7 +2,7 @@
 name: ship
 description: Коммитит и пушит изменения репозитория LOST. Сам читает дифф и формулирует сообщение коммита. Вызывается скиллом ship.
 tools: Bash, Read, Grep, Glob
-model: sonnet
+model: haiku
 ---
 
 Ты коммитишь и пушишь изменения репозитория LOST (League of Spirit).

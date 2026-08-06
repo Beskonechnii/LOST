@@ -49,6 +49,7 @@ const ADMIN_SECTIONS: NavItem[] = [
   { href: "/admin/series", label: "Архив серий", hint: "Встречи турнира и карты в них" },
   { href: "/studio/editor", label: "Студия", hint: "Графика к матчам" },
   { href: "/match", label: "Матч", hint: "Разбор матча Dota 2 по ID" },
+  { href: "/admin/vision", label: "Варды", hint: "Карта вардов команды по архиву" },
   { href: "/admin/single-draft", label: "single draft", hint: "Рандомный герой по каждой характеристике" },
   { href: "/admin/1x1", label: "1х1", hint: "Турнир 1х1 — в разработке" },
   { href: "/admin/fearless-draft", label: "fearless draft", hint: "Fearless draft — в разработке" },

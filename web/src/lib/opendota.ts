@@ -43,6 +43,9 @@ async function getJson<T>(url: string): Promise<T> {
 }
 
 // --- Сырые формы OpenDota (только нужные поля) ---
+// Запись лога варда: постановка (obs/sen_log) или снятие (obs/sen_left_log).
+// x/y — мировые координаты миникарты (64..192), ehandle — id сущности, связывает пару.
+type WardLogEntry = { time: number; x: number; y: number; ehandle?: number; player_slot?: number; attackername?: string };
 type RawPlayer = {
   isRadiant?: boolean;
   name?: string | null;
@@ -77,6 +80,11 @@ type RawPlayer = {
   camps_stacked?: number;
   obs_placed?: number; // парс
   sen_placed?: number; // парс
+  // Логи вардов (только у распарсенных): постановка и снятие/истечение. ehandle связывает пару.
+  obs_log?: WardLogEntry[] | null;
+  sen_log?: WardLogEntry[] | null;
+  obs_left_log?: WardLogEntry[] | null;
+  sen_left_log?: WardLogEntry[] | null;
   lane_role?: number | null;
   player_slot?: number; // <128 — свет, иначе тьма; нужен для резолва событий objectives
 };
@@ -116,6 +124,21 @@ async function heroInfo(): Promise<Map<number, Entity>> {
   // slug из name (npc_dota_hero_antimage → antimage) — совпадает с sync-assets.ts
   heroCache = new Map(arr.map((h) => [h.id, { name: h.localized_name, slug: h.name.replace(/^npc_dota_hero_/, "") }]));
   return heroCache;
+}
+
+// Герой по slug'у (для данных, где хранится только slug — например варды из БД). Из вендоренного
+// справочника, синхронно; неизвестный slug — прямой prettify как фолбэк.
+let heroSlugCache: Map<string, Entity> | null = null;
+export function heroBySlug(slug: string): Entity {
+  if (!heroSlugCache) {
+    heroSlugCache = new Map(
+      localHeroes().map((h) => {
+        const s = h.name.replace(/^npc_dota_hero_/, "");
+        return [s, { name: h.localized_name, slug: s }];
+      }),
+    );
+  }
+  return heroSlugCache.get(slug) ?? { name: slug ? pretty(slug) : "", slug };
 }
 
 type HeroAbilities = { talents?: { name: string; level: number }[] };
@@ -232,6 +255,19 @@ export type MatchEvents = {
   couriers: { radiant: number; dire: number; kills: { time: number; victimSide: Side; killer: Entity | null }[] };
 };
 
+// Вард на карте: где, чей, какого типа, когда поставлен и когда снят/истёк.
+// x/y — доля карты (0..1) от левого-верхнего угла, уже пересчитанные из мировых координат.
+export type Ward = {
+  side: Side;
+  hero: Entity; // кто поставил
+  type: "obs" | "sen"; // обсервер / сентри
+  x: number; // 0..1 слева направо
+  y: number; // 0..1 сверху вниз
+  placed: number; // секунда постановки (может быть < 0 — префейз)
+  left: number | null; // секунда снятия/истечения; null — дожил до конца матча
+  killer: Entity | null; // герой, снявший вард (если снят раньше срока)
+};
+
 export type MatchReport = {
   matchId: string;
   parsed: boolean;
@@ -253,6 +289,7 @@ export type MatchReport = {
   events: MatchEvents;
   picksBans: PickBan[];
   players: PlayerReport[];
+  wards: Ward[]; // расстановка вардов по времени (пусто у нераспарсенных и Steam-источника)
 };
 
 // --- Декод битмасок строений (бит=1 → строение цело) ---
@@ -494,6 +531,48 @@ export async function buildMatchReport(matchId: string, m: RawMatch): Promise<Ma
     dire: { ...decodeTowers(m.tower_status_dire), racks: decodeRacks(m.barracks_status_dire) },
   };
 
+  // --- Варды: постановка + снятие/истечение по каждому игроку ---
+  // Мировые координаты миникарты — 64..192 по обеим осям, свет в низу-слева (как detailed_740).
+  // Доля карты: x → слева направо; y инвертируем (большой y — верх карты).
+  const frac = (v: number) => Math.min(1, Math.max(0, (v - 64) / 128));
+  const wardXY = (x: number, y: number) => ({ x: frac(x), y: 1 - frac(y) });
+  // Ресурс жизни варда — чтобы отличить снятие врагом от честного истечения (obs 6 мин, sen 7 мин).
+  const WARD_LIFE = { obs: 360, sen: 420 };
+  // Герой по npc-имени из attackername (npc_dota_hero_storm_spirit → Storm Spirit).
+  const heroBySlug = new Map<string, Entity>([...heroes.values()].map((h) => [h.slug, h]));
+  const killerOf = (name?: string): Entity | null =>
+    (name && heroBySlug.get(name.replace(/^npc_dota_hero_/, ""))) || null;
+  // ehandle → запись снятия (по всем игрокам, оба типа): ehandle уникален в матче.
+  const leftByHandle = new Map<number, WardLogEntry>();
+  for (const p of m.players) {
+    for (const e of [...(p.obs_left_log ?? []), ...(p.sen_left_log ?? [])]) {
+      if (e.ehandle != null) leftByHandle.set(e.ehandle, e);
+    }
+  }
+  const wards: Ward[] = [];
+  for (const p of m.players) {
+    const side: Side = p.isRadiant ? "radiant" : "dire";
+    const hero = heroEntity(p.hero_id);
+    for (const [type, log] of [["obs", p.obs_log], ["sen", p.sen_log]] as const) {
+      for (const e of log ?? []) {
+        const gone = e.ehandle != null ? leftByHandle.get(e.ehandle) : undefined;
+        const left = gone?.time ?? null;
+        // Снят врагом — если исчез заметно раньше максимального срока жизни.
+        const destroyed = left != null && left - e.time < WARD_LIFE[type] - 5;
+        wards.push({
+          side,
+          hero,
+          type,
+          ...wardXY(e.x, e.y),
+          placed: e.time,
+          left,
+          killer: destroyed ? killerOf(gone?.attackername) : null,
+        });
+      }
+    }
+  }
+  wards.sort((a, b) => a.placed - b.placed);
+
   const picksBans: PickBan[] = (m.picks_bans ?? [])
     .map((pb) => ({
       order: pb.order,
@@ -524,5 +603,6 @@ export async function buildMatchReport(matchId: string, m: RawMatch): Promise<Ma
     events,
     picksBans,
     players,
+    wards,
   };
 }

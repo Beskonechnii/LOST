@@ -28,9 +28,9 @@ const d = (v: string | Date | null | undefined) => (v ? new Date(v) : null);
 
 async function main() {
   const snap = JSON.parse(readFileSync(input, "utf8"));
-  if (snap.version !== 4) {
+  if (snap.version !== 5) {
     throw new Error(
-      `Снимок версии ${snap.version}, а нужен 4. Снимки не мигрируются: пересними базу свежим ` +
+      `Снимок версии ${snap.version}, а нужен 5. Снимки не мигрируются: пересними базу свежим ` +
         `scripts/export-db.ts на той машине, где данные актуальны.`,
     );
   }
@@ -81,6 +81,7 @@ async function main() {
   await prisma.render.deleteMany();
   await prisma.pointsEntry.deleteMany();
   await prisma.matchStat.deleteMany();
+  await prisma.ward.deleteMany();
   // Матчи строго раньше серий: на серию ссылается карта, обратный порядок упрётся во внешний ключ.
   await prisma.match.deleteMany();
   await prisma.series.deleteMany();
@@ -200,6 +201,16 @@ async function main() {
     });
   }
 
+  // Варды — пачкой: строк много (тысячи), по одной было бы медленно. matchKey обязан найтись.
+  if (snap.wards?.length) {
+    await prisma.ward.createMany({
+      data: snap.wards.map((w: { matchKey: string; teamSlug: string | null } & Record<string, unknown>) => {
+        const { matchKey, teamSlug, ...rest } = w;
+        return { ...rest, matchId: matchId.get(matchKey)!, teamId: teamSlug ? teamId.get(teamSlug) ?? null : null };
+      }),
+    });
+  }
+
   console.log("\nГотово. В базе:");
   console.table({
     команды: await prisma.team.count(),
@@ -211,6 +222,7 @@ async function main() {
     "стата матчей": await prisma.matchStat.count(),
     баллы: await prisma.pointsEntry.count(),
     генерации: await prisma.render.count(),
+    варды: await prisma.ward.count(),
   });
 }
 

@@ -25,9 +25,9 @@ export default async function StandingsPage({ params }: { params: Promise<{ div:
         aside={<>Счёт и очки — из привязанных карт архива серий, автоматически</>}
       />
 
-      {/* легенда зон: те же цвета, что и рейка слева от места */}
+      {/* легенда зон: те же цвета, что и рейка слева от места. В D2 вылета из группы нет — чип не показываем */}
       <div className="flex flex-wrap gap-2">
-        {(["upper", "lower", "out"] as const).map((k) => (
+        {(division.name === "Division 2" ? (["upper", "lower"] as const) : (["upper", "lower", "out"] as const)).map((k) => (
           <Chip key={k}>
             <span className={`h-2 w-2 rounded-full ${QUALIFICATION[k].marker}`} />
             {QUALIFICATION[k].label}

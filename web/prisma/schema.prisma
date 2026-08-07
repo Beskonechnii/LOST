@@ -30,6 +30,7 @@ model Team {
   groupEntries   GroupEntry[]
   seriesHome     Series[]      @relation("SeriesHome")
   seriesAway     Series[]      @relation("SeriesAway")
+  wards          Ward[]
 }
 
 model Player {
@@ -105,6 +106,7 @@ model Match {
   stats         MatchStat[]
   pointsEntries PointsEntry[]
   renders       Render[]
+  wards         Ward[]
 
   @@unique([seriesId, gameNumber]) // две «второй карты» в одной серии — ошибка ввода
 }
@@ -266,6 +268,30 @@ model MatchStat {
   denies       Int     @default(0)
 
   @@unique([matchId, playerId])
+}
+
+// Расстановка вардов карты — из распарсенного отчёта OpenDota (obs_log/sen_log), пишется в syncMatch.
+// Живёт в БД, чтобы «карта вардов команды» строилась по архиву офлайн, не ходя каждый раз в OpenDota.
+// Строки производные: при перечитке карты сносятся и создаются заново (как MatchStat).
+model Ward {
+  id         Int    @id @default(autoincrement())
+  match      Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  matchId    Int
+  // Команда лиги, поставившая вард. Денормализация из side + Match.radiantTeamId — чтобы
+  // «все варды команды» брались одним where по teamId. null, если сторону не распознали.
+  team       Team?  @relation(fields: [teamId], references: [id])
+  teamId     Int?
+  side       String // radiant | dire — для раскраски обеих сторон на одной карте
+  type       String // obs | sen — обсервер / сентри
+  heroSlug   String @default("") // кто поставил (ключ константы == имя ассета)
+  x          Float // 0..1 доля карты слева направо
+  y          Float // 0..1 доля карты сверху вниз
+  placed     Int // секунда постановки (может быть < 0 — префейз)
+  leftAt     Int? // секунда снятия/истечения; null — дожил до конца матча
+  killerSlug String @default("") // герой, снявший вард раньше срока (иначе пусто)
+
+  @@index([teamId])
+  @@index([matchId])
 }
 
 // Реестр баллов — единственный способ менять очки. Корректировки = новые записи (аудит).

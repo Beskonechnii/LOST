@@ -119,6 +119,52 @@ body {
   background-clip: padding-box;
 }
 
+/* Ползунок карты вардов: дорожка тонкая, а бегунок крупный и с высокой зоной захвата —
+   тонкий нативный thumb трудно поймать мышкой. Высота элемента = зона клика, трек рисуем сами. */
+.vision-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+.vision-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-surface-2);
+}
+.vision-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -6px; /* центр на 6px-дорожке: (6-18)/2 */
+  border-radius: 999px;
+  background: var(--color-accent);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.6);
+  transition: transform 0.1s;
+}
+.vision-slider::-webkit-slider-thumb:hover {
+  background: var(--color-accent-bright);
+}
+.vision-slider:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+.vision-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-surface-2);
+}
+.vision-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  background: var(--color-accent);
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.6);
+}
+
 /* Eyebrow — надпись-категория над каждой секцией: 12px, uppercase, положительный трекинг.
    В HashiCorp это обязательный элемент ритма страницы. */
 .eyebrow {

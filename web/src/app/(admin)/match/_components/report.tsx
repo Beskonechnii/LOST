@@ -15,6 +15,7 @@ import {
   TeamCrest,
 } from "@/app/_components/postgame/blocks";
 import { PostgameExport } from "@/app/_components/postgame/export-canvas";
+import { VisionMap } from "@/app/_components/postgame/vision-map";
 import { SITE_MAX_W } from "@/app/_components/ui";
 import {
   clock,
@@ -559,6 +560,7 @@ function PlayerDetails({ p }: { p: PlayerReport }) {
 const TABS = [
   { key: "report", label: "Отчёт" },
   { key: "extra", label: "Доп. статистика" },
+  { key: "vision", label: "Варды" },
   { key: "export", label: "Экспорт PNG" },
 ] as const;
 type Tab = (typeof TABS)[number]["key"];
@@ -869,6 +871,17 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
                   <Draft picksBans={match.picksBans} names={names} />
                 </div>
               </>
+            )}
+
+            {tab === "vision" && (
+              match.wards?.length ? (
+                <VisionMap wards={match.wards} durationSeconds={match.durationSeconds} sideLabels={names} />
+              ) : (
+                <div className="rounded-2xl border border-hairline bg-surface-1 p-6 text-center text-sm text-ink-muted">
+                  Расстановка вардов доступна только у распарсенных матчей OpenDota.
+                  {src === "steam" && " Переключитесь на источник OpenDota."}
+                </div>
+              )
             )}
 
             {tab === "export" && (

@@ -66,6 +66,9 @@ export function SingleDraft() {
   // Math.random() в рендере разошёлся бы между SSR и гидрацией.
   const [draft, setDraft] = useState<Record<Attr, LocalHero | null> | null>(null);
   const reroll = useCallback(() => setDraft(roll()), []);
+  // Первый бросок — ровно на монтировании: это не «производное состояние», а клиентский Math.random,
+  // которому нельзя в рендер (разъедется с SSR). Правило про setState-в-эффекте этот случай не ловит.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => reroll(), [reroll]);
 
   return (

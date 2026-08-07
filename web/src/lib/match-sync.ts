@@ -140,6 +140,26 @@ export async function syncMatch(prisma: PrismaClient, matchId: number) {
     },
   });
 
+  // Варды карты: сносим прежние и пишем заново (как стата — производные от отчёта, идемпотентно).
+  // teamId проставляем по стороне: у распарсенного матча так «карта вардов команды» берётся по teamId.
+  await prisma.ward.deleteMany({ where: { matchId: match.id } });
+  if (report.wards.length) {
+    await prisma.ward.createMany({
+      data: report.wards.map((w) => ({
+        matchId: match.id,
+        teamId: (w.side === "radiant" ? radiantTeamId : direTeamId) ?? null,
+        side: w.side,
+        type: w.type,
+        heroSlug: w.hero.slug,
+        x: w.x,
+        y: w.y,
+        placed: w.placed,
+        leftAt: w.left,
+        killerSlug: w.killer?.slug ?? "",
+      })),
+    });
+  }
+
   return {
     matchId: match.id,
     openDotaMatchId: report.matchId,

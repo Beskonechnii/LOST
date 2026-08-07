@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { bad, parseId } from "@/lib/api";
 import { isRole } from "@/lib/roles";
 import { spotConflict } from "@/lib/roster-spots";
 
 /** Поменять роль или капитанство на месте в составе. */
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const spotId = Number(id);
+  const spotId = parseId((await params).id);
+  if (!spotId) return bad("id: ожидался числовой id");
   const body = (await req.json()) as Record<string, unknown>;
 
   const spot = await prisma.rosterSpot.findUnique({ where: { id: spotId }, include: { team: { select: { group: true } } } });
-  if (!spot) return NextResponse.json({ error: "Место не найдено" }, { status: 404 });
+  if (!spot) return bad("Место не найдено", 404);
 
   const data: Record<string, unknown> = {};
   if ("role" in body) {
@@ -26,7 +27,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       others.map((s) => ({ teamId: s.teamId, role: s.role, teamName: s.team.name, division: s.team.group })),
       { teamId: spot.teamId, role, division: spot.team.group },
     );
-    if (conflict) return NextResponse.json({ error: conflict }, { status: 409 });
+    if (conflict) return bad(conflict, 409);
     data.role = role;
   }
   if ("isCaptain" in body) data.isCaptain = Boolean(body.isCaptain);
@@ -36,7 +37,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 /** Убрать игрока из состава. Сама карточка игрока остаётся — со статой, фото и account_id. */
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  await prisma.rosterSpot.delete({ where: { id: Number(id) } });
+  const id = parseId((await params).id);
+  if (!id) return bad("id: ожидался числовой id");
+  const { count } = await prisma.rosterSpot.deleteMany({ where: { id } });
+  if (!count) return bad("Место не найдено", 404);
   return NextResponse.json({ ok: true });
 }

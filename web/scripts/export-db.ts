@@ -42,7 +42,7 @@ function omit<T extends object, K extends keyof T>(row: T, ...keys: K[]): Omit<T
 }
 
 async function main() {
-  const [teams, players, spots, matches, groupEntries, series, stats, points, renders] =
+  const [teams, players, spots, matches, groupEntries, series, stats, points, renders, wards] =
     await Promise.all([
       prisma.team.findMany({ orderBy: { slug: "asc" } }),
       prisma.player.findMany({ orderBy: { slug: "asc" } }),
@@ -55,6 +55,7 @@ async function main() {
       prisma.matchStat.findMany({ include: { player: true, match: { include: { teamA: true, teamB: true } } } }),
       prisma.pointsEntry.findMany({ include: { match: { include: { teamA: true, teamB: true } } } }),
       prisma.render.findMany({ include: { match: { include: { teamA: true, teamB: true } } } }),
+      prisma.ward.findMany({ include: { team: true, match: { include: { teamA: true, teamB: true } } } }),
     ]);
 
   // Баллы ссылаются на субъекта сырым id + типом, без relation — разворачиваем в slug вручную.
@@ -64,7 +65,7 @@ async function main() {
     matchKey(m, m.teamA.slug, m.teamB.slug);
 
   const snapshot = {
-    version: 4, // 4 — у Series появился slot (позиция в сетке плей-офф, src/lib/playoff-bracket.ts)
+    version: 5, // 5 — добавлены варды карт (модель Ward, «карта вардов команды» из архива)
     exportedAt: new Date().toISOString(),
 
     teams: teams.map((t) => omit(t, "id")),
@@ -123,6 +124,14 @@ async function main() {
     renders: renders
       .map((r) => ({ ...omit(r, "id", "matchId", "match"), matchKey: r.match ? keyOfMatch(r.match) : null }))
       .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
+
+    wards: wards
+      .map((w) => ({
+        ...omit(w, "id", "matchId", "teamId", "team", "match"),
+        matchKey: keyOfMatch(w.match),
+        teamSlug: w.team?.slug ?? null, // сторону не распознали → вард без команды
+      }))
+      .sort((a, b) => `${a.matchKey}${a.placed}${a.x}${a.y}`.localeCompare(`${b.matchKey}${b.placed}${b.x}${b.y}`)),
   };
 
   writeFileSync(out, JSON.stringify(snapshot, null, 2) + "\n", "utf8");
@@ -138,6 +147,7 @@ async function main() {
     "стата матчей": snapshot.matchStats.length,
     баллы: snapshot.pointsEntries.length,
     генерации: snapshot.renders.length,
+    варды: snapshot.wards.length,
   });
 }
 

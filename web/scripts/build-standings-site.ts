@@ -82,7 +82,7 @@ function tableFor(g: StandingGroup): string {
   const rows = g.rows
     .map((r, i) => {
       const place = r.place ?? i + 1;
-      const zone = qualificationOf(place, g.rows.length);
+      const zone = qualificationOf(place, g.rows.length, division.name);
       const color = ZONE_COLOR[zone];
       // Команда — просто текст, без ссылки: в статике страниц команд нет,
       // а битая ссылка хуже её отсутствия.

@@ -48,6 +48,17 @@ export type MatchEvents = {
   roshan: { radiant: number; dire: number; kills: { time: number; side: Side }[] };
   couriers: { radiant: number; dire: number; kills: { time: number; victimSide: Side; killer: Entity | null }[] };
 };
+// Вард на карте (зеркало Ward из lib/opendota.ts). x/y — доля карты 0..1 от левого-верхнего угла.
+export type Ward = {
+  side: Side;
+  hero: Entity;
+  type: "obs" | "sen";
+  x: number;
+  y: number;
+  placed: number;
+  left: number | null;
+  killer: Entity | null;
+};
 export type MatchReport = {
   matchId: string;
   parsed: boolean;
@@ -69,6 +80,7 @@ export type MatchReport = {
   events: MatchEvents;
   picksBans: PickBan[];
   players: PlayerReport[];
+  wards: Ward[];
 };
 
 export const fmt = (n: number) => n.toLocaleString("ru-RU");

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Icon, TeamCrest } from "@/app/_components/postgame/blocks";
 import { Eyebrow } from "@/app/_components/ui";
-import { BackButton } from "./_components/back-button";
+import { BackButton } from "@/app/_components/back-button";
 import { divisionSlug } from "@/lib/divisions";
 import { getSeriesDetail, type GamePlayer, type SeriesDetail, type SeriesGameDetail } from "@/lib/series";
 import { playoffLabel, stageLabel } from "@/lib/stages";

@@ -92,7 +92,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
               {group && <span className="ml-2 text-ink-muted">группа {group.group}</span>}
             </Eyebrow>
             <div className="flex flex-wrap gap-3 text-xs">
-              <Link href={`/standings/${divSlug}`} className="font-medium text-accent-bright hover:underline">
+              <Link href={`/standings/${divSlug}/groups`} className="font-medium text-accent-bright hover:underline">
                 Групповая стадия →
               </Link>
               <Link href={`/standings/${divSlug}/playoff`} className="font-medium text-accent-bright hover:underline">

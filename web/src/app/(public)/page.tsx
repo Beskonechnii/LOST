@@ -29,14 +29,14 @@ const ACCENT = {
 /** Разделы продукта. Порядок тот же, что в верхней навигации, — карточки её и повторяют. */
 const SECTIONS = [
   {
-    href: "/standings/d1",
+    href: "/standings/d1/groups",
     title: "LOST D1",
     text: "Первый дивизион: таблица с зонами выхода, сетка групповой стадии и плей-офф. Правка результата встречи двигает и сетку, и таблицу.",
     cta: "Смотреть таблицу",
     accent: "d1",
   },
   {
-    href: "/standings/d2",
+    href: "/standings/d2/groups",
     title: "LOST D2",
     text: "Второй дивизион: своя таблица, группы и плей-офф. Считается по тем же правилам, что и первый.",
     cta: "Смотреть таблицу",
@@ -92,7 +92,7 @@ export default async function Home() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/standings/d1"
+              href="/standings/d1/groups"
               className="rounded-md bg-d1 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-d1-bright hover:text-canvas"
             >
               Таблица дивизиона

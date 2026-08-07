@@ -21,40 +21,17 @@ export type NavItem = { href: string; label: string; hint?: string; match?: stri
 // не меняется, меняется только второй ряд (подвкладки сезона / инструменты админки).
 const TOP_SECTIONS: NavItem[] = [
   {
-    href: "/standings/d1",
+    href: "/standings",
     label: "LOST S2",
     hint: "Второй сезон: дивизионы и ростер",
     match: ["/standings", "/roster", "/series", "/tp"],
   },
   {
-    href: "/admin/series",
+    href: "/admin",
     label: "Админ",
     hint: "Операторская: серии, студия, драфты, разбор матча",
     match: ["/admin", "/studio", "/underbeer", "/match"],
   },
-];
-
-// Подвкладки сезона LOST S2 — общий второй ряд для дивизионов и ростера. Живёт над собственным
-// SubNav каждого раздела (этапы дивизиона / команды-игроки ростера).
-const SEASON_SECTIONS: NavItem[] = [
-  { href: "/standings/d1", label: "Дивизион 1", hint: "Первый дивизион: таблица, плей-офф, статистика" },
-  { href: "/standings/d2", label: "Дивизион 2", hint: "Второй дивизион: таблица, плей-офф, статистика" },
-  { href: "/roster", label: "Ростер", hint: "Команды и игроки лиги" },
-  { href: "/tp", label: "TP", hint: "Сезонный зачёт очков MVP" },
-];
-
-// Инструменты админки — второй ряд под вкладкой «Админ». Порядок как просил оператор.
-// 1х1 и fearless draft пока заглушки («в разработке»), но место в навигации держат.
-const ADMIN_SECTIONS: NavItem[] = [
-  { href: "/underbeer", label: "UNDERBEER 2.0", hint: "Сборка шоу-команд драфтом" },
-  { href: "/admin/series", label: "Архив серий", hint: "Встречи турнира и карты в них" },
-  { href: "/admin/tp", label: "TP", hint: "Проставить очки MVP игрокам" },
-  { href: "/studio/editor", label: "Студия", hint: "Графика к матчам" },
-  { href: "/match", label: "Матч", hint: "Разбор матча Dota 2 по ID" },
-  { href: "/admin/vision", label: "Варды", hint: "Карта вардов команды по архиву" },
-  { href: "/admin/single-draft", label: "single draft", hint: "Рандомный герой по каждой характеристике" },
-  { href: "/admin/1x1", label: "1х1", hint: "Турнир 1х1 — в разработке" },
-  { href: "/admin/fearless-draft", label: "fearless draft", hint: "Fearless draft — в разработке" },
 ];
 
 /** Активен раздел, если путь совпадает или лежит внутри него («/» — только точное совпадение). */
@@ -148,37 +125,13 @@ export function PublicNav() {
   return <TopBar />;
 }
 
-/** Навигация служебной части (группа admin) — та же строка, второй ряд добавляет layout админки. */
+/** Навигация служебной части (группа admin) — та же верхняя строка, что и у продукта. */
 export function AdminNav() {
   return <TopBar />;
 }
 
-/** Первый ряд подвкладок сезона LOST S2: дивизионы и ростер. Общий для /standings и /roster. */
-export function SeasonNav({ maxWidthClass }: { maxWidthClass?: string }) {
-  return <SubNav items={SEASON_SECTIONS} maxWidthClass={maxWidthClass} />;
-}
-
-/** Второй ряд под вкладкой «Админ»: инструменты оператора. */
-export function AdminSubNav() {
-  return <SubNav items={ADMIN_SECTIONS} />;
-}
-
-// Второй ряд вкладок (SubNav под SeasonNav) липнет на высоту первого ниже — их два, наедут иначе.
-export const SUBNAV_SECOND_ROW = "top-[89px]";
-
-/** Подразделы секции. Подсвечивается самый конкретный подходящий пункт. */
-// maxWidthClass — ширина ряда вкладок; по умолчанию единая ширина сайта (совпадает с контентом).
-// topClass — липкая привязка ряда. По умолчанию под верхней строкой (49px); второй ряд (SubNav под
-// SeasonNav) сдвигается ниже на высоту первого — иначе они наедут друг на друга при скролле.
-export function SubNav({
-  items,
-  maxWidthClass = SITE_MAX_W,
-  topClass = "top-[49px]",
-}: {
-  items: NavItem[];
-  maxWidthClass?: string;
-  topClass?: string;
-}) {
+/** Подразделы секции (ростер, студия). Подсвечивается самый конкретный подходящий пункт. */
+export function SubNav({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
   const active = items
     .filter((t) => isActive(pathname, t))
@@ -186,8 +139,8 @@ export function SubNav({
 
   return (
     // 49px = высота верхней строки (h-12) вместе с её нижней границей — иначе при скролле щель в 1px
-    <div className={`sticky ${topClass} z-40 border-b border-hairline bg-canvas/85 backdrop-blur`}>
-      <nav className={`mx-auto flex ${maxWidthClass} gap-4 overflow-x-auto px-4 md:px-6`}>
+    <div className="sticky top-[49px] z-40 border-b border-hairline bg-canvas/85 backdrop-blur">
+      <nav className={`mx-auto flex ${SITE_MAX_W} gap-4 overflow-x-auto px-4 md:px-6`}>
         {items.map((t) => (
           <Link
             key={t.href}

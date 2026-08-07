@@ -28,9 +28,9 @@ const d = (v: string | Date | null | undefined) => (v ? new Date(v) : null);
 
 async function main() {
   const snap = JSON.parse(readFileSync(input, "utf8"));
-  if (snap.version !== 5) {
+  if (snap.version !== 6) {
     throw new Error(
-      `Снимок версии ${snap.version}, а нужен 5. Снимки не мигрируются: пересними базу свежим ` +
+      `Снимок версии ${snap.version}, а нужен 6. Снимки не мигрируются: пересними базу свежим ` +
         `scripts/export-db.ts на той машине, где данные актуальны.`,
     );
   }
@@ -78,6 +78,7 @@ async function main() {
 
   // ── производные строки: снести и создать заново ────────────────────────────
   // Порядок обратный зависимостям, иначе внешние ключи не дадут удалить.
+  await prisma.mediaAsset.deleteMany(); // сирота-таблица без FK — сносим и пересоздаём как renders
   await prisma.render.deleteMany();
   await prisma.pointsEntry.deleteMany();
   await prisma.matchStat.deleteMany();
@@ -211,6 +212,16 @@ async function main() {
     });
   }
 
+  // Медиатека — пачкой: связей нет, createdAt переносим как есть (id база выдаст свои).
+  if (snap.mediaAssets?.length) {
+    await prisma.mediaAsset.createMany({
+      data: snap.mediaAssets.map((m: { createdAt: string } & Record<string, unknown>) => ({
+        ...m,
+        createdAt: d(m.createdAt) ?? new Date(),
+      })),
+    });
+  }
+
   console.log("\nГотово. В базе:");
   console.table({
     команды: await prisma.team.count(),
@@ -223,6 +234,7 @@ async function main() {
     баллы: await prisma.pointsEntry.count(),
     генерации: await prisma.render.count(),
     варды: await prisma.ward.count(),
+    медиатека: await prisma.mediaAsset.count(),
   });
 }
 

@@ -42,7 +42,7 @@ function omit<T extends object, K extends keyof T>(row: T, ...keys: K[]): Omit<T
 }
 
 async function main() {
-  const [teams, players, spots, matches, groupEntries, series, stats, points, renders, wards] =
+  const [teams, players, spots, matches, groupEntries, series, stats, points, renders, wards, mediaAssets] =
     await Promise.all([
       prisma.team.findMany({ orderBy: { slug: "asc" } }),
       prisma.player.findMany({ orderBy: { slug: "asc" } }),
@@ -56,6 +56,9 @@ async function main() {
       prisma.pointsEntry.findMany({ include: { match: { include: { teamA: true, teamB: true } } } }),
       prisma.render.findMany({ include: { match: { include: { teamA: true, teamB: true } } } }),
       prisma.ward.findMany({ include: { team: true, match: { include: { teamA: true, teamB: true } } } }),
+      // Медиатека редактора: связей по FK нет (сирота-таблица), естественный ключ — url
+      // (он же имя файла в public/uploads/library, который теперь коммитится). См. §7.1 CLAUDE.md.
+      prisma.mediaAsset.findMany({ orderBy: { url: "asc" } }),
     ]);
 
   // Баллы ссылаются на субъекта сырым id + типом, без relation — разворачиваем в slug вручную.
@@ -65,7 +68,7 @@ async function main() {
     matchKey(m, m.teamA.slug, m.teamB.slug);
 
   const snapshot = {
-    version: 5, // 5 — добавлены варды карт (модель Ward, «карта вардов команды» из архива)
+    version: 6, // 6 — добавлена медиатека редактора (модель MediaAsset, файлы library/ теперь в git)
     exportedAt: new Date().toISOString(),
 
     teams: teams.map((t) => omit(t, "id")),
@@ -132,6 +135,8 @@ async function main() {
         teamSlug: w.team?.slug ?? null, // сторону не распознали → вард без команды
       }))
       .sort((a, b) => `${a.matchKey}${a.placed}${a.x}${a.y}`.localeCompare(`${b.matchKey}${b.placed}${b.x}${b.y}`)),
+
+    mediaAssets: mediaAssets.map((m) => omit(m, "id")).sort((a, b) => a.url.localeCompare(b.url)),
   };
 
   writeFileSync(out, JSON.stringify(snapshot, null, 2) + "\n", "utf8");
@@ -148,6 +153,7 @@ async function main() {
     баллы: snapshot.pointsEntries.length,
     генерации: snapshot.renders.length,
     варды: snapshot.wards.length,
+    медиатека: snapshot.mediaAssets.length,
   });
 }
 

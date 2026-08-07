@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// Проверка связки Next → Prisma → SQLite. Позже заменим на реальные роуты.
+// Проверка связки Next → Prisma → SQLite: счётчики команд/матчей/баллов. Зовётся лендингом.
 export async function GET() {
   const [teams, matches, points] = await Promise.all([
     prisma.team.count(),

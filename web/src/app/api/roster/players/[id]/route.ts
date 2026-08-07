@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { bad, parseId } from "@/lib/api";
 import { accountIdFromUrl, normalizeTelegram, parseBirthday } from "@/lib/profiles";
 
 const TEXT_FIELDS = [
@@ -7,7 +8,8 @@ const TEXT_FIELDS = [
 ] as const;
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+  const id = parseId((await params).id);
+  if (!id) return bad("id: ожидался числовой id");
   const body = (await req.json()) as Record<string, unknown>;
 
   const data: Record<string, unknown> = {};
@@ -21,14 +23,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (raw === "") {
       data.accountId = null;
     } else {
-      const id = accountIdFromUrl(raw);
-      if (!id) {
-        return NextResponse.json(
-          { error: `Не разобрал «${raw}». Нужен account_id, ссылка на steamcommunity.com/profiles/… , Dotabuff или Stratz` },
-          { status: 400 },
-        );
+      const accountId = accountIdFromUrl(raw);
+      if (!accountId) {
+        return bad(`Не разобрал «${raw}». Нужен account_id, ссылка на steamcommunity.com/profiles/… , Dotabuff или Stratz`);
       }
-      data.accountId = id;
+      data.accountId = accountId;
     }
   }
 
@@ -38,7 +37,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       data.telegram = null;
     } else {
       const handle = normalizeTelegram(raw);
-      if (!handle) return NextResponse.json({ error: `«${raw}» не похоже на телеграм-хендл` }, { status: 400 });
+      if (!handle) return bad(`«${raw}» не похоже на телеграм-хендл`);
       data.telegram = handle;
     }
   }
@@ -49,7 +48,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       data.birthday = null;
     } else {
       const date = parseBirthday(raw);
-      if (!date) return NextResponse.json({ error: `Дата «${raw}» не разобрана — ждём 21.04.1998` }, { status: 400 });
+      if (!date) return bad(`Дата «${raw}» не разобрана — ждём 21.04.1998`);
       data.birthday = date;
     }
   }
@@ -62,28 +61,30 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     } else {
       const mmr = Number(raw);
       if (!Number.isFinite(mmr) || mmr < 0) {
-        return NextResponse.json({ error: `MMR должен быть числом, а не «${raw}»` }, { status: 400 });
+        return bad(`MMR должен быть числом, а не «${raw}»`);
       }
       data.mmr = Math.round(mmr);
     }
   }
   // Роль, капитанство и команда — это место в составе, они правятся через /api/roster/spots.
-  if (data.nickname === null) return NextResponse.json({ error: "Ник не может быть пустым" }, { status: 400 });
+  if (data.nickname === null) return bad("Ник не может быть пустым");
 
-  const player = await prisma.player.update({ where: { id: Number(id) }, data });
-  return NextResponse.json(player);
+  const { count } = await prisma.player.updateMany({ where: { id }, data });
+  if (!count) return bad("Игрок не найден", 404);
+  return NextResponse.json(await prisma.player.findUnique({ where: { id } }));
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const playerId = Number(id);
+  const playerId = parseId((await params).id);
+  if (!playerId) return bad("id: ожидался числовой id");
 
   // Игрока со статой не удаляем — на него ссылается MatchStat (история матчей).
   const stats = await prisma.matchStat.count({ where: { playerId } });
   if (stats > 0) {
-    return NextResponse.json({ error: `У игрока стата по ${stats} матч(ам) — удаление сломает историю` }, { status: 409 });
+    return bad(`У игрока стата по ${stats} матч(ам) — удаление сломает историю`, 409);
   }
 
-  await prisma.player.delete({ where: { id: playerId } });
+  const { count } = await prisma.player.deleteMany({ where: { id: playerId } });
+  if (!count) return bad("Игрок не найден", 404);
   return NextResponse.json({ ok: true });
 }

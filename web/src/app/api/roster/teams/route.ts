@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { listTeams } from "@/lib/roster-data";
-import { slugify } from "@/lib/profiles";
+import { isColor, slugify } from "@/lib/profiles";
 
 export async function GET() {
   return NextResponse.json(await listTeams());
@@ -18,9 +18,13 @@ export async function POST(req: Request) {
   if (await prisma.team.findUnique({ where: { slug } })) {
     return NextResponse.json({ error: `Команда со слагом «${slug}» уже есть` }, { status: 409 });
   }
+  const color = body.color?.trim() || null;
+  if (color && !isColor(color)) {
+    return NextResponse.json({ error: `Цвет «${color}» — ожидался hex, например #7c3aed` }, { status: 400 });
+  }
 
   const team = await prisma.team.create({
-    data: { slug, name, tag: body.tag || null, group: body.group || null, color: body.color || null },
+    data: { slug, name, tag: body.tag || null, group: body.group || null, color },
   });
   return NextResponse.json(team, { status: 201 });
 }

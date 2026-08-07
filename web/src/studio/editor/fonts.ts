@@ -19,13 +19,18 @@ export const BUILTIN_FONTS: FontDef[] = [
 
 export const DEFAULT_FONT = BUILTIN_FONTS[0].family;
 
+/** Значения идут в `<style dangerouslySetInnerHTML>`, а `family`/`src` выводятся из имени файла в
+ *  public/fonts. Файл с кавычкой или `</style>` в имени иначе сломал бы (а то и вырвался из) тега —
+ *  режем кавычки, скобки и угловые. */
+const cssSafe = (s: string) => s.replace(/["'()<>\\]/g, "");
+
 /** CSS с @font-face для шрифтов, у которых указан файл. Один <style> на редактор. */
 export function fontFaceCss(fonts: FontDef[]): string {
   return fonts
     .filter((f) => f.src)
     .map(
       (f) =>
-        `@font-face{font-family:"${f.family}";src:url("${f.src}");${f.weight ? `font-weight:${f.weight};` : ""}font-display:swap;}`,
+        `@font-face{font-family:"${cssSafe(f.family)}";src:url("${cssSafe(f.src!)}");${f.weight ? `font-weight:${cssSafe(f.weight)};` : ""}font-display:swap;}`,
     )
     .join("\n");
 }

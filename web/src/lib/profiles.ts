@@ -49,6 +49,10 @@ export function teamAccent(team: { color?: string | null; slug?: string | null; 
   return hslToHex(hash, 0.62, 0.58);
 }
 
+/** Цвет команды валиден? Только hex (#rgb/#rrggbb/#rrggbbaa) — он идёт прямо в CSS-стили карточек,
+ *  и к нему дописывают альфу суффиксом. Ограничение бережёт от произвольной строки в атрибуте style. */
+export const isColor = (raw: string): boolean => /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(raw.trim());
+
 /** Всегда возвращаем hex: к нему в разметке дописывают альфу суффиксом («#a855f766»), с hsl() так нельзя. */
 function hslToHex(h: number, s: number, l: number): string {
   const c = (n: number) => {

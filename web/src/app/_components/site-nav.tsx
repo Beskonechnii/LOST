@@ -24,7 +24,7 @@ const TOP_SECTIONS: NavItem[] = [
     href: "/standings/d1",
     label: "LOST S2",
     hint: "Второй сезон: дивизионы и ростер",
-    match: ["/standings", "/roster", "/series"],
+    match: ["/standings", "/roster", "/series", "/tp"],
   },
   {
     href: "/admin/series",
@@ -40,6 +40,7 @@ const SEASON_SECTIONS: NavItem[] = [
   { href: "/standings/d1", label: "Дивизион 1", hint: "Первый дивизион: таблица, плей-офф, статистика" },
   { href: "/standings/d2", label: "Дивизион 2", hint: "Второй дивизион: таблица, плей-офф, статистика" },
   { href: "/roster", label: "Ростер", hint: "Команды и игроки лиги" },
+  { href: "/tp", label: "TP", hint: "Сезонный зачёт очков MVP" },
 ];
 
 // Инструменты админки — второй ряд под вкладкой «Админ». Порядок как просил оператор.
@@ -47,6 +48,7 @@ const SEASON_SECTIONS: NavItem[] = [
 const ADMIN_SECTIONS: NavItem[] = [
   { href: "/underbeer", label: "UNDERBEER 2.0", hint: "Сборка шоу-команд драфтом" },
   { href: "/admin/series", label: "Архив серий", hint: "Встречи турнира и карты в них" },
+  { href: "/admin/tp", label: "TP", hint: "Проставить очки MVP игрокам" },
   { href: "/studio/editor", label: "Студия", hint: "Графика к матчам" },
   { href: "/match", label: "Матч", hint: "Разбор матча Dota 2 по ID" },
   { href: "/admin/vision", label: "Варды", hint: "Карта вардов команды по архиву" },

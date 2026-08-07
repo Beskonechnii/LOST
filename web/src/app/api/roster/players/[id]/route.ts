@@ -66,6 +66,20 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       data.mmr = Math.round(mmr);
     }
   }
+  if ("tp" in body) {
+    // TP — сезонные очки MVP, оператор правит их вручную. Пустое поле = 0 (в отличие от MMR,
+    // где пусто значит «не указан»): TP есть у всех, просто у большинства ноль.
+    const raw = String(body.tp ?? "").trim();
+    if (raw === "") {
+      data.tp = 0;
+    } else {
+      const tp = Number(raw);
+      if (!Number.isInteger(tp) || tp < 0) {
+        return NextResponse.json({ error: `TP должны быть целым числом ≥ 0, а не «${raw}»` }, { status: 400 });
+      }
+      data.tp = tp;
+    }
+  }
   // Роль, капитанство и команда — это место в составе, они правятся через /api/roster/spots.
   if (data.nickname === null) return bad("Ник не может быть пустым");
 

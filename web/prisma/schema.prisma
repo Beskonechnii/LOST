@@ -40,6 +40,7 @@ model Player {
   realName    String?
   accountId   String? // Dota/Steam32 account id (для OpenDota)
   mmr         Int? // из таблицы сезона; у команды не хранится — считается по составу
+  tp          Int      @default(0) // сезонные TP (очки MVP), оператор правит вручную раз в неделю
   photo       String?
   steamUrl    String? // перекрывает ссылку, выведенную из accountId
   dotabuffUrl String?

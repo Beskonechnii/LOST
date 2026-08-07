@@ -103,6 +103,11 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                 </Link>
               )}
               {player.mmr && <Chip>{player.mmr.toLocaleString("ru")} MMR</Chip>}
+              {player.tp > 0 && (
+                <Link href="/tp" className="rounded-full border border-accent/50 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent-bright transition-colors hover:border-accent">
+                  {player.tp} TP
+                </Link>
+              )}
               {player.birthday && (
                 <Chip>
                   {formatBirthday(player.birthday)} · {yearsLabel(ageOf(player.birthday))}

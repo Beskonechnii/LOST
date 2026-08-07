@@ -65,7 +65,7 @@ async function main() {
     matchKey(m, m.teamA.slug, m.teamB.slug);
 
   const snapshot = {
-    version: 5, // 5 — добавлены варды карт (модель Ward, «карта вардов команды» из архива)
+    version: 6, // 6 — варды карт (модель Ward) + у Player появился tp (сезонные TP, очки MVP)
     exportedAt: new Date().toISOString(),
 
     teams: teams.map((t) => omit(t, "id")),

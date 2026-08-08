@@ -137,8 +137,12 @@ export function Workspace({
         w={doc.w}
         h={doc.h}
         background={doc.background}
+        backgroundImage={doc.backgroundImage}
+        backgroundFit={doc.backgroundFit}
         onFormat={(w, h) => setDoc((d) => scaleDoc(d, w, h))}
         onBackground={(background) => setDoc((d) => ({ ...d, background }))}
+        onBackgroundFit={(backgroundFit) => setDoc((d) => ({ ...d, backgroundFit }))}
+        onClearBackgroundImage={() => setDoc((d) => ({ ...d, backgroundImage: undefined }))}
         onExport={() => void exportPng()}
         onSave={() => void save()}
         busy={busy}
@@ -165,6 +169,7 @@ export function Workspace({
                 const ratio = w && h ? h / w : 1;
                 addEl("image", { src, w: target, h: Math.round(target * ratio) });
               }}
+              onSetBackground={(src) => setDoc((d) => ({ ...d, backgroundImage: src }))}
             />
           </div>
           <div className="rounded-lg border border-hairline bg-surface-1/40 p-3">

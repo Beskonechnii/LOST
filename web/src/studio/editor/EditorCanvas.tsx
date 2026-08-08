@@ -190,6 +190,23 @@ export function EditorCanvas({
             top: 0,
           }}
         >
+          {/* Фон-картинка — самый нижний слой узла, поэтому первым ребёнком. Реальный <img>,
+              чтобы modern-screenshot её заинлайнил в PNG (см. DesignDoc.backgroundImage). */}
+          {doc.backgroundImage && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={doc.backgroundImage}
+              alt=""
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: doc.backgroundFit ?? "cover",
+                pointerEvents: "none",
+              }}
+            />
+          )}
           {doc.elements.filter((el) => !el.hidden).map((el) => (
             <ElementView key={el.id} el={el} />
           ))}

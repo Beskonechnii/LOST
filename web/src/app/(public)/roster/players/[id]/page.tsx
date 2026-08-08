@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPlayerProfile } from "@/lib/roster-data";
+import { getPlayerHeroes } from "@/lib/player-stats";
+import { getPlayerRecord, getTeammates } from "@/lib/player-record";
 import { ageOf, formatBirthday, playerGaps, playerLinks, teamAccent, telegramUrl, yearsLabel } from "@/lib/profiles";
+import { heroImg } from "@/lib/assets";
 import { roleLabel } from "@/lib/roles";
 import { isAdmin } from "@/lib/admin-session";
 import { Button } from "@/components/ui/button";
@@ -35,7 +38,14 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
 
 export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [player, authed] = await Promise.all([getPlayerProfile(Number(id)), isAdmin()]);
+  const pid = Number(id);
+  const [player, authed, heroes, record, teammates] = await Promise.all([
+    getPlayerProfile(pid),
+    isAdmin(),
+    getPlayerHeroes(pid),
+    getPlayerRecord(pid),
+    getTeammates(pid),
+  ]);
   if (!player) notFound();
 
   // главное место — первое по порядку ролей: оно и задаёт цвет страницы, и рисуется в крошках
@@ -180,23 +190,90 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
         </section>
       ))}
 
-      {/* Задел под статистику: модель MatchStat уже есть, матчей в базе пока нет */}
+      {/* Статистика лиги — из привязанных к сериям карт (MatchStat). Есть игры → карьерка и герои,
+          нет → мягкая заглушка со ссылкой на Dotabuff. */}
       <section>
-        <Eyebrow className="mb-3">Статистика</Eyebrow>
-        <div className="rounded-xl border border-dashed border-hairline p-6 text-center text-sm text-ink-subtle">
-          Появится, когда в базу лягут матчи: средние K/D/A, любимые герои, MVP.
-          {links.dotabuff && (
-            <>
-              {" "}
-              Пока смотрите на{" "}
-              <a href={links.dotabuff} target="_blank" rel="noreferrer" className="text-accent-bright hover:underline">
-                Dotabuff
-              </a>
-              .
-            </>
-          )}
-        </div>
+        <Eyebrow className="mb-3">Статистика лиги</Eyebrow>
+        {record.games === 0 ? (
+          <div className="rounded-xl border border-dashed border-hairline p-6 text-center text-sm text-ink-subtle">
+            Появится, когда в архив лягут карты этого игрока: винрейт, сигнатурные герои, тиммейты.
+            {links.dotabuff && (
+              <>
+                {" "}
+                Пока смотрите на{" "}
+                <a href={links.dotabuff} target="_blank" rel="noreferrer" className="text-accent-bright hover:underline">
+                  Dotabuff
+                </a>
+                .
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Карьерка: три плитки — сыграно, W-L, винрейт. */}
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { label: "Карт", value: record.games, tone: "text-ink" },
+                { label: "Победы — поражения", value: `${record.wins}–${record.losses}`, tone: "text-ink" },
+                { label: "Винрейт", value: `${record.winrate.toFixed(0)}%`, tone: "text-accent-bright" },
+              ].map((s) => (
+                <div key={s.label} className="rounded-xl border border-hairline bg-surface-1 p-4 text-center">
+                  <div className={`text-2xl font-bold tabular-nums ${s.tone}`}>{s.value}</div>
+                  <div className="mt-1 text-xs text-ink-subtle">{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Сигнатурные герои — топ по винрейту (мин. 2 карты). */}
+            {heroes.signature.length > 0 && (
+              <div>
+                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-subtle">Сигнатурные герои</div>
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {heroes.signature.map((h) => (
+                    <div key={h.slug} className="flex items-center gap-3 rounded-xl border border-hairline bg-surface-1 p-2.5">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={heroImg(h.slug)} alt={h.name} className="h-10 w-[62px] shrink-0 rounded object-cover" />
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-sm font-semibold text-ink">{h.name}</div>
+                        <div className="text-xs text-ink-subtle tabular-nums">
+                          {h.games} карт · <span className="text-emerald-400">{h.wins}</span>–<span className="text-rose-400">{h.losses}</span>
+                        </div>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <div className="text-sm font-bold tabular-nums text-accent-bright">{h.winrate.toFixed(0)}%</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </section>
+
+      {/* Топ-5 тиммейтов — с кем больше всего сыграно за одну команду (турнирная стата, кликабельны). */}
+      {teammates.length > 0 && (
+        <section>
+          <Eyebrow className="mb-3">Чаще всего играет с</Eyebrow>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {teammates.map((m) => (
+              <PlayerMiniCard
+                key={m.playerId}
+                id={m.playerId}
+                nickname={m.nickname}
+                photo={m.photo}
+                accent={m.accent}
+                size={44}
+                subtitle={
+                  <div className="mt-1 text-xs tabular-nums text-ink-subtle">
+                    {m.games} вместе · <span className="text-emerald-400">{m.wins}</span> побед
+                  </div>
+                }
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

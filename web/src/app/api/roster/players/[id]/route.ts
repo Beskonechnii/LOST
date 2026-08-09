@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { bad, parseId } from "@/lib/api";
 import { accountIdFromUrl, normalizeTelegram, parseBirthday } from "@/lib/profiles";
+import { parseTags } from "@/lib/player-tags";
 
 const TEXT_FIELDS = [
   "nickname", "realName", "photo", "steamUrl", "dotabuffUrl", "stratzUrl", "city", "country",
+  "banner", "interviewUrl", "achievements",
 ] as const;
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -80,6 +82,24 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       data.tp = tp;
     }
   }
+  if ("orderNo" in body) {
+    // Порядковый номер игрока в лиге — ручной. Пустое поле = «без номера» (null), не ноль.
+    const raw = String(body.orderNo ?? "").trim();
+    if (raw === "") {
+      data.orderNo = null;
+    } else {
+      const n = Number(raw);
+      if (!Number.isInteger(n) || n < 0) return bad(`Номер должен быть целым числом ≥ 0, а не «${raw}»`);
+      data.orderNo = n;
+    }
+  }
+
+  if ("tags" in body) {
+    // Плашки-роли: приводим к канону справочника (лишнее и дубли отсекаются), пусто → null.
+    const keys = parseTags(String(body.tags ?? ""));
+    data.tags = keys.length ? keys.join(",") : null;
+  }
+
   // Роль, капитанство и команда — это место в составе, они правятся через /api/roster/spots.
   if (data.nickname === null) return bad("Ник не может быть пустым");
 

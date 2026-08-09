@@ -1,6 +1,6 @@
 {
-  "version": 6,
-  "exportedAt": "2026-08-07T20:21:41.662Z",
+  "version": 7,
+  "exportedAt": "2026-08-09T03:29:42.677Z",
   "teams": [
     {
       "slug": "300",
@@ -9,6 +9,7 @@
       "logo": "/uploads/teams/300-logo.png",
       "wordmark": "/uploads/teams/300-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": "#36b6ec",
       "group": "Division 1",
       "createdAt": "2026-07-22T23:58:23.862Z"
@@ -20,6 +21,7 @@
       "logo": "/uploads/teams/4naturala-logo.png",
       "wordmark": "/uploads/teams/4naturala-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 1",
       "createdAt": "2026-07-22T23:58:23.882Z"
@@ -31,6 +33,7 @@
       "logo": "/uploads/teams/5kn-logo.png",
       "wordmark": "/uploads/teams/5kn-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 1",
       "createdAt": "2026-07-22T23:58:23.816Z"
@@ -42,6 +45,7 @@
       "logo": "/uploads/teams/acolytes-logo.png",
       "wordmark": "/uploads/teams/acolytes-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 2",
       "createdAt": "2026-07-28T14:35:32.452Z"
@@ -53,6 +57,7 @@
       "logo": "/uploads/teams/alt-q-q-logo.png",
       "wordmark": "/uploads/teams/alt-q-q-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 2",
       "createdAt": "2026-07-28T14:35:32.520Z"
@@ -64,6 +69,7 @@
       "logo": "/uploads/teams/bbc-logo.png",
       "wordmark": "/uploads/teams/bbc-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 1",
       "createdAt": "2026-07-22T23:58:23.664Z"
@@ -75,6 +81,7 @@
       "logo": "/uploads/teams/chubriki-logo.png",
       "wordmark": "/uploads/teams/chubriki-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 2",
       "createdAt": "2026-07-28T14:35:32.462Z"
@@ -86,6 +93,7 @@
       "logo": "/uploads/teams/cruiser-aurora-team-logo.png",
       "wordmark": "/uploads/teams/cruiser-aurora-team-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 1",
       "createdAt": "2026-07-22T23:58:23.925Z"
@@ -97,6 +105,7 @@
       "logo": "/uploads/teams/dark-aria-logo.png",
       "wordmark": "/uploads/teams/dark-aria-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 2",
       "createdAt": "2026-07-28T14:35:32.484Z"
@@ -108,6 +117,7 @@
       "logo": "/uploads/teams/eclipse-gaming-logo.png",
       "wordmark": "/uploads/teams/eclipse-gaming-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 1",
       "createdAt": "2026-07-22T23:58:23.837Z"
@@ -119,6 +129,7 @@
       "logo": "/uploads/teams/eclipse-gaming-young-logo.png",
       "wordmark": "/uploads/teams/eclipse-gaming-young-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 2",
       "createdAt": "2026-07-28T14:35:32.474Z"
@@ -130,6 +141,7 @@
       "logo": "/uploads/teams/ethereal-logo.png",
       "wordmark": "/uploads/teams/ethereal-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 1",
       "createdAt": "2026-07-22T23:58:23.745Z"
@@ -141,6 +153,7 @@
       "logo": "/uploads/teams/etherial-prime-logo.png",
       "wordmark": "/uploads/teams/etherial-prime-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 1",
       "createdAt": "2026-07-22T23:58:23.720Z"
@@ -152,6 +165,7 @@
       "logo": "/uploads/teams/from-paris-logo.png",
       "wordmark": "/uploads/teams/from-paris-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 1",
       "createdAt": "2026-07-22T23:58:23.697Z"
@@ -163,6 +177,7 @@
       "logo": "/uploads/teams/gitlz-logo.png",
       "wordmark": "/uploads/teams/gitlz-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": "#000000",
       "group": "Division 1",
       "createdAt": "2026-07-22T23:58:23.902Z"
@@ -174,6 +189,7 @@
       "logo": "/uploads/teams/guzliki-logo.png",
       "wordmark": "/uploads/teams/guzliki-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 1",
       "createdAt": "2026-07-22T23:58:23.773Z"
@@ -185,6 +201,7 @@
       "logo": "/uploads/teams/malchishki-logo.png",
       "wordmark": "/uploads/teams/malchishki-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 1",
       "createdAt": "2026-07-22T23:58:23.792Z"
@@ -196,6 +213,7 @@
       "logo": "/uploads/teams/moloko-logo.png",
       "wordmark": "/uploads/teams/moloko-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": "#A855F7",
       "group": "Division 1",
       "createdAt": "2026-07-22T18:11:05.144Z"
@@ -207,6 +225,7 @@
       "logo": "/uploads/teams/morbus-mentis-logo.png",
       "wordmark": "/uploads/teams/morbus-mentis-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": "#C4B5FD",
       "group": "Division 1",
       "createdAt": "2026-07-22T18:11:05.154Z"
@@ -218,6 +237,7 @@
       "logo": "/uploads/teams/navi-logo.png",
       "wordmark": "/uploads/teams/navi-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 2",
       "createdAt": "2026-07-28T14:35:32.508Z"
@@ -229,6 +249,7 @@
       "logo": "/uploads/teams/pasechniki-logo.png",
       "wordmark": "/uploads/teams/pasechniki-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 2",
       "createdAt": "2026-07-28T14:35:32.539Z"
@@ -240,6 +261,7 @@
       "logo": "/uploads/teams/pomidory-logo.png",
       "wordmark": "/uploads/teams/pomidory-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 2",
       "createdAt": "2026-07-28T14:35:32.500Z"
@@ -251,6 +273,7 @@
       "logo": "/uploads/teams/psixdispancer-logo.png",
       "wordmark": "/uploads/teams/psixdispancer-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 1",
       "createdAt": "2026-07-22T23:58:23.633Z"
@@ -262,6 +285,7 @@
       "logo": "/uploads/teams/remix-logo.png",
       "wordmark": "/uploads/teams/remix-wordmark.png",
       "photo": null,
+      "banner": null,
       "color": "#EF4444",
       "group": "Division 1",
       "createdAt": "2026-07-22T18:11:05.161Z"
@@ -273,6 +297,7 @@
       "logo": "/uploads/teams/remix-d2-logo.png",
       "wordmark": null,
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 2",
       "createdAt": "2026-07-28T14:35:32.530Z"
@@ -284,6 +309,7 @@
       "logo": null,
       "wordmark": null,
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 2",
       "createdAt": "2026-07-28T14:35:32.437Z"
@@ -295,6 +321,7 @@
       "logo": "/uploads/teams/team-sausages-disbanded-logo.png",
       "wordmark": null,
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 2",
       "createdAt": "2026-07-28T14:35:32.553Z"
@@ -306,6 +333,7 @@
       "logo": "/uploads/teams/u-s-burgers-logo.png",
       "wordmark": null,
       "photo": null,
+      "banner": null,
       "color": null,
       "group": "Division 2",
       "createdAt": "2026-07-28T14:35:32.491Z"
@@ -327,6 +355,11 @@
       "birthday": "1997-06-17T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.440Z"
     },
     {
@@ -344,6 +377,11 @@
       "birthday": "2000-08-24T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.531Z"
     },
     {
@@ -361,6 +399,11 @@
       "birthday": "1999-07-12T12:00:00.000Z",
       "city": null,
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.908Z"
     },
     {
@@ -378,6 +421,11 @@
       "birthday": "1997-11-09T12:00:00.000Z",
       "city": "Брест",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.830Z"
     },
     {
@@ -395,6 +443,11 @@
       "birthday": "1997-12-20T12:00:00.000Z",
       "city": "РБ",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.253Z"
     },
     {
@@ -412,6 +465,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.899Z"
     },
     {
@@ -429,6 +487,11 @@
       "birthday": "1993-04-01T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.229Z"
     },
     {
@@ -446,6 +509,11 @@
       "birthday": null,
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.232Z"
     },
     {
@@ -463,6 +531,11 @@
       "birthday": "2004-10-04T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.885Z"
     },
     {
@@ -480,6 +553,11 @@
       "birthday": "2004-08-03T12:00:00.000Z",
       "city": null,
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.914Z"
     },
     {
@@ -497,6 +575,11 @@
       "birthday": "2003-08-22T12:00:00.000Z",
       "city": "Могилев",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.693Z"
     },
     {
@@ -514,6 +597,11 @@
       "birthday": "2000-12-28T12:00:00.000Z",
       "city": null,
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.931Z"
     },
     {
@@ -531,6 +619,11 @@
       "birthday": "2001-01-23T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.847Z"
     },
     {
@@ -548,6 +641,11 @@
       "birthday": "1994-05-24T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.512Z"
     },
     {
@@ -565,6 +663,11 @@
       "birthday": "2000-05-15T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.849Z"
     },
     {
@@ -582,6 +685,11 @@
       "birthday": "2006-08-16T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.738Z"
     },
     {
@@ -599,6 +707,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.543Z"
     },
     {
@@ -616,6 +729,11 @@
       "birthday": "1999-03-03T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T20:14:26.930Z"
     },
     {
@@ -633,6 +751,11 @@
       "birthday": "2007-01-12T12:00:00.000Z",
       "city": null,
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.922Z"
     },
     {
@@ -650,6 +773,11 @@
       "birthday": "1997-12-31T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.551Z"
     },
     {
@@ -667,6 +795,11 @@
       "birthday": "1999-12-29T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.479Z"
     },
     {
@@ -684,6 +817,11 @@
       "birthday": "2002-01-18T12:00:00.000Z",
       "city": "Минск",
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.859Z"
     },
     {
@@ -701,6 +839,11 @@
       "birthday": "2003-10-02T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.213Z"
     },
     {
@@ -718,6 +861,11 @@
       "birthday": "1995-09-04T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.489Z"
     },
     {
@@ -735,6 +883,11 @@
       "birthday": "1999-03-07T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.238Z"
     },
     {
@@ -752,6 +905,11 @@
       "birthday": "1999-01-11T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.471Z"
     },
     {
@@ -769,6 +927,11 @@
       "birthday": "1998-11-25T12:00:00.000Z",
       "city": null,
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.467Z"
     },
     {
@@ -786,6 +949,11 @@
       "birthday": "1995-05-21T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.528Z"
     },
     {
@@ -803,6 +971,11 @@
       "birthday": "2001-11-02T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.841Z"
     },
     {
@@ -820,6 +993,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.891Z"
     },
     {
@@ -837,6 +1015,11 @@
       "birthday": "2003-08-29T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.499Z"
     },
     {
@@ -854,6 +1037,11 @@
       "birthday": "2003-01-30T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.749Z"
     },
     {
@@ -871,6 +1059,11 @@
       "birthday": "2000-04-28T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.713Z"
     },
     {
@@ -888,6 +1081,11 @@
       "birthday": "1998-09-04T12:00:00.000Z",
       "city": "РБ",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.244Z"
     },
     {
@@ -905,6 +1103,11 @@
       "birthday": "2001-04-19T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.728Z"
     },
     {
@@ -922,6 +1125,11 @@
       "birthday": "1998-11-25T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.541Z"
     },
     {
@@ -939,6 +1147,11 @@
       "birthday": "2002-06-18T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.646Z"
     },
     {
@@ -956,6 +1169,11 @@
       "birthday": "2005-08-09T12:00:00.000Z",
       "city": null,
       "country": "Казахстан",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.223Z"
     },
     {
@@ -973,6 +1191,11 @@
       "birthday": "2000-12-16T12:00:00.000Z",
       "city": null,
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.465Z"
     },
     {
@@ -990,6 +1213,11 @@
       "birthday": "1996-02-08T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.207Z"
     },
     {
@@ -1007,6 +1235,11 @@
       "birthday": "2002-11-05T12:00:00.000Z",
       "city": null,
       "country": "Казахстан",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.801Z"
     },
     {
@@ -1024,6 +1257,11 @@
       "birthday": "1994-12-28T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.446Z"
     },
     {
@@ -1041,6 +1279,11 @@
       "birthday": "2001-03-21T12:00:00.000Z",
       "city": "Барановичи",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.686Z"
     },
     {
@@ -1058,6 +1301,11 @@
       "birthday": "2004-01-06T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.710Z"
     },
     {
@@ -1075,6 +1323,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.905Z"
     },
     {
@@ -1092,6 +1345,11 @@
       "birthday": "1995-02-03T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.707Z"
     },
     {
@@ -1109,6 +1367,11 @@
       "birthday": "2002-12-19T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.844Z"
     },
     {
@@ -1126,6 +1389,11 @@
       "birthday": "2000-08-08T12:00:00.000Z",
       "city": "Гомель",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.941Z"
     },
     {
@@ -1143,6 +1411,11 @@
       "birthday": "1995-11-07T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.716Z"
     },
     {
@@ -1160,6 +1433,11 @@
       "birthday": "2003-11-05T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.523Z"
     },
     {
@@ -1177,6 +1455,11 @@
       "birthday": "2003-02-16T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.758Z"
     },
     {
@@ -1194,6 +1477,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.487Z"
     },
     {
@@ -1211,6 +1499,11 @@
       "birthday": "2007-08-17T12:00:00.000Z",
       "city": null,
       "country": "Польша",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.554Z"
     },
     {
@@ -1228,6 +1521,11 @@
       "birthday": "2002-02-24T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.458Z"
     },
     {
@@ -1245,6 +1543,11 @@
       "birthday": "1998-12-27T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.444Z"
     },
     {
@@ -1262,6 +1565,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.798Z"
     },
     {
@@ -1279,6 +1587,11 @@
       "birthday": "2003-02-19T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.187Z"
     },
     {
@@ -1296,6 +1609,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.810Z"
     },
     {
@@ -1313,6 +1631,11 @@
       "birthday": "2003-04-03T12:00:00.000Z",
       "city": null,
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.469Z"
     },
     {
@@ -1330,6 +1653,11 @@
       "birthday": "2004-02-10T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.525Z"
     },
     {
@@ -1347,6 +1675,11 @@
       "birthday": "1997-02-04T12:00:00.000Z",
       "city": null,
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.509Z"
     },
     {
@@ -1364,6 +1697,11 @@
       "birthday": "2000-02-09T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.256Z"
     },
     {
@@ -1381,6 +1719,11 @@
       "birthday": "1993-06-15T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.506Z"
     },
     {
@@ -1398,6 +1741,11 @@
       "birthday": "2003-04-27T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.777Z"
     },
     {
@@ -1415,6 +1763,11 @@
       "birthday": "2002-06-13T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.459Z"
     },
     {
@@ -1432,6 +1785,11 @@
       "birthday": "2000-02-14T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.501Z"
     },
     {
@@ -1449,6 +1807,11 @@
       "birthday": "1999-08-14T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.548Z"
     },
     {
@@ -1466,6 +1829,11 @@
       "birthday": "2001-11-13T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.216Z"
     },
     {
@@ -1483,6 +1851,11 @@
       "birthday": "1999-11-05T12:00:00.000Z",
       "city": null,
       "country": "Казахстан",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.804Z"
     },
     {
@@ -1500,6 +1873,11 @@
       "birthday": "2000-01-12T12:00:00.000Z",
       "city": null,
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.249Z"
     },
     {
@@ -1517,6 +1895,11 @@
       "birthday": "1999-05-15T12:00:00.000Z",
       "city": null,
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.929Z"
     },
     {
@@ -1534,6 +1917,11 @@
       "birthday": "2000-08-03T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.559Z"
     },
     {
@@ -1551,6 +1939,11 @@
       "birthday": "2000-07-13T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.651Z"
     },
     {
@@ -1568,6 +1961,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.769Z"
     },
     {
@@ -1585,6 +1983,11 @@
       "birthday": "1995-04-18T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.273Z"
     },
     {
@@ -1602,6 +2005,11 @@
       "birthday": "2000-07-23T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.463Z"
     },
     {
@@ -1619,6 +2027,11 @@
       "birthday": "2002-06-25T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.277Z"
     },
     {
@@ -1636,6 +2049,11 @@
       "birthday": "2006-10-20T12:00:00.000Z",
       "city": null,
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.555Z"
     },
     {
@@ -1653,6 +2071,11 @@
       "birthday": "2003-02-20T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.911Z"
     },
     {
@@ -1670,6 +2093,11 @@
       "birthday": "2005-07-13T12:00:00.000Z",
       "city": "Пермь",
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.689Z"
     },
     {
@@ -1687,6 +2115,11 @@
       "birthday": "2001-07-20T12:00:00.000Z",
       "city": "Варшава",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.547Z"
     },
     {
@@ -1704,6 +2137,11 @@
       "birthday": "2001-12-09T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.199Z"
     },
     {
@@ -1721,6 +2159,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.266Z"
     },
     {
@@ -1738,6 +2181,11 @@
       "birthday": "1992-02-04T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.538Z"
     },
     {
@@ -1755,6 +2203,11 @@
       "birthday": "1995-03-01T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.742Z"
     },
     {
@@ -1772,6 +2225,11 @@
       "birthday": "1993-04-19T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.762Z"
     },
     {
@@ -1789,6 +2247,11 @@
       "birthday": "1997-08-20T12:00:00.000Z",
       "city": null,
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.917Z"
     },
     {
@@ -1806,6 +2269,11 @@
       "birthday": "1992-06-05T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.517Z"
     },
     {
@@ -1823,6 +2291,11 @@
       "birthday": "2002-02-25T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.893Z"
     },
     {
@@ -1840,6 +2313,11 @@
       "birthday": "2002-09-27T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.486Z"
     },
     {
@@ -1857,6 +2335,11 @@
       "birthday": "1999-12-24T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.702Z"
     },
     {
@@ -1874,6 +2357,11 @@
       "birthday": "1996-12-16T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.279Z"
     },
     {
@@ -1891,6 +2379,11 @@
       "birthday": "1999-11-06T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.195Z"
     },
     {
@@ -1908,6 +2401,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.919Z"
     },
     {
@@ -1925,6 +2423,11 @@
       "birthday": "2000-02-02T12:00:00.000Z",
       "city": "Минск",
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.682Z"
     },
     {
@@ -1942,6 +2445,11 @@
       "birthday": "2000-07-01T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.783Z"
     },
     {
@@ -1959,6 +2467,11 @@
       "birthday": "2000-07-09T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.935Z"
     },
     {
@@ -1976,6 +2489,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.795Z"
     },
     {
@@ -1993,6 +2511,11 @@
       "birthday": "2003-01-09T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.752Z"
     },
     {
@@ -2010,6 +2533,11 @@
       "birthday": "2003-10-15T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.669Z"
     },
     {
@@ -2027,6 +2555,11 @@
       "birthday": "2004-05-22T12:00:00.000Z",
       "city": "Казань",
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.823Z"
     },
     {
@@ -2044,6 +2577,11 @@
       "birthday": "2010-09-12T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.656Z"
     },
     {
@@ -2061,6 +2599,11 @@
       "birthday": "2002-05-26T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.946Z"
     },
     {
@@ -2078,6 +2621,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.943Z"
     },
     {
@@ -2095,6 +2643,11 @@
       "birthday": null,
       "city": null,
       "country": "Украина",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.560Z"
     },
     {
@@ -2112,6 +2665,11 @@
       "birthday": "2000-11-23T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.853Z"
     },
     {
@@ -2129,6 +2687,11 @@
       "birthday": "2000-10-26T12:00:00.000Z",
       "city": null,
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.731Z"
     },
     {
@@ -2146,6 +2709,11 @@
       "birthday": "1999-09-01T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.786Z"
     },
     {
@@ -2163,6 +2731,11 @@
       "birthday": "2002-07-10T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.202Z"
     },
     {
@@ -2180,6 +2753,11 @@
       "birthday": "2000-03-09T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.833Z"
     },
     {
@@ -2197,6 +2775,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.807Z"
     },
     {
@@ -2214,6 +2797,11 @@
       "birthday": "2005-07-04T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.660Z"
     },
     {
@@ -2231,6 +2819,11 @@
       "birthday": "2003-01-22T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.724Z"
     },
     {
@@ -2248,6 +2841,11 @@
       "birthday": "2002-12-21T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.734Z"
     },
     {
@@ -2265,6 +2863,11 @@
       "birthday": "2001-02-09T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.453Z"
     },
     {
@@ -2282,6 +2885,11 @@
       "birthday": "1998-10-20T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.472Z"
     },
     {
@@ -2299,6 +2907,11 @@
       "birthday": "1999-12-21T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.780Z"
     },
     {
@@ -2316,6 +2929,11 @@
       "birthday": "2001-11-17T12:00:00.000Z",
       "city": null,
       "country": "Украина",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.235Z"
     },
     {
@@ -2333,6 +2951,11 @@
       "birthday": "1993-07-11T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.527Z"
     },
     {
@@ -2350,6 +2973,11 @@
       "birthday": "1999-09-15T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.476Z"
     },
     {
@@ -2367,6 +2995,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.515Z"
     },
     {
@@ -2384,6 +3017,11 @@
       "birthday": "1996-06-24T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.270Z"
     },
     {
@@ -2401,6 +3039,11 @@
       "birthday": "1997-07-16T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.789Z"
     },
     {
@@ -2418,6 +3061,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.896Z"
     },
     {
@@ -2435,6 +3083,11 @@
       "birthday": "2000-12-31T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.485Z"
     },
     {
@@ -2452,6 +3105,11 @@
       "birthday": null,
       "city": null,
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.812Z"
     },
     {
@@ -2469,6 +3127,11 @@
       "birthday": "1996-05-10T12:00:00.000Z",
       "city": null,
       "country": "Россия",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T18:52:37.259Z"
     },
     {
@@ -2486,6 +3149,11 @@
       "birthday": "1994-11-24T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.521Z"
     },
     {
@@ -2503,6 +3171,11 @@
       "birthday": "2000-04-14T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.826Z"
     },
     {
@@ -2520,6 +3193,11 @@
       "birthday": "2003-08-07T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.673Z"
     },
     {
@@ -2537,6 +3215,11 @@
       "birthday": "2000-04-21T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.494Z"
     },
     {
@@ -2554,6 +3237,11 @@
       "birthday": "2003-09-07T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.677Z"
     },
     {
@@ -2571,6 +3259,11 @@
       "birthday": "2002-07-18T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.535Z"
     },
     {
@@ -2588,6 +3281,11 @@
       "birthday": "1991-01-29T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.511Z"
     },
     {
@@ -2605,6 +3303,11 @@
       "birthday": "1995-07-07T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.503Z"
     },
     {
@@ -2622,6 +3325,11 @@
       "birthday": "2000-05-08T12:00:00.000Z",
       "city": "Греция",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.755Z"
     },
     {
@@ -2639,6 +3347,11 @@
       "birthday": "1992-07-02T12:00:00.000Z",
       "city": "Варшава",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-28T14:35:32.518Z"
     },
     {
@@ -2656,6 +3369,11 @@
       "birthday": "2003-07-02T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.888Z"
     },
     {
@@ -2673,6 +3391,11 @@
       "birthday": "2002-07-18T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.640Z"
     },
     {
@@ -2690,6 +3413,11 @@
       "birthday": "1999-08-10T12:00:00.000Z",
       "city": "Минск",
       "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.819Z"
     },
     {
@@ -2707,6 +3435,11 @@
       "birthday": "2000-12-15T12:00:00.000Z",
       "city": null,
       "country": "Беларусь",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
       "createdAt": "2026-07-22T23:58:23.765Z"
     }
   ],

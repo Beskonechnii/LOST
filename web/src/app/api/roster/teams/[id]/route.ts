@@ -4,7 +4,7 @@ import { bad, parseId } from "@/lib/api";
 import { isColor } from "@/lib/profiles";
 
 // Редактируемые поля профиля команды. Всё, чего нет в теле запроса, не трогаем.
-const FIELDS = ["name", "tag", "group", "color", "logo", "wordmark", "photo"] as const;
+const FIELDS = ["name", "tag", "group", "color", "logo", "wordmark", "photo", "banner"] as const;
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const id = parseId((await params).id);

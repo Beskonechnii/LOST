@@ -65,7 +65,7 @@ async function main() {
     matchKey(m, m.teamA.slug, m.teamB.slug);
 
   const snapshot = {
-    version: 6, // 6 — варды карт (модель Ward) + у Player появился tp (сезонные TP, очки MVP)
+    version: 7, // 7 — доп. поля ростера: banner (Team+Player), interviewUrl/orderNo/achievements/tags у Player
     exportedAt: new Date().toISOString(),
 
     teams: teams.map((t) => omit(t, "id")),

@@ -6,6 +6,7 @@ import { getPlayerRecord, getTeammates } from "@/lib/player-record";
 import { ageOf, formatBirthday, playerGaps, playerLinks, teamAccent, telegramUrl, yearsLabel } from "@/lib/profiles";
 import { heroImg } from "@/lib/assets";
 import { roleLabel } from "@/lib/roles";
+import { parseTags, tagLabel } from "@/lib/player-tags";
 import { isAdmin } from "@/lib/admin-session";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/app/_components/ui";
@@ -54,6 +55,9 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
   const links = playerLinks(player);
   const where = [player.city, player.country].filter(Boolean).join(", ");
   const gaps = playerGaps(player);
+  const tags = parseTags(player.tags);
+  // Достижения — свободный текст, одна строка = одна строчка списка; пустые строки отбрасываем.
+  const achievements = (player.achievements ?? "").split("\n").map((s) => s.trim()).filter(Boolean);
 
   return (
     <div className="space-y-6">
@@ -75,11 +79,20 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
 
       {/* Шапка: цвет команды задаёт настроение страницы, лого уходит в подложку водяным знаком */}
       <section className="relative overflow-hidden rounded-2xl border border-hairline bg-surface-1 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_24px_60px_-30px_rgba(0,0,0,0.95)]">
+        {/* Баннер профиля — самый нижний слой шапки, поверх него затемняющий градиент для читаемости */}
+        {player.banner && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={player.banner} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-40" />
+        )}
         <div
           className="pointer-events-none absolute inset-0"
-          style={{ background: `linear-gradient(115deg, ${accent}2e, transparent 55%)` }}
+          style={{
+            background: player.banner
+              ? `linear-gradient(115deg, ${accent}55, transparent 45%), linear-gradient(0deg, var(--color-surface-1), transparent 70%)`
+              : `linear-gradient(115deg, ${accent}2e, transparent 55%)`,
+          }}
         />
-        {main?.team.logo && (
+        {!player.banner && main?.team.logo && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={main.team.logo}
@@ -94,10 +107,21 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
           <div className="min-w-0 flex-1 space-y-3">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">
+                {player.orderNo != null && <span className="mr-2 align-middle text-xl font-semibold text-ink-subtle tabular-nums">#{player.orderNo}</span>}
                 {player.nickname}
                 {main?.isCaptain && <span className="ml-3 align-middle text-sm text-accent-bright">капитан</span>}
               </h1>
               {player.realName && <p className="text-ink-muted">{player.realName}</p>}
+              {/* Плашки роли в лиге — кем человек является для лиги (игрок / кастер / организатор …) */}
+              {tags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {tags.map((t) => (
+                    <span key={t} className="rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent-bright">
+                      {tagLabel(t)}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -131,6 +155,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
               {links.dotabuff && <ExternalLink href={links.dotabuff}>Dotabuff</ExternalLink>}
               {links.stratz && <ExternalLink href={links.stratz}>Stratz</ExternalLink>}
               {links.steam && <ExternalLink href={links.steam}>Steam</ExternalLink>}
+              {player.interviewUrl && <ExternalLink href={player.interviewUrl}>Интервью</ExternalLink>}
               {!links.dotabuff && !player.telegram && (
                 <span className="text-xs text-ink-subtle">Ссылок нет — заполните account_id или телеграм</span>
               )}
@@ -250,6 +275,21 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
           </div>
         )}
       </section>
+
+      {/* Достижения — свободный список из анкеты игрока. */}
+      {achievements.length > 0 && (
+        <section>
+          <Eyebrow className="mb-3">Достижения</Eyebrow>
+          <ul className="space-y-1.5">
+            {achievements.map((a, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-ink-muted">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                <span>{a}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* Топ-5 тиммейтов — с кем больше всего сыграно за одну команду (турнирная стата, кликабельны). */}
       {teammates.length > 0 && (

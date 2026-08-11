@@ -159,7 +159,7 @@ export function Workspace({
 
       <div className="grid items-start gap-4 lg:grid-cols-[300px_minmax(0,1fr)_300px]">
         <div className="space-y-4">
-          <div className="rounded-lg border border-hairline bg-surface-1/40 p-3">
+          <div className="rounded-card bg-surface p-3 cushion-field">
             <LibraryPanel
               teams={teams}
               onAdd={(type) => addEl(type)}
@@ -172,7 +172,7 @@ export function Workspace({
               onSetBackground={(src) => setDoc((d) => ({ ...d, backgroundImage: src }))}
             />
           </div>
-          <div className="rounded-lg border border-hairline bg-surface-1/40 p-3">
+          <div className="rounded-card bg-surface p-3 cushion-field">
             <LayersPanel
               elements={doc.elements}
               selectedId={selectedId}
@@ -198,7 +198,7 @@ export function Workspace({
           />
         </div>
 
-        <div className="rounded-lg border border-hairline bg-surface-1/40 p-3">
+        <div className="rounded-card bg-surface p-3 cushion-field">
           <Inspector
             el={selected}
             fonts={fonts}

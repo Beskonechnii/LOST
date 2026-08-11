@@ -99,7 +99,7 @@ function Setup({ teams, heroes, onStart }: { teams: TeamRef[]; heroes: HeroRef[]
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Fearless draft</h1>
+        <h1 className="text-[28px] font-black tracking-[-0.5px] text-ink md:text-4xl">Fearless draft</h1>
         <p className="mt-1 text-sm text-ink-muted">
           Пул карты — по 9 случайных героев на атрибут, на каждой карте новый. Герои, взятые в прошлых картах, в пул не попадают; баны — покарточные.
         </p>

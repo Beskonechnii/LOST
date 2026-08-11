@@ -179,7 +179,7 @@ export function VisionMap({
                 if (time >= tEnd) setTime(0);
                 setPlaying((p) => !p);
               }}
-              className="grid h-9 w-9 flex-none place-items-center rounded-full bg-gradient-to-b from-accent-bright to-accent text-white shadow-[0_6px_18px_-6px_var(--color-accent)]"
+              className="grid h-9 w-9 flex-none place-items-center rounded-full bg-purple text-[var(--on-accent)] cushion-control"
               aria-label={playing ? "Пауза" : "Играть"}
             >
               {playing ? "❚❚" : "▶"}

@@ -245,6 +245,18 @@ model DraftSession {
   updatedAt DateTime @updatedAt
 }
 
+/// Сессия fearless-драфта: серия драфтов героев без повторов. Как DraftSession (UNDERBEER) —
+/// эфемерный операторский вывод, всё состояние в payload JSON-строкой (src/lib/fearless.ts →
+/// FearlessState). В снимок БД НЕ входит (как и DraftSession): это не данные лиги, а рабочий стол.
+model FearlessSession {
+  id        Int      @id @default(autoincrement())
+  title     String?
+  status    String   @default("draft") // draft | done
+  payload   String // JSON всего состояния (src/lib/fearless.ts → FearlessState)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 /// Стата игрока на карте — строки, из которых считаются все рейтинги турнира (src/lib/leaders.ts).
 /// Пишется при привязке карты к серии (src/lib/match-sync.ts) из того же отчёта, что рисует постгейм.
 /// `won` дублирует «команда игрока = победитель»: сторона игрока в самой строке не хранится,

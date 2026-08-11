@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   newFearless,
@@ -35,9 +35,32 @@ const fmtTime = (sec: number) => {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 };
 
-export function FearlessBoard({ teams, heroes }: { teams: TeamRef[]; heroes: HeroRef[] }) {
+export function FearlessBoard({
+  teams,
+  heroes,
+  sessionId,
+  initialState = null,
+}: {
+  teams: TeamRef[];
+  heroes: HeroRef[];
+  sessionId?: number;
+  initialState?: FearlessState | null;
+}) {
   const heroById = useMemo(() => new Map(heroes.map((h) => [h.id, h])), [heroes]);
-  const [state, setState] = useState<FearlessState | null>(null);
+  const [state, setState] = useState<FearlessState | null>(initialState);
+
+  // Автосейв в архив: PATCH payload при каждом изменении состояния (первый рендер — загруженное
+  // состояние, его не пересохраняем). fetch в эффекте допустим (это не setState).
+  const first = useRef(true);
+  useEffect(() => {
+    if (!sessionId || state === null) return;
+    if (first.current) { first.current = false; return; }
+    void fetch(`/api/fearless/${sessionId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ payload: state }),
+    });
+  }, [state, sessionId]);
 
   if (!state) {
     return <Setup teams={teams} heroes={heroes} onStart={setState} />;

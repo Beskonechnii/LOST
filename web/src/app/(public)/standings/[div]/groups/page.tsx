@@ -46,7 +46,7 @@ export default async function StandingsPage({ params }: { params: Promise<{ div:
         <GroupStage tables={tables} />
       )}
 
-      <Link href={`/standings/${division.slug}/playoff`} className="inline-block text-xs text-ink-subtle hover:text-accent-bright">
+      <Link href={`/standings/${division.slug}/playoff`} className="inline-block font-pouf text-xs font-bold text-muted hover:text-[var(--purple)]">
         Дальше — плей-офф с посевом из групп →
       </Link>
     </div>

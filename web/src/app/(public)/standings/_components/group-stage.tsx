@@ -8,8 +8,10 @@ import type { GroupRow, GroupTable } from "@/lib/group-stage";
 // затемнена. Плотно, без пустых мест. Только чтение: счёт из привязанных карт архива серий,
 // правки — через /admin/series.
 
-const CARD =
-  "overflow-hidden rounded-2xl border border-hairline bg-surface-1 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_16px_44px_-26px_rgba(0,0,0,0.9)]";
+const CARD = "overflow-hidden rounded-card bg-surface cushion-card";
+
+/** Заголовок-полоска над таблицей/сеткой — компактный uppercase в духе pouf Eyebrow. */
+const HEAD = "px-4 py-2.5 text-center text-[11px] font-extrabold uppercase tracking-[1.5px] text-muted";
 
 /** Лого команды. Нет файла — монограмма из первых букв тега на подложке. */
 function TeamMark({ row, size = 26 }: { row: GroupRow; size?: number }) {
@@ -37,9 +39,7 @@ function TeamMark({ row, size = 26 }: { row: GroupRow; size?: number }) {
 function StandingsCard({ t }: { t: GroupTable }) {
   return (
     <div className={`${CARD} w-full lg:w-[23rem] lg:shrink-0`}>
-      <div className="border-b border-hairline bg-surface-2/40 px-4 py-2 text-center text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">
-        Таблица
-      </div>
+      <div className={`border-b border-hairline ${HEAD}`}>Таблица</div>
       <table className="w-full border-collapse text-sm">
         <tbody>
           {t.rows.map((r) => {
@@ -69,8 +69,8 @@ function StandingsCard({ t }: { t: GroupTable }) {
                 </td>
                 <td className="w-12 py-2.5 pr-3 text-center">
                   <span
-                    className={`inline-block min-w-7 rounded-full px-2 py-0.5 text-sm font-bold tabular-nums ${
-                      leader ? "bg-accent/20 text-accent-bright" : "bg-surface-2 text-ink"
+                    className={`inline-block min-w-7 rounded-pill px-2.5 py-0.5 text-sm font-black tabular-nums ${
+                      leader ? "bg-purple text-[var(--on-accent)]" : "bg-surface-2 text-ink"
                     }`}
                   >
                     {r.points}
@@ -89,9 +89,7 @@ function StandingsCard({ t }: { t: GroupTable }) {
 function HeadToHeadCard({ t }: { t: GroupTable }) {
   return (
     <div className={`${CARD} overflow-x-auto`}>
-      <div className="border-b border-hairline bg-surface-2/40 px-4 py-2 text-center text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">
-        Личные встречи
-      </div>
+      <div className={`border-b border-hairline ${HEAD}`}>Личные встречи</div>
       <table className="border-collapse text-sm">
         <tbody>
           {t.rows.map((r, i) => (
@@ -145,12 +143,12 @@ function HeadToHeadCard({ t }: { t: GroupTable }) {
 
 export function GroupStage({ tables }: { tables: GroupTable[] }) {
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 font-pouf">
       {tables.map((t) => (
         <section key={t.group}>
           <div className="mb-3 flex items-baseline gap-2.5">
-            <h2 className="text-lg font-bold tracking-tight text-ink">Группа {t.group}</h2>
-            <span className="text-xs text-ink-subtle">{t.rows.length} команд</span>
+            <h2 className="text-xl font-black tracking-[-0.3px] text-ink">Группа {t.group}</h2>
+            <span className="text-xs font-bold text-muted">{t.rows.length} команд</span>
           </div>
           {/* stretch (по умолчанию) — обе карточки одной высоты; на широком экране заметный зазор */}
           <div className="flex flex-col gap-4 lg:flex-row lg:gap-8">

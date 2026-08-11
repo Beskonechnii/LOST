@@ -202,13 +202,13 @@ export function DraftBoard({
   return (
     <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
       {/* Шапка: название, статус сохранения, старт/оверлей */}
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-hairline bg-surface-1/40 p-3">
+      <div className="flex flex-wrap items-center gap-3 rounded-card bg-surface p-3 cushion-field">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onBlur={() => saveTitle(title)}
           placeholder={`Драфт #${sessionId}`}
-          className="min-w-40 flex-1 rounded border border-hairline bg-canvas px-3 py-1.5 text-sm outline-none focus:border-amber-600"
+          className="min-w-40 flex-1 rounded-control bg-bg px-3 py-2 text-sm font-bold text-ink outline-none cushion-field"
         />
         <span className="text-xs text-ink-subtle">
           {saving === "saving" ? "Сохраняю…" : saving === "error" ? "Ошибка сохранения" : "Сохранено"}
@@ -316,7 +316,7 @@ export function DraftBoard({
                 (a, b) => Number(taken.has(a.id)) - Number(taken.has(b.id)),
               );
               return (
-                <div key={String(seg.position)} className="rounded-lg border border-hairline bg-surface-1/30 p-2">
+                <div key={String(seg.position)} className="rounded-control bg-surface p-2 cushion-field">
                   <div className="mb-1.5 flex items-center justify-between px-0.5 text-[11px] uppercase tracking-wide text-ink-subtle">
                     <span className="truncate">{seg.label}</span>
                     <span className="shrink-0 text-ink-subtle">{remaining}</span>
@@ -400,12 +400,12 @@ function RosterSelect({
 
   return (
     <div className="mt-4 space-y-4">
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-hairline bg-surface-1/40 p-3">
+      <div className="flex flex-wrap items-center gap-3 rounded-card bg-surface p-3 cushion-field">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Поиск по нику или имени…"
-          className="min-w-48 flex-1 rounded border border-hairline bg-canvas px-3 py-1.5 text-sm outline-none focus:border-sky-600"
+          className="min-w-48 flex-1 rounded-control bg-bg px-3 py-2 text-sm font-bold text-ink outline-none cushion-field"
         />
         <span className="text-sm text-ink-muted">
           Выбрано: <b className="text-ink">{count}</b>
@@ -425,7 +425,7 @@ function RosterSelect({
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
         {filtered.map((seg) => (
-          <div key={String(seg.position)} className="rounded-lg border border-hairline bg-surface-1/30 p-2">
+          <div key={String(seg.position)} className="rounded-control bg-surface p-2 cushion-field">
             <div className="mb-1.5 flex items-center justify-between px-0.5 text-[11px] uppercase tracking-wide text-ink-subtle">
               <span className="truncate">{seg.label}</span>
               <span className="shrink-0 text-ink-subtle">{seg.players.filter((p) => selected?.has(p.id)).length}</span>
@@ -666,7 +666,7 @@ function ConfigControls({
 }) {
   const activeName = activeTeamId ? teamById(state, activeTeamId)?.name : null;
   return (
-    <div className="space-y-3 rounded-lg border border-hairline bg-surface-1/40 p-3">
+    <div className="space-y-3 rounded-card bg-surface p-3 cushion-field">
       <div className="flex flex-wrap items-center gap-4">
         <label className="flex items-center gap-2 text-sm">
           Размер состава

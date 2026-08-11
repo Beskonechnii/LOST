@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/pouf/Button";
 import {
   newFearless,
   buildPool,
@@ -111,7 +111,7 @@ function Setup({ teams, heroes, onStart }: { teams: TeamRef[]; heroes: HeroRef[]
       </div>
 
       <div>
-        <div className="mb-2 text-xs uppercase tracking-widest text-ink-subtle">Формат</div>
+        <div className="mb-2 text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">Формат</div>
         <div className="flex gap-2">
           {BEST_OF.map((n) => (
             <button key={n} type="button" onClick={() => setBestOf(n)}
@@ -123,9 +123,9 @@ function Setup({ teams, heroes, onStart }: { teams: TeamRef[]; heroes: HeroRef[]
       </div>
 
       {/* Монетка: бросок случаен, победитель выбирает блок; операторы вводят итог двумя строками */}
-      <div className="rounded-2xl border border-hairline bg-surface-1 p-4">
+      <div className="rounded-card bg-surface p-4 cushion-card">
         <div className="flex items-center gap-3">
-          <Button type="button" variant="outline" size="sm" onClick={() => setCoin(tossCoin())}>
+          <Button type="button" variant="quiet" size="sm" onClick={() => setCoin(tossCoin())}>
             🪙 Бросить монетку
           </Button>
           {coin !== null && (
@@ -142,8 +142,8 @@ function Setup({ teams, heroes, onStart }: { teams: TeamRef[]; heroes: HeroRef[]
         </div>
       </div>
 
-      <Button type="button" disabled={!ready} onClick={start}>Начать драфт</Button>
-      {!ready && <p className="text-xs text-ink-subtle">Выберите две разные команды.</p>}
+      <Button type="button" tone="orange" disabled={!ready} onClick={start}>Начать драфт</Button>
+      {!ready && <p className="text-xs font-bold text-muted">Выберите две разные команды.</p>}
     </div>
   );
 }
@@ -151,11 +151,11 @@ function Setup({ teams, heroes, onStart }: { teams: TeamRef[]; heroes: HeroRef[]
 function PickTwo({ label, names, value, onChange }: { label: string; names: [string, string]; value: TeamIdx; onChange: (v: TeamIdx) => void }) {
   return (
     <div>
-      <div className="mb-1 text-xs uppercase tracking-widest text-ink-subtle">{label}</div>
-      <div className="flex overflow-hidden rounded-lg border border-hairline">
+      <div className="mb-1 text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">{label}</div>
+      <div className="flex gap-2">
         {([0, 1] as TeamIdx[]).map((i) => (
           <button key={i} type="button" onClick={() => onChange(i)}
-            className={`flex-1 truncate px-3 py-2 text-sm transition ${value === i ? "bg-accent text-white" : "bg-surface-1 text-ink-muted hover:text-ink"}`}>
+            className={`flex-1 truncate rounded-[14px] px-3 py-2 text-sm font-black transition-[box-shadow,transform,background] ${value === i ? "bg-purple text-[var(--on-accent)] cushion-control" : "bg-surface text-ink-muted cushion-field hover:text-ink"}`}>
             {names[i]}
           </button>
         ))}
@@ -167,9 +167,9 @@ function PickTwo({ label, names, value, onChange }: { label: string; names: [str
 function TeamPick({ label, teams, value, onChange, exclude }: { label: string; teams: TeamRef[]; value: number | null; onChange: (id: number) => void; exclude: number | null }) {
   return (
     <label className="block">
-      <div className="mb-1 text-xs uppercase tracking-widest text-ink-subtle">{label}</div>
+      <div className="mb-1 text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">{label}</div>
       <select value={value ?? ""} onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full rounded-lg border border-hairline bg-surface-1 px-3 py-2 text-sm text-ink">
+        className="w-full rounded-control bg-bg px-3 py-2 text-sm font-bold text-ink outline-none cushion-field">
         {teams.map((t) => (
           <option key={t.id} value={t.id} disabled={t.id === exclude}>{t.name}</option>
         ))}
@@ -260,7 +260,7 @@ function Draft({ state, setState, heroById, onReset }: {
       {/* Шапка: карта, чей ход, управление */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-hairline bg-surface-1 p-3">
         <div className="flex flex-wrap items-center gap-3 text-sm">
-          <span className="text-xs uppercase tracking-widest text-ink-subtle">Карта {state.current + 1} / {state.bestOf}</span>
+          <span className="text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">Карта {state.current + 1} / {state.bestOf}</span>
           <span className="text-ink-subtle">свет: <b className="text-ink">{state.teams[light].name}</b> · первый пик: <b className="text-ink">{state.teams[first].name}</b></span>
           {step ? (
             <span className="rounded-full px-3 py-1 text-sm font-semibold text-white" style={{ background: state.teams[active!].color }}>
@@ -271,9 +271,9 @@ function Draft({ state, setState, heroById, onReset }: {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <Button type="button" variant="outline" size="sm" onClick={doUndo} disabled={movesCount === 0}>← Отменить</Button>
+          <Button type="button" variant="quiet" size="sm" onClick={doUndo} disabled={movesCount === 0}>← Отменить</Button>
           {canNextGame(state) && <Button type="button" size="sm" onClick={doNext}>Следующая карта →</Button>}
-          <Button type="button" variant="ghost" size="sm" className="text-ink-subtle hover:text-rose-400" onClick={onReset}>Сбросить</Button>
+          <Button type="button" variant="quiet" tone="down" size="sm" onClick={onReset}>Сбросить</Button>
         </div>
       </div>
 
@@ -309,7 +309,7 @@ function Sequence({ state, heroById }: { state: FearlessState; heroById: Map<num
   const leftTeam = firstPickOf(state, state.current); // слева тот, кто ходит первым
   return (
     <div className="rounded-2xl border border-hairline bg-surface-1 p-3">
-      <div className="mb-2 grid grid-cols-[1fr_auto_1fr] text-xs uppercase tracking-widest text-ink-subtle">
+      <div className="mb-2 grid grid-cols-[1fr_auto_1fr] text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">
         <span className="truncate">{state.teams[leftTeam].name}</span>
         <span className="px-3">#</span>
         <span className="truncate text-right">{state.teams[(1 - leftTeam) as TeamIdx].name}</span>
@@ -376,7 +376,7 @@ function PoolGrid({ state, heroById, locked, onPick, disabled }: {
 
   return (
     <div className="rounded-2xl border border-hairline bg-surface-1 p-3">
-      <div className="mb-2 text-xs uppercase tracking-widest text-ink-subtle">Пул карты · {state.pool.length} героев</div>
+      <div className="mb-2 text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">Пул карты · {state.pool.length} героев</div>
       <div className="space-y-3">
         {groups.map((g) => (
           <div key={g.attr}>
@@ -408,7 +408,7 @@ function PastMaps({ state, heroById }: { state: FearlessState; heroById: Map<num
   if (state.current === 0) return null;
   return (
     <div className="rounded-2xl border border-hairline bg-surface-1 p-3">
-      <div className="mb-2 text-xs uppercase tracking-widest text-ink-subtle">Взято в прошлых картах</div>
+      <div className="mb-2 text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">Взято в прошлых картах</div>
       <div className="space-y-2">
         {Array.from({ length: state.current }).map((_, gi) => {
           const picks = picksOfGame(state, gi);

@@ -2,23 +2,31 @@
 
 import { useActionState } from "react";
 import { login } from "./actions";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/pouf/Button";
+import { inputClasses } from "@/components/pouf/Input";
 
 // Форма входа. Ошибка приходит из серверного экшена через useActionState —
 // отдельного состояния и fetch-обвязки для одного поля не нужно.
+// Поле — нативный input (форма отправляется server action по name), но в скине pouf.
 export function LoginForm({ next }: { next: string }) {
   const [error, action, pending] = useActionState(login, null);
 
   return (
-    <form action={action} className="space-y-3">
+    <form action={action} className="space-y-3 font-pouf">
       <input type="hidden" name="next" value={next} />
-      <Input name="password" type="password" autoFocus autoComplete="current-password" placeholder="Пароль" />
-      <Button type="submit" disabled={pending} className="w-full">
-        {pending ? "Проверяю…" : "Войти"}
+      <input
+        name="password"
+        type="password"
+        autoFocus
+        autoComplete="current-password"
+        placeholder="Пароль"
+        className={inputClasses()}
+      />
+      <Button type="submit" loading={pending} block>
+        Войти
       </Button>
       {error && (
-        <p className="rounded-md border border-rose-900 bg-rose-950/40 px-3 py-2 text-sm text-rose-300">{error}</p>
+        <p className="rounded-control bg-orange px-3 py-2 text-sm font-bold text-[var(--on-accent)]">{error}</p>
       )}
     </form>
   );

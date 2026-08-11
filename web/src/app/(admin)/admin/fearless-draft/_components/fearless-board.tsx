@@ -101,7 +101,7 @@ function Setup({ teams, heroes, onStart }: { teams: TeamRef[]; heroes: HeroRef[]
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Fearless draft</h1>
         <p className="mt-1 text-sm text-ink-muted">
-          Пул серии — по 9 случайных героев на атрибут. Взятый герой недоступен до конца серии; баны — покарточные.
+          Пул карты — по 9 случайных героев на атрибут, на каждой карте новый. Герои, взятые в прошлых картах, в пул не попадают; баны — покарточные.
         </p>
       </div>
 
@@ -186,6 +186,13 @@ function Draft({ state, setState, heroById, onReset }: {
   heroById: Map<number, HeroRef>;
   onReset: () => void;
 }) {
+  // Новая карта = свежий рандом-пул (9/атрибут), но БЕЗ уже сыгранных (взятых) в серии героев.
+  const rerollPool = (s: FearlessState): number[] => {
+    const played = new Set<number>();
+    for (const g of s.games) for (const m of g.moves) if (m.action === "pick") played.add(m.heroId);
+    const avail = [...heroById.values()].filter((h) => !played.has(h.id));
+    return buildPool(avail.map((h) => ({ id: h.id, attr: h.attr })));
+  };
   const step = currentStep(state);
   const active = currentTeam(state);
   const locked = fearlessLocked(state);
@@ -227,7 +234,12 @@ function Draft({ state, setState, heroById, onReset }: {
     resetTurn();
   };
   const doUndo = () => { setState(undo(state)); resetTurn(); };
-  const doNext = () => { setState(nextGame(state)); setReserve([state.reserveSec, state.reserveSec]); resetTurn(); };
+  const doNext = () => {
+    const advanced = nextGame(state);
+    setState({ ...advanced, pool: rerollPool(advanced) }); // новый пул без сыгранных героев
+    setReserve([state.reserveSec, state.reserveSec]);
+    resetTurn();
+  };
 
   return (
     <div className="space-y-4">
@@ -364,7 +376,7 @@ function PoolGrid({ state, heroById, locked, onPick, disabled }: {
 
   return (
     <div className="rounded-2xl border border-hairline bg-surface-1 p-3">
-      <div className="mb-2 text-xs uppercase tracking-widest text-ink-subtle">Пул серии · {state.pool.length} героев</div>
+      <div className="mb-2 text-xs uppercase tracking-widest text-ink-subtle">Пул карты · {state.pool.length} героев</div>
       <div className="space-y-3">
         {groups.map((g) => (
           <div key={g.attr}>

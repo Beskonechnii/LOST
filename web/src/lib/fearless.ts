@@ -20,12 +20,18 @@ export type FearlessTeam = { name: string; color: string };
 /** Шаг последовательности карты: чья очередь (в терминах Seq) и что делает. */
 export type Step = { seq: Seq; action: "ban" | "pick" };
 
-// CM-lite: 4 бана + 5 пиков на сторону (18 ходов), вперемешку. Легко переписать под свой регламент —
-// движок зависит только от этого массива. seq 0 — тот, кто ходит первым на карте.
+// 5 банов + 5 пиков на сторону (20 ходов), вперемешку. Первая стадия банов — по 3 на команду,
+// вторая — по 2. Легко переписать под свой регламент: движок зависит только от этого массива.
+// seq 0 — тот, кто ходит первым на карте.
 export const SEQUENCE: Step[] = [
-  { seq: 0, action: "ban" }, { seq: 1, action: "ban" }, { seq: 0, action: "ban" }, { seq: 1, action: "ban" },
+  // Стадия 1 — баны по 3 на команду
+  { seq: 0, action: "ban" }, { seq: 1, action: "ban" }, { seq: 0, action: "ban" },
+  { seq: 1, action: "ban" }, { seq: 0, action: "ban" }, { seq: 1, action: "ban" },
+  // Пики стадии 1
   { seq: 0, action: "pick" }, { seq: 1, action: "pick" }, { seq: 1, action: "pick" }, { seq: 0, action: "pick" },
+  // Стадия 2 — баны по 2 на команду
   { seq: 0, action: "ban" }, { seq: 1, action: "ban" }, { seq: 0, action: "ban" }, { seq: 1, action: "ban" },
+  // Пики стадии 2
   { seq: 1, action: "pick" }, { seq: 0, action: "pick" }, { seq: 0, action: "pick" }, { seq: 1, action: "pick" },
   { seq: 0, action: "pick" }, { seq: 1, action: "pick" },
 ];

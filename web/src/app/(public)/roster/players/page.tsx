@@ -7,6 +7,7 @@ import { isAdmin } from "@/lib/admin-session";
 import { CreateForm } from "@/app/_components/roster-editors";
 import { SectionHeader } from "@/app/_components/ui";
 import { PlayerMiniCard } from "../_components/player-card";
+import { DivTabs, parseDiv, divName } from "../_components/div-tabs";
 
 export const dynamic = "force-dynamic";
 
@@ -24,12 +25,18 @@ const isSort = (v: unknown): v is SortKey => SORTS.some((s) => s.key === v);
 
 // Витрина игроков — публичная. Форма создания и статистика пробелов в анкетах видны
 // только вошедшему: это операторская диагностика полноты данных, а не факт о лиге.
-export default async function PlayersPage({ searchParams }: { searchParams: Promise<{ sort?: string }> }) {
+export default async function PlayersPage({ searchParams }: { searchParams: Promise<{ sort?: string; div?: string }> }) {
   const q = await searchParams;
   const sort: SortKey = isSort(q.sort) ? q.sort : "tp";
+  const div = parseDiv(q.div);
 
-  const [players, records] = await Promise.all([listPlayers(), getPlayerRecords(null)]);
+  const [allPlayers, records] = await Promise.all([listPlayers(), getPlayerRecords(null)]);
   const authed = await isAdmin();
+
+  // Дивизион игрока — по его командам (Team.group): игрок попадает в D1/D2, если в этом дивизионе
+  // у него есть место в составе. «Все» — весь пул, включая игроков без команды.
+  const name = divName(div);
+  const players = name ? allPlayers.filter((p) => p.spots.some((s) => s.team.group === name)) : allPlayers;
 
   // Карьерка игрока (игры/победы/поражения) — из турнирной статы (кирпич B). Нет статы → нули.
   const ranked = players.map((p) => {
@@ -75,11 +82,18 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
         />
       )}
 
+      <DivTabs current={div} base="/roster/players" keep={{ sort: sort === "tp" ? undefined : sort }} />
+
       <div className="flex flex-wrap gap-2">
-        {SORTS.map((s) => (
+        {SORTS.map((s) => {
+          const params = new URLSearchParams();
+          if (s.key !== "tp") params.set("sort", s.key);
+          if (div) params.set("div", div);
+          const qs = params.toString();
+          return (
           <Link
             key={s.key}
-            href={s.key === "tp" ? "/roster/players" : `/roster/players?sort=${s.key}`}
+            href={qs ? `/roster/players?${qs}` : "/roster/players"}
             className={`rounded-full px-3 py-1 text-xs font-medium transition ${
               sort === s.key
                 ? "bg-gradient-to-b from-accent-bright to-accent text-white shadow-[0_5px_14px_-6px_var(--color-accent)]"
@@ -88,7 +102,8 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
           >
             {s.label}
           </Link>
-        ))}
+          );
+        })}
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getPlayerProfile } from "@/lib/roster-data";
 import { getPlayerHeroes } from "@/lib/player-stats";
 import { getPlayerRecord, getTeammates } from "@/lib/player-record";
+import { getPlayerLeague, mmss } from "@/lib/player-league";
 import { ageOf, formatBirthday, playerGaps, playerLinks, teamAccent, telegramUrl, yearsLabel } from "@/lib/profiles";
 import { heroImg } from "@/lib/assets";
 import { roleLabel } from "@/lib/roles";
@@ -40,12 +41,13 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
 export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const pid = Number(id);
-  const [player, authed, heroes, record, teammates] = await Promise.all([
+  const [player, authed, heroes, record, teammates, league] = await Promise.all([
     getPlayerProfile(pid),
     isAdmin(),
     getPlayerHeroes(pid),
     getPlayerRecord(pid),
     getTeammates(pid),
+    getPlayerLeague(pid),
   ]);
   if (!player) notFound();
 
@@ -234,20 +236,100 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
             )}
           </div>
         ) : (
-          <div className="space-y-4">
-            {/* Карьерка: три плитки — сыграно, W-L, винрейт. */}
-            <div className="grid grid-cols-3 gap-3">
+          <div className="space-y-6">
+            {/* Карьерка: сыграно, W-L, винрейт — и средние за карту (KDA, GPM/XPM, длительность). */}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               {[
                 { label: "Карт", value: record.games, tone: "text-ink" },
                 { label: "Победы — поражения", value: `${record.wins}–${record.losses}`, tone: "text-ink" },
                 { label: "Винрейт", value: `${record.winrate.toFixed(0)}%`, tone: "text-accent-bright" },
+                { label: "Сред. KDA", value: `${league.summary.kills.toFixed(1)}/${league.summary.deaths.toFixed(1)}/${league.summary.assists.toFixed(1)}`, tone: "text-ink" },
+                { label: "GPM / XPM", value: `${league.summary.gpm} / ${league.summary.xpm}`, tone: "text-ink" },
+                { label: "Сред. время", value: mmss(league.summary.avgDurationSec) ?? "—", tone: "text-ink" },
               ].map((s) => (
                 <div key={s.label} className="rounded-xl border border-hairline bg-surface-1 p-4 text-center">
-                  <div className={`text-2xl font-bold tabular-nums ${s.tone}`}>{s.value}</div>
+                  <div className={`text-xl font-bold tabular-nums ${s.tone}`}>{s.value}</div>
                   <div className="mt-1 text-xs text-ink-subtle">{s.label}</div>
                 </div>
               ))}
             </div>
+
+            {/* Разрез по турнирам: дивизион × стадия — карьерка и самый играемый герой. */}
+            {league.tournaments.length > 0 && (
+              <div>
+                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-subtle">По турнирам</div>
+                <div className="overflow-hidden rounded-xl border border-hairline">
+                  <table className="w-full text-sm">
+                    <tbody>
+                      {league.tournaments.map((t) => (
+                        <tr key={`${t.division}-${t.stage}`} className="border-b border-hairline/60 last:border-0">
+                          <td className="px-4 py-2.5">
+                            <div className="font-medium text-ink">{t.division}</div>
+                            <div className="text-xs text-ink-subtle">{t.label}</div>
+                          </td>
+                          <td className="px-4 py-2.5 text-center tabular-nums text-ink-muted">{t.games} карт</td>
+                          <td className="px-4 py-2.5 text-center tabular-nums">
+                            <span className="text-emerald-400">{t.wins}</span>–<span className="text-rose-400">{t.losses}</span>
+                          </td>
+                          <td className="px-4 py-2.5 text-center font-semibold tabular-nums text-accent-bright">{t.winrate.toFixed(0)}%</td>
+                          <td className="px-4 py-2.5">
+                            {t.topHero && (
+                              <div className="flex items-center justify-end gap-2 text-xs text-ink-muted">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={heroImg(t.topHero.slug)} alt={t.topHero.name} className="h-6 w-[38px] shrink-0 rounded object-cover" />
+                                <span className="truncate">{t.topHero.name}</span>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Последние карты: герой, K/D/A, GPM/XPM, за кого/против кого, стадия, ссылка на разбор. */}
+            {league.games.length > 0 && (
+              <div>
+                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-subtle">Последние игры</div>
+                <div className="space-y-1.5">
+                  {league.games.map((g) => (
+                    <Link
+                      key={g.matchId}
+                      href={g.openDotaMatchId ? `/match/${g.openDotaMatchId}` : `/series/${g.seriesSlug}`}
+                      className="flex items-center gap-3 rounded-xl border border-hairline bg-surface-1 px-3 py-2 transition-colors hover:border-accent/60"
+                    >
+                      {/* Полоска исхода: зелёная — победа, красная — поражение */}
+                      <span className={`h-9 w-1 shrink-0 rounded-full ${g.won ? "bg-emerald-400" : "bg-rose-400"}`} />
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={heroImg(g.heroSlug)} alt={g.heroName} className="h-9 w-[56px] shrink-0 rounded object-cover" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className={`font-semibold ${g.won ? "text-emerald-400" : "text-rose-400"}`}>{g.won ? "W" : "L"}</span>
+                          {g.opponent && (
+                            <span className="truncate text-ink-muted">
+                              {g.myTeam && <span className="text-ink">{g.myTeam.tag ?? g.myTeam.name}</span>} vs {g.opponent.tag ?? g.opponent.name}
+                            </span>
+                          )}
+                        </div>
+                        <div className="truncate text-xs text-ink-subtle">
+                          {g.division} · {g.stageText}
+                        </div>
+                      </div>
+                      <div className="shrink-0 text-right text-xs tabular-nums text-ink-muted">
+                        <div className="text-ink">
+                          <span className="text-emerald-400">{g.kills}</span>/<span className="text-rose-400">{g.deaths}</span>/<span className="text-sky-400">{g.assists}</span>
+                        </div>
+                        <div className="text-ink-subtle">
+                          {g.gpm}/{g.xpm} gpm{mmss(g.durationSec) ? ` · ${mmss(g.durationSec)}` : ""}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Сигнатурные герои — топ по винрейту (мин. 2 карты). */}
             {heroes.signature.length > 0 && (
@@ -267,6 +349,23 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                       <div className="shrink-0 text-right">
                         <div className="text-sm font-bold tabular-nums text-accent-bright">{h.winrate.toFixed(0)}%</div>
                       </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Самые играемые — топ по числу карт (герои уже отсортированы по играм). */}
+            {heroes.heroes.length > 0 && (
+              <div>
+                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-subtle">Самые играемые</div>
+                <div className="flex flex-wrap gap-2">
+                  {heroes.heroes.slice(0, 8).map((h) => (
+                    <div key={h.slug} className="flex items-center gap-2 rounded-full border border-hairline bg-surface-1 py-1 pl-1 pr-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={heroImg(h.slug)} alt={h.name} className="h-6 w-[38px] shrink-0 rounded object-cover" />
+                      <span className="text-xs font-medium text-ink">{h.name}</span>
+                      <span className="text-xs tabular-nums text-ink-subtle">{h.games} · {h.winrate.toFixed(0)}%</span>
                     </div>
                   ))}
                 </div>

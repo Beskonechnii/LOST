@@ -231,8 +231,9 @@ export async function getPlayerProfile(id: number) {
 export async function listPlayers() {
   const players = await prisma.player.findMany({
     orderBy: [{ nickname: "asc" }],
-    // slug и color нужны аватаркам-заглушкам: цвет команды выводится из слага (teamAccent)
-    include: { spots: { include: { team: { select: { id: true, slug: true, name: true, tag: true, color: true } } } } },
+    // slug и color нужны аватаркам-заглушкам: цвет команды выводится из слага (teamAccent);
+    // group — чтобы делить список по дивизиону (вкладки D1/D2/Все на /roster/players)
+    include: { spots: { include: { team: { select: { id: true, slug: true, name: true, tag: true, color: true, group: true } } } } },
   });
   // в списке показываем основное место (действующее, если оно есть), остальные — счётчиком
   return Promise.all(

@@ -4,15 +4,15 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { UploadKind } from "@/lib/profiles";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/pouf/Button";
+import { Input, Textarea } from "@/components/pouf/Input";
 
 // Мелкие клиентские кирпичики студии: поля, загрузка картинок, кнопка сохранения.
 // Данные читают серверные страницы, пишут — эти компоненты через /api/studio/*.
+// Визуал — 1st-Pouf: поля-«подушки», кнопки-пилюли, шрифт Nunito.
 
 export function Label({ children }: { children: React.ReactNode }) {
-  return <span className="mb-1 block text-xs uppercase tracking-widest text-ink-subtle">{children}</span>;
+  return <span className="mb-1.5 block font-pouf text-[13px] font-black uppercase tracking-[0.6px] text-ink">{children}</span>;
 }
 
 export function TextField(props: {
@@ -30,9 +30,9 @@ export function TextField(props: {
         type={props.type ?? "text"}
         value={props.value}
         placeholder={props.placeholder}
-        onChange={(e) => props.onChange(e.target.value)}
+        onChange={props.onChange}
       />
-      {props.hint && <span className="mt-1 block text-xs text-ink-subtle">{props.hint}</span>}
+      {props.hint && <span className="mt-1.5 block font-pouf text-[13px] font-bold text-muted">{props.hint}</span>}
     </label>
   );
 }
@@ -48,11 +48,10 @@ export function TextAreaField(props: {
     <label className="block">
       <Label>{props.label}</Label>
       <Textarea
-        className="resize-y leading-relaxed"
         rows={props.rows ?? 5}
         value={props.value}
         placeholder={props.placeholder}
-        onChange={(e) => props.onChange(e.target.value)}
+        onChange={props.onChange}
       />
     </label>
   );
@@ -116,31 +115,31 @@ export function ImageField(props: {
   return (
     <div>
       <Label>{props.label}</Label>
-      <div className="flex items-center gap-3">
-        <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-xl border border-hairline bg-surface-1">
+      <div className="flex items-center gap-3 font-pouf">
+        <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-control bg-bg cushion-field">
           {props.value ? (
             // локальный файл из public/uploads — оптимизация next/image здесь не нужна
             // eslint-disable-next-line @next/next/no-img-element
             <img src={props.value} alt="" className="h-full w-full object-contain" />
           ) : (
-            <span className="text-xs text-ink-subtle">пусто</span>
+            <span className="text-xs font-bold text-muted">пусто</span>
           )}
         </div>
         <div className="text-sm">
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp"
-            className="block w-full text-xs text-ink-muted file:mr-3 file:rounded file:border-0 file:bg-surface-2 file:px-3 file:py-1.5 file:text-ink"
+            className="block w-full text-xs font-bold text-ink-muted file:mr-3 file:rounded-[12px] file:border-0 file:bg-purple file:px-3 file:py-1.5 file:font-black file:text-[var(--on-accent)]"
             onChange={(e) => {
               const f = e.target.files?.[0];
               if (f) void upload(f);
             }}
           />
-          {props.hint && <p className="mt-1 text-xs text-ink-subtle">{props.hint}</p>}
-          {busy && <p className="mt-1 text-xs text-accent-bright">Загружаю…</p>}
-          {error && <p className="mt-1 text-xs text-rose-400">{error}</p>}
+          {props.hint && <p className="mt-1 text-xs font-bold text-muted">{props.hint}</p>}
+          {busy && <p className="mt-1 text-xs font-bold text-[var(--purple)]">Загружаю…</p>}
+          {error && <p className="mt-1 text-xs font-bold text-rose-400">{error}</p>}
           {props.value && (
-            <button type="button" className="mt-1 text-xs text-ink-subtle underline" onClick={() => props.onChange(null)}>
+            <button type="button" className="mt-1 text-xs font-bold text-muted underline" onClick={() => props.onChange(null)}>
               убрать
             </button>
           )}

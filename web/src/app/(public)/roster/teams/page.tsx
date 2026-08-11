@@ -20,7 +20,7 @@ export default async function TeamsPage({ searchParams }: { searchParams: Promis
   const noId = teams.reduce((sum, t) => sum + t.noAccountIdCount, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-pouf">
       <SectionHeader
         eyebrow="Ростер лиги"
         title="Команды"

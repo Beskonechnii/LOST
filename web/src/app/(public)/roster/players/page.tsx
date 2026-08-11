@@ -58,7 +58,7 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
   const incomplete = players.filter((p) => playerGaps(p).length > 0).length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-pouf">
       <SectionHeader
         eyebrow="Ростер лиги"
         title="Игроки"
@@ -84,7 +84,7 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
 
       <DivTabs current={div} base="/roster/players" keep={{ sort: sort === "tp" ? undefined : sort }} />
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 font-pouf">
         {SORTS.map((s) => {
           const params = new URLSearchParams();
           if (s.key !== "tp") params.set("sort", s.key);
@@ -94,10 +94,10 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
           <Link
             key={s.key}
             href={qs ? `/roster/players?${qs}` : "/roster/players"}
-            className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+            className={`rounded-[14px] px-3.5 py-[7px] text-[13px] font-black transition-[box-shadow,transform,background] ${
               sort === s.key
-                ? "bg-gradient-to-b from-accent-bright to-accent text-white shadow-[0_5px_14px_-6px_var(--color-accent)]"
-                : "border border-hairline bg-surface-1 text-ink-muted hover:border-accent/60 hover:text-ink"
+                ? "bg-purple text-[var(--on-accent)] cushion-control"
+                : "bg-surface text-ink-muted cushion-field hover:text-ink"
             }`}
           >
             {s.label}

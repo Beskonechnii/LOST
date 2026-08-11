@@ -36,10 +36,10 @@ function Tab({
     <button
       type="button"
       onClick={onClick}
-      className={`flex-1 rounded-full px-3 py-1 text-xs font-semibold transition ${
+      className={`flex-1 rounded-[14px] px-3 py-1.5 text-xs font-black transition-[box-shadow,transform,background] ${
         active
-          ? "bg-surface-3 text-ink shadow-[inset_0_0_0_1px_var(--color-hairline-strong)]"
-          : "text-ink-subtle hover:text-ink-muted"
+          ? "bg-purple text-[var(--on-accent)] cushion-control-active [transform:translateY(1px)]"
+          : "bg-surface text-ink-subtle cushion-field hover:text-ink"
       }`}
     >
       {children}
@@ -95,7 +95,7 @@ function TeamCard({ team, defaultOpen }: { team: TeamWithRoster; defaultOpen: bo
   return (
     <div
       style={{ "--tc": accent } as React.CSSProperties}
-      className="group relative overflow-hidden rounded-2xl border border-hairline bg-surface-1 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_14px_40px_-20px_rgba(0,0,0,0.9)] transition-transform duration-200 hover:-translate-y-0.5"
+      className="group relative overflow-hidden rounded-card bg-surface font-pouf cushion-card transition-transform duration-200 hover:-translate-y-0.5"
     >
       {/* рейка и верхнее свечение в цвет команды — карточки различимы с одного взгляда */}
       <div
@@ -124,10 +124,10 @@ function TeamCard({ team, defaultOpen }: { team: TeamWithRoster; defaultOpen: bo
         </div>
 
         <Link href={`/roster/teams/${team.id}`} className="group/link min-w-0 flex-1">
-          <div className="truncate font-bold tracking-tight text-ink group-hover/link:text-accent-bright">
+          <div className="truncate font-black tracking-[-0.2px] text-ink group-hover/link:text-[var(--purple)]">
             {team.name}
           </div>
-          <div className="mt-0.5 flex items-center gap-1.5 truncate text-xs text-ink-subtle">
+          <div className="mt-0.5 flex items-center gap-1.5 truncate text-xs font-bold text-muted">
             <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: "var(--tc)" }} />
             {(open ? [teamTag(team), team.group] : [teamTag(team), `${team.playersCount} игрок(ов)`])
               .filter(Boolean)
@@ -136,9 +136,9 @@ function TeamCard({ team, defaultOpen }: { team: TeamWithRoster; defaultOpen: bo
         </Link>
 
         {team.mmrAverage !== null && (
-          <div className="shrink-0 rounded-xl border border-accent/25 bg-accent/10 px-3 py-1.5 text-right">
-            <div className="text-[9px] font-semibold uppercase tracking-[0.1em] text-accent-bright">ср. MMR</div>
-            <div className="text-base font-extrabold tabular-nums text-ink">{team.mmrAverage.toLocaleString("ru")}</div>
+          <div className="shrink-0 rounded-[14px] bg-purple px-3 py-1.5 text-right text-[var(--on-accent)] cushion-control">
+            <div className="text-[9px] font-black uppercase tracking-[0.1em] text-[var(--on-accent-muted)]">ср. MMR</div>
+            <div className="text-base font-black tabular-nums">{team.mmrAverage.toLocaleString("ru")}</div>
           </div>
         )}
 
@@ -146,7 +146,7 @@ function TeamCard({ team, defaultOpen }: { team: TeamWithRoster; defaultOpen: bo
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Свернуть состав" : "Развернуть состав"}
-          className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-hairline text-ink-subtle transition hover:border-accent hover:text-accent-bright"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-[14px] bg-surface text-ink-subtle cushion-field transition hover:text-[var(--purple)]"
         >
           <svg
             viewBox="0 0 16 16"
@@ -209,10 +209,10 @@ export function TeamCards({ teams }: { teams: TeamWithRoster[] }) {
   const shown = teams.filter((t) => (active === "—" ? !divisions.some((d) => d.name === t.group) : t.group === active));
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 font-pouf">
       <div className="flex items-center justify-between gap-3">
         {tabs.length > 1 ? (
-          <div className="flex gap-1.5">
+          <div className="flex gap-2">
             {tabs.map((t) => {
               const count = teams.filter((x) =>
                 t.key === "—" ? !divisions.some((d) => d.name === x.group) : x.group === t.key,
@@ -222,14 +222,14 @@ export function TeamCards({ teams }: { teams: TeamWithRoster[] }) {
                   key={t.key}
                   type="button"
                   onClick={() => setTab(t.key)}
-                  className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition ${
+                  className={`rounded-[14px] px-4 py-[9px] text-[13px] font-black transition-[box-shadow,transform,background] ${
                     active === t.key
-                      ? "bg-gradient-to-b from-accent-bright to-accent text-white shadow-[0_6px_18px_-6px_rgba(124,58,237,0.7)]"
-                      : "border border-hairline bg-surface-1 text-ink-muted hover:text-ink"
+                      ? "bg-purple text-[var(--on-accent)] cushion-control"
+                      : "bg-surface text-ink-muted cushion-field hover:text-ink"
                   }`}
                 >
                   {t.label}
-                  <span className={`ml-1.5 text-xs ${active === t.key ? "text-white/70" : "text-ink-subtle"}`}>
+                  <span className={`ml-1.5 text-xs ${active === t.key ? "text-[var(--on-accent-muted)]" : "text-ink-subtle"}`}>
                     {count}
                   </span>
                 </button>
@@ -246,7 +246,7 @@ export function TeamCards({ teams }: { teams: TeamWithRoster[] }) {
             setCollapsed((v) => !v);
             setGeneration((g) => g + 1);
           }}
-          className="shrink-0 text-xs font-medium text-ink-subtle transition-colors hover:text-accent-bright"
+          className="shrink-0 text-xs font-bold text-muted transition-colors hover:text-[var(--purple)]"
         >
           {collapsed ? "Развернуть все составы" : "Свернуть все составы"}
         </button>

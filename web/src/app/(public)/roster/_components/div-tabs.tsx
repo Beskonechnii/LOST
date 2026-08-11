@@ -39,15 +39,15 @@ export function DivTabs({
     { key: null, label: "Все" },
   ];
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 font-pouf">
       {tabs.map((t) => (
         <Link
           key={t.key ?? "all"}
           href={href(base, t.key, keep)}
-          className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+          className={`rounded-[14px] px-3.5 py-[7px] text-[13px] font-black transition-[box-shadow,transform,background] ${
             current === t.key
-              ? "bg-gradient-to-b from-accent-bright to-accent text-white shadow-[0_5px_14px_-6px_var(--color-accent)]"
-              : "border border-hairline bg-surface-1 text-ink-muted hover:border-accent/60 hover:text-ink"
+              ? "bg-purple text-[var(--on-accent)] cushion-control"
+              : "bg-surface text-ink-muted cushion-field hover:text-ink"
           }`}
         >
           {t.label}

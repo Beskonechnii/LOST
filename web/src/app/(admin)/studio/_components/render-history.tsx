@@ -43,17 +43,17 @@ export function RenderHistory({ renders }: { renders: Item[] }) {
   if (items.length === 0) return null;
 
   return (
-    <section>
-      <h2 className="mb-3 text-sm uppercase tracking-widest text-ink-subtle">История</h2>
+    <section className="font-pouf">
+      <h2 className="mb-3 text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">История</h2>
       <ul className="space-y-2 text-sm">
         {items.map((r) => {
           const label = r.title ?? r.templateId;
           return (
             <li key={r.id} className="flex items-center gap-2">
-              <Link href={`/studio/new/${r.templateId}?render=${r.id}`} className="text-accent-bright hover:underline">
+              <Link href={`/studio/new/${r.templateId}?render=${r.id}`} className="font-bold text-[var(--purple)] hover:underline">
                 {label}
               </Link>
-              <span className="text-xs text-ink-subtle">{r.created}</span>
+              <span className="text-xs font-bold text-muted">{r.created}</span>
               <button
                 onClick={() => setConfirmId(r.id)}
                 title="Удалить из истории"

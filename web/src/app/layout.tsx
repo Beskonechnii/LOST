@@ -37,7 +37,11 @@ export default function RootLayout({
     >
       {/* Навигации здесь намеренно нет: она своя у каждой группы маршрутов —
           (public)/layout.tsx для продукта и (admin)/layout.tsx для служебной части. */}
-      <body className="flex min-h-full flex-col bg-canvas font-sans text-ink">
+      {/* pouf-lost — скоуп дизайн-системы 1st-Pouf на весь сайт: перекрашивает пастельный
+          --purple в бренд-violet LOST и ставит --on-accent=белый. Трогает только токены pouf
+          (--purple/--on-accent) и утилиту text-muted, которых вне pouf-компонентов нигде нет,
+          поэтому на старую вёрстку не влияет, а любой pouf-компонент выходит сразу в теме LOST. */}
+      <body className="pouf-lost flex min-h-full flex-col bg-canvas font-sans text-ink">
         {children}
         {/* Тосты (sonner) — один хост на весь сайт; заменяют webview-глохнущий alert(). */}
         <Toaster position="bottom-right" richColors />

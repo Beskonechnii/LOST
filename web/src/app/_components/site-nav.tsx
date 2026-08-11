@@ -44,28 +44,28 @@ function isActive(pathname: string, item: NavItem) {
   return matchesHref(pathname, item.href) || (item.match ?? []).some((m) => matchesHref(pathname, m));
 }
 
-const focus = "outline-none focus-visible:ring-2 focus-visible:ring-accent-bright";
+const focus = "outline-none focus-visible:ring-[3px] focus-visible:ring-purple";
 
-/** Общая раскладка верхней строки — отличаются только наполнением и акцентом. */
+/** Общая раскладка верхней строки — отличаются только наполнением и акцентом.
+ *  Визуал 1st-Pouf: пилюли-«подушки», Nunito, лого-Blob. Активный раздел вжат внутрь
+ *  (cushion-control), неактивный — тихий контур, поднимается на hover. */
 function Bar({
   sections,
-  accent,
   brand,
   aside,
 }: {
   sections: NavItem[];
-  accent: string;
   brand: React.ReactNode;
   aside: React.ReactNode;
 }) {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-hairline bg-canvas/85 backdrop-blur">
-      <div className={`mx-auto flex h-12 ${SITE_MAX_W} items-center gap-4 px-4 md:px-6`}>
+    <header className="pouf-lost sticky top-0 z-50 border-b border-hairline bg-canvas/85 font-pouf backdrop-blur" data-theme="dark">
+      <div className={`mx-auto flex h-14 ${SITE_MAX_W} items-center gap-4 px-4 md:px-6`}>
         {brand}
 
-        <nav className="-mx-1 flex flex-1 gap-1 overflow-x-auto">
+        <nav className="-mx-1 flex flex-1 gap-2 overflow-x-auto px-1 py-2">
           {sections.map((s) => {
             const active = isActive(pathname, s);
             return (
@@ -74,8 +74,10 @@ function Bar({
                 href={s.href}
                 title={s.hint}
                 aria-current={active ? "page" : undefined}
-                className={`shrink-0 rounded-md px-3 py-1.5 text-sm transition-colors ${focus} ${
-                  active ? accent : "text-ink-muted hover:bg-surface-1 hover:text-ink"
+                className={`shrink-0 rounded-[14px] px-4 py-[9px] text-[13px] font-black transition-[box-shadow,transform,background] ${focus} ${
+                  active
+                    ? "bg-purple text-[var(--on-accent)] cushion-control"
+                    : "text-ink-muted hover:bg-surface-1 hover:text-ink hover:cushion-field"
                 }`}
               >
                 {s.label}
@@ -90,13 +92,13 @@ function Bar({
   );
 }
 
-/** Логотип-ссылка на главную — один для всего сайта. */
+/** Логотип-ссылка на главную — один для всего сайта. Пухлый бренд-Blob в духе pouf. */
 const brand = (
-  <Link href="/" className={`flex shrink-0 items-center gap-2 rounded ${focus}`} title="League of Spirits">
-    <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-accent to-fuchsia-600 text-sm font-black text-white">
+  <Link href="/" className={`flex shrink-0 items-center gap-3 rounded-control ${focus}`} title="League of Spirits">
+    <span className="grid h-9 w-9 place-items-center rounded-[14px] bg-purple text-[15px] font-black text-[var(--on-accent)] cushion-blob">
       L
     </span>
-    <span className="hidden text-xs font-bold uppercase tracking-[0.2em] text-ink-muted sm:block">
+    <span className="hidden text-xs font-black uppercase tracking-[0.2em] text-ink-muted sm:block">
       League&nbsp;of&nbsp;Spirits
     </span>
   </Link>
@@ -107,7 +109,7 @@ const accessLink = (
   <Link
     href="/admin/login"
     title="Вход в админку"
-    className={`shrink-0 rounded-md px-2 py-1.5 text-xs text-ink-subtle transition-colors hover:text-ink-muted ${focus}`}
+    className={`shrink-0 rounded-[14px] px-3 py-1.5 text-xs font-bold text-ink-subtle transition-colors hover:text-ink-muted ${focus}`}
   >
     Доступ
   </Link>
@@ -117,7 +119,7 @@ const accessLink = (
 // PublicNav/AdminNav оставлены отдельными функциями лишь потому, что их зовут разные layout'ы —
 // содержимое у них общее.
 function TopBar() {
-  return <Bar sections={TOP_SECTIONS} accent="bg-accent/15 font-medium text-accent-bright" brand={brand} aside={accessLink} />;
+  return <Bar sections={TOP_SECTIONS} brand={brand} aside={accessLink} />;
 }
 
 /** Навигация продукта (группа public). */
@@ -138,19 +140,19 @@ export function SubNav({ items }: { items: NavItem[] }) {
     .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   return (
-    // 49px = высота верхней строки (h-12) вместе с её нижней границей — иначе при скролле щель в 1px
-    <div className="sticky top-[49px] z-40 border-b border-hairline bg-canvas/85 backdrop-blur">
-      <nav className={`mx-auto flex ${SITE_MAX_W} gap-4 overflow-x-auto px-4 md:px-6`}>
+    // 57px = высота верхней строки (h-14) вместе с её нижней границей — иначе при скролле щель в 1px
+    <div className="pouf-lost sticky top-[57px] z-40 border-b border-hairline bg-canvas/85 font-pouf backdrop-blur" data-theme="dark">
+      <nav className={`mx-auto flex ${SITE_MAX_W} gap-2 overflow-x-auto px-4 py-2 md:px-6`}>
         {items.map((t) => (
           <Link
             key={t.href}
             href={t.href}
             title={t.hint}
             aria-current={t.href === active ? "page" : undefined}
-            className={`shrink-0 border-b-2 px-1 py-2 text-sm transition-colors ${focus} ${
+            className={`shrink-0 rounded-[14px] px-4 py-[9px] text-[13px] font-black transition-[box-shadow,transform,background] ${focus} ${
               t.href === active
-                ? "border-accent-bright text-ink"
-                : "border-transparent text-ink-subtle hover:text-ink"
+                ? "bg-purple text-[var(--on-accent)] cushion-control"
+                : "text-ink-muted hover:bg-surface-1 hover:text-ink hover:cushion-field"
             }`}
           >
             {t.label}

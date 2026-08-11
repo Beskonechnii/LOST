@@ -9,7 +9,7 @@ import { heroImg } from "@/lib/assets";
 import { roleLabel } from "@/lib/roles";
 import { parseTags, tagLabel } from "@/lib/player-tags";
 import { isAdmin } from "@/lib/admin-session";
-import { Button } from "@/components/ui/button";
+import { buttonClasses } from "@/components/pouf/Button";
 import { Eyebrow } from "@/app/_components/ui";
 import { PlayerAvatar, TeamLogo } from "../../_components/avatar";
 import { PlayerMiniCard } from "../../_components/player-card";
@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 /** Плашка факта: роль, MMR, возраст, город. Пустые значения не рисуем — дыр в строке быть не должно. */
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full border border-hairline-strong/70 bg-surface-1/60 px-3 py-1 text-xs text-ink-muted">
+    <span className="rounded-pill bg-surface px-3 py-1 text-xs font-bold text-ink-muted cushion-field">
       {children}
     </span>
   );
@@ -31,7 +31,7 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="rounded border border-hairline px-3 py-1.5 text-xs text-ink-muted transition-colors hover:border-accent hover:text-accent-bright"
+      className="rounded-[14px] bg-surface px-3 py-1.5 text-xs font-bold text-ink-muted cushion-field transition-colors hover:text-[var(--purple)]"
     >
       {children}
     </a>
@@ -62,15 +62,15 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
   const achievements = (player.achievements ?? "").split("\n").map((s) => s.trim()).filter(Boolean);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-2 text-sm text-ink-subtle">
-        <Link href="/roster/players" className="hover:text-ink-muted">
+    <div className="space-y-6 font-pouf">
+      <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-muted">
+        <Link href="/roster/players" className="hover:text-[var(--purple)]">
           Игроки
         </Link>
         {main && (
           <>
             <span className="text-ink-subtle">/</span>
-            <Link href={`/roster/teams/${main.team.id}`} className="hover:text-ink-muted">
+            <Link href={`/roster/teams/${main.team.id}`} className="hover:text-[var(--purple)]">
               {main.team.name}
             </Link>
           </>
@@ -80,7 +80,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
       </div>
 
       {/* Шапка: цвет команды задаёт настроение страницы, лого уходит в подложку водяным знаком */}
-      <section className="relative overflow-hidden rounded-2xl border border-hairline bg-surface-1 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_24px_60px_-30px_rgba(0,0,0,0.95)]">
+      <section className="relative overflow-hidden rounded-card bg-surface cushion-card">
         {/* Баннер профиля — самый нижний слой шапки, поверх него затемняющий градиент для читаемости */}
         {player.banner && (
           // eslint-disable-next-line @next/next/no-img-element
@@ -108,17 +108,17 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
 
           <div className="min-w-0 flex-1 space-y-3">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">
-                {player.orderNo != null && <span className="mr-2 align-middle text-xl font-semibold text-ink-subtle tabular-nums">#{player.orderNo}</span>}
+              <h1 className="text-3xl font-black tracking-[-0.5px] text-ink">
+                {player.orderNo != null && <span className="mr-2 align-middle text-xl font-black text-ink-subtle tabular-nums">#{player.orderNo}</span>}
                 {player.nickname}
-                {main?.isCaptain && <span className="ml-3 align-middle text-sm text-accent-bright">капитан</span>}
+                {main?.isCaptain && <span className="ml-3 align-middle text-sm font-black text-[var(--purple)]">капитан</span>}
               </h1>
-              {player.realName && <p className="text-ink-muted">{player.realName}</p>}
+              {player.realName && <p className="font-bold text-ink-muted">{player.realName}</p>}
               {/* Плашки роли в лиге — кем человек является для лиги (игрок / кастер / организатор …) */}
               {tags.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {tags.map((t) => (
-                    <span key={t} className="rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent-bright">
+                    <span key={t} className="rounded-pill bg-purple px-3 py-1 text-xs font-black text-[var(--on-accent)]">
                       {tagLabel(t)}
                     </span>
                   ))}
@@ -130,17 +130,16 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
               {main && (
                 <Link
                   href={`/roster/teams/${main.team.id}`}
-                  className="flex items-center gap-2 rounded-full border px-3 py-1 text-xs transition-colors hover:border-accent"
-                  style={{ borderColor: `${accent}66` }}
+                  className="flex items-center gap-2 rounded-pill bg-surface px-3 py-1 text-xs cushion-field transition-transform hover:-translate-y-px"
                 >
                   <TeamLogo team={main.team} size={18} />
-                  <span className="font-medium text-ink">{main.team.name}</span>
-                  {roleLabel(main.role) && <span className="text-ink-subtle">{roleLabel(main.role)}</span>}
+                  <span className="font-black text-ink">{main.team.name}</span>
+                  {roleLabel(main.role) && <span className="font-bold text-muted">{roleLabel(main.role)}</span>}
                 </Link>
               )}
               {player.mmr && <Chip>{player.mmr.toLocaleString("ru")} MMR</Chip>}
               {player.tp > 0 && (
-                <Link href="/tp" className="rounded-full border border-accent/50 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent-bright transition-colors hover:border-accent">
+                <Link href="/tp" className="rounded-pill bg-purple px-3 py-1 text-xs font-black text-[var(--on-accent)] cushion-control transition-transform hover:-translate-y-px">
                   {player.tp} TP
                 </Link>
               )}
@@ -159,7 +158,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
               {links.steam && <ExternalLink href={links.steam}>Steam</ExternalLink>}
               {player.interviewUrl && <ExternalLink href={player.interviewUrl}>Интервью</ExternalLink>}
               {!links.dotabuff && !player.telegram && (
-                <span className="text-xs text-ink-subtle">Ссылок нет — заполните account_id или телеграм</span>
+                <span className="text-xs font-bold text-muted">Ссылок нет — заполните account_id или телеграм</span>
               )}
             </div>
           </div>
@@ -167,16 +166,16 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
           {/* Правка и служебный slug — только оператору: посетителю ни то, ни другое не нужно */}
           {authed && (
             <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
-              <Button asChild>
-                <Link href={`/admin/roster/players/${player.id}/edit`}>Редактировать</Link>
-              </Button>
-              <span className="text-xs text-ink-subtle">slug: {player.slug}</span>
+              <Link href={`/admin/roster/players/${player.id}/edit`} className={buttonClasses({ size: "sm" })}>
+                Редактировать
+              </Link>
+              <span className="text-xs font-bold text-muted">slug: {player.slug}</span>
             </div>
           )}
         </div>
 
         {gaps.length > 0 && (
-          <div className="relative border-t border-hairline px-6 py-2 text-xs text-amber-400/90">
+          <div className="relative border-t border-hairline px-6 py-2 text-xs font-bold text-amber-400/90">
             Не заполнено: {gaps.join(", ")}
           </div>
         )}
@@ -187,7 +186,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
         <section key={spot.id}>
           <div className="mb-3 flex flex-wrap items-baseline gap-2">
             <Eyebrow>{spot === player.spots[0] ? "Команда" : "Ещё в составе"}</Eyebrow>
-            <Link href={`/roster/teams/${spot.team.id}`} className="text-sm font-medium text-ink-muted hover:text-accent-bright">
+            <Link href={`/roster/teams/${spot.team.id}`} className="text-sm font-medium text-ink-muted hover:text-[var(--purple)]">
               {spot.team.name}
             </Link>
             <span className="text-xs text-ink-subtle">
@@ -222,13 +221,13 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
       <section>
         <Eyebrow className="mb-3">Статистика лиги</Eyebrow>
         {record.games === 0 ? (
-          <div className="rounded-xl border border-dashed border-hairline p-6 text-center text-sm text-ink-subtle">
+          <div className="rounded-card bg-surface cushion-field p-6 text-center text-sm text-ink-subtle">
             Появится, когда в архив лягут карты этого игрока: винрейт, сигнатурные герои, тиммейты.
             {links.dotabuff && (
               <>
                 {" "}
                 Пока смотрите на{" "}
-                <a href={links.dotabuff} target="_blank" rel="noreferrer" className="text-accent-bright hover:underline">
+                <a href={links.dotabuff} target="_blank" rel="noreferrer" className="text-[var(--purple)] hover:underline">
                   Dotabuff
                 </a>
                 .
@@ -242,14 +241,14 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
               {[
                 { label: "Карт", value: record.games, tone: "text-ink" },
                 { label: "Победы — поражения", value: `${record.wins}–${record.losses}`, tone: "text-ink" },
-                { label: "Винрейт", value: `${record.winrate.toFixed(0)}%`, tone: "text-accent-bright" },
+                { label: "Винрейт", value: `${record.winrate.toFixed(0)}%`, tone: "text-[var(--purple)]" },
                 { label: "Сред. KDA", value: `${league.summary.kills.toFixed(1)}/${league.summary.deaths.toFixed(1)}/${league.summary.assists.toFixed(1)}`, tone: "text-ink" },
                 { label: "GPM / XPM", value: `${league.summary.gpm} / ${league.summary.xpm}`, tone: "text-ink" },
                 { label: "Сред. время", value: mmss(league.summary.avgDurationSec) ?? "—", tone: "text-ink" },
               ].map((s) => (
-                <div key={s.label} className="rounded-xl border border-hairline bg-surface-1 p-4 text-center">
-                  <div className={`text-xl font-bold tabular-nums ${s.tone}`}>{s.value}</div>
-                  <div className="mt-1 text-xs text-ink-subtle">{s.label}</div>
+                <div key={s.label} className="rounded-control bg-surface cushion-card p-4 text-center">
+                  <div className={`text-xl font-black tabular-nums ${s.tone === "text-[var(--purple)]" ? "text-[var(--purple)]" : s.tone}`}>{s.value}</div>
+                  <div className="mt-1 text-xs font-bold text-muted">{s.label}</div>
                 </div>
               ))}
             </div>
@@ -257,8 +256,8 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
             {/* Разрез по турнирам: дивизион × стадия — карьерка и самый играемый герой. */}
             {league.tournaments.length > 0 && (
               <div>
-                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-subtle">По турнирам</div>
-                <div className="overflow-hidden rounded-xl border border-hairline">
+                <div className="mb-2 text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">По турнирам</div>
+                <div className="overflow-hidden rounded-card cushion-card">
                   <table className="w-full text-sm">
                     <tbody>
                       {league.tournaments.map((t) => (
@@ -271,7 +270,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                           <td className="px-4 py-2.5 text-center tabular-nums">
                             <span className="text-emerald-400">{t.wins}</span>–<span className="text-rose-400">{t.losses}</span>
                           </td>
-                          <td className="px-4 py-2.5 text-center font-semibold tabular-nums text-accent-bright">{t.winrate.toFixed(0)}%</td>
+                          <td className="px-4 py-2.5 text-center font-semibold tabular-nums text-[var(--purple)]">{t.winrate.toFixed(0)}%</td>
                           <td className="px-4 py-2.5">
                             {t.topHero && (
                               <div className="flex items-center justify-end gap-2 text-xs text-ink-muted">
@@ -292,13 +291,13 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
             {/* Последние карты: герой, K/D/A, GPM/XPM, за кого/против кого, стадия, ссылка на разбор. */}
             {league.games.length > 0 && (
               <div>
-                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-subtle">Последние игры</div>
+                <div className="mb-2 text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">Последние игры</div>
                 <div className="space-y-1.5">
                   {league.games.map((g) => (
                     <Link
                       key={g.matchId}
                       href={g.openDotaMatchId ? `/match/${g.openDotaMatchId}` : `/series/${g.seriesSlug}`}
-                      className="flex items-center gap-3 rounded-xl border border-hairline bg-surface-1 px-3 py-2 transition-colors hover:border-accent/60"
+                      className="flex items-center gap-3 rounded-control bg-surface cushion-field px-3 py-2 transition-colors hover:border-accent/60"
                     >
                       {/* Полоска исхода: зелёная — победа, красная — поражение */}
                       <span className={`h-9 w-1 shrink-0 rounded-full ${g.won ? "bg-emerald-400" : "bg-rose-400"}`} />
@@ -334,10 +333,10 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
             {/* Сигнатурные герои — топ по винрейту (мин. 2 карты). */}
             {heroes.signature.length > 0 && (
               <div>
-                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-subtle">Сигнатурные герои</div>
+                <div className="mb-2 text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">Сигнатурные герои</div>
                 <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   {heroes.signature.map((h) => (
-                    <div key={h.slug} className="flex items-center gap-3 rounded-xl border border-hairline bg-surface-1 p-2.5">
+                    <div key={h.slug} className="flex items-center gap-3 rounded-control bg-surface cushion-field p-2.5">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={heroImg(h.slug)} alt={h.name} className="h-10 w-[62px] shrink-0 rounded object-cover" />
                       <div className="min-w-0 flex-1">
@@ -347,7 +346,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                         </div>
                       </div>
                       <div className="shrink-0 text-right">
-                        <div className="text-sm font-bold tabular-nums text-accent-bright">{h.winrate.toFixed(0)}%</div>
+                        <div className="text-sm font-bold tabular-nums text-[var(--purple)]">{h.winrate.toFixed(0)}%</div>
                       </div>
                     </div>
                   ))}
@@ -358,10 +357,10 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
             {/* Самые играемые — топ по числу карт (герои уже отсортированы по играм). */}
             {heroes.heroes.length > 0 && (
               <div>
-                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-subtle">Самые играемые</div>
+                <div className="mb-2 text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">Самые играемые</div>
                 <div className="flex flex-wrap gap-2">
                   {heroes.heroes.slice(0, 8).map((h) => (
-                    <div key={h.slug} className="flex items-center gap-2 rounded-full border border-hairline bg-surface-1 py-1 pl-1 pr-3">
+                    <div key={h.slug} className="flex items-center gap-2 rounded-pill bg-surface py-1 pl-1 pr-3 cushion-field">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={heroImg(h.slug)} alt={h.name} className="h-6 w-[38px] shrink-0 rounded object-cover" />
                       <span className="text-xs font-medium text-ink">{h.name}</span>
@@ -382,7 +381,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
           <ul className="space-y-1.5">
             {achievements.map((a, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-ink-muted">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-purple" />
                 <span>{a}</span>
               </li>
             ))}

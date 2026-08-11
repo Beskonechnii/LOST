@@ -4,7 +4,7 @@ import { getTeamProfile, type RosterMember } from "@/lib/roster-data";
 import { getStandings } from "@/lib/standings";
 import { DIVISIONS, divisionSlug } from "@/lib/divisions";
 import { teamAccent, teamTag } from "@/lib/profiles";
-import { Button } from "@/components/ui/button";
+import { buttonClasses } from "@/components/pouf/Button";
 import { roleLabel } from "@/lib/roles";
 import { QUALIFICATION, qualificationOf } from "@/lib/qualification";
 import { isAdmin } from "@/lib/admin-session";
@@ -33,9 +33,9 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
   const zone = row?.place ? qualificationOf(row.place, group!.rows.length, team.group ?? DIVISIONS[0].name) : null;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-2 text-sm text-ink-subtle">
-        <Link href="/roster/teams" className="hover:text-ink-muted">
+    <div className="space-y-6 font-pouf">
+      <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-muted">
+        <Link href="/roster/teams" className="hover:text-[var(--purple)]">
           Команды
         </Link>
         <span className="text-ink-subtle">/</span>
@@ -43,7 +43,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
       </div>
 
       {/* Обложка: командное фото, если оно есть; иначе — градиент в цвет команды с лого водяным знаком */}
-      <section className="overflow-hidden rounded-2xl border border-hairline bg-canvas">
+      <section className="overflow-hidden rounded-card bg-canvas cushion-card">
         <TeamCover team={team} accent={accent} />
 
         {/* Лого наезжает на обложку — тот же приём, что с аватаркой игрока: шапка и тело срастаются.
@@ -63,39 +63,39 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
           </div>
 
           <div className="min-w-0 flex-1 sm:pb-1">
-            <h1 className="text-3xl font-bold leading-tight tracking-tight break-words">{team.name}</h1>
-            <p className="text-sm text-ink-subtle">
+            <h1 className="text-3xl font-black leading-tight tracking-[-0.5px] break-words text-ink">{team.name}</h1>
+            <p className="text-sm font-bold text-muted">
               {[teamTag(team), team.group, `${team.playersCount} игрок(ов)`].filter(Boolean).join(" · ")}
             </p>
             {team.mmrAverage !== null && (
-              <p className="text-sm text-ink-muted">
-                ср. MMR основы <span className="font-medium text-ink">{team.mmrAverage.toLocaleString("ru")}</span>
-                <span className="text-ink-subtle"> · Σ {team.mmrTotal.toLocaleString("ru")}</span>
+              <p className="text-sm font-bold text-ink-muted">
+                ср. MMR основы <span className="font-black text-ink">{team.mmrAverage.toLocaleString("ru")}</span>
+                <span className="text-muted"> · Σ {team.mmrTotal.toLocaleString("ru")}</span>
               </p>
             )}
           </div>
 
           {authed && (
-            <Button asChild className="self-start sm:mb-1 sm:self-auto">
-              <Link href={`/admin/roster/teams/${team.id}/edit`}>Редактировать</Link>
-            </Button>
+            <Link href={`/admin/roster/teams/${team.id}/edit`} className={`${buttonClasses({ size: "sm" })} self-start sm:mb-1 sm:self-auto`}>
+              Редактировать
+            </Link>
           )}
         </div>
       </section>
 
       {/* Участие в дивизионе: цифры те же, что в разделе «LOST D1», и переходы туда же */}
       {row && (
-        <section className="rounded-2xl border border-hairline bg-surface-1 p-5 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-24px_rgba(0,0,0,0.9)]">
+        <section className="rounded-card bg-surface p-5 cushion-card">
           <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
             <Eyebrow>
               {team.group ?? "Дивизион"}
               {group && <span className="ml-2 text-ink-muted">группа {group.group}</span>}
             </Eyebrow>
             <div className="flex flex-wrap gap-3 text-xs">
-              <Link href={`/standings/${divSlug}/groups`} className="font-medium text-accent-bright hover:underline">
+              <Link href={`/standings/${divSlug}/groups`} className="font-black text-[var(--purple)] hover:underline">
                 Групповая стадия →
               </Link>
-              <Link href={`/standings/${divSlug}/playoff`} className="font-medium text-accent-bright hover:underline">
+              <Link href={`/standings/${divSlug}/playoff`} className="font-black text-[var(--purple)] hover:underline">
                 Плей-офф →
               </Link>
             </div>
@@ -134,7 +134,7 @@ function RosterSection({
     <section>
       <Eyebrow className="mb-3">{title}</Eyebrow>
       {players.length === 0 ? (
-        <p className="text-sm text-ink-subtle">{empty}</p>
+        <p className="text-sm font-bold text-muted">{empty}</p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {players.map((p) => (
@@ -151,7 +151,7 @@ function RosterSection({
               size={56}
               trailing={
                 p.position ? (
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-hairline bg-surface-2 text-xs font-semibold text-ink-muted">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[12px] bg-surface-2 text-xs font-black text-ink-muted cushion-field">
                     {p.position}
                   </span>
                 ) : undefined

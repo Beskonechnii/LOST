@@ -16,15 +16,16 @@ const nf = new Intl.NumberFormat("ru-RU");
 const fmt = (v: number, decimals = 0) =>
   decimals ? v.toLocaleString("ru-RU", { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) : nf.format(Math.round(v));
 
-/** Ссылка-фильтр: тот же адрес с подменённым параметром. `null` — параметр убрать (значение «все»). */
+/** Ссылка-фильтр: тот же адрес с подменённым параметром. `null` — параметр убрать (значение «все»).
+ *  Пилюля-«подушка» pouf: активная вжата (cushion-control, фиолет), неактивная — тихий контур. */
 function Chip({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
   return (
     <Link
       href={href}
-      className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+      className={`rounded-[14px] px-3.5 py-[7px] text-[13px] font-black transition-[box-shadow,transform,background] ${
         active
-          ? "bg-gradient-to-b from-accent-bright to-accent text-white shadow-[0_5px_14px_-6px_var(--color-accent)]"
-          : "border border-hairline bg-surface-1 text-ink-muted hover:border-accent/60 hover:text-ink"
+          ? "bg-purple text-[var(--on-accent)] cushion-control-active [transform:translateY(1px)]"
+          : "bg-surface text-ink-muted cushion-field hover:text-ink hover:cushion-field-focus"
       }`}
     >
       {children}
@@ -47,13 +48,13 @@ function Board({
 }) {
   const top = rows[0]?.value ?? 0;
   return (
-    <section className="overflow-hidden rounded-2xl border border-hairline bg-surface-1 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-26px_rgba(0,0,0,0.9)]">
-      <div className="border-b border-hairline bg-gradient-to-r from-accent/[0.14] to-transparent px-4 py-2.5">
-        <div className="text-sm font-bold tracking-wide text-ink">{title}</div>
-        <div className="text-[11px] text-ink-subtle">{hint}</div>
+    <section className="overflow-hidden rounded-card bg-surface font-pouf cushion-card">
+      <div className="border-b border-hairline bg-gradient-to-r from-purple/[0.16] to-transparent px-4 py-3">
+        <div className="text-sm font-black tracking-[-0.2px] text-ink">{title}</div>
+        <div className="text-[11px] font-bold text-muted">{hint}</div>
       </div>
       {rows.length === 0 ?
-        <p className="px-4 py-4 text-xs text-ink-subtle">Нет карт в этом разрезе.</p>
+        <p className="px-4 py-4 text-xs font-bold text-muted">Нет карт в этом разрезе.</p>
       : <ol className="divide-y divide-hairline">
           {rows.map((r, i) => {
             const leader = i === 0;
@@ -64,30 +65,30 @@ function Board({
               >
                 {/* полоса-доля от лидера: строку читаешь глазами, не сравнивая цифры */}
                 <span
-                  className={`absolute inset-y-0 left-0 ${leader ? "bg-accent/[0.16]" : "bg-accent/[0.08]"}`}
+                  className={`absolute inset-y-0 left-0 ${leader ? "bg-purple/[0.20]" : "bg-purple/[0.09]"}`}
                   style={{ width: `${top > 0 ? Math.max(2, (r.value / top) * 100) : 0}%` }}
                   aria-hidden
                 />
                 <span
-                  className={`relative grid h-5 w-5 shrink-0 place-items-center rounded-md text-[11px] font-bold tabular-nums ${
-                    leader ? "bg-accent/20 text-accent-bright" : "text-ink-subtle"
+                  className={`relative grid h-6 w-6 shrink-0 place-items-center rounded-[10px] text-[11px] font-black tabular-nums ${
+                    leader ? "bg-purple text-[var(--on-accent)]" : "text-ink-subtle"
                   }`}
                 >
                   {i + 1}
                 </span>
-                <span className="relative w-9 shrink-0 truncate text-[10px] font-medium text-ink-subtle">
+                <span className="relative w-9 shrink-0 truncate text-[10px] font-bold text-ink-subtle">
                   {r.subject.tag}
                 </span>
                 <Link
                   href={r.subject.kind === "team" ? `/roster/teams/${r.subject.id}` : `/roster/players/${r.subject.id}`}
-                  className="relative truncate text-sm font-semibold transition-colors group-hover:text-accent-bright"
+                  className="relative truncate text-sm font-black transition-colors group-hover:text-[var(--purple)]"
                 >
                   {r.subject.name}
                 </Link>
                 <span className="relative ml-auto shrink-0 text-right">
-                  <span className="block text-sm font-bold tabular-nums text-ink">{fmt(r.value, decimals)}</span>
+                  <span className="block text-sm font-black tabular-nums text-ink">{fmt(r.value, decimals)}</span>
                   {r.per != null && perLabel && (
-                    <span className="block text-[10px] tabular-nums text-ink-subtle">
+                    <span className="block text-[10px] font-bold tabular-nums text-muted">
                       {/* дробная часть осмысленна у «убийств за карту», а у «урона за карту» — шум */}
                       {fmt(r.per, r.per < 100 ? 1 : 0)} {perLabel}
                     </span>
@@ -135,7 +136,7 @@ export default async function StatsPage({
 
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-pouf">
       <SectionHeader
         eyebrow={`${division.label} · рейтинги`}
         title="Статистика"
@@ -151,7 +152,7 @@ export default async function StatsPage({
 
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="mr-1 text-[10px] uppercase tracking-widest text-ink-subtle">Кто</span>
+          <span className="mr-1 text-[10px] font-extrabold uppercase tracking-widest text-muted">Кто</span>
           <Chip href={link({ kind: undefined })} active={kind === "players"}>
             Игроки
           </Chip>
@@ -161,7 +162,7 @@ export default async function StatsPage({
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="mr-1 text-[10px] uppercase tracking-widest text-ink-subtle">Стадия</span>
+          <span className="mr-1 text-[10px] font-extrabold uppercase tracking-widest text-muted">Стадия</span>
           <Chip href={link({ stage: undefined, group: undefined, bracket: undefined })} active={!stage}>
             Весь турнир
           </Chip>
@@ -174,7 +175,7 @@ export default async function StatsPage({
 
         {stage === "group" && (
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="mr-1 text-[10px] uppercase tracking-widest text-ink-subtle">Группа</span>
+            <span className="mr-1 text-[10px] font-extrabold uppercase tracking-widest text-muted">Группа</span>
             <Chip href={link({ group: undefined })} active={!group}>
               Обе
             </Chip>
@@ -188,7 +189,7 @@ export default async function StatsPage({
 
         {stage === "playoff" && (
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="mr-1 text-[10px] uppercase tracking-widest text-ink-subtle">Сетка</span>
+            <span className="mr-1 text-[10px] font-extrabold uppercase tracking-widest text-muted">Сетка</span>
             <Chip href={link({ bracket: undefined })} active={!bracket}>
               Вся
             </Chip>
@@ -202,9 +203,9 @@ export default async function StatsPage({
       </div>
 
       {data.games === 0 ?
-        <p className="rounded-lg border border-dashed border-hairline p-6 text-sm text-ink-muted">
+        <p className="rounded-card bg-surface p-6 text-sm font-bold text-muted cushion-field">
           В этом разрезе нет ни одной карты. Карты попадают сюда, когда их привязывают к встрече —{" "}
-          <Link href="/admin/series" className="text-accent-bright hover:underline">
+          <Link href="/admin/series" className="text-[var(--purple)] hover:underline">
             архив серий
           </Link>
           .

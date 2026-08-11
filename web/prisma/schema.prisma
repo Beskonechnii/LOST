@@ -18,6 +18,7 @@ model Team {
   logo      String?
   wordmark  String? // граффити-надпись названия (для анонсов)
   photo     String? // командное фото в рамку
+  banner    String? // баннер команды (широкая подложка шапки); путь как у logo
   color     String? // акцент команды, hex
   group     String?
   createdAt DateTime @default(now())
@@ -49,6 +50,11 @@ model Player {
   birthday    DateTime? // только дата, время не значимо; нужна для возраста в графике и поздравлений
   city        String? // где живёт — город как в CRM, страна опционально следом
   country     String?
+  banner      String? // баннер профиля (широкая подложка шапки); путь как у photo
+  interviewUrl String? // ссылка на интервью игрока, если есть
+  orderNo     Int? // порядковый номер игрока в лиге (ручной, для витрины); null — без номера
+  achievements String? // достижения внутри и вне лиги — свободный текст, одна строка = одно достижение
+  tags        String? // роли в лиге через запятую (player,streamer,caster,partner,organizer) — src/lib/player-tags.ts
   createdAt   DateTime  @default(now())
 
   spots RosterSpot[]
@@ -235,6 +241,18 @@ model DraftSession {
   title     String?
   status    String   @default("draft") // draft | done
   payload   String // JSON всего состояния драфта (src/lib/draft.ts → DraftState)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Сессия fearless-драфта: серия драфтов героев без повторов. Как DraftSession (UNDERBEER) —
+/// эфемерный операторский вывод, всё состояние в payload JSON-строкой (src/lib/fearless.ts →
+/// FearlessState). В снимок БД НЕ входит (как и DraftSession): это не данные лиги, а рабочий стол.
+model FearlessSession {
+  id        Int      @id @default(autoincrement())
+  title     String?
+  status    String   @default("draft") // draft | done
+  payload   String // JSON всего состояния (src/lib/fearless.ts → FearlessState)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

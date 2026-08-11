@@ -45,6 +45,7 @@ export default async function TeamEditPage({ params }: { params: Promise<{ id: s
           logo: team.logo,
           wordmark: team.wordmark,
           photo: team.photo,
+          banner: team.banner,
         }}
       />
 

@@ -48,6 +48,11 @@ export default async function PlayerEditPage({ params }: { params: Promise<{ id:
           city: player.city ?? "",
           country: player.country ?? "",
           photo: player.photo,
+          banner: player.banner,
+          interviewUrl: player.interviewUrl ?? "",
+          orderNo: player.orderNo != null ? String(player.orderNo) : "",
+          achievements: player.achievements ?? "",
+          tags: player.tags ?? "",
         }}
       />
 

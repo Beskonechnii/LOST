@@ -21,13 +21,21 @@ type Source = "materials" | "teams";
 export function LibraryPanel({
   onAdd,
   onAddImage,
+  onSetBackground,
   teams,
 }: {
   onAdd: (type: "text") => void;
   onAddImage: (src: string, w: number | null, h: number | null) => void;
+  /** Поставить картинку фоном холста (режим «В фон»). */
+  onSetBackground: (src: string) => void;
   teams: TeamGroup[];
 }) {
   const [source, setSource] = useState<Source>("materials");
+  // Куда кладёт клик по картинке: новым элементом на холст или фоном под всё.
+  const [target, setTarget] = useState<"canvas" | "background">("canvas");
+
+  // Единый обработчик выбора: в режиме фона размеры не нужны — картинка растягивается по холсту.
+  const pick: PickFn = target === "background" ? (src) => onSetBackground(src) : onAddImage;
 
   return (
     <div className="space-y-5">
@@ -40,8 +48,24 @@ export function LibraryPanel({
 
       <div>
         <Label>Библиотека</Label>
+        {/* Режим клика по картинке — на холст отдельным слоем или в фон под всё */}
+        <div className="mt-1 flex overflow-hidden rounded border border-hairline text-xs">
+          {(["canvas", "background"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTarget(t)}
+              className={`flex-1 px-2 py-1.5 transition ${
+                target === t ? "bg-accent text-white" : "bg-surface-1 text-ink-muted hover:text-ink"
+              }`}
+            >
+              {t === "canvas" ? "На холст" : "В фон"}
+            </button>
+          ))}
+        </div>
+
         <Select value={source} onValueChange={(v) => setSource(v as Source)}>
-          <SelectTrigger className="mt-1 w-full">
+          <SelectTrigger className="mt-2 w-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -50,11 +74,7 @@ export function LibraryPanel({
           </SelectContent>
         </Select>
 
-        {source === "materials" ? (
-          <Materials onPick={onAddImage} />
-        ) : (
-          <TeamBrowser teams={teams} onPick={onAddImage} />
-        )}
+        {source === "materials" ? <Materials onPick={pick} /> : <TeamBrowser teams={teams} onPick={pick} />}
       </div>
     </div>
   );

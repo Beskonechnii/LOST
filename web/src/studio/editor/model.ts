@@ -79,6 +79,12 @@ export type DesignDoc = {
   w: number;
   h: number;
   background: string; // цвет фона холста (под всеми элементами)
+  // Фон-картинка под всеми элементами (локальный путь, как у ImageEl — иначе PNG-снимок сломается).
+  // Рисуется отдельным <img> в самом низу узла, а не CSS background: modern-screenshot инлайнит
+  // только реальные <img>, но не url() в стиле. Цвет `background` остаётся подложкой (например,
+  // «поля» при fit=contain). Пусто/undefined — фон только цветной, как было.
+  backgroundImage?: string;
+  backgroundFit?: "cover" | "contain"; // как вписать картинку; по умолчанию cover
   elements: Element[];
 };
 

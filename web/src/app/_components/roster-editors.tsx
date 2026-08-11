@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ImageField, SaveButton, SelectField, TextField, Label } from "./form";
+import { ImageField, SaveButton, SelectField, TextAreaField, TextField, Label } from "./form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ROLES } from "@/lib/roles";
+import { PLAYER_TAGS, parseTags } from "@/lib/player-tags";
 
 // Формы профилей. Значения приходят из серверной страницы, изменения уходят в /api/studio/*.
 
@@ -18,6 +19,7 @@ type TeamForm = {
   logo: string | null;
   wordmark: string | null;
   photo: string | null;
+  banner: string | null;
 };
 
 export function TeamEditor({ id, initial }: { id: number; initial: TeamForm }) {
@@ -48,6 +50,7 @@ export function TeamEditor({ id, initial }: { id: number; initial: TeamForm }) {
         <ImageField label="Логотип" kind="teams" value={v.logo} onChange={(x) => set("logo", x)} hint="Эмблема, PNG с прозрачностью" />
         <ImageField label="Wordmark" kind="teams" value={v.wordmark} onChange={(x) => set("wordmark", x)} hint="Надпись-граффити для анонсов" />
         <ImageField label="Фото команды" kind="teams" value={v.photo} onChange={(x) => set("photo", x)} hint="Кадр в рамку VS-анонса" />
+        <ImageField label="Баннер" kind="teams" value={v.banner} onChange={(x) => set("banner", x)} hint="Широкая подложка шапки страницы команды" />
       </div>
 
       <SaveButton url={`/api/roster/teams/${id}`} data={v} />
@@ -67,6 +70,11 @@ type PlayerForm = {
   city: string;
   country: string;
   photo: string | null;
+  banner: string | null;
+  interviewUrl: string;
+  orderNo: string;
+  achievements: string;
+  tags: string; // ключи ролей через запятую (см. player-tags.ts)
 };
 
 function Fieldset({ title, children }: { title: string; children: React.ReactNode }) {
@@ -81,6 +89,15 @@ function Fieldset({ title, children }: { title: string; children: React.ReactNod
 export function PlayerEditor({ id, initial }: { id: number; initial: PlayerForm }) {
   const [v, setV] = useState(initial);
   const set = <K extends keyof PlayerForm>(k: K, val: PlayerForm[K]) => setV((p) => ({ ...p, [k]: val }));
+
+  // Плашки-роли — мультивыбор: строка «player,caster» ↔ набор чекбоксов справочника.
+  const active = new Set(parseTags(v.tags));
+  const toggleTag = (key: string) => {
+    const next = new Set(active);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    set("tags", PLAYER_TAGS.filter((t) => next.has(t.key)).map((t) => t.key).join(","));
+  };
 
   return (
     <div className="space-y-4">
@@ -115,8 +132,47 @@ export function PlayerEditor({ id, initial }: { id: number; initial: PlayerForm 
         </div>
       </Fieldset>
 
+      <Fieldset title="Лига">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <TextField label="Порядковый номер" value={v.orderNo} onChange={(x) => set("orderNo", x)} placeholder="1" hint="Номер игрока в лиге; пусто — без номера" />
+          <TextField label="Ссылка на интервью" value={v.interviewUrl} onChange={(x) => set("interviewUrl", x)} placeholder="https://…" />
+        </div>
+        <div className="mt-4">
+          <Label>Роли в лиге</Label>
+          <div className="mt-1 flex flex-wrap gap-2">
+            {PLAYER_TAGS.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => toggleTag(t.key)}
+                className={`rounded-full border px-3 py-1 text-xs transition ${
+                  active.has(t.key)
+                    ? "border-accent bg-accent/15 text-accent-bright"
+                    : "border-hairline bg-surface-1 text-ink-muted hover:border-accent/50 hover:text-ink"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="mt-4">
+          <TextAreaField
+            label="Достижения"
+            value={v.achievements}
+            onChange={(x) => set("achievements", x)}
+            placeholder={"Топ-4 LOST S1\nMVP гранд-финала\n…"}
+            rows={4}
+          />
+          <p className="mt-1 text-xs text-ink-subtle">Одна строка — одно достижение.</p>
+        </div>
+      </Fieldset>
+
       <Fieldset title="Фото">
-        <ImageField label="Портрет" kind="players" value={v.photo} onChange={(x) => set("photo", x)} hint="Для плашек и анонсов" />
+        <div className="grid gap-5 sm:grid-cols-2">
+          <ImageField label="Портрет" kind="players" value={v.photo} onChange={(x) => set("photo", x)} hint="Для плашек и анонсов" />
+          <ImageField label="Баннер" kind="players" value={v.banner} onChange={(x) => set("banner", x)} hint="Широкая подложка шапки профиля" />
+        </div>
       </Fieldset>
 
       <SaveButton url={`/api/roster/players/${id}`} data={v} />

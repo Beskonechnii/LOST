@@ -14,8 +14,12 @@ export function Toolbar({
   w,
   h,
   background,
+  backgroundImage,
+  backgroundFit,
   onFormat,
   onBackground,
+  onBackgroundFit,
+  onClearBackgroundImage,
   onExport,
   onSave,
   busy,
@@ -31,8 +35,12 @@ export function Toolbar({
   w: number;
   h: number;
   background: string;
+  backgroundImage?: string;
+  backgroundFit?: "cover" | "contain";
   onFormat: (w: number, h: number) => void;
   onBackground: (v: string) => void;
+  onBackgroundFit: (v: "cover" | "contain") => void;
+  onClearBackgroundImage: () => void;
   onExport: () => void;
   onSave: () => void;
   busy: boolean;
@@ -80,6 +88,31 @@ export function Toolbar({
           className="h-8 w-9 cursor-pointer rounded border border-hairline bg-surface-1"
         />
       </label>
+
+      {/* Фон-картинку выбирают из библиотеки слева (режим «В фон»); тут — что выбрано, как вписать и сброс */}
+      {backgroundImage && (
+        <div className="flex items-center gap-2 text-xs text-ink-subtle" title="Фон-картинка холста">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={backgroundImage} alt="" className="h-8 w-8 rounded border border-hairline object-cover" />
+          <div className="flex overflow-hidden rounded border border-hairline">
+            {(["cover", "contain"] as const).map((fit) => (
+              <button
+                key={fit}
+                type="button"
+                onClick={() => onBackgroundFit(fit)}
+                className={`px-2 py-1 transition ${
+                  (backgroundFit ?? "cover") === fit ? "bg-accent text-white" : "bg-surface-1 text-ink-muted hover:text-ink"
+                }`}
+              >
+                {fit === "cover" ? "залить" : "вписать"}
+              </button>
+            ))}
+          </div>
+          <button type="button" onClick={onClearBackgroundImage} className="text-ink-subtle hover:text-rose-400" title="Убрать фон-картинку">
+            ✕
+          </button>
+        </div>
+      )}
 
       <label className="flex cursor-pointer items-center gap-1.5 text-xs text-ink-subtle">
         <Checkbox checked={showGrid} onCheckedChange={(v) => onGrid(v === true, gridSize)} />

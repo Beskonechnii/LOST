@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPlayerProfile } from "@/lib/roster-data";
+import { getPlayerHeroes } from "@/lib/player-stats";
+import { getPlayerRecord, getTeammates } from "@/lib/player-record";
 import { ageOf, formatBirthday, playerGaps, playerLinks, teamAccent, telegramUrl, yearsLabel } from "@/lib/profiles";
+import { heroImg } from "@/lib/assets";
 import { roleLabel } from "@/lib/roles";
+import { parseTags, tagLabel } from "@/lib/player-tags";
 import { isAdmin } from "@/lib/admin-session";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/app/_components/ui";
@@ -35,7 +39,14 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
 
 export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [player, authed] = await Promise.all([getPlayerProfile(Number(id)), isAdmin()]);
+  const pid = Number(id);
+  const [player, authed, heroes, record, teammates] = await Promise.all([
+    getPlayerProfile(pid),
+    isAdmin(),
+    getPlayerHeroes(pid),
+    getPlayerRecord(pid),
+    getTeammates(pid),
+  ]);
   if (!player) notFound();
 
   // главное место — первое по порядку ролей: оно и задаёт цвет страницы, и рисуется в крошках
@@ -44,6 +55,9 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
   const links = playerLinks(player);
   const where = [player.city, player.country].filter(Boolean).join(", ");
   const gaps = playerGaps(player);
+  const tags = parseTags(player.tags);
+  // Достижения — свободный текст, одна строка = одна строчка списка; пустые строки отбрасываем.
+  const achievements = (player.achievements ?? "").split("\n").map((s) => s.trim()).filter(Boolean);
 
   return (
     <div className="space-y-6">
@@ -65,11 +79,20 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
 
       {/* Шапка: цвет команды задаёт настроение страницы, лого уходит в подложку водяным знаком */}
       <section className="relative overflow-hidden rounded-2xl border border-hairline bg-surface-1 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_24px_60px_-30px_rgba(0,0,0,0.95)]">
+        {/* Баннер профиля — самый нижний слой шапки, поверх него затемняющий градиент для читаемости */}
+        {player.banner && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={player.banner} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-40" />
+        )}
         <div
           className="pointer-events-none absolute inset-0"
-          style={{ background: `linear-gradient(115deg, ${accent}2e, transparent 55%)` }}
+          style={{
+            background: player.banner
+              ? `linear-gradient(115deg, ${accent}55, transparent 45%), linear-gradient(0deg, var(--color-surface-1), transparent 70%)`
+              : `linear-gradient(115deg, ${accent}2e, transparent 55%)`,
+          }}
         />
-        {main?.team.logo && (
+        {!player.banner && main?.team.logo && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={main.team.logo}
@@ -84,10 +107,21 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
           <div className="min-w-0 flex-1 space-y-3">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">
+                {player.orderNo != null && <span className="mr-2 align-middle text-xl font-semibold text-ink-subtle tabular-nums">#{player.orderNo}</span>}
                 {player.nickname}
                 {main?.isCaptain && <span className="ml-3 align-middle text-sm text-accent-bright">капитан</span>}
               </h1>
               {player.realName && <p className="text-ink-muted">{player.realName}</p>}
+              {/* Плашки роли в лиге — кем человек является для лиги (игрок / кастер / организатор …) */}
+              {tags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {tags.map((t) => (
+                    <span key={t} className="rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent-bright">
+                      {tagLabel(t)}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -121,6 +155,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
               {links.dotabuff && <ExternalLink href={links.dotabuff}>Dotabuff</ExternalLink>}
               {links.stratz && <ExternalLink href={links.stratz}>Stratz</ExternalLink>}
               {links.steam && <ExternalLink href={links.steam}>Steam</ExternalLink>}
+              {player.interviewUrl && <ExternalLink href={player.interviewUrl}>Интервью</ExternalLink>}
               {!links.dotabuff && !player.telegram && (
                 <span className="text-xs text-ink-subtle">Ссылок нет — заполните account_id или телеграм</span>
               )}
@@ -180,23 +215,105 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
         </section>
       ))}
 
-      {/* Задел под статистику: модель MatchStat уже есть, матчей в базе пока нет */}
+      {/* Статистика лиги — из привязанных к сериям карт (MatchStat). Есть игры → карьерка и герои,
+          нет → мягкая заглушка со ссылкой на Dotabuff. */}
       <section>
-        <Eyebrow className="mb-3">Статистика</Eyebrow>
-        <div className="rounded-xl border border-dashed border-hairline p-6 text-center text-sm text-ink-subtle">
-          Появится, когда в базу лягут матчи: средние K/D/A, любимые герои, MVP.
-          {links.dotabuff && (
-            <>
-              {" "}
-              Пока смотрите на{" "}
-              <a href={links.dotabuff} target="_blank" rel="noreferrer" className="text-accent-bright hover:underline">
-                Dotabuff
-              </a>
-              .
-            </>
-          )}
-        </div>
+        <Eyebrow className="mb-3">Статистика лиги</Eyebrow>
+        {record.games === 0 ? (
+          <div className="rounded-xl border border-dashed border-hairline p-6 text-center text-sm text-ink-subtle">
+            Появится, когда в архив лягут карты этого игрока: винрейт, сигнатурные герои, тиммейты.
+            {links.dotabuff && (
+              <>
+                {" "}
+                Пока смотрите на{" "}
+                <a href={links.dotabuff} target="_blank" rel="noreferrer" className="text-accent-bright hover:underline">
+                  Dotabuff
+                </a>
+                .
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Карьерка: три плитки — сыграно, W-L, винрейт. */}
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { label: "Карт", value: record.games, tone: "text-ink" },
+                { label: "Победы — поражения", value: `${record.wins}–${record.losses}`, tone: "text-ink" },
+                { label: "Винрейт", value: `${record.winrate.toFixed(0)}%`, tone: "text-accent-bright" },
+              ].map((s) => (
+                <div key={s.label} className="rounded-xl border border-hairline bg-surface-1 p-4 text-center">
+                  <div className={`text-2xl font-bold tabular-nums ${s.tone}`}>{s.value}</div>
+                  <div className="mt-1 text-xs text-ink-subtle">{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Сигнатурные герои — топ по винрейту (мин. 2 карты). */}
+            {heroes.signature.length > 0 && (
+              <div>
+                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-subtle">Сигнатурные герои</div>
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {heroes.signature.map((h) => (
+                    <div key={h.slug} className="flex items-center gap-3 rounded-xl border border-hairline bg-surface-1 p-2.5">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={heroImg(h.slug)} alt={h.name} className="h-10 w-[62px] shrink-0 rounded object-cover" />
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-sm font-semibold text-ink">{h.name}</div>
+                        <div className="text-xs text-ink-subtle tabular-nums">
+                          {h.games} карт · <span className="text-emerald-400">{h.wins}</span>–<span className="text-rose-400">{h.losses}</span>
+                        </div>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <div className="text-sm font-bold tabular-nums text-accent-bright">{h.winrate.toFixed(0)}%</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </section>
+
+      {/* Достижения — свободный список из анкеты игрока. */}
+      {achievements.length > 0 && (
+        <section>
+          <Eyebrow className="mb-3">Достижения</Eyebrow>
+          <ul className="space-y-1.5">
+            {achievements.map((a, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-ink-muted">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                <span>{a}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Топ-5 тиммейтов — с кем больше всего сыграно за одну команду (турнирная стата, кликабельны). */}
+      {teammates.length > 0 && (
+        <section>
+          <Eyebrow className="mb-3">Чаще всего играет с</Eyebrow>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {teammates.map((m) => (
+              <PlayerMiniCard
+                key={m.playerId}
+                id={m.playerId}
+                nickname={m.nickname}
+                photo={m.photo}
+                accent={m.accent}
+                size={44}
+                subtitle={
+                  <div className="mt-1 text-xs tabular-nums text-ink-subtle">
+                    {m.games} вместе · <span className="text-emerald-400">{m.wins}</span> побед
+                  </div>
+                }
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

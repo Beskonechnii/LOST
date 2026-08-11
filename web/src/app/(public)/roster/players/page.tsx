@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { listPlayers } from "@/lib/roster-data";
+import { getPlayerRecords } from "@/lib/player-record";
 import { roleLabel } from "@/lib/roles";
 import { playerGaps, teamAccent } from "@/lib/profiles";
 import { isAdmin } from "@/lib/admin-session";
@@ -8,11 +10,42 @@ import { PlayerMiniCard } from "../_components/player-card";
 
 export const dynamic = "force-dynamic";
 
+// Разрезы сортировки живут в query — как рейтинги и постгейм: ссылку с нужным порядком можно
+// кинуть в чат. `tp` первым, потому что сезонный зачёт — витринный смысл списка.
+const SORTS = [
+  { key: "tp", label: "По TP" },
+  { key: "games", label: "По играм" },
+  { key: "wins", label: "По победам" },
+  { key: "losses", label: "По поражениям" },
+  { key: "name", label: "По нику" },
+] as const;
+type SortKey = (typeof SORTS)[number]["key"];
+const isSort = (v: unknown): v is SortKey => SORTS.some((s) => s.key === v);
+
 // Витрина игроков — публичная. Форма создания и статистика пробелов в анкетах видны
 // только вошедшему: это операторская диагностика полноты данных, а не факт о лиге.
-export default async function PlayersPage() {
-  const players = await listPlayers();
+export default async function PlayersPage({ searchParams }: { searchParams: Promise<{ sort?: string }> }) {
+  const q = await searchParams;
+  const sort: SortKey = isSort(q.sort) ? q.sort : "tp";
+
+  const [players, records] = await Promise.all([listPlayers(), getPlayerRecords(null)]);
   const authed = await isAdmin();
+
+  // Карьерка игрока (игры/победы/поражения) — из турнирной статы (кирпич B). Нет статы → нули.
+  const ranked = players.map((p) => {
+    const rec = records.get(p.id) ?? { games: 0, wins: 0, losses: 0, winrate: 0 };
+    return { ...p, rec };
+  });
+  const byName = (a: (typeof ranked)[number], b: (typeof ranked)[number]) => a.nickname.localeCompare(b.nickname);
+  ranked.sort((a, b) => {
+    switch (sort) {
+      case "tp": return b.tp - a.tp || byName(a, b);
+      case "games": return b.rec.games - a.rec.games || byName(a, b);
+      case "wins": return b.rec.wins - a.rec.wins || byName(a, b);
+      case "losses": return b.rec.losses - a.rec.losses || byName(a, b);
+      default: return byName(a, b);
+    }
+  });
   // Без account_id игрок не подтягивается из OpenDota; остальные дыры анкеты — из CRM, их добиваем руками
   const noId = players.filter((p) => !p.accountId).length;
   const incomplete = players.filter((p) => playerGaps(p).length > 0).length;
@@ -42,8 +75,24 @@ export default async function PlayersPage() {
         />
       )}
 
+      <div className="flex flex-wrap gap-2">
+        {SORTS.map((s) => (
+          <Link
+            key={s.key}
+            href={s.key === "tp" ? "/roster/players" : `/roster/players?sort=${s.key}`}
+            className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+              sort === s.key
+                ? "bg-gradient-to-b from-accent-bright to-accent text-white shadow-[0_5px_14px_-6px_var(--color-accent)]"
+                : "border border-hairline bg-surface-1 text-ink-muted hover:border-accent/60 hover:text-ink"
+            }`}
+          >
+            {s.label}
+          </Link>
+        ))}
+      </div>
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {players.map((p) => {
+        {ranked.map((p) => {
           // Пробелы анкеты подсвечиваем только оператору — это состояние наших данных,
           // а не факт об игроке. Посетитель видит ровную сетку карточек.
           const gaps = authed ? playerGaps(p) : [];
@@ -63,6 +112,19 @@ export default async function PlayersPage() {
               subtitle={
                 <div className="mt-1 space-y-0.5">
                   <div className="truncate text-xs text-ink-subtle">{p.main?.team.name ?? "без команды"}</div>
+                  {/* Турнирная карьерка и TP — то, по чему сортируется список. Показываем только
+                      непустое: у игрока без турнирных карт строки нет, ноль-плашки не нужны. */}
+                  {(p.rec.games > 0 || p.tp > 0) && (
+                    <div className="flex flex-wrap items-center gap-x-2 text-xs tabular-nums text-ink-muted">
+                      {p.rec.games > 0 && (
+                        <span>
+                          {p.rec.games} игр · <span className="text-emerald-400">{p.rec.wins}</span>–
+                          <span className="text-rose-400">{p.rec.losses}</span>
+                        </span>
+                      )}
+                      {p.tp > 0 && <span className="font-semibold text-accent-bright">{p.tp} TP</span>}
+                    </div>
+                  )}
                   {/* стоит ещё где-то (обычно заменой) — показываем, чтобы не выглядело потерянным */}
                   {p.spots.length > 1 && (
                     <div className="truncate text-xs text-ink-subtle">

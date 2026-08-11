@@ -10,15 +10,17 @@ export function TeamCover({
   accent,
   className = "",
 }: {
-  team: { name: string; tag?: string | null; logo: string | null; wordmark?: string | null; photo?: string | null };
+  team: { name: string; tag?: string | null; logo: string | null; wordmark?: string | null; photo?: string | null; banner?: string | null };
   accent: string;
   className?: string;
 }) {
+  // Обложкой служит баннер, если задан (он для этого и есть), иначе командное фото, иначе — сборный фон.
+  const cover = team.banner || team.photo;
   return (
     <div className={`relative h-32 overflow-hidden sm:h-40 ${className}`}>
-      {team.photo ? (
+      {cover ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={team.photo} alt="" className="h-full w-full object-cover" />
+        <img src={cover} alt="" className="h-full w-full object-cover" />
       ) : (
         <>
           <div

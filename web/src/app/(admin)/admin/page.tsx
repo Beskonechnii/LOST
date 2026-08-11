@@ -12,9 +12,10 @@ const TOOLS: HubTile[] = [
   { href: "/studio/editor", label: "Студия", icon: "🎨", desc: "Сборка турнирной графики по данным ростера." },
   { href: "/match", label: "Матч", icon: "📊", desc: "Постгейм-отчёт по ID матча из Dota 2." },
   { href: "/admin/vision", label: "Варды", icon: "👁️", desc: "Карта расстановки вардов команды по архиву." },
+  { href: "/admin/stats", label: "Показатели", icon: "📈", desc: "Топ-5 по каждой метрике: разрез дивизион / стадия / игроки или команды." },
   { href: "/admin/single-draft", label: "single draft", icon: "🎲", desc: "Случайный герой по каждой характеристике." },
   { href: "/admin/1x1", label: "1х1", icon: "🛠️", desc: "Турнир 1х1.", soon: true },
-  { href: "/admin/fearless-draft", label: "fearless draft", icon: "🛠️", desc: "Fearless draft.", soon: true },
+  { href: "/admin/fearless-draft", label: "fearless draft", icon: "🚫", desc: "Драфт героев без повторов по серии: баны, пики, fearless-пул." },
 ];
 
 export default function AdminHome() {

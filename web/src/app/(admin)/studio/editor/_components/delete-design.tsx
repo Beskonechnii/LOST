@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { TrashIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, IconButton } from "@/components/pouf/Button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,20 +55,19 @@ export function DeleteDesign({
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         {full ? (
-          <Button type="button" variant="outline" size="sm">
-            <TrashIcon />
+          <Button type="button" variant="quiet" tone="down" size="sm">
+            <TrashIcon size={16} />
             Удалить
           </Button>
         ) : (
-          <Button
+          <IconButton
             type="button"
-            variant="ghost"
-            size="icon-sm"
-            title="Удалить документ"
-            className="bg-canvas/70 text-ink-subtle hover:text-rose-400"
-          >
-            <TrashIcon />
-          </Button>
+            variant="quiet"
+            tone="down"
+            size="sm"
+            label="Удалить документ"
+            icon={<TrashIcon size={16} />}
+          />
         )}
       </AlertDialogTrigger>
       <AlertDialogContent>

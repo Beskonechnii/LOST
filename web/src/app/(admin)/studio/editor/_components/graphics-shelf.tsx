@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CheckIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/pouf/Button";
 
 // Полка «Графика серий» с режимом выбора: «Выбрать» включает чекбоксы, дальше «Выбрать все» и
 // удаление пачкой. Обычные карточки без корзины — чтобы не держать лишний хром на каждой.
@@ -45,14 +45,14 @@ export function GraphicsShelf({ rows }: { rows: Row[] }) {
   }
 
   return (
-    <div>
+    <div className="font-pouf">
       <div className="mb-1 flex items-center gap-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.1em] text-ink-subtle">Графика серий</span>
-        <span className="text-xs text-ink-subtle">{rows.length}</span>
+        <span className="text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">Графика серий</span>
+        <span className="text-xs font-bold text-muted">{rows.length}</span>
         <div className="ml-auto flex items-center gap-2">
           {!selecting ? (
             rows.length > 0 && (
-              <Button type="button" variant="outline" size="xs" onClick={() => setSelecting(true)}>
+              <Button type="button" variant="quiet" size="sm" onClick={() => setSelecting(true)}>
                 Выбрать
               </Button>
             )
@@ -60,54 +60,54 @@ export function GraphicsShelf({ rows }: { rows: Row[] }) {
             <>
               <Button
                 type="button"
-                variant="outline"
-                size="xs"
+                variant="quiet"
+                size="sm"
                 onClick={() => setSelected(allSelected ? new Set() : new Set(rows.map((r) => r.id)))}
               >
                 {allSelected ? "Снять все" : "Выбрать все"}
               </Button>
               <Button
                 type="button"
-                variant="outline"
-                size="xs"
+                variant={confirming ? "solid" : "quiet"}
+                tone="down"
+                size="sm"
                 disabled={busy || selected.size === 0}
                 onClick={() => void removeSelected()}
-                className={confirming ? "border-rose-500 text-rose-400" : "text-rose-400"}
               >
                 {busy ? "…" : confirming ? `Точно удалить ${selected.size}?` : `Удалить (${selected.size})`}
               </Button>
-              <Button type="button" variant="ghost" size="xs" onClick={exit}>
+              <Button type="button" variant="quiet" size="sm" onClick={exit}>
                 Готово
               </Button>
             </>
           )}
         </div>
       </div>
-      <p className="mb-3 text-xs text-ink-subtle">
+      <p className="mb-3 text-xs font-bold text-muted">
         Собранные из мастеров карточки встреч. «Выбрать» — чтобы удалить пачкой; мастер не пострадает.
       </p>
 
       {rows.length === 0 ? (
-        <p className="text-sm text-ink-subtle">Пока пусто — соберите графику кнопками в архиве серий.</p>
+        <p className="text-sm font-bold text-muted">Пока пусто — соберите графику кнопками в архиве серий.</p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map((d) => {
             const isSel = selected.has(d.id);
             const card = (
               <div
-                className={`block rounded-xl border p-4 pr-12 transition ${
-                  isSel ? "border-accent bg-accent/10" : "border-hairline bg-surface-1"
-                } ${selecting ? "cursor-pointer hover:border-accent/60" : "hover:-translate-y-0.5 hover:border-accent/50 hover:bg-surface-2"}`}
+                className={`block rounded-card p-4 pr-12 transition ${
+                  isSel ? "bg-purple/[0.14] cushion-field" : "bg-surface cushion-card"
+                } ${selecting ? "cursor-pointer" : "hover:-translate-y-1"}`}
               >
                 <div className="flex items-center gap-2">
                   {d.kind && (
-                    <span className="rounded bg-surface-2 px-1.5 py-0.5 text-[10px] uppercase tracking-widest text-ink-muted">
+                    <span className="rounded-pill bg-surface-2 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-ink-muted">
                       {KIND_LABEL[d.kind] ?? d.kind}
                     </span>
                   )}
-                  <span className="min-w-0 flex-1 truncate font-semibold text-ink">{d.title || `Документ #${d.id}`}</span>
+                  <span className="min-w-0 flex-1 truncate font-black text-ink">{d.title || `Документ #${d.id}`}</span>
                 </div>
-                <div className="mt-1 text-xs text-ink-subtle">изменён {d.updated}</div>
+                <div className="mt-1 text-xs font-bold text-muted">изменён {d.updated}</div>
               </div>
             );
             return (
@@ -119,8 +119,8 @@ export function GraphicsShelf({ rows }: { rows: Row[] }) {
                 )}
                 {selecting && (
                   <span
-                    className={`pointer-events-none absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-md border ${
-                      isSel ? "border-accent bg-accent text-white" : "border-hairline bg-canvas/70 text-transparent"
+                    className={`pointer-events-none absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-[8px] ${
+                      isSel ? "bg-purple text-[var(--on-accent)]" : "bg-canvas/70 text-transparent cushion-field"
                     }`}
                   >
                     <CheckIcon className="h-4 w-4" />

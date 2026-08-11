@@ -28,11 +28,11 @@ export default async function EditorHome() {
   const docs = designs.filter((d) => !d.kind && d.seriesId == null);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 font-pouf">
       <div>
         <Eyebrow className="mb-2">Служебная часть · графика</Eyebrow>
-        <h1 className="text-2xl font-bold tracking-tight md:text-[28px]">Редактор</h1>
-        <p className="mt-1.5 text-sm text-ink-subtle">
+        <h1 className="text-[28px] font-black tracking-[-0.5px] text-ink md:text-4xl">Редактор</h1>
+        <p className="mt-1.5 text-sm font-bold text-muted">
           Свободный холст: текст, фигуры и картинки из медиатеки расставляются вручную. Экспорт — PNG в натуральном размере.
         </p>
       </div>
@@ -56,7 +56,7 @@ export default async function EditorHome() {
       />
 
       <div>
-        <div className="mb-3 text-xs font-semibold uppercase tracking-[0.1em] text-ink-subtle">Создать документ</div>
+        <div className="mb-3 text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">Создать документ</div>
         <CreateDesign />
       </div>
 
@@ -81,33 +81,31 @@ function Section({
   return (
     <div>
       <div className="mb-1 flex items-baseline gap-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.1em] text-ink-subtle">{title}</span>
-        <span className="text-xs text-ink-subtle">{rows.length}</span>
+        <span className="text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">{title}</span>
+        <span className="text-xs font-bold text-muted">{rows.length}</span>
       </div>
-      {hint && <p className="mb-3 text-xs text-ink-subtle">{hint}</p>}
+      {hint && <p className="mb-3 text-xs font-bold text-muted">{hint}</p>}
       {rows.length === 0 ? (
-        <p className="text-sm text-ink-subtle">{empty}</p>
+        <p className="text-sm font-bold text-muted">{empty}</p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map((d) => (
             <div key={d.id} className="relative">
               <Link
                 href={`/studio/editor/${d.id}`}
-                className={`block rounded-xl border p-4 transition hover:-translate-y-0.5 hover:bg-surface-2 ${
-                  locked
-                    ? "border-accent/40 bg-accent/5 hover:border-accent/60"
-                    : "border-hairline bg-surface-1 hover:border-accent/50"
+                className={`block rounded-card p-4 transition hover:-translate-y-1 ${
+                  locked ? "bg-purple/[0.12] cushion-field" : "bg-surface cushion-card"
                 } ${locked ? "" : "pr-12"}`}
               >
                 <div className="flex items-center gap-2">
                   {(locked || d.kind) && (
-                    <span className="rounded bg-surface-2 px-1.5 py-0.5 text-[10px] uppercase tracking-widest text-ink-muted">
+                    <span className="rounded-pill bg-surface-2 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-ink-muted">
                       {locked ? "мастер" : KIND_LABEL[d.kind ?? ""] ?? d.kind}
                     </span>
                   )}
-                  <span className="min-w-0 flex-1 truncate font-semibold text-ink">{d.title || `Документ #${d.id}`}</span>
+                  <span className="min-w-0 flex-1 truncate font-black text-ink">{d.title || `Документ #${d.id}`}</span>
                 </div>
-                <div className="mt-1 text-xs text-ink-subtle">
+                <div className="mt-1 text-xs font-bold text-muted">
                   изменён {d.updatedAt.toLocaleString("ru-RU", { dateStyle: "short", timeStyle: "short" })}
                 </div>
               </Link>

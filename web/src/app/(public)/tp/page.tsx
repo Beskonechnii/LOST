@@ -21,7 +21,7 @@ export default async function TpPage() {
   const ranked = players.filter((p) => p.tp > 0).sort((a, b) => b.tp - a.tp);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-pouf">
       <SectionHeader
         eyebrow="Сезонный зачёт"
         title="TP"
@@ -29,13 +29,13 @@ export default async function TpPage() {
       />
 
       {ranked.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-hairline p-8 text-center text-sm text-ink-subtle">
+        <div className="rounded-card bg-surface p-8 text-center text-sm font-bold text-muted cushion-field">
           Пока ни у кого нет TP.
           {authed && (
             <>
               {" "}
               Проставить можно в{" "}
-              <Link href="/admin/tp" className="text-accent-bright hover:underline">
+              <Link href="/admin/tp" className="text-[var(--purple)] hover:underline">
                 админке
               </Link>
               .
@@ -50,24 +50,24 @@ export default async function TpPage() {
               <li key={p.id}>
                 <Link
                   href={`/roster/players/${p.id}`}
-                  className="flex items-center gap-4 rounded-2xl border border-hairline bg-surface-1 px-4 py-3 transition-colors hover:border-accent"
+                  className="flex items-center gap-4 rounded-card bg-surface px-4 py-3 cushion-row transition-transform hover:-translate-y-px hover:cushion-row-hover"
                 >
                   {/* Место: медаль для тройки, номер для остальных — одинаковой ширины, чтобы ники встали в столбец */}
-                  <span className="w-9 shrink-0 text-center text-lg font-bold tabular-nums text-ink-muted">
+                  <span className="w-9 shrink-0 text-center text-lg font-black tabular-nums text-ink-muted">
                     {MEDAL[i] ?? i + 1}
                   </span>
                   <PlayerAvatar photo={p.photo} nickname={p.nickname} color={accent} size={48} />
                   <div className="min-w-0 flex-1">
-                    <div className="truncate font-semibold text-ink">{p.nickname}</div>
-                    <div className="truncate text-xs text-ink-subtle">
+                    <div className="truncate font-black text-ink">{p.nickname}</div>
+                    <div className="truncate text-xs font-bold text-muted">
                       {p.main
                         ? [p.main.team.name, roleLabel(p.main.role)].filter(Boolean).join(" · ")
                         : "без команды"}
                     </div>
                   </div>
                   <span className="shrink-0 text-right">
-                    <span className="text-xl font-bold tabular-nums text-accent-bright">{p.tp}</span>
-                    <span className="ml-1 text-xs text-ink-subtle">TP</span>
+                    <span className="text-xl font-black tabular-nums text-[var(--purple)]">{p.tp}</span>
+                    <span className="ml-1 text-xs font-bold text-muted">TP</span>
                   </span>
                 </Link>
               </li>

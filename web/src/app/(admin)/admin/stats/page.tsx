@@ -81,8 +81,10 @@ export default async function AdminStatsPage({ searchParams }: { searchParams: P
     return s ? `${base}?${s}` : base;
   };
 
+  // key по href — иначе в .map (дивизионы) React ругается на отсутствие ключа.
   const chip = (href: string, active: boolean, children: React.ReactNode) => (
     <Link
+      key={href}
       href={href}
       className={`rounded-full px-3 py-1 text-xs font-medium transition ${
         active

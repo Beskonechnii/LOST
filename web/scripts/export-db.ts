@@ -42,7 +42,7 @@ function omit<T extends object, K extends keyof T>(row: T, ...keys: K[]): Omit<T
 }
 
 async function main() {
-  const [teams, players, spots, matches, groupEntries, series, stats, points, renders, wards] =
+  const [teams, players, spots, matches, groupEntries, series, stats, points, renders, wards, accounts] =
     await Promise.all([
       prisma.team.findMany({ orderBy: { slug: "asc" } }),
       prisma.player.findMany({ orderBy: { slug: "asc" } }),
@@ -56,6 +56,7 @@ async function main() {
       prisma.pointsEntry.findMany({ include: { match: { include: { teamA: true, teamB: true } } } }),
       prisma.render.findMany({ include: { match: { include: { teamA: true, teamB: true } } } }),
       prisma.ward.findMany({ include: { team: true, match: { include: { teamA: true, teamB: true } } } }),
+      prisma.userAccount.findMany({ include: { player: true, claim: true } }),
     ]);
 
   // Баллы ссылаются на субъекта сырым id + типом, без relation — разворачиваем в slug вручную.
@@ -65,7 +66,7 @@ async function main() {
     matchKey(m, m.teamA.slug, m.teamB.slug);
 
   const snapshot = {
-    version: 7, // 7 — доп. поля ростера: banner (Team+Player), interviewUrl/orderNo/achievements/tags у Player
+    version: 9, // 9 — роль аккаунта (owner/admin/player) в UserAccount
     exportedAt: new Date().toISOString(),
 
     teams: teams.map((t) => omit(t, "id")),
@@ -132,6 +133,21 @@ async function main() {
         teamSlug: w.team?.slug ?? null, // сторону не распознали → вард без команды
       }))
       .sort((a, b) => `${a.matchKey}${a.placed}${a.x}${a.y}`.localeCompare(`${b.matchKey}${b.placed}${b.x}${b.y}`)),
+
+    // Аккаунты — реальные данные пользователей, а не производные: должны переживать db:import (зеркало),
+    // иначе привязки потерялись бы. Ключ переноса — googleSub; профиль/заявка — по slug игрока.
+    accounts: accounts
+      .map((a) => ({
+        email: a.email,
+        googleSub: a.googleSub,
+        name: a.name,
+        avatar: a.avatar,
+        role: a.role,
+        createdAt: a.createdAt,
+        playerSlug: a.player?.slug ?? null,
+        claimSlug: a.claim?.slug ?? null,
+      }))
+      .sort((a, b) => a.googleSub.localeCompare(b.googleSub)),
   };
 
   writeFileSync(out, JSON.stringify(snapshot, null, 2) + "\n", "utf8");
@@ -148,6 +164,7 @@ async function main() {
     баллы: snapshot.pointsEntries.length,
     генерации: snapshot.renders.length,
     варды: snapshot.wards.length,
+    аккаунты: snapshot.accounts.length,
   });
 }
 

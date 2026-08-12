@@ -1,25 +1,29 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { ADMIN_COOKIE, needsAdmin, verifyToken } from "@/lib/auth";
+import { needsAdmin } from "@/lib/auth";
+import { SESSION_COOKIE, sessionIsAdmin } from "@/lib/player-auth";
 
-// Защита админки. В Next 16 это `proxy.ts` (бывший `middleware.ts`, переименован в v16)
-// и по умолчанию он идёт на Node-рантайме — поэтому `node:crypto` внутри lib/auth работает.
+// Защита служебной части. В Next 16 это `proxy.ts` (бывший `middleware.ts`, переименован в v16)
+// и по умолчанию он идёт на Node-рантайме — поэтому `node:crypto` внутри player-auth работает.
 //
-// Здесь только развилка «пускать или нет». Что именно закрыто — в lib/auth.ts (`needsAdmin`),
-// чтобы список защищённого не разъезжался между proxy и самими роутами.
+// Единственный вход — через Google (кабинет /me); пароля-админки больше нет. Пускаем только сессию
+// с ролью owner/admin (роль вшита в подписанную куку, решается чистой криптой без БД). Что закрыто —
+// в lib/auth.ts (`needsAdmin`), чтобы список защищённого не разъезжался между proxy и роутами.
 
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   if (!needsAdmin(pathname, request.method)) return NextResponse.next();
-  if (verifyToken(request.cookies.get(ADMIN_COOKIE)?.value)) return NextResponse.next();
+  if (sessionIsAdmin(request.cookies.get(SESSION_COOKIE)?.value)) return NextResponse.next();
 
   // API отвечает кодом, а не редиректом: fetch из формы должен получить внятную 401,
-  // а не HTML страницы логина.
+  // а не HTML страницы входа.
   if (pathname.startsWith("/api/")) {
-    return NextResponse.json({ ok: false, error: "Нужен вход в админку" }, { status: 401 });
+    return NextResponse.json({ ok: false, error: "Нужны права администратора" }, { status: 401 });
   }
 
-  const login = new URL("/admin/login", request.url);
-  login.searchParams.set("next", `${pathname}${search}`); // после входа вернём куда шли
+  // Не админ — уводим в кабинет: там единственный вход. `next` сохраняем на будущее (страница входа
+  // пока просто показывает кабинет и после входа ведёт в админку сама).
+  const login = new URL("/me", request.url);
+  login.searchParams.set("next", `${pathname}${search}`);
   return NextResponse.redirect(login);
 }
 

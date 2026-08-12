@@ -28,9 +28,9 @@ const d = (v: string | Date | null | undefined) => (v ? new Date(v) : null);
 
 async function main() {
   const snap = JSON.parse(readFileSync(input, "utf8"));
-  if (snap.version !== 7) {
+  if (snap.version !== 9) {
     throw new Error(
-      `Снимок версии ${snap.version}, а нужен 7. Снимки не мигрируются: пересними базу свежим ` +
+      `Снимок версии ${snap.version}, а нужен 9. Снимки не мигрируются: пересними базу свежим ` +
         `scripts/export-db.ts на той машине, где данные актуальны.`,
     );
   }
@@ -87,6 +87,8 @@ async function main() {
   await prisma.series.deleteMany();
   await prisma.groupEntry.deleteMany();
   await prisma.rosterSpot.deleteMany();
+  // Аккаунты ссылаются на игрока (SetNull) — сносим до игроков и создаём заново из снимка.
+  await prisma.userAccount.deleteMany();
   await prisma.team.deleteMany({ where: { slug: { notIn: keepTeams } } });
   await prisma.player.deleteMany({ where: { slug: { notIn: keepPlayers } } });
 
@@ -211,6 +213,22 @@ async function main() {
     });
   }
 
+  // Аккаунты игроков — после игроков: привязка и заявка резолвятся по slug в id.
+  for (const a of snap.accounts ?? []) {
+    await prisma.userAccount.create({
+      data: {
+        email: a.email,
+        googleSub: a.googleSub,
+        name: a.name ?? null,
+        avatar: a.avatar ?? null,
+        role: a.role ?? "player",
+        createdAt: d(a.createdAt) ?? new Date(),
+        playerId: a.playerSlug ? playerId.get(a.playerSlug) ?? null : null,
+        claimId: a.claimSlug ? playerId.get(a.claimSlug) ?? null : null,
+      },
+    });
+  }
+
   console.log("\nГотово. В базе:");
   console.table({
     команды: await prisma.team.count(),
@@ -223,6 +241,7 @@ async function main() {
     баллы: await prisma.pointsEntry.count(),
     генерации: await prisma.render.count(),
     варды: await prisma.ward.count(),
+    аккаунты: await prisma.userAccount.count(),
   });
 }
 

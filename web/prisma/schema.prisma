@@ -59,6 +59,34 @@ model Player {
 
   spots RosterSpot[]
   stats MatchStat[]
+
+  account UserAccount?  @relation("AccountPlayer") // подтверждённый вход игрока (0..1)
+  claims  UserAccount[] @relation("AccountClaim") // заявки на привязку, ждущие подтверждения
+}
+
+/// Аккаунт игрока: вход по Google. Отдельно от `Player` намеренно — профиль игрока есть у всех в
+/// ростере, а аккаунт появляется только у того, кто сам вошёл. Один аккаунт ↔ один профиль.
+///
+/// Новый игрок при входе заводит профиль и привязывается сразу (`playerId`). Существующий в ростере
+/// подаёт заявку (`claimId`) — оператор подтверждает её в админке, и тогда `claimId` переезжает в
+/// `playerId`. Две связи, а не одна, чтобы непроверенная заявка не считалась привязкой.
+model UserAccount {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  googleSub String   @unique // стабильный id google-аккаунта («sub» из id_token) — истинный ключ входа
+  name      String? // имя из google-профиля (для операторского списка заявок)
+  avatar    String? // ссылка на аватар google
+  // Роль в системе: player (по умолчанию) | admin | owner. Владелец назначается не здесь, а по
+  // OWNER_EMAIL (src/lib/account.ts): совпал email при входе — роль owner, и её нельзя отобрать из UI.
+  // admin раздаёт владелец в панели ролей; проверка доступа в proxy читает роль из подписанной куки.
+  role      String   @default("player")
+
+  player   Player? @relation("AccountPlayer", fields: [playerId], references: [id], onDelete: SetNull)
+  playerId Int?    @unique // подтверждённая привязка; уникальна — один профиль на один аккаунт
+  claim    Player? @relation("AccountClaim", fields: [claimId], references: [id], onDelete: SetNull)
+  claimId  Int? // заявка на существующего игрока, ждёт подтверждения оператора
+
+  createdAt DateTime @default(now())
 }
 
 /// Место игрока в составе команды. Роль и капитанство живут здесь, а не у игрока: один человек

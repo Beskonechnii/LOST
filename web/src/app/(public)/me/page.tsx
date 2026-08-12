@@ -1,0 +1,165 @@
+import Link from "next/link";
+import { googleConfigured } from "@/lib/google-oauth";
+import { currentAccount, linkablePlayers, effectiveRole } from "@/lib/account";
+import { Button } from "@/components/ui/button";
+import { Onboarding } from "./onboarding";
+import { logout } from "./actions";
+
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Кабинет" };
+
+// Кабинет игрока и единственный вход в систему: логин через Google, привязка профиля, его просмотр,
+// а для админов/владельца — дверь в служебную часть. Публичная страница (в needsAdmin не значится) —
+// иначе входить было бы некуда.
+
+// Тексты ошибок из ?error, которым callback/старт уводят обратно (коды — там же).
+const ERRORS: Record<string, string> = {
+  off: "Вход через Google не настроен на этом сервере.",
+  state: "Сессия входа истекла или не совпала. Попробуйте войти ещё раз.",
+  google: "Google не подтвердил вход. Попробуйте ещё раз.",
+};
+
+type Account = NonNullable<Awaited<ReturnType<typeof currentAccount>>>;
+
+export default async function AccountPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const { error } = await searchParams;
+  const account = await currentAccount();
+  const role = account ? effectiveRole(account) : null;
+
+  return (
+    <main className="flex-1 px-4 py-10 md:py-16">
+      <div className="mx-auto w-full max-w-md">
+        {/* Шапка-марка: делает страницу входа «лицом», а не голой формой */}
+        <div className="mb-6 text-center">
+          <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-accent to-fuchsia-600 text-xl font-black text-white shadow-lg shadow-accent/20">
+            L
+          </span>
+          <h1 className="mt-3 text-2xl font-bold tracking-tight">Личный кабинет</h1>
+          <p className="mt-1 text-sm text-ink-muted">League of Spirits</p>
+        </div>
+
+        <div className="rounded-2xl border border-hairline bg-surface-1/60 p-5 shadow-xl shadow-black/20 backdrop-blur">
+          {error && ERRORS[error] && (
+            <p className="mb-4 rounded-lg border border-rose-900 bg-rose-950/40 px-3 py-2 text-sm text-rose-300">{ERRORS[error]}</p>
+          )}
+
+          {role && role !== "player" && <AdminEntry role={role} />}
+
+          {!account ? (
+            <SignedOut />
+          ) : account.player ? (
+            <Linked account={account} />
+          ) : account.claim ? (
+            <Pending account={account} />
+          ) : (
+            <>
+              <AccountLine email={account.email} />
+              <Onboarding players={await linkablePlayers()} />
+            </>
+          )}
+        </div>
+      </div>
+    </main>
+  );
+}
+
+/** Плашка входа в служебную часть — видят только owner/admin. */
+function AdminEntry({ role }: { role: "owner" | "admin" }) {
+  return (
+    <Link
+      href="/admin"
+      className="mb-4 flex items-center justify-between gap-2 rounded-xl border border-fuchsia-800/70 bg-fuchsia-950/30 px-4 py-3 transition-colors hover:bg-fuchsia-950/50"
+    >
+      <span>
+        <span className="block text-sm font-medium text-fuchsia-100">
+          {role === "owner" ? "Вы владелец лиги" : "Вы админ лиги"}
+        </span>
+        <span className="block text-xs text-fuchsia-300/70">Инструменты, заявки{role === "owner" ? ", роли" : ""}</span>
+      </span>
+      <span className="shrink-0 text-sm text-fuchsia-300">Открыть →</span>
+    </Link>
+  );
+}
+
+/** Не вошёл: крупная кнопка Google (или сообщение, если вход не настроен). */
+function SignedOut() {
+  return (
+    <div>
+      <p className="mb-4 text-center text-sm text-ink-muted">
+        Войдите через Google, чтобы привязать свой профиль игрока или завести новый.
+      </p>
+      {googleConfigured() ? (
+        <a
+          href="/api/auth/google/start"
+          className="flex w-full items-center justify-center gap-3 rounded-xl border border-hairline-strong bg-white px-4 py-3 text-sm font-medium text-neutral-800 shadow-sm transition-transform hover:scale-[1.01] active:scale-100"
+        >
+          <GoogleIcon />
+          Войти через Google
+        </a>
+      ) : (
+        <p className="rounded-lg border border-amber-900 bg-amber-950/40 px-3 py-2 text-sm text-amber-300">
+          Вход через Google не настроен: не заданы <code>GOOGLE_CLIENT_ID</code>/<code>GOOGLE_CLIENT_SECRET</code> в <code>web/.env</code>.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Шапка «вы вошли как …» + выход — общая для привязанного/заявки/онбординга. */
+function AccountLine({ email }: { email: string }) {
+  return (
+    <div className="mb-4 flex items-center justify-between gap-2 rounded-lg border border-hairline bg-surface-2/60 px-3 py-2">
+      <span className="truncate text-sm text-ink-muted">{email}</span>
+      <form action={logout}>
+        <button type="submit" className="shrink-0 text-xs text-ink-subtle transition-colors hover:text-ink">
+          Выйти
+        </button>
+      </form>
+    </div>
+  );
+}
+
+/** Профиль привязан: показываем его и ведём в ростер. */
+function Linked({ account }: { account: Account }) {
+  const player = account.player!;
+  return (
+    <div className="space-y-3">
+      <AccountLine email={account.email} />
+      <div className="rounded-xl border border-emerald-900 bg-emerald-950/30 px-4 py-3">
+        <p className="text-xs uppercase tracking-wide text-emerald-400/80">Профиль привязан</p>
+        <p className="mt-1 text-lg font-semibold">{player.nickname}</p>
+      </div>
+      <Button asChild variant="outline" className="w-full">
+        <Link href={`/roster/players/${player.slug}`}>Открыть мой профиль</Link>
+      </Button>
+    </div>
+  );
+}
+
+/** Заявка на существующего игрока подана — ждёт оператора. */
+function Pending({ account }: { account: Account }) {
+  return (
+    <div className="space-y-3">
+      <AccountLine email={account.email} />
+      <div className="rounded-xl border border-amber-900 bg-amber-950/30 px-4 py-3">
+        <p className="text-xs uppercase tracking-wide text-amber-400/80">Заявка на подтверждении</p>
+        <p className="mt-1 text-sm text-ink-muted">
+          Вы заявили привязку к профилю <span className="font-semibold text-ink">{account.claim!.nickname}</span>.
+          Оператор подтвердит её в админке — после этого профиль появится здесь.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** Официальный «G» четырёх цветов — узнаваемость кнопки входа. */
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+      <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62Z" />
+      <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.02-3.7H.96v2.34A9 9 0 0 0 9 18Z" />
+      <path fill="#FBBC05" d="M3.98 10.72a5.4 5.4 0 0 1 0-3.44V4.94H.96a9 9 0 0 0 0 8.12l3.02-2.34Z" />
+      <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.46 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 0 0 .96 4.94l3.02 2.34C4.68 5.16 6.66 3.58 9 3.58Z" />
+    </svg>
+  );
+}

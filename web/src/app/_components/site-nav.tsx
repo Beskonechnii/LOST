@@ -16,23 +16,21 @@ import { SITE_MAX_W } from "./ui";
 // живёт не под своим href: «LOST S2» ведёт на /standings/d1, но подсвечивается и на /roster.
 export type NavItem = { href: string; label: string; hint?: string; match?: string[] };
 
-// Верхняя строка — одна на весь сайт: продукт (LOST S2) и операторская (Админ) стоят рядом.
+// Верхняя строка: продукт (LOST S2) видят все, операторская (Админ) — только админы/владелец.
 // Обе группы маршрутов рисуют эти же вкладки, поэтому переход между ними бесшовный: строка
 // не меняется, меняется только второй ряд (подвкладки сезона / инструменты админки).
-const TOP_SECTIONS: NavItem[] = [
-  {
-    href: "/standings",
-    label: "LOST S2",
-    hint: "Второй сезон: дивизионы и ростер",
-    match: ["/standings", "/roster", "/series", "/tp"],
-  },
-  {
-    href: "/admin",
-    label: "Админ",
-    hint: "Операторская: серии, студия, драфты, разбор матча",
-    match: ["/admin", "/studio", "/underbeer", "/match"],
-  },
-];
+const PRODUCT_SECTION: NavItem = {
+  href: "/standings",
+  label: "LOST S2",
+  hint: "Второй сезон: дивизионы и ростер",
+  match: ["/standings", "/roster", "/series", "/tp"],
+};
+const ADMIN_SECTION: NavItem = {
+  href: "/admin",
+  label: "Админ",
+  hint: "Операторская: серии, студия, драфты, разбор матча",
+  match: ["/admin", "/studio", "/underbeer", "/match"],
+};
 
 /** Активен раздел, если путь совпадает или лежит внутри него («/» — только точное совпадение). */
 function matchesHref(pathname: string, href: string) {
@@ -102,32 +100,32 @@ const brand = (
   </Link>
 );
 
-/** Неприметная дверь для входа/выхода оператора — справа, одна на весь сайт. */
-const accessLink = (
+/** Справа — единственный вход: личный кабинет (там же логин через Google). Один на весь сайт. */
+const cabinetLink = (
   <Link
-    href="/admin/login"
-    title="Вход в админку"
-    className={`shrink-0 rounded-md px-2 py-1.5 text-xs text-ink-subtle transition-colors hover:text-ink-muted ${focus}`}
+    href="/me"
+    title="Личный кабинет"
+    className={`shrink-0 rounded-md border border-hairline px-3 py-1.5 text-xs text-ink-muted transition-colors hover:border-accent hover:text-ink ${focus}`}
   >
-    Доступ
+    Кабинет
   </Link>
 );
 
-// Верхняя строка теперь единая: LOST S2 и Админ стоят рядом, обе группы рисуют её одинаково.
-// PublicNav/AdminNav оставлены отдельными функциями лишь потому, что их зовут разные layout'ы —
-// содержимое у них общее.
-function TopBar() {
-  return <Bar sections={TOP_SECTIONS} accent="bg-accent/15 font-medium text-accent-bright" brand={brand} aside={accessLink} />;
+// Верхняя строка: продукт всем, «Админ» — только админам (роль приходит из layout'а). PublicNav/AdminNav
+// оставлены отдельными функциями лишь потому, что их зовут разные layout'ы — содержимое у них общее.
+function TopBar({ isAdmin }: { isAdmin: boolean }) {
+  const sections = isAdmin ? [PRODUCT_SECTION, ADMIN_SECTION] : [PRODUCT_SECTION];
+  return <Bar sections={sections} accent="bg-accent/15 font-medium text-accent-bright" brand={brand} aside={cabinetLink} />;
 }
 
-/** Навигация продукта (группа public). */
-export function PublicNav() {
-  return <TopBar />;
+/** Навигация продукта (группа public). `isAdmin` управляет видимостью вкладки «Админ». */
+export function PublicNav({ isAdmin }: { isAdmin: boolean }) {
+  return <TopBar isAdmin={isAdmin} />;
 }
 
 /** Навигация служебной части (группа admin) — та же верхняя строка, что и у продукта. */
-export function AdminNav() {
-  return <TopBar />;
+export function AdminNav({ isAdmin }: { isAdmin: boolean }) {
+  return <TopBar isAdmin={isAdmin} />;
 }
 
 /** Подразделы секции (ростер, студия). Подсвечивается самый конкретный подходящий пункт. */

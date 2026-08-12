@@ -9,6 +9,8 @@ const TOOLS: HubTile[] = [
   { href: "/underbeer", label: "UNDERBEER 2.0", icon: "🍺", desc: "Шоу-драфт: капитаны по очереди собирают команды из ростера." },
   { href: "/admin/series", label: "Архив серий", icon: "🗂️", desc: "Встречи турнира и карты в них — отсюда стата идёт в статистику." },
   { href: "/admin/tp", label: "TP", icon: "🏅", desc: "Начисление сезонных очков MVP игрокам." },
+  { href: "/admin/claims", label: "Заявки", icon: "🔗", desc: "Подтверждение привязки Google-аккаунтов к профилям ростера." },
+  { href: "/admin/roles", label: "Роли и доступ", icon: "🛡️", desc: "Панель владельца: раздача ролей админ/игрок аккаунтам." },
   { href: "/studio/editor", label: "Студия", icon: "🎨", desc: "Сборка турнирной графики по данным ростера." },
   { href: "/match", label: "Матч", icon: "📊", desc: "Постгейм-отчёт по ID матча из Dota 2." },
   { href: "/admin/vision", label: "Варды", icon: "👁️", desc: "Карта расстановки вардов команды по архиву." },

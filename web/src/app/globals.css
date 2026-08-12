@@ -16,27 +16,34 @@
      3. Акцент = идентичность секции. У нас это дивизион: D1 фиолетовый, D2 бирюзовый.
    Возвышение — сменой поверхности и 1px hairline, а не тенью. */
 @theme inline {
+  /* Все базовые токены развёрнуты в `var(--lost-*, fallback)` — не литералами. Fallback = дефолт
+     темы, а сырой `--lost-*` пуст, пока панель «Тема» (/admin/theme) не запишет его через <style>
+     в корневом layout из data/theme.json. Приём тот же, что у --accent ниже (слой дивизиона живёт
+     на нём): под `@theme inline` ссылка на сырую переменную остаётся живой в рантайме, а на theme-
+     токен — схлопывается в литерал на сборке. Префикс --lost-* нарочно: pouf.css занимает сырые
+     --ink/--muted/--surface, с ними бы вышла коллизия. Один источник значений — src/lib/theme.ts. */
   /* Поверхности: чёрная канва и «приподнятые» над ней уголь-карточки */
-  --color-canvas: #000000;
-  --color-surface-1: #15181e;
-  --color-surface-2: #1f232b;
-  --color-surface-3: #3b3d45;
+  --color-canvas: var(--lost-canvas, #000000);
+  --color-surface-1: var(--lost-surface-1, #15181e);
+  --color-surface-2: var(--lost-surface-2, #1f232b);
+  --color-surface-3: var(--lost-surface-3, #3b3d45);
 
   /* Границы: почти невидимая молочная линия и её плотный вариант */
-  --color-hairline: rgba(178, 182, 189, 0.1);
-  --color-hairline-strong: #3b3d45;
+  --color-hairline: var(--lost-hairline, rgba(178, 182, 189, 0.1));
+  --color-hairline-strong: var(--lost-hairline-strong, #3b3d45);
 
   /* Текст — только эти три ступени, без промежуточных серых */
-  --color-ink: #ffffff;
-  --color-ink-muted: #b2b6bd;
-  --color-ink-subtle: #656a76;
+  --color-ink: var(--lost-ink, #ffffff);
+  --color-ink-muted: var(--lost-ink-muted, #b2b6bd);
+  --color-ink-subtle: var(--lost-ink-subtle, #656a76);
 
   /* Акценты дивизионов (per-division identity вместо per-product у HashiCorp).
-     D1 держит бренд-фиолетовый LOST (совпал с Terraform-фиолетовым), D2 — бирюзовый. */
-  --color-d1: #7c3aed;
-  --color-d1-bright: #a78bfa;
-  --color-d2: #14c6cb;
-  --color-d2-bright: #5eead4;
+     D1 держит бренд-фиолетовый LOST (совпал с Terraform-фиолетовым), D2 — бирюзовый.
+     D1 = бренд-акцент: панель пишет --lost-d1 тем же значением, что и --accent. */
+  --color-d1: var(--lost-d1, #7c3aed);
+  --color-d1-bright: var(--lost-d1-bright, #a78bfa);
+  --color-d2: var(--lost-d2, #14c6cb);
+  --color-d2-bright: var(--lost-d2-bright, #5eead4);
 
   /* Текущий акцент секции. По умолчанию бренд-фиолетовый; слой дивизиона (standings/[div])
      переопределяет `--accent` на цвет D2 — и весь хром внутри перекрашивается сам.
@@ -193,9 +200,41 @@ body {
 .pouf-sheet-dialog,
 .pouf-menu {
   color: var(--ink);
-  --purple: #7c3aed;
-  --color-purple: #7c3aed;
-  --on-accent: #ffffff;
+  /* Акцент pouf = бренд-акцент LOST: обе палитры сидят на одном --accent, который панель
+     /admin/theme пишет на :root. Так «Сохранить» перекрашивает и лендинг, и студию разом. */
+  --purple: var(--accent, #7c3aed);
+  --color-purple: var(--accent, #7c3aed);
+  --on-accent: var(--accent-contrast, #ffffff);
+  --idle: var(--accent, #7c3aed);
+
+  /* Остальная палитра pouf — из токенов панели (--lost-pouf-*). Fallback = дефолт ТЁМНОЙ темы
+     pouf (сайт всегда тёмный). Задаём здесь, на уровне body/скоупа: pouf объявляет эти переменные
+     на <html>, а body выигрывает наследованием — значит правки видны и в порталах Radix. Каждый
+     цвет ставим тремя адресами: @theme-имя (--color-…, его читают утилиты bg/text), короткий
+     alias (--surface/--ink/…, его читает собственный CSS компонентов) и семантический alias
+     (--warn/--down/…, через который тоны красят бейджи). Один ползунок панели — все три. */
+  --color-bg: var(--lost-pouf-bg, #12111a);
+  --bg: var(--lost-pouf-bg, #12111a);
+  --color-surface: var(--lost-pouf-surface, #211f2b);
+  --surface: var(--lost-pouf-surface, #211f2b);
+  --color-clay-ink: var(--lost-pouf-ink, #f7f3ff);
+  --ink: var(--lost-pouf-ink, #f7f3ff);
+  --color-clay-muted: var(--lost-pouf-muted, #b8afcb);
+  --muted: var(--lost-pouf-muted, #b8afcb);
+  --color-yellow: var(--lost-pouf-warn, #ffe58a);
+  --yellow: var(--lost-pouf-warn, #ffe58a);
+  --warn: var(--lost-pouf-warn, #ffe58a);
+  --color-orange: var(--lost-pouf-orange, #ffb38a);
+  --orange: var(--lost-pouf-orange, #ffb38a);
+  --color-pink: var(--lost-pouf-down, #ffb3d1);
+  --pink: var(--lost-pouf-down, #ffb3d1);
+  --down: var(--lost-pouf-down, #ffb3d1);
+  --color-mint: var(--lost-pouf-up, #a8f0d0);
+  --mint: var(--lost-pouf-up, #a8f0d0);
+  --up: var(--lost-pouf-up, #a8f0d0);
+  --color-blue: var(--lost-pouf-info, #9ec8ff);
+  --blue: var(--lost-pouf-info, #9ec8ff);
+  --info: var(--lost-pouf-info, #9ec8ff);
 }
 
 /* pouf-компоненты зовут утилиту text-muted, а наш @theme inline печёт в неё цвет

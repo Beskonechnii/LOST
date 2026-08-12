@@ -4,6 +4,8 @@ import "./globals.css";
 // Шрифт для компонентов 1st-Pouf (класс font-pouf → 'Nunito Variable').
 import "@fontsource-variable/nunito";
 import { Toaster } from "@/components/ui/sonner";
+import { readTheme } from "@/lib/theme-store";
+import { themeToStyle } from "@/lib/theme";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,11 +22,16 @@ export const metadata: Metadata = {
   description: "Стата матчей, таблица лиги и студия графики League of Spirit",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Тема UI из data/theme.json → сырые токены (--lost-* и --accent) прямо на <html>=:root, инлайновым
+  // style. Токены в globals.css развёрнуты в var(--lost-*, fallback), поэтому один объект перекрашивает
+  // весь сайт. Значения санитайзятся в themeToStyle. Style-атрибут (а не <style>-тег) — чтобы не
+  // связываться с хостингом стилей в React и чисто обновляться. Правит панель /admin/theme.
+  const themeStyle = themeToStyle(await readTheme());
   return (
     <html
       lang="ru"
@@ -33,6 +40,7 @@ export default function RootLayout({
       // живущие в <body> вне обёртки страницы, тоже получали тёмную палитру pouf.
       // Наши собственные токены его не читают — на остальной сайт не влияет.
       data-theme="dark"
+      style={themeStyle}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       {/* Навигации здесь намеренно нет: она своя у каждой группы маршрутов —

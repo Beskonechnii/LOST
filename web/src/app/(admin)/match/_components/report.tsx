@@ -399,7 +399,7 @@ function CardTeam({
   const accent = side === "radiant" ? "text-emerald-400" : "text-rose-400";
   const bar = side === "radiant" ? "bg-emerald-500" : "bg-rose-500";
   return (
-    <div className="rounded-2xl border border-hairline bg-surface-1 p-3 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-28px_rgba(0,0,0,0.9)]">
+    <div className="rounded-card bg-surface cushion-card p-3 ">
       <div className="mb-2 flex items-center gap-2">
         <span className={`h-4 w-1 rounded ${bar}`} />
         {logo && (
@@ -740,36 +740,36 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
   const maxNet = Math.max(1, ...(match?.players.map((p) => p.netWorth) ?? [1]));
 
   return (
-    <main className="flex-1 px-4 py-8 md:px-6">
+    <main className="flex-1 px-4 py-8 font-pouf md:px-6">
       <div className={`mx-auto w-full ${SITE_MAX_W} space-y-4`}>
         {/* Шапка отчёта: возврат к форме, номер матча и переключатель источника. */}
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-hairline bg-surface-1 px-4 py-3 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-26px_rgba(0,0,0,0.9)]">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-card bg-surface px-4 py-3 cushion-card">
           <div className="flex min-w-0 items-center gap-3">
             <Link
               href="/match"
               title="К вводу другого матча"
-              className="rounded-md border border-hairline px-2 py-1 text-xs text-ink-muted transition-colors hover:border-hairline-strong hover:text-ink"
+              className="rounded-[12px] bg-surface px-3 py-1.5 text-xs font-bold text-ink-muted cushion-field transition-colors hover:text-[var(--purple)]"
             >
               ← Другой матч
             </Link>
-            <h1 className="truncate text-lg font-black uppercase tracking-tight md:text-xl">
+            <h1 className="truncate text-lg font-black uppercase tracking-[-0.3px] text-ink md:text-xl">
               Postgame <span className="tabular-nums text-ink-subtle">#{matchId}</span>
             </h1>
             {match && !match.parsed && (
-              <span className="text-[11px] text-amber-400" title="OpenDota ещё не разобрала реплей">
+              <span className="text-[11px] font-bold text-amber-400" title="OpenDota ещё не разобрала реплей">
                 ⚠ не распарсен
               </span>
             )}
           </div>
           {/* Источник — часть адреса: «почему тут пустой график» видно и в ссылке, и в интерфейсе. */}
-          <div className="flex gap-1 rounded-full border border-hairline bg-surface-2 p-1">
+          <div className="flex gap-1.5">
             {SOURCES.map((s) => (
               <button
                 key={s.key}
                 onClick={() => patchUrl({ src: s.key === "opendota" ? null : s.key })}
                 title={s.hint}
-                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-                  src === s.key ? "bg-surface-3 text-ink shadow-[inset_0_0_0_1px_var(--color-hairline-strong)]" : "text-ink-subtle hover:text-ink"
+                className={`rounded-[14px] px-3.5 py-[7px] text-xs font-black transition-[box-shadow,transform,background] ${
+                  src === s.key ? "bg-purple text-[var(--on-accent)] cushion-control-active [transform:translateY(1px)]" : "bg-surface text-ink-subtle cushion-field hover:text-ink"
                 }`}
               >
                 {s.label}
@@ -779,18 +779,18 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
         </div>
 
         {loading && (
-          <p className="rounded-md border border-hairline bg-surface-1/40 px-3 py-2 text-sm text-ink-muted">
+          <p className="rounded-control bg-surface px-3 py-2 text-sm font-bold text-muted cushion-field">
             Загружаю матч из {src === "steam" ? "Steam" : "OpenDota"}…
           </p>
         )}
 
         {error && (
-          <div className="rounded-md border border-rose-900 bg-rose-950/40 px-3 py-2 text-sm text-rose-300">
+          <div className="rounded-control bg-orange px-3 py-2 text-sm font-bold text-[var(--on-accent)]">
             {error}
             {/* Второй источник живёт независимо: когда OpenDota лежит, разбор всё равно соберётся. */}
             <button
               onClick={() => patchUrl({ src: src === "opendota" ? "steam" : null })}
-              className="ml-3 rounded border border-rose-800 px-2 py-0.5 text-xs text-rose-200 hover:border-rose-600 hover:text-white"
+              className="ml-3 rounded-[10px] bg-[rgba(255,255,255,0.45)] px-2 py-0.5 text-xs font-black text-[var(--on-accent)] hover:bg-[rgba(255,255,255,0.7)]"
             >
               Попробовать {src === "opendota" ? "Steam" : "OpenDota"}
             </button>
@@ -799,15 +799,15 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
 
         {match && (
           <>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {TABS.map((t) => (
                 <button
                   key={t.key}
                   onClick={() => patchUrl({ tab: t.key === "report" ? null : t.key })}
-                  className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${
+                  className={`rounded-[14px] px-4 py-[9px] text-[13px] font-black transition-[box-shadow,transform,background] ${
                     tab === t.key
-                      ? "bg-gradient-to-b from-accent-bright to-accent text-white shadow-[0_6px_18px_-6px_var(--color-accent)]"
-                      : "border border-hairline bg-surface-1 text-ink-muted hover:text-ink"
+                      ? "bg-purple text-[var(--on-accent)] cushion-control"
+                      : "bg-surface text-ink-muted cushion-field hover:text-ink"
                   }`}
                 >
                   {t.label}
@@ -819,7 +819,7 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
               <>
                 {/* Блок 1 — сводка матча единым блоком (по референсу):
                     шапка → герои → баны → низ: карта строений + события | график преимущества */}
-                <div className="divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface-1 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_16px_44px_-26px_rgba(0,0,0,0.9)]">
+                <div className="divide-y divide-hairline overflow-hidden rounded-card bg-surface cushion-card ">
                   <div className="p-3 md:p-4">
                     <ScoreHeader match={match} names={names} setNames={setNames} commitNames={commitNames} logos={logos} />
                   </div>
@@ -859,7 +859,7 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
 
             {tab === "extra" && (
               <>
-                <div className="rounded-2xl border border-hairline bg-surface-1 p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-28px_rgba(0,0,0,0.9)]">
+                <div className="rounded-card bg-surface cushion-card p-4 ">
                   <div className="mb-3 text-sm font-medium text-ink-muted">Скиллы и покупки (по игрокам)</div>
                   <div className="grid gap-2 md:grid-cols-2">
                     {byPos.map((p, i) => (
@@ -867,7 +867,7 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
                     ))}
                   </div>
                 </div>
-                <div className="rounded-2xl border border-hairline bg-surface-1 p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-28px_rgba(0,0,0,0.9)]">
+                <div className="rounded-card bg-surface cushion-card p-4 ">
                   <Draft picksBans={match.picksBans} names={names} />
                 </div>
               </>
@@ -877,7 +877,7 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
               match.wards?.length ? (
                 <VisionMap wards={match.wards} durationSeconds={match.durationSeconds} sideLabels={names} />
               ) : (
-                <div className="rounded-2xl border border-hairline bg-surface-1 p-6 text-center text-sm text-ink-muted">
+                <div className="rounded-card bg-surface p-6 text-center text-sm font-bold text-muted cushion-card">
                   Расстановка вардов доступна только у распарсенных матчей OpenDota.
                   {src === "steam" && " Переключитесь на источник OpenDota."}
                 </div>
@@ -885,7 +885,7 @@ export function MatchReportView({ matchId, canArchive }: { matchId: string; canA
             )}
 
             {tab === "export" && (
-              <div className="rounded-xl border border-hairline bg-surface-1/40 p-4">
+              <div className="rounded-card bg-surface p-4 cushion-card">
                 {/* В архив уходит подпись ровно с теми названиями, что нарисованы на картинке. */}
                 <PostgameExport
                   match={match}

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/pouf/Button";
 
 // Создать пустую fearless-сессию и уйти в неё. Создание — POST (запись), список серверный.
 
@@ -25,8 +25,8 @@ export function NewFearlessButton() {
   }
 
   return (
-    <Button onClick={create} disabled={busy} className="shrink-0">
-      {busy ? "Создаю…" : "Новый драфт"}
+    <Button onClick={create} loading={busy} tone="orange">
+      Новый драфт
     </Button>
   );
 }

@@ -20,9 +20,15 @@ export default async function DivisionLayout({
   // Акцент секции = цвет дивизиона. D1 держит бренд-фиолетовый (дефолт токенов), D2 — бирюзовый
   // с тёмным текстом на плашках. Задаём CSS-переменные на обёртке — весь `accent`-хром внутри
   // (плитки, кнопки, ссылки) перекрашивается сам, без дублирования классов на каждой странице.
+  // Значения берём из токенов темы (--lost-d2*), а не литералами — тогда цвет D2 правится в одном
+  // месте, на панели /admin/theme, и здесь, и на бренд-хроме.
   const accentVars =
     division.slug === "d2"
-      ? ({ "--accent": "#14c6cb", "--accent-bright": "#5eead4", "--accent-contrast": "#000000" } as React.CSSProperties)
+      ? ({
+          "--accent": "var(--lost-d2, #14c6cb)",
+          "--accent-bright": "var(--lost-d2-bright, #5eead4)",
+          "--accent-contrast": "var(--lost-d2-contrast, #000000)",
+        } as React.CSSProperties)
       : undefined;
 
   // Ширина — единая на весь сайт (SITE_MAX_W): шапка и контент совпадают по краю.

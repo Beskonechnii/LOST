@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ImageField, SaveButton, SelectField, TextAreaField, TextField, Label } from "./form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/pouf/Button";
+import { Input } from "@/components/pouf/Input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ROLES } from "@/lib/roles";
 import { PLAYER_TAGS, parseTags } from "@/lib/player-tags";
@@ -39,9 +39,9 @@ export function TeamEditor({ id, initial }: { id: number; initial: TeamForm }) {
               type="color"
               value={v.color || "#a855f7"}
               onChange={(e) => set("color", e.target.value)}
-              className="h-10 w-12 rounded-lg border border-hairline bg-surface-1"
+              className="h-[52px] w-14 shrink-0 rounded-control bg-bg cushion-field"
             />
-            <Input value={v.color} placeholder="#A855F7" onChange={(e) => set("color", e.target.value)} />
+            <Input value={v.color} placeholder="#A855F7" onChange={(x) => set("color", x)} />
           </div>
         </label>
       </div>
@@ -79,8 +79,8 @@ type PlayerForm = {
 
 function Fieldset({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-hairline bg-surface-1 p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_12px_36px_-26px_rgba(0,0,0,0.9)]">
-      <h3 className="mb-3 text-xs uppercase tracking-widest text-ink-subtle">{title}</h3>
+    <section className="rounded-card bg-surface p-5 font-pouf cushion-card">
+      <h3 className="mb-3 text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">{title}</h3>
       {children}
     </section>
   );
@@ -145,10 +145,10 @@ export function PlayerEditor({ id, initial }: { id: number; initial: PlayerForm 
                 key={t.key}
                 type="button"
                 onClick={() => toggleTag(t.key)}
-                className={`rounded-full border px-3 py-1 text-xs transition ${
+                className={`rounded-[14px] px-3.5 py-[7px] text-[13px] font-black transition-[box-shadow,transform,background] ${
                   active.has(t.key)
-                    ? "border-accent bg-accent/15 text-accent-bright"
-                    : "border-hairline bg-surface-1 text-ink-muted hover:border-accent/50 hover:text-ink"
+                    ? "bg-purple text-[var(--on-accent)] cushion-control"
+                    : "bg-surface text-ink-muted cushion-field hover:text-ink"
                 }`}
               >
                 {t.label}
@@ -227,12 +227,12 @@ export function SpotsEditor({
   const free = teams.filter((t) => !spots.some((s) => s.teamId === t.id));
 
   return (
-    <div className="space-y-3">
-      {spots.length === 0 && <p className="text-sm text-ink-subtle">Игрок не числится ни в одном составе.</p>}
+    <div className="space-y-3 font-pouf">
+      {spots.length === 0 && <p className="text-sm font-bold text-muted">Игрок не числится ни в одном составе.</p>}
 
       {spots.map((s) => (
-        <div key={s.id} className="flex flex-wrap items-end gap-3 rounded-xl border border-hairline bg-surface-1 p-3">
-          <div className="min-w-40 flex-1 text-sm font-medium text-ink">{s.teamName}</div>
+        <div key={s.id} className="flex flex-wrap items-end gap-3 rounded-card bg-surface p-4 cushion-row">
+          <div className="min-w-40 flex-1 text-sm font-black text-ink">{s.teamName}</div>
           <div className="w-56">
             <SelectField
               label="Роль"
@@ -241,27 +241,21 @@ export function SpotsEditor({
               options={ROLE_OPTIONS}
             />
           </div>
-          <label className="flex items-center gap-2 pb-2 text-sm text-ink-muted">
+          <label className="flex items-center gap-2 pb-3 text-sm font-bold text-ink-muted">
             <Checkbox
               checked={s.isCaptain}
               onCheckedChange={(v) => void send(`/api/roster/spots/${s.id}`, "PATCH", { isCaptain: v === true })}
             />
             Капитан
           </label>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={busy}
-            onClick={() => void send(`/api/roster/spots/${s.id}`, "DELETE")}
-            className="hover:border-rose-600/60 hover:bg-transparent hover:text-rose-400"
-          >
+          <Button type="button" variant="quiet" tone="down" disabled={busy} onClick={() => void send(`/api/roster/spots/${s.id}`, "DELETE")}>
             Убрать
           </Button>
         </div>
       ))}
 
       {free.length > 0 && (
-        <div className="flex flex-wrap items-end gap-3 rounded-xl border border-dashed border-hairline p-3">
+        <div className="flex flex-wrap items-end gap-3 rounded-card bg-surface p-4 cushion-field">
           <div className="w-56">
             <SelectField
               label="Добавить в состав"
@@ -283,7 +277,7 @@ export function SpotsEditor({
         </div>
       )}
 
-      {error && <p className="text-sm text-rose-400">{error}</p>}
+      {error && <p className="text-sm font-bold text-rose-400">{error}</p>}
     </div>
   );
 }
@@ -322,7 +316,7 @@ export function CreateForm({
   }
 
   return (
-    <div className="rounded-xl border border-hairline bg-surface-1 p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_12px_36px_-26px_rgba(0,0,0,0.9)]">
+    <div className="rounded-card bg-surface p-5 font-pouf cushion-card">
       <div className="flex flex-wrap items-end gap-3">
         {fields.map((f) => (
           <div key={f.key} className="w-48">
@@ -334,11 +328,11 @@ export function CreateForm({
             />
           </div>
         ))}
-        <Button type="button" disabled={busy} onClick={() => void submit()}>
-          {busy ? "…" : submitLabel}
+        <Button type="button" loading={busy} onClick={() => void submit()}>
+          {submitLabel}
         </Button>
       </div>
-      {error && <p className="mt-2 text-sm text-rose-400">{error}</p>}
+      {error && <p className="mt-2 text-sm font-bold text-rose-400">{error}</p>}
     </div>
   );
 }

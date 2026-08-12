@@ -81,8 +81,8 @@ function Box({ slot }: { slot: ResolvedSlot }) {
   const winId = slot.winner?.teamId;
   const loseId = slot.loser?.teamId;
   return (
-    <div className="absolute" style={{ left: left(p.col), top: top(p.row), width: BOXW }}>
-      <div className="overflow-hidden rounded-md border border-hairline bg-surface-1 shadow-[0_8px_22px_-18px_rgba(0,0,0,0.9)]">
+    <div className="absolute font-pouf" style={{ left: left(p.col), top: top(p.row), width: BOXW }}>
+      <div className="overflow-hidden rounded-[14px] bg-surface cushion-field">
         <Row side={slot.a} won={winId === slot.a.team?.teamId} lost={loseId === slot.a.team?.teamId} walkover={slot.walkover} />
         <div className="h-px bg-hairline" />
         <Row side={slot.b} won={winId === slot.b.team?.teamId} lost={loseId === slot.b.team?.teamId} walkover={slot.walkover} />
@@ -91,7 +91,7 @@ function Box({ slot }: { slot: ResolvedSlot }) {
         <Link
           href={`/series/${slot.seriesSlug}`}
           title="Открыть серию"
-          className="absolute -right-2 top-1/2 flex h-4 w-4 -translate-y-1/2 items-center justify-center rounded-full border border-hairline bg-surface-3 text-[9px] font-bold text-ink-muted transition hover:border-accent hover:text-accent-bright"
+          className="absolute -right-2 top-1/2 flex h-4 w-4 -translate-y-1/2 items-center justify-center rounded-full bg-surface-3 text-[9px] font-black text-ink-muted transition hover:bg-purple hover:text-[var(--on-accent)]"
         >
           i
         </Link>
@@ -104,7 +104,7 @@ function Box({ slot }: { slot: ResolvedSlot }) {
 function Header({ col, row, label }: { col: number; row: number; label: string }) {
   return (
     <div
-      className="absolute flex h-6 items-center truncate rounded bg-surface-2 px-2 text-[11px] font-medium text-ink-muted"
+      className="absolute flex h-6 items-center truncate rounded-[10px] bg-surface-2 px-2.5 font-pouf text-[11px] font-extrabold uppercase tracking-[0.5px] text-muted"
       style={{ left: left(col), top: top(row) - 32, width: BOXW }}
     >
       {label}

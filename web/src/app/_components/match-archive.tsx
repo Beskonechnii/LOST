@@ -53,7 +53,7 @@ function Card({ entry, onOpen, onDropped }: { entry: ArchiveEntry; onOpen: () =>
   const date = new Date(entry.savedAt).toLocaleDateString("ru-RU");
 
   return (
-    <div className="group relative w-44 shrink-0 overflow-hidden rounded-lg border border-hairline bg-surface-1/60 transition-colors hover:border-hairline-strong">
+    <div className="group relative w-44 shrink-0 overflow-hidden rounded-control bg-surface font-pouf cushion-field transition-transform hover:-translate-y-0.5">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={cover}
@@ -128,8 +128,8 @@ export function MatchArchive({
   if (!items.length) return null;
 
   return (
-    <div className="mb-6">
-      <div className="mb-1.5 text-xs uppercase tracking-widest text-ink-subtle">Архив выгрузок</div>
+    <div className="mb-6 font-pouf">
+      <div className="mb-1.5 text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">Архив выгрузок</div>
       <div className="flex gap-2 overflow-x-auto pb-1">
         {items.map((e) => (
           <Card key={e.matchId} entry={e} onOpen={() => onOpen(e)} onDropped={onChanged} />

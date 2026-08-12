@@ -45,9 +45,9 @@ export default async function DesignEditorPage({ params }: { params: Promise<{ i
   if (orphans.length) teamGroups.push({ id: 0, name: "Без команды", logo: null, players: orphans });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 font-pouf">
       <div className="flex items-center justify-between">
-        <Link href="/studio/editor" className="text-xs text-ink-subtle hover:text-ink">
+        <Link href="/studio/editor" className="text-xs font-bold text-muted hover:text-[var(--purple)]">
           ← к списку документов
         </Link>
         <DeleteDesign id={design.id} title={design.title} redirectTo="/studio/editor" full />

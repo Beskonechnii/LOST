@@ -37,13 +37,13 @@ export default async function NewGraphicPage({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-pouf">
       <div>
-        <Link href="/studio" className="text-sm text-ink-subtle hover:text-ink-muted">
+        <Link href="/studio" className="text-sm font-bold text-muted hover:text-[var(--purple)]">
           ← Шаблоны
         </Link>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight">{template.title}</h1>
-        <p className="text-sm text-ink-subtle">{template.description}</p>
+        <h1 className="mt-2 text-[28px] font-black tracking-[-0.5px] text-ink md:text-4xl">{template.title}</h1>
+        <p className="text-sm font-bold text-muted">{template.description}</p>
       </div>
 
       <Wizard templateId={templateId} refs={refs} matches={matches} initial={initial} />

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { IMAGE_MODELS, IMAGE_QUALITIES, IMAGE_SIZES, MAX_IMAGES, MAX_REFERENCES } from "@/lib/image-options";
 import { SelectField, TextAreaField } from "../../../_components/form";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/pouf/Button";
 import { Checkbox } from "@/components/ui/checkbox";
 
 // Генерация картинок по API. Настройки → POST /api/studio/generate → готовые файлы в public/uploads/generated.
@@ -52,7 +52,7 @@ export function Generator() {
   }
 
   return (
-    <div className="grid items-start gap-8 lg:grid-cols-[minmax(300px,380px)_minmax(0,1fr)]">
+    <div className="grid items-start gap-8 font-pouf lg:grid-cols-[minmax(300px,380px)_minmax(0,1fr)]">
       <div className="space-y-5">
         <SelectField label="Модель" value={model} onChange={setModel} options={opts(IMAGE_MODELS)} />
 
@@ -74,12 +74,12 @@ export function Generator() {
           options={Array.from({ length: MAX_IMAGES }, (_, i) => ({ value: String(i + 1), label: String(i + 1) }))}
         />
 
-        <div className="rounded border border-hairline bg-surface-1/40 p-3">
+        <div className="rounded-card bg-surface p-4 cushion-field">
           <label className="flex cursor-pointer items-center gap-2">
             <Checkbox checked={useRefs} onCheckedChange={(v) => setUseRefs(v === true)} />
-            <span className="text-sm text-ink">Использовать как референс</span>
+            <span className="text-sm font-bold text-ink">Использовать как референс</span>
           </label>
-          <p className="mt-1 text-xs text-ink-subtle">
+          <p className="mt-1 text-xs font-bold text-muted">
             С референсом модель правит присланные картинки, а не рисует с нуля. До {MAX_REFERENCES} файлов.
           </p>
 
@@ -89,11 +89,11 @@ export function Generator() {
                 type="file"
                 multiple
                 accept="image/png,image/jpeg,image/webp"
-                className="block w-full text-xs text-ink-muted file:mr-3 file:rounded file:border-0 file:bg-surface-2 file:px-3 file:py-1.5 file:text-ink"
+                className="block w-full text-xs font-bold text-ink-muted file:mr-3 file:rounded-[12px] file:border-0 file:bg-purple file:px-3 file:py-1.5 file:font-black file:text-[var(--on-accent)]"
                 onChange={(e) => setRefs(Array.from(e.target.files ?? []).slice(0, MAX_REFERENCES))}
               />
               {refs.length > 0 && (
-                <ul className="mt-2 space-y-0.5 text-xs text-ink-subtle">
+                <ul className="mt-2 space-y-0.5 text-xs font-bold text-muted">
                   {refs.map((f) => (
                     <li key={f.name} className="truncate">
                       {f.name}
@@ -106,34 +106,34 @@ export function Generator() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
-          <Button type="button" disabled={!canRun} onClick={() => void run()}>
+          <Button type="button" disabled={!canRun} loading={busy} onClick={() => void run()}>
             {busy ? "Рисую…" : `Сгенерировать${n > 1 ? ` ×${n}` : ""}`}
           </Button>
-          {busy && <span className="text-sm text-ink-subtle">высокое качество считается до минуты</span>}
+          {busy && <span className="text-sm font-bold text-muted">высокое качество считается до минуты</span>}
         </div>
 
         {error && (
-          <p className="rounded border border-rose-900 bg-rose-950/40 px-3 py-2 text-sm text-rose-300">{error}</p>
+          <p className="rounded-control bg-orange px-3 py-2 text-sm font-bold text-[var(--on-accent)]">{error}</p>
         )}
       </div>
 
       <div>
         {results.length === 0 ? (
-          <div className="grid h-[45vh] place-items-center rounded border border-dashed border-hairline text-sm text-ink-subtle lg:h-[calc(100vh-14rem)]">
+          <div className="grid h-[45vh] place-items-center rounded-card bg-surface text-sm font-bold text-muted cushion-field lg:h-[calc(100vh-14rem)]">
             Здесь появятся картинки
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             {results.map((src) => (
-              <figure key={src} className="overflow-hidden rounded border border-hairline bg-canvas">
+              <figure key={src} className="overflow-hidden rounded-control bg-canvas cushion-field">
                 {/* локальный файл из public/uploads — оптимизация next/image здесь не нужна */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={src} alt="" className="block w-full" />
-                <figcaption className="flex items-center justify-between px-3 py-2 text-xs">
-                  <a href={src} download className="text-accent-bright hover:underline">
+                <figcaption className="flex items-center justify-between px-3 py-2 text-xs font-bold">
+                  <a href={src} download className="text-[var(--purple)] hover:underline">
                     скачать
                   </a>
-                  <a href={src} target="_blank" rel="noreferrer" className="text-ink-subtle hover:text-ink-muted">
+                  <a href={src} target="_blank" rel="noreferrer" className="text-muted hover:text-ink-muted">
                     открыть
                   </a>
                 </figcaption>
@@ -142,7 +142,7 @@ export function Generator() {
           </div>
         )}
         {results.length > 0 && (
-          <p className="mt-2 text-xs text-ink-subtle">
+          <p className="mt-2 text-xs font-bold text-muted">
             Файлы лежат в <code>public/uploads/generated/</code> — они вне git, чистить вручную.
           </p>
         )}

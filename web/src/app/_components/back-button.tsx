@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/pouf/Button";
 
 // Кнопка «Назад» разделов-хабов: с плитки провалились в инструмент — этой кнопкой вернулись.
 // Обычно это честный «назад» по истории; если пришли по прямой ссылке (истории нет) — уводим
@@ -21,14 +21,15 @@ export function BackButton({
   if (hideOn.includes(pathname)) return null;
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      className={className}
-      onClick={() => (typeof window !== "undefined" && window.history.length > 1 ? router.back() : router.push(fallback))}
-    >
-      ← Назад
-    </Button>
+    <div className={className}>
+      <Button
+        variant="quiet"
+        size="sm"
+        onClick={() => (typeof window !== "undefined" && window.history.length > 1 ? router.back() : router.push(fallback))}
+      >
+        ← Назад
+      </Button>
+    </div>
   );
 }
 

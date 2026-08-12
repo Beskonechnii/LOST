@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/pouf/Button";
+import { Input } from "@/components/pouf/Input";
 
 // Ввод id матча. Форма ничего не грузит — она только собирает адрес отчёта:
 // весь разбор живёт на /match/<id>, поэтому ссылкой на него можно поделиться.
@@ -30,26 +30,27 @@ export function MatchForm() {
   }
 
   return (
-    <div>
+    <div className="font-pouf">
       <div className="flex flex-wrap items-center gap-2">
-        <Input
-          value={input}
-          onChange={(e) => {
-            setInput(e.target.value);
-            setError(null);
-          }}
-          onKeyDown={(e) => e.key === "Enter" && open("opendota")}
-          placeholder="ID матча Dota 2, напр. 8907510684"
-          inputMode="numeric"
-          aria-label="ID матча Dota 2"
-          className="max-w-xs"
-        />
+        <div className="w-full max-w-xs">
+          <Input
+            value={input}
+            onChange={(v) => {
+              setInput(v);
+              setError(null);
+            }}
+            onKeyDown={(e) => e.key === "Enter" && open("opendota")}
+            placeholder="ID матча Dota 2, напр. 8907510684"
+            inputMode="numeric"
+            aria-label="ID матча Dota 2"
+          />
+        </div>
         <Button onClick={() => open("opendota")} disabled={!input.trim()}>
           Разобрать
         </Button>
         {/* Запасной источник: беднее данными, но живёт независимо от аварий OpenDota. */}
         <Button
-          variant="outline"
+          variant="quiet"
           onClick={() => open("steam")}
           disabled={!input.trim()}
           title="Первоисточник Valve: без графика золота, таймингов покупок, событий и ников"
@@ -57,7 +58,7 @@ export function MatchForm() {
           Из Steam
         </Button>
       </div>
-      {error && <p className="mt-2 text-sm text-rose-300">{error}</p>}
+      {error && <p className="mt-2 text-sm font-bold text-rose-300">{error}</p>}
     </div>
   );
 }

@@ -19,11 +19,11 @@ export default async function PlayoffPage({ params }: { params: Promise<{ div: s
 
   const bracket = await resolveBracket(division.name);
   if (!bracket.seeded) {
-    return <p className="text-ink-muted">Групповая стадия ещё не залита — посев брать неоткуда.</p>;
+    return <p className="font-pouf font-bold text-muted">Групповая стадия ещё не залита — посев брать неоткуда.</p>;
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 font-pouf">
       <SectionHeader
         eyebrow={`${division.label} · плей-офф`}
         title="Плей-офф"
@@ -47,10 +47,10 @@ export default async function PlayoffPage({ params }: { params: Promise<{ div: s
               <Link
                 key={t.teamId}
                 href={`/roster/teams/${t.teamId}`}
-                className="rounded-lg border border-hairline bg-surface-1 px-2.5 py-1.5 text-xs text-ink-muted transition hover:border-rose-600/60 hover:text-rose-400"
+                className="rounded-[14px] bg-surface px-3 py-1.5 text-xs font-bold text-ink-muted cushion-field transition hover:text-rose-400"
               >
                 {t.name}
-                <span className="ml-1 text-ink-subtle">
+                <span className="ml-1 text-muted">
                   {t.group}
                   {t.place}
                 </span>

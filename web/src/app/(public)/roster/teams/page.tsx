@@ -3,19 +3,24 @@ import { isAdmin } from "@/lib/admin-session";
 import { CreateForm } from "@/app/_components/roster-editors";
 import { SectionHeader } from "@/app/_components/ui";
 import { TeamCards } from "../_components/team-cards";
+import { DivTabs, parseDiv, divName } from "../_components/div-tabs";
 
 export const dynamic = "force-dynamic";
 
 // Страница публичная — витрина команд лиги. Форма создания и счётчик пробелов в данных
 // показываются только вошедшему оператору: посетителю они не нужны, а сама запись всё равно
 // закрыта в needsAdmin() на уровне API.
-export default async function TeamsPage() {
-  const teams = await listTeamRosters();
+export default async function TeamsPage({ searchParams }: { searchParams: Promise<{ div?: string }> }) {
+  const div = parseDiv((await searchParams).div);
   const authed = await isAdmin();
+
+  // Дивизион команды — её Team.group; «Все» показывает весь список.
+  const name = divName(div);
+  const teams = (await listTeamRosters()).filter((t) => !name || t.group === name);
   const noId = teams.reduce((sum, t) => sum + t.noAccountIdCount, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-pouf">
       <SectionHeader
         eyebrow="Ростер лиги"
         title="Команды"
@@ -26,6 +31,8 @@ export default async function TeamsPage() {
           </>
         }
       />
+
+      <DivTabs current={div} base="/roster/teams" />
 
       {authed && (
         <CreateForm

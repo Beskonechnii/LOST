@@ -45,33 +45,33 @@ export function DraftList({ sessions }: { sessions: Item[] }) {
 
   if (items.length === 0) {
     return (
-      <p className="rounded-xl border border-dashed border-hairline p-8 text-center text-sm text-ink-subtle">
+      <p className="rounded-card bg-surface p-8 text-center text-sm font-bold text-muted cushion-field font-pouf">
         Пока нет ни одного драфта. Нажми «Новый драфт», чтобы собрать команды.
       </p>
     );
   }
 
   return (
-    <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className="grid gap-3 font-pouf sm:grid-cols-2 lg:grid-cols-3">
       {items.map((s) => {
         const label = s.title ?? `Драфт #${s.id}`;
         return (
           <li key={s.id} className="group relative">
             <Link
               href={`/underbeer/${s.id}`}
-              className="block rounded-xl border border-hairline bg-surface-1 p-4 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_12px_36px_-26px_rgba(0,0,0,0.9)] transition duration-200 hover:-translate-y-0.5 hover:border-amber-500/60"
+              className="block rounded-card bg-surface p-4 cushion-card transition-transform duration-200 hover:-translate-y-1"
             >
               <div className="flex items-center justify-between gap-2 pr-16">
-                <span className="truncate font-semibold">{label}</span>
+                <span className="truncate font-black text-ink">{label}</span>
                 <span
-                  className={`shrink-0 rounded-full px-2 py-0.5 text-xs ${
-                    s.status === "done" ? "bg-emerald-500/15 text-emerald-300" : "bg-amber-500/15 text-amber-300"
+                  className={`shrink-0 rounded-pill px-2.5 py-0.5 text-xs font-black text-[var(--on-accent)] ${
+                    s.status === "done" ? "bg-mint" : "bg-warn"
                   }`}
                 >
                   {s.status === "done" ? "Собран" : "Черновик"}
                 </span>
               </div>
-              <div className="mt-2 text-xs text-ink-subtle">Обновлён {s.updated}</div>
+              <div className="mt-2 text-xs font-bold text-muted">Обновлён {s.updated}</div>
             </Link>
 
             {/* Удаление — кнопка поверх карточки, отдельно от ссылки (кнопку в ссылку вкладывать нельзя).

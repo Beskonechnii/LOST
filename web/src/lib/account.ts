@@ -14,6 +14,7 @@ import {
   formatApplication,
   parseApplication,
   profileLinkProblem,
+  applicationAccountId,
   type Application,
   type ApplicationInput,
 } from "./application";
@@ -335,10 +336,13 @@ export async function submitClaim(
 
 // ── операторская модерация заявок ────────────────────────────────────────────
 
-/** Заявки, ждущие подтверждения: есть claim, но привязки ещё нет. */
+/** Заявки, ждущие подтверждения: есть claim, но привязки ещё нет.
+ *  Аккаунты в pending исключены намеренно — они целиком (обе ветки воронки) разбираются в очереди
+ *  регистраций, и без этого фильтра одна и та же заявка висела бы в двух списках сразу. Здесь
+ *  остаётся исходный случай: уже одобренный аккаунт нашёл себя в ростере и просит привязку. */
 export function pendingClaims() {
   return prisma.userAccount.findMany({
-    where: { claimId: { not: null }, playerId: null },
+    where: { claimId: { not: null }, playerId: null, status: { not: "pending" } },
     include: { claim: true },
     orderBy: { createdAt: "asc" },
   });
@@ -356,6 +360,110 @@ export async function approveClaim(accountId: number): Promise<void> {
 /** Оператор отклонил заявку: просто снимаем claim, аккаунт остаётся без привязки. */
 export async function rejectClaim(accountId: number): Promise<void> {
   await prisma.userAccount.update({ where: { id: accountId }, data: { claimId: null } });
+}
+
+// ── очередь регистраций (модерация воронки) ───────────────────────────────────
+//
+// Здесь заявка становится решением. Ветка «я новый игрок» превращает анкету в Player — до этого
+// момента его нет вовсе (§2.1 плана), поэтому неодобренный человек не мог попасть в публичный
+// ростер. Ветка «я уже в ростере» ничего не создаёт, а лишь связывает аккаунт с готовым профилем.
+// Оба пути заканчиваются active: только с ним кабинет открывается целиком.
+//
+// Право accounts.approve проверяется прямо здесь, а не только в экшене: до этих функций можно
+// дойти из любой точки служебной части, а пускать в лигу — самое чувствительное действие в системе.
+
+/** Очередь модерации: отправленные заявки, ранние сверху — их разбирают по порядку. */
+export function pendingRegistrations() {
+  return prisma.userAccount.findMany({
+    where: { status: "pending" },
+    include: { claim: true, player: true },
+    orderBy: [{ submittedAt: "asc" }, { id: "asc" }],
+  });
+}
+
+export type PendingRegistration = Awaited<ReturnType<typeof pendingRegistrations>>[number];
+
+/** Анкета → новый Player. MMR берём не из анкеты: там он со слов игрока, а в лиге это её собственные
+ *  данные — их ставит оператор в форме апрува. Позиции у Player нет вовсе: роль в составе живёт в
+ *  RosterSpot и появляется вместе с командой, поэтому заявленная позиция остаётся в анкете. */
+async function createPlayerFromApplication(app: Application, mmr: number | null): Promise<number> {
+  const slug = await uniqueSlug(slugify(app.nickname));
+  const player = await prisma.player.create({
+    data: {
+      slug,
+      nickname: app.nickname,
+      realName: app.realName || null,
+      birthday: app.birthday ? parseBirthday(app.birthday) : null,
+      city: app.city || null,
+      country: app.country || null,
+      dotabuffUrl: app.dotabuff || null,
+      stratzUrl: app.stratz || null,
+      steamUrl: app.steam || null,
+      telegram: app.telegram || null,
+      // Без account_id игрок не находится ни в одном матче (§7 CLAUDE.md) — выводим из ссылок сразу.
+      accountId: applicationAccountId(app),
+      achievements: app.achievements || null,
+      mmr,
+    },
+  });
+  return player.id;
+}
+
+export type ApproveResult = { ok: true; playerId: number } | { ok: false; error: string };
+
+/** Одобрить заявку: завести профиль из анкеты либо подтвердить привязку, и открыть аккаунт. */
+export async function approveRegistration(accountId: number, mmr: number | null): Promise<ApproveResult> {
+  const reviewer = await requirePermission("accounts.approve");
+  const account = await prisma.userAccount.findUnique({ where: { id: accountId } });
+  if (!account) return { ok: false, error: "Аккаунт не найден" };
+
+  let playerId = account.playerId;
+  if (playerId == null) {
+    if (account.claimId != null) {
+      // Привязка: профиль уже есть. Пока заявка ждала, игрока мог занять другой аккаунт.
+      const taken = await prisma.userAccount.findUnique({ where: { playerId: account.claimId }, select: { id: true } });
+      if (taken && taken.id !== accountId) return { ok: false, error: "Игрок уже привязан к другому аккаунту" };
+      playerId = account.claimId;
+    } else {
+      const app = parseApplication(account.application);
+      if (!app) return { ok: false, error: "У заявки нет ни анкеты, ни выбранного профиля — верните её с причиной" };
+      playerId = await createPlayerFromApplication(app, mmr);
+    }
+  }
+
+  await prisma.userAccount.update({
+    where: { id: accountId },
+    data: {
+      playerId,
+      claimId: null,
+      status: "active",
+      reviewedAt: new Date(),
+      reviewedById: reviewer.id,
+      rejectedReason: null, // решение принято, прошлая причина отказа к нему не относится
+    },
+  });
+  return { ok: true, playerId };
+}
+
+/** Вернуть заявку с причиной: человек видит её в кабинете, правит анкету и отправляет снова.
+ *  Возвращает текст ошибки или null при успехе. */
+export async function rejectRegistration(accountId: number, reason: string): Promise<string | null> {
+  const text = reason.trim();
+  if (!text) return "Напишите причину — человек увидит её в кабинете и по ней поправит анкету";
+  const reviewer = await requirePermission("accounts.approve");
+  await prisma.userAccount.update({
+    where: { id: accountId },
+    data: {
+      status: "rejected",
+      rejectedReason: text,
+      reviewedAt: new Date(),
+      reviewedById: reviewer.id,
+      // Выбранный профиль снимаем: решение принято, иначе отклонённая привязка так и висела бы
+      // открытой в очереди /admin/claims.
+      claimId: null,
+    },
+  });
+  return null;
 }
 
 // ── панель ролей (только владелец) ────────────────────────────────────────────

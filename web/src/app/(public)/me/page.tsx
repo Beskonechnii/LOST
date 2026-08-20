@@ -3,6 +3,7 @@ import { googleConfigured } from "@/lib/google-oauth";
 import { currentAccount, linkablePlayers, effectiveRole, accountStatus, accountApplication } from "@/lib/account";
 import type { Role } from "@/lib/player-auth";
 import { Button } from "@/components/ui/button";
+import { ApplicationSummary } from "@/app/_components/application-summary";
 import { Onboarding } from "./onboarding";
 import { ApplicationFlow } from "./application-form";
 import { AuthForms } from "./auth-forms";
@@ -18,6 +19,14 @@ export const metadata = { title: "Кабинет" };
 // Что показывать, решает статус воронки (ACCOUNTS-PLAN.md §4): draft/rejected — только анкету
 // (пока она не отправлена, аккаунт в лиге ничего не значит), pending — «на рассмотрении»,
 // active — полноценный кабинет.
+
+// Даты отправки и решения — одним форматом на весь кабинет.
+const dateTime = new Intl.DateTimeFormat("ru", {
+  day: "numeric",
+  month: "long",
+  hour: "2-digit",
+  minute: "2-digit",
+});
 
 // Тексты сообщений из ?error, которыми google-callback уводит обратно (коды — там же).
 const ERRORS: Record<string, string> = {
@@ -92,6 +101,8 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
                 application={accountApplication(account)}
                 players={await linkablePlayers()}
                 rejectedReason={account.rejectedReason}
+                // Дату решения форматируем на сервере: клиент в другом поясе показал бы своё время
+                rejectedAt={account.rejectedReason && account.reviewedAt ? dateTime.format(account.reviewedAt) : null}
               />
             </div>
           )}
@@ -213,31 +224,47 @@ function Linked({ account }: { account: Account }) {
   );
 }
 
-/** Аккаунт в pending: заявка отправлена, решения ещё нет. Полный экран решения — этап 3 плана. */
+/** Аккаунт в pending: заявка отправлена, решения ещё нет. Показываем ровно то, что ушло оператору —
+ *  иначе человеку нечего вспомнить, когда заявку вернут с причиной. */
 function UnderReview({ account }: { account: Account }) {
   const app = accountApplication(account);
-  const sent = account.submittedAt
-    ? new Intl.DateTimeFormat("ru", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }).format(
-        account.submittedAt,
-      )
-    : null;
+  const sent = account.submittedAt ? dateTime.format(account.submittedAt) : null;
 
   return (
-    <div className="rounded-xl border border-amber-900 bg-amber-950/30 px-4 py-3">
-      <p className="text-xs uppercase tracking-wide text-amber-400/80">Заявка на рассмотрении</p>
-      <p className="mt-1 text-sm text-ink-muted">
-        {account.claim ? (
-          <>
-            Вы заявили привязку к профилю <span className="font-semibold text-ink">{account.claim.nickname}</span>.
-          </>
-        ) : (
-          <>
-            Анкета отправлена{app?.nickname ? <> под ником <span className="font-semibold text-ink">{app.nickname}</span></> : null}.
-          </>
-        )}{" "}
-        Организатор проверит её и откроет доступ — до этого в кабинете больше ничего нет.
-      </p>
-      {sent && <p className="mt-2 text-xs text-ink-subtle">Отправлено {sent}</p>}
+    <div className="space-y-3">
+      <div className="rounded-xl border border-amber-900 bg-amber-950/30 px-4 py-3">
+        <p className="text-xs uppercase tracking-wide text-amber-400/80">Заявка на рассмотрении</p>
+        <p className="mt-1 text-sm text-ink-muted">
+          {account.claim ? (
+            <>
+              Вы заявили привязку к профилю <span className="font-semibold text-ink">{account.claim.nickname}</span>.
+            </>
+          ) : (
+            <>
+              Анкета отправлена
+              {app?.nickname ? (
+                <>
+                  {" "}
+                  под ником <span className="font-semibold text-ink">{app.nickname}</span>
+                </>
+              ) : null}
+              .
+            </>
+          )}{" "}
+          Организатор сверит данные и откроет доступ — до этого в кабинете больше ничего нет.
+        </p>
+        {sent && <p className="mt-2 text-xs text-ink-subtle">Отправлено {sent}</p>}
+      </div>
+
+      {app && (
+        <div className="rounded-xl border border-hairline bg-surface-2/40 px-4 py-3">
+          <p className="mb-1 text-xs uppercase tracking-wide text-ink-subtle">Что вы отправили</p>
+          <ApplicationSummary application={app} />
+          <p className="mt-2 text-xs text-ink-subtle">
+            Ошиблись в данных? Напишите организатору — он вернёт заявку, и анкету можно будет поправить.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

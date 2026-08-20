@@ -52,10 +52,13 @@ export function ApplicationFlow({
   application,
   players,
   rejectedReason,
+  rejectedAt,
 }: {
   application: Application | null;
   players: LinkablePlayer[];
   rejectedReason: string | null;
+  /** Дата решения, уже отформатированная на сервере (клиент в другом поясе показал бы своё время). */
+  rejectedAt: string | null;
 }) {
   // Если анкету уже присылали (её вернули на доработку) — сразу открываем форму с прежними ответами:
   // заставлять человека второй раз проходить развилку незачем.
@@ -66,7 +69,13 @@ export function ApplicationFlow({
       {rejectedReason && (
         <div className="rounded-xl border border-rose-900 bg-rose-950/30 px-4 py-3">
           <p className="text-xs uppercase tracking-wide text-rose-400/80">Заявку вернули</p>
-          <p className="mt-1 text-sm text-ink-muted">{rejectedReason}</p>
+          {/* Причина — не приговор, а список правок: ниже сразу открыта та же анкета с прежними
+              ответами, поправить нужное и отправить снова. */}
+          <p className="mt-1 whitespace-pre-line text-sm text-ink">{rejectedReason}</p>
+          <p className="mt-2 text-xs text-ink-subtle">
+            {rejectedAt ? `Решение от ${rejectedAt}. ` : ""}
+            Поправьте {application ? "анкету" : "заявку"} ниже и отправьте снова — она вернётся в очередь.
+          </p>
         </div>
       )}
 

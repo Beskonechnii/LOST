@@ -66,7 +66,7 @@ async function main() {
     matchKey(m, m.teamA.slug, m.teamB.slug);
 
   const snapshot = {
-    version: 9, // 9 — роль аккаунта (owner/admin/player) в UserAccount
+    version: 10, // 10 — вход по паролю: passwordHash/emailVerified, googleSub опционален
     exportedAt: new Date().toISOString(),
 
     teams: teams.map((t) => omit(t, "id")),
@@ -135,11 +135,14 @@ async function main() {
       .sort((a, b) => `${a.matchKey}${a.placed}${a.x}${a.y}`.localeCompare(`${b.matchKey}${b.placed}${b.x}${b.y}`)),
 
     // Аккаунты — реальные данные пользователей, а не производные: должны переживать db:import (зеркало),
-    // иначе привязки потерялись бы. Ключ переноса — googleSub; профиль/заявка — по slug игрока.
+    // иначе привязки и пароли потерялись бы. Ключ переноса — email (уникален и есть всегда, в отличие
+    // от googleSub — у парольного аккаунта его нет); профиль/заявка — по slug игрока.
     accounts: accounts
       .map((a) => ({
         email: a.email,
         googleSub: a.googleSub,
+        passwordHash: a.passwordHash,
+        emailVerified: a.emailVerified,
         name: a.name,
         avatar: a.avatar,
         role: a.role,
@@ -147,7 +150,7 @@ async function main() {
         playerSlug: a.player?.slug ?? null,
         claimSlug: a.claim?.slug ?? null,
       }))
-      .sort((a, b) => a.googleSub.localeCompare(b.googleSub)),
+      .sort((a, b) => a.email.localeCompare(b.email)),
   };
 
   writeFileSync(out, JSON.stringify(snapshot, null, 2) + "\n", "utf8");

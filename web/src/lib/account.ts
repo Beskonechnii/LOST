@@ -4,9 +4,13 @@
 
 import "server-only";
 import { prisma } from "./prisma";
-import { currentAccountId } from "./player-session";
+import { currentAccountId, setSessionCookie } from "./player-session";
 import type { Role } from "./player-auth";
 import { slugify } from "./profiles";
+import { hashPassword, verifyPassword, passwordProblem } from "./password";
+import { issueToken, consumeToken } from "./auth-tokens";
+import { sendVerifyEmail, sendResetEmail } from "./mailer";
+import { appUrl } from "./app-url";
 
 /** Аккаунт по id — вместе с привязанным профилем и заявкой (обе связи опциональны). */
 export function loadAccount(id: number) {
@@ -139,4 +143,115 @@ export async function requireOwner() {
   const acc = await currentAccount();
   if (!acc || effectiveRole(acc) !== "owner") throw new Error("Доступ только для владельца");
   return acc;
+}
+
+// ── вход по email + паролю ─────────────────────────────────────────────────────
+//
+// Второй способ входа рядом с Google. Ключ аккаунта — email (уникален): один человек ↔ один аккаунт,
+// хоть Google, хоть пароль, хоть оба. Правила безопасности:
+//   • регистрация НЕ трогает уже существующий email — иначе, зная чужую почту, можно было бы
+//     подсадить свой пароль в чужой Google-аккаунт (перехват). Забыл/хочет пароль — через сброс.
+//   • сброс/подтверждение доказывают владение почтой (ссылка приходит на неё) — только они ставят
+//     пароль существующему аккаунту и поднимают emailVerified.
+//   • вход по паролю закрыт до подтверждения почты; Google-вход подтверждён самим Google.
+
+/** Выдать сессию аккаунту с правильной ролью: владельца по OWNER_EMAIL закрепляем в БД (как в OAuth). */
+export async function establishSession(accountId: number): Promise<void> {
+  const account = await prisma.userAccount.findUnique({ where: { id: accountId } });
+  if (!account) return;
+  if (isOwnerEmail(account.email) && account.role !== "owner") {
+    await prisma.userAccount.update({ where: { id: account.id }, data: { role: "owner" } });
+  }
+  await setSessionCookie(account.id, effectiveRole(account));
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Нормализованный (нижний регистр, без пробелов) email — им всегда ищем и пишем. */
+const normEmail = (email: string) => email.trim().toLowerCase();
+
+/** Претензии к формату почты, либо null. */
+export function emailProblem(email: string): string | null {
+  return EMAIL_RE.test(normEmail(email)) ? null : "Введите корректный email";
+}
+
+/** Отправить письмо с подтверждением почты аккаунту (выпуск токена + ссылка). */
+async function sendVerification(accountId: number, email: string): Promise<void> {
+  const token = await issueToken(accountId, "verify");
+  await sendVerifyEmail(email, `${await appUrl()}/api/auth/verify?token=${token}`);
+}
+
+export type RegisterResult = { ok: true } | { ok: false; error: string };
+
+/** Регистрация по email + паролю. Заводит аккаунт (почта не подтверждена) и шлёт письмо-подтверждение. */
+export async function registerWithPassword(email: string, password: string, name: string): Promise<RegisterResult> {
+  const mail = normEmail(email);
+  const ep = emailProblem(mail);
+  if (ep) return { ok: false, error: ep };
+  const pp = passwordProblem(password);
+  if (pp) return { ok: false, error: pp };
+
+  const existing = await prisma.userAccount.findUnique({ where: { email: mail }, select: { id: true } });
+  if (existing) return { ok: false, error: "Почта уже занята. Войдите или восстановите пароль." };
+
+  const account = await prisma.userAccount.create({
+    data: { email: mail, passwordHash: hashPassword(password), name: name.trim() || null },
+  });
+  await sendVerification(account.id, mail);
+  return { ok: true };
+}
+
+export type LoginResult =
+  | { ok: true; accountId: number }
+  | { ok: false; error: string; unverified?: boolean };
+
+/** Вход по email + паролю. Возвращает id аккаунта для выдачи сессии, либо ошибку. */
+export async function loginWithPassword(email: string, password: string): Promise<LoginResult> {
+  const mail = normEmail(email);
+  const account = await prisma.userAccount.findUnique({ where: { email: mail } });
+  // Одинаковый текст на «нет такого аккаунта» и «пароль не тот» — не подсказываем, что почта есть.
+  if (!account || !verifyPassword(password, account.passwordHash)) {
+    return { ok: false, error: "Неверная почта или пароль" };
+  }
+  if (!account.emailVerified) {
+    return { ok: false, error: "Почта не подтверждена — проверьте письмо", unverified: true };
+  }
+  return { ok: true, accountId: account.id };
+}
+
+/** Повторно выслать подтверждение почты (если аккаунт есть и ещё не подтверждён). Молча — без утечки. */
+export async function resendVerification(email: string): Promise<void> {
+  const account = await prisma.userAccount.findUnique({ where: { email: normEmail(email) } });
+  if (account && !account.emailVerified) await sendVerification(account.id, account.email);
+}
+
+/** Подтверждение почты по токену из письма. Возвращает id аккаунта (для выдачи сессии) или null. */
+export async function verifyEmail(token: string): Promise<number | null> {
+  const accountId = await consumeToken(token, "verify");
+  if (accountId == null) return null;
+  await prisma.userAccount.update({ where: { id: accountId }, data: { emailVerified: true } });
+  return accountId;
+}
+
+/** Запрос сброса пароля: шлём ссылку, если аккаунт есть. Наружу всегда «письмо отправлено» — без утечки. */
+export async function startPasswordReset(email: string): Promise<void> {
+  const account = await prisma.userAccount.findUnique({ where: { email: normEmail(email) } });
+  if (!account) return;
+  const token = await issueToken(account.id, "reset");
+  await sendResetEmail(account.email, `${await appUrl()}/reset?token=${token}`);
+}
+
+export type ResetResult = { ok: true; accountId: number } | { ok: false; error: string };
+
+/** Завершение сброса: гасим токен, ставим новый пароль. Сброс доказывает почту → и подтверждаем её. */
+export async function completePasswordReset(token: string, password: string): Promise<ResetResult> {
+  const pp = passwordProblem(password);
+  if (pp) return { ok: false, error: pp };
+  const accountId = await consumeToken(token, "reset");
+  if (accountId == null) return { ok: false, error: "Ссылка недействительна или устарела. Запросите сброс заново." };
+  await prisma.userAccount.update({
+    where: { id: accountId },
+    data: { passwordHash: hashPassword(password), emailVerified: true },
+  });
+  return { ok: true, accountId };
 }

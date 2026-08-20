@@ -1,28 +1,42 @@
 import Link from "next/link";
 import { googleConfigured } from "@/lib/google-oauth";
 import { currentAccount, linkablePlayers, effectiveRole } from "@/lib/account";
+import type { Role } from "@/lib/player-auth";
 import { Button } from "@/components/ui/button";
 import { Onboarding } from "./onboarding";
+import { AuthForms } from "./auth-forms";
 import { logout } from "./actions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Кабинет" };
 
-// Кабинет игрока и единственный вход в систему: логин через Google, привязка профиля, его просмотр,
-// а для админов/владельца — дверь в служебную часть. Публичная страница (в needsAdmin не значится) —
-// иначе входить было бы некуда.
+// Кабинет игрока и единственный вход в систему: логин через Google ИЛИ по email + паролю, привязка
+// профиля, его просмотр, а для админов/владельца — дверь в служебную часть. Публичная страница
+// (в needsAdmin не значится) — иначе входить было бы некуда.
 
-// Тексты ошибок из ?error, которым callback/старт уводят обратно (коды — там же).
+// Тексты сообщений из ?error/?ok, которыми callback/verify уводят обратно (коды — там же).
 const ERRORS: Record<string, string> = {
   off: "Вход через Google не настроен на этом сервере.",
   state: "Сессия входа истекла или не совпала. Попробуйте войти ещё раз.",
   google: "Google не подтвердил вход. Попробуйте ещё раз.",
+  verify: "Ссылка подтверждения недействительна или устарела. Войдите и запросите письмо заново.",
+};
+const OKS: Record<string, string> = {
+  verified: "Почта подтверждена — вы вошли. Добро пожаловать!",
+  reset: "Пароль обновлён — вы вошли.",
 };
 
 type Account = NonNullable<Awaited<ReturnType<typeof currentAccount>>>;
 
-export default async function AccountPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  const { error } = await searchParams;
+// Оформление бейджа роли: у каждой роли свой цвет и подпись — роль всегда на виду в карточке.
+const ROLE_META: Record<Role, { label: string; cls: string }> = {
+  owner: { label: "Владелец лиги", cls: "border-amber-700/60 bg-amber-950/40 text-amber-300" },
+  admin: { label: "Администратор", cls: "border-fuchsia-700/60 bg-fuchsia-950/40 text-fuchsia-300" },
+  player: { label: "Игрок", cls: "border-sky-800/60 bg-sky-950/40 text-sky-300" },
+};
+
+export default async function AccountPage({ searchParams }: { searchParams: Promise<{ error?: string; ok?: string }> }) {
+  const { error, ok } = await searchParams;
   const account = await currentAccount();
   const role = account ? effectiveRole(account) : null;
 
@@ -42,24 +56,77 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           {error && ERRORS[error] && (
             <p className="mb-4 rounded-lg border border-rose-900 bg-rose-950/40 px-3 py-2 text-sm text-rose-300">{ERRORS[error]}</p>
           )}
+          {ok && OKS[ok] && (
+            <p className="mb-4 rounded-lg border border-emerald-900 bg-emerald-950/40 px-3 py-2 text-sm text-emerald-300">{OKS[ok]}</p>
+          )}
 
-          {role && role !== "player" && <AdminEntry role={role} />}
-
-          {!account ? (
+          {!account || !role ? (
             <SignedOut />
-          ) : account.player ? (
-            <Linked account={account} />
-          ) : account.claim ? (
-            <Pending account={account} />
           ) : (
-            <>
-              <AccountLine email={account.email} />
-              <Onboarding players={await linkablePlayers()} />
-            </>
+            <div className="space-y-4">
+              <ProfileCard account={account} role={role} />
+              {role !== "player" && <AdminEntry role={role} />}
+              {account.player ? (
+                <Linked account={account} />
+              ) : account.claim ? (
+                <Pending account={account} />
+              ) : (
+                <Onboarding players={await linkablePlayers()} />
+              )}
+            </div>
           )}
         </div>
       </div>
     </main>
+  );
+}
+
+/** Внутренний профиль пользователя: аватар, имя/почта, бейдж роли, способы входа, выход. */
+function ProfileCard({ account, role }: { account: Account; role: Role }) {
+  const meta = ROLE_META[role];
+  const initial = (account.name || account.email).trim().charAt(0).toUpperCase() || "?";
+  return (
+    <div className="rounded-xl border border-hairline bg-surface-2/50 p-4">
+      <div className="flex items-center gap-3">
+        {account.avatar ? (
+          // eslint-disable-next-line @next/next/no-img-element -- внешний аватар google, не наш ассет
+          <img src={account.avatar} alt="" className="h-12 w-12 rounded-full object-cover" />
+        ) : (
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-accent to-fuchsia-600 text-lg font-bold text-white">
+            {initial}
+          </span>
+        )}
+        <div className="min-w-0 flex-1">
+          {account.name && <p className="truncate font-semibold">{account.name}</p>}
+          <p className="truncate text-sm text-ink-muted">{account.email}</p>
+        </div>
+        <form action={logout}>
+          <button type="submit" className="shrink-0 text-xs text-ink-subtle transition-colors hover:text-ink">
+            Выйти
+          </button>
+        </form>
+      </div>
+
+      {/* Роль — обязательно на виду */}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${meta.cls}`}>{meta.label}</span>
+        {account.emailVerified ? (
+          <span className="rounded-full border border-emerald-800/60 bg-emerald-950/30 px-2.5 py-0.5 text-xs text-emerald-400">
+            почта подтверждена
+          </span>
+        ) : (
+          <span className="rounded-full border border-amber-800/60 bg-amber-950/30 px-2.5 py-0.5 text-xs text-amber-400">
+            почта не подтверждена
+          </span>
+        )}
+      </div>
+
+      {/* Способы входа — как «connected accounts» на привычных сайтах */}
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-subtle">
+        <span>{account.googleSub ? "Google — привязан" : "Google — не привязан"}</span>
+        <span>{account.passwordHash ? "Пароль — задан" : "Пароль — не задан"}</span>
+      </div>
+    </div>
   );
 }
 
@@ -68,7 +135,7 @@ function AdminEntry({ role }: { role: "owner" | "admin" }) {
   return (
     <Link
       href="/admin"
-      className="mb-4 flex items-center justify-between gap-2 rounded-xl border border-fuchsia-800/70 bg-fuchsia-950/30 px-4 py-3 transition-colors hover:bg-fuchsia-950/50"
+      className="flex items-center justify-between gap-2 rounded-xl border border-fuchsia-800/70 bg-fuchsia-950/30 px-4 py-3 transition-colors hover:bg-fuchsia-950/50"
     >
       <span>
         <span className="block text-sm font-medium text-fuchsia-100">
@@ -81,40 +148,28 @@ function AdminEntry({ role }: { role: "owner" | "admin" }) {
   );
 }
 
-/** Не вошёл: крупная кнопка Google (или сообщение, если вход не настроен). */
+/** Не вошёл: формы email/пароль + кнопка Google. */
 function SignedOut() {
   return (
-    <div>
-      <p className="mb-4 text-center text-sm text-ink-muted">
-        Войдите через Google, чтобы привязать свой профиль игрока или завести новый.
-      </p>
-      {googleConfigured() ? (
-        <a
-          href="/api/auth/google/start"
-          className="flex w-full items-center justify-center gap-3 rounded-xl border border-hairline-strong bg-white px-4 py-3 text-sm font-medium text-neutral-800 shadow-sm transition-transform hover:scale-[1.01] active:scale-100"
-        >
-          <GoogleIcon />
-          Войти через Google
-        </a>
-      ) : (
-        <p className="rounded-lg border border-amber-900 bg-amber-950/40 px-3 py-2 text-sm text-amber-300">
-          Вход через Google не настроен: не заданы <code>GOOGLE_CLIENT_ID</code>/<code>GOOGLE_CLIENT_SECRET</code> в <code>web/.env</code>.
-        </p>
-      )}
-    </div>
-  );
-}
+    <div className="space-y-5">
+      <AuthForms />
 
-/** Шапка «вы вошли как …» + выход — общая для привязанного/заявки/онбординга. */
-function AccountLine({ email }: { email: string }) {
-  return (
-    <div className="mb-4 flex items-center justify-between gap-2 rounded-lg border border-hairline bg-surface-2/60 px-3 py-2">
-      <span className="truncate text-sm text-ink-muted">{email}</span>
-      <form action={logout}>
-        <button type="submit" className="shrink-0 text-xs text-ink-subtle transition-colors hover:text-ink">
-          Выйти
-        </button>
-      </form>
+      {googleConfigured() && (
+        <>
+          <div className="flex items-center gap-3 text-xs text-ink-subtle">
+            <span className="h-px flex-1 bg-hairline" />
+            или
+            <span className="h-px flex-1 bg-hairline" />
+          </div>
+          <a
+            href="/api/auth/google/start"
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-hairline-strong bg-white px-4 py-3 text-sm font-medium text-neutral-800 shadow-sm transition-transform hover:scale-[1.01] active:scale-100"
+          >
+            <GoogleIcon />
+            Войти через Google
+          </a>
+        </>
+      )}
     </div>
   );
 }
@@ -124,7 +179,6 @@ function Linked({ account }: { account: Account }) {
   const player = account.player!;
   return (
     <div className="space-y-3">
-      <AccountLine email={account.email} />
       <div className="rounded-xl border border-emerald-900 bg-emerald-950/30 px-4 py-3">
         <p className="text-xs uppercase tracking-wide text-emerald-400/80">Профиль привязан</p>
         <p className="mt-1 text-lg font-semibold">{player.nickname}</p>
@@ -139,15 +193,12 @@ function Linked({ account }: { account: Account }) {
 /** Заявка на существующего игрока подана — ждёт оператора. */
 function Pending({ account }: { account: Account }) {
   return (
-    <div className="space-y-3">
-      <AccountLine email={account.email} />
-      <div className="rounded-xl border border-amber-900 bg-amber-950/30 px-4 py-3">
-        <p className="text-xs uppercase tracking-wide text-amber-400/80">Заявка на подтверждении</p>
-        <p className="mt-1 text-sm text-ink-muted">
-          Вы заявили привязку к профилю <span className="font-semibold text-ink">{account.claim!.nickname}</span>.
-          Оператор подтвердит её в админке — после этого профиль появится здесь.
-        </p>
-      </div>
+    <div className="rounded-xl border border-amber-900 bg-amber-950/30 px-4 py-3">
+      <p className="text-xs uppercase tracking-wide text-amber-400/80">Заявка на подтверждении</p>
+      <p className="mt-1 text-sm text-ink-muted">
+        Вы заявили привязку к профилю <span className="font-semibold text-ink">{account.claim!.nickname}</span>.
+        Оператор подтвердит её в админке — после этого профиль появится здесь.
+      </p>
     </div>
   );
 }

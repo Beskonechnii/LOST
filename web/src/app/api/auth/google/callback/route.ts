@@ -30,13 +30,17 @@ export async function GET(req: NextRequest) {
     return back(req, "google");
   }
 
-  // Ключ аккаунта — googleSub (стабилен на весь срок аккаунта Google); email/имя/аватар обновляем,
-  // они могут меняться на стороне Google.
-  const account = await prisma.userAccount.upsert({
-    where: { googleSub: user.sub },
-    create: { googleSub: user.sub, email: user.email, name: user.name ?? null, avatar: user.picture ?? null },
-    update: { email: user.email, name: user.name ?? null, avatar: user.picture ?? null },
-  });
+  // Аккаунт ищем сначала по googleSub, затем по email. Второе — чтобы вход через Google подхватил
+  // уже заведённый парольный аккаунт с той же почтой (это тот же человек: Google подтверждает почту),
+  // а не упёрся в уникальность email. Google-вход всегда поднимает emailVerified — почта доказана.
+  const mail = user.email.trim().toLowerCase();
+  const common = { email: mail, name: user.name ?? null, avatar: user.picture ?? null, emailVerified: true };
+  const existing =
+    (await prisma.userAccount.findUnique({ where: { googleSub: user.sub } })) ??
+    (await prisma.userAccount.findUnique({ where: { email: mail } }));
+  const account = existing
+    ? await prisma.userAccount.update({ where: { id: existing.id }, data: { googleSub: user.sub, ...common } })
+    : await prisma.userAccount.create({ data: { googleSub: user.sub, ...common } });
 
   // Владелец (OWNER_EMAIL) закрепляется в БД при входе — чтобы он был виден в панели как owner,
   // а не только жил в куке. Роль для куки берём эффективную (owner по почте перекрывает запись).

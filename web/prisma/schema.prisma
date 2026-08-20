@@ -70,11 +70,22 @@ model Player {
 /// Новый игрок при входе заводит профиль и привязывается сразу (`playerId`). Существующий в ростере
 /// подаёт заявку (`claimId`) — оператор подтверждает её в админке, и тогда `claimId` переезжает в
 /// `playerId`. Две связи, а не одна, чтобы непроверенная заявка не считалась привязкой.
+///
+/// Войти можно двумя способами, и один аккаунт может держать оба: через Google (`googleSub`) или
+/// по email + паролю (`passwordHash`). Ключ аккаунта — `email` (уникален): вошёл через Google той же
+/// почтой, что регистрировался паролем, — это тот же аккаунт, к нему прицепляется `googleSub`.
+/// Поэтому `googleSub` теперь опционален (у чисто парольного аккаунта его нет).
 model UserAccount {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  googleSub String   @unique // стабильный id google-аккаунта («sub» из id_token) — истинный ключ входа
-  name      String? // имя из google-профиля (для операторского списка заявок)
+  googleSub String?  @unique // id google-аккаунта («sub» из id_token); null у аккаунта только с паролем
+  // Хеш пароля (scrypt, формат `salt:hash` hex — см. src/lib/password.ts). null = входа по паролю нет,
+  // только через Google. Сам пароль в БД не хранится нигде.
+  passwordHash String?
+  // Подтверждена ли почта. Google-вход подтверждён самим Google (ставим true в callback); при
+  // регистрации паролем — false до перехода по ссылке из письма (src/lib/auth-tokens.ts).
+  emailVerified Boolean @default(false)
+  name      String? // имя (из google-профиля или введённое при регистрации) — для списка заявок
   avatar    String? // ссылка на аватар google
   // Роль в системе: player (по умолчанию) | admin | owner. Владелец назначается не здесь, а по
   // OWNER_EMAIL (src/lib/account.ts): совпал email при входе — роль owner, и её нельзя отобрать из UI.
@@ -86,7 +97,26 @@ model UserAccount {
   claim    Player? @relation("AccountClaim", fields: [claimId], references: [id], onDelete: SetNull)
   claimId  Int? // заявка на существующего игрока, ждёт подтверждения оператора
 
+  tokens    AuthToken[]
   createdAt DateTime @default(now())
+}
+
+/// Одноразовый токен: подтверждение почты (`verify`) или сброс пароля (`reset`). В БД лежит только
+/// sha256-хеш токена — сам токен уходит человеку в ссылке письма и в базе не хранится (утечка БД не
+/// раздаёт доступы). Гасится при использовании (`usedAt`) и протухает по сроку. В снапшот НЕ входит:
+/// эфемерный, как DraftSession — протух за час/сутки, переносить нечего.
+model AuthToken {
+  id        Int       @id @default(autoincrement())
+  tokenHash String    @unique // sha256(raw) hex — ищем по нему, не зная самого токена
+  purpose   String    // verify | reset (src/lib/auth-tokens.ts)
+  expiresAt DateTime
+  usedAt    DateTime? // проставляется при погашении; повторно тот же токен не сработает
+  createdAt DateTime  @default(now())
+
+  account   UserAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId Int
+
+  @@index([accountId])
 }
 
 /// Место игрока в составе команды. Роль и капитанство живут здесь, а не у игрока: один человек

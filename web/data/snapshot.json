@@ -1,6 +1,6 @@
 {
-  "version": 9,
-  "exportedAt": "2026-08-12T10:42:43.495Z",
+  "version": 10,
+  "exportedAt": "2026-08-18T20:36:33.622Z",
   "teams": [
     {
       "slug": "300",
@@ -325833,24 +325833,28 @@
   ],
   "accounts": [
     {
-      "email": "stanislav.bovshis@gmail.com",
-      "googleSub": "106907069221969989962",
-      "name": "Stanislau Boushys",
-      "avatar": "https://lh3.googleusercontent.com/a/ACg8ocLTSxM7QcROSAf3Yee6su_1pQ2FhwPzTj7y1VFkjRXG880QPkB4=s96-c",
-      "role": "player",
-      "createdAt": "2026-08-12T00:03:21.034Z",
-      "playerSlug": "bsk",
-      "claimSlug": null
-    },
-    {
       "email": "mehhhh12221@gmail.com",
       "googleSub": "109864542485506344784",
+      "passwordHash": null,
+      "emailVerified": false,
       "name": "Mehdi larbi",
       "avatar": "https://lh3.googleusercontent.com/a/ACg8ocImqaDGXYqE9bm9vNWM_R0qlRflaLhF2VdEynrDTKN0SkQ2Og=s96-c",
       "role": "player",
       "createdAt": "2026-08-12T00:07:13.983Z",
-      "playerSlug": null,
-      "claimSlug": "npq"
+      "playerSlug": "npq",
+      "claimSlug": null
+    },
+    {
+      "email": "stanislav.bovshis@gmail.com",
+      "googleSub": "106907069221969989962",
+      "passwordHash": null,
+      "emailVerified": false,
+      "name": "Stanislau Boushys",
+      "avatar": "https://lh3.googleusercontent.com/a/ACg8ocLTSxM7QcROSAf3Yee6su_1pQ2FhwPzTj7y1VFkjRXG880QPkB4=s96-c",
+      "role": "owner",
+      "createdAt": "2026-08-12T00:03:21.034Z",
+      "playerSlug": "bsk",
+      "claimSlug": null
     }
   ]
 }

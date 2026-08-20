@@ -16,7 +16,9 @@ export type ProfileValues = {
   country: string;
   birthday: string; // yyyy-mm-dd для <input type=date>
   telegram: string;
-  profileLink: string;
+  dotabuffUrl: string;
+  stratzUrl: string;
+  steamUrl: string;
   achievements: string;
 };
 
@@ -65,8 +67,16 @@ export function ProfileForm({ values }: { values: ProfileValues }) {
         <Input name="telegram" defaultValue={values.telegram} placeholder="@nickname" />
       </Field>
 
-      <Field label="Ссылка на профиль" hint="Dotabuff, Stratz или Steam — из неё определим ваш account_id, ссылки на витрине появятся сами.">
-        <Input name="profileLink" defaultValue={values.profileLink} placeholder="https://www.dotabuff.com/players/…" />
+      <Field label="Dotabuff" hint="Из ссылок определяем ваш account_id — по нему вас находят в матчах лиги.">
+        <Input name="dotabuffUrl" defaultValue={values.dotabuffUrl} placeholder="https://www.dotabuff.com/players/…" />
+      </Field>
+
+      <Field label="Stratz">
+        <Input name="stratzUrl" defaultValue={values.stratzUrl} placeholder="https://stratz.com/players/…" />
+      </Field>
+
+      <Field label="Steam">
+        <Input name="steamUrl" defaultValue={values.steamUrl} placeholder="https://steamcommunity.com/profiles/…" />
       </Field>
 
       <Field label="Достижения" hint="Свободный список — одна строка на достижение.">

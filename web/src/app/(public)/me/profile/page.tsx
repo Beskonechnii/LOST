@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { currentAccount } from "@/lib/account";
-import { playerLinks } from "@/lib/profiles";
 import { Button } from "@/components/ui/button";
 import { ProfileForm, type ProfileValues } from "./profile-form";
 
@@ -17,7 +16,8 @@ export default async function EditProfilePage() {
   if (!account.player) redirect("/me"); // профиля ещё нет — сначала онбординг в /me
 
   const p = account.player;
-  const links = playerLinks(p);
+  // Ссылки показываем ровно те, что записаны у игрока, а не выведенные из account_id: иначе человек
+  // «сохранял» бы то, чего сам не вводил, и выведенная ссылка навсегда становилась бы его полем.
   const values: ProfileValues = {
     nickname: p.nickname,
     realName: p.realName ?? "",
@@ -25,7 +25,9 @@ export default async function EditProfilePage() {
     country: p.country ?? "",
     birthday: p.birthday ? p.birthday.toISOString().slice(0, 10) : "",
     telegram: p.telegram ?? "",
-    profileLink: links.dotabuff ?? links.steam ?? links.stratz ?? "",
+    dotabuffUrl: p.dotabuffUrl ?? "",
+    stratzUrl: p.stratzUrl ?? "",
+    steamUrl: p.steamUrl ?? "",
     achievements: p.achievements ?? "",
   };
 

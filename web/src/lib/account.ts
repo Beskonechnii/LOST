@@ -6,9 +6,17 @@ import "server-only";
 import { prisma } from "./prisma";
 import { currentAccountId, setSessionCookie } from "./player-session";
 import type { Role } from "./player-auth";
-import { slugify, accountIdFromUrl, normalizeTelegram, parseBirthday } from "./profiles";
+import { slugify, playerAccountId, normalizeTelegram, parseBirthday } from "./profiles";
 import { hashPassword, verifyPassword, passwordProblem } from "./password";
 import { hasPermission, permissionsOf, type PermissionKey } from "./permissions";
+import {
+  normalizeApplication,
+  formatApplication,
+  parseApplication,
+  profileLinkProblem,
+  type Application,
+  type ApplicationInput,
+} from "./application";
 
 /** Аккаунт по id — вместе с привязанным профилем и заявкой (обе связи опциональны). */
 export function loadAccount(id: number) {
@@ -138,7 +146,11 @@ export type OwnProfileInput = {
   country?: string;
   birthday?: string;
   telegram?: string;
-  profileLink?: string; // ссылка на Dotabuff/Steam/Stratz → account_id (одно поле для игрока)
+  // Ссылки — каждая своим полем (требование 6 плана): раньше было одно «ссылка на профиль», и по нему
+  // нельзя было понять, что человек дал и чего не хватает.
+  dotabuffUrl?: string;
+  stratzUrl?: string;
+  steamUrl?: string;
   achievements?: string;
 };
 
@@ -200,17 +212,24 @@ export async function updateOwnProfile(accountId: number, input: OwnProfileInput
     }
   }
 
-  // Ссылка на профиль → account_id: одно поле для игрока, три ссылки (Dotabuff/Stratz/Steam)
-  // выводятся из него автоматически (profiles.ts). Пусто → отвязываем account_id.
-  if (input.profileLink !== undefined) {
-    const raw = input.profileLink.trim();
-    if (raw === "") data.accountId = null;
-    else {
-      const id = accountIdFromUrl(raw);
-      if (!id) return `Не разобрал «${raw}». Нужна ссылка на Dotabuff, Stratz или steamcommunity.com/profiles/…`;
-      data.accountId = id;
-    }
+  // Ссылки на профиль — по одной на площадку. Проверяем, что адрес ведёт куда обещано, и из первой
+  // разобравшейся выводим account_id: по нему игрока находят в матчах. Если не разобралась ни одна
+  // (например, дали именной адрес Steam), прежний account_id НЕ трогаем — его мог поставить оператор
+  // или resolve-vanity, и терять привязку к статистике из-за правки анкеты нельзя.
+  const links = { dotabuffUrl: "dotabuff", stratzUrl: "stratz", steamUrl: "steam" } as const;
+  for (const [column, kind] of Object.entries(links) as [keyof typeof links, "dotabuff" | "stratz" | "steam"][]) {
+    const raw = input[column];
+    if (raw === undefined) continue;
+    const problem = profileLinkProblem(kind, raw);
+    if (problem) return problem;
+    data[column] = raw.trim().replace(/\/+$/, "") || null;
   }
+  const derived = playerAccountId({
+    dotabuffUrl: data.dotabuffUrl as string | null | undefined,
+    stratzUrl: data.stratzUrl as string | null | undefined,
+    steamUrl: data.steamUrl as string | null | undefined,
+  });
+  if (derived) data.accountId = derived;
 
   if (Object.keys(data).length > 0) {
     await prisma.player.update({ where: { id: account.playerId }, data });
@@ -239,6 +258,79 @@ export async function linkablePlayers() {
     select: { id: true, nickname: true, slug: true },
   });
   return players.filter((p) => !taken.has(p.id));
+}
+
+// ── анкета-заявка на вступление ───────────────────────────────────────────────
+//
+// Что происходит при регистрации: аккаунт заводится в draft, и до отправки анкеты кабинет ничего,
+// кроме неё, не показывает — иначе в очередь модерации попадали бы пустые аккаунты (требование 6).
+// Обе ветки — «я новый игрок» (анкета JSON) и «я уже в ростере» (заявка на привязку) — заканчиваются
+// в pending; какая именно, оператор увидит по наличию application / claimId.
+//
+// Согласие с политикой (/rules) — обязательное условие отправки, поэтому проверяется здесь, а не
+// только в форме: до БД можно дойти и мимо неё.
+
+/** Анкета аккаунта, разобранная из JSON; её ещё нет — null. */
+export const accountApplication = (account: { application: string | null }): Application | null =>
+  parseApplication(account.application);
+
+const POLICY_REQUIRED = "Примите правила лиги — без согласия заявку не отправить";
+
+/** Отправить анкету нового игрока: проверяем, пишем JSON и переводим аккаунт в pending.
+ *  Возвращает текст ошибки или null при успехе (как updateOwnProfile). */
+export async function submitApplication(
+  accountId: number,
+  input: ApplicationInput,
+  policyAccepted: boolean,
+): Promise<string | null> {
+  if (!policyAccepted) return POLICY_REQUIRED;
+  const parsed = normalizeApplication(input);
+  if (!parsed.ok) return parsed.error;
+
+  const now = new Date();
+  await prisma.userAccount.update({
+    where: { id: accountId },
+    data: {
+      application: formatApplication(parsed.value),
+      claimId: null, // ветка «я новый игрок» отменяет ранее выбранную привязку
+      policyAcceptedAt: now,
+      submittedAt: now,
+      status: "pending",
+      // Прошлый отказ снимаем: человек прислал новую редакцию, старая причина к ней не относится.
+      rejectedReason: null,
+      reviewedAt: null,
+      reviewedById: null,
+    },
+  });
+  return null;
+}
+
+/** Отправить заявку на привязку к существующему игроку: тот же pending, но вместо анкеты — claim. */
+export async function submitClaim(
+  accountId: number,
+  playerId: number,
+  policyAccepted: boolean,
+): Promise<string | null> {
+  if (!policyAccepted) return POLICY_REQUIRED;
+  try {
+    await claimExisting(accountId, playerId);
+  } catch (e) {
+    return e instanceof Error ? e.message : "Не удалось подать заявку";
+  }
+  const now = new Date();
+  await prisma.userAccount.update({
+    where: { id: accountId },
+    data: {
+      application: null, // привязка к готовому профилю анкеты не требует — данные уже в Player
+      policyAcceptedAt: now,
+      submittedAt: now,
+      status: "pending",
+      rejectedReason: null,
+      reviewedAt: null,
+      reviewedById: null,
+    },
+  });
+  return null;
 }
 
 // ── операторская модерация заявок ────────────────────────────────────────────

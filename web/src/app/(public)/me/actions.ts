@@ -9,7 +9,10 @@ import {
   registerWithPassword,
   loginWithPassword,
   establishSession,
+  submitApplication,
+  submitClaim,
 } from "@/lib/account";
+import type { ApplicationInput } from "@/lib/application";
 
 // Действия кабинета игрока. Все требуют вошедшего аккаунта — id берём из сессии, а не из формы,
 // чтобы нельзя было действовать от чужого имени.
@@ -47,6 +50,52 @@ export async function login(_state: AuthState, form: FormData): Promise<AuthStat
   if (!res.ok) return { error: res.error };
   await establishSession(res.accountId);
   redirect("/me");
+}
+
+// ── анкета-заявка (аккаунт в draft/rejected) ───────────────────────────────────
+
+// Состояние форм заявки. Кроме ошибки возвращаем и введённые значения: после submit React сбрасывает
+// неуправляемые поля к defaultValue, и без этого длинная анкета очищалась бы на каждой опечатке.
+export type ApplyState = { error?: string; values?: ApplicationInput } | null;
+
+/** Отправка анкеты нового игрока. Все проверки — в submitApplication: форму можно и обойти. */
+export async function sendApplication(_state: ApplyState, form: FormData): Promise<ApplyState> {
+  const id = await currentAccountId();
+  if (id == null) return { error: "Сессия истекла — войдите снова" };
+
+  const text = (key: keyof ApplicationInput) => String(form.get(key) ?? "");
+  const input: ApplicationInput = {
+    nickname: text("nickname"),
+    realName: text("realName"),
+    birthday: text("birthday"),
+    city: text("city"),
+    country: text("country"),
+    dotabuff: text("dotabuff"),
+    stratz: text("stratz"),
+    steam: text("steam"),
+    telegram: text("telegram"),
+    position: text("position"),
+    mmr: text("mmr"),
+    achievements: text("achievements"),
+  };
+
+  const error = await submitApplication(id, input, form.get("policy") != null);
+  if (error) return { error, values: input };
+  revalidatePath("/me");
+  return null;
+}
+
+/** Отправка заявки на привязку к профилю из ростера — вторая ветка той же воронки. */
+export async function sendClaim(_state: ApplyState, form: FormData): Promise<ApplyState> {
+  const id = await currentAccountId();
+  if (id == null) return { error: "Сессия истекла — войдите снова" };
+  const playerId = Number(form.get("playerId"));
+  if (!Number.isFinite(playerId) || playerId <= 0) return { error: "Выберите себя из списка" };
+
+  const error = await submitClaim(id, playerId, form.get("policy") != null);
+  if (error) return { error };
+  revalidatePath("/me");
+  return null;
 }
 
 /** Новый игрок завёл профиль по нику — создаём и уводим на его страницу в ростере. */

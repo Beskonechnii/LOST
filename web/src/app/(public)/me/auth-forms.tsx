@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Link from "next/link";
 import { register, login, type AuthState } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -96,7 +97,11 @@ function RegisterForm() {
         {pending ? "Создаю…" : "Зарегистрироваться"}
       </Button>
       <p className="text-center text-xs text-ink-subtle">
-        Регистрируясь, вы соглашаетесь с правилами лиги.
+        Регистрация — заявка в лигу: дальше нужно заполнить анкету. Отправляя её, вы соглашаетесь с{" "}
+        <Link href="/rules" target="_blank" className="text-accent underline underline-offset-2">
+          правилами лиги
+        </Link>
+        .
       </p>
       {state?.error && <p className={box.error}>{state.error}</p>}
     </form>

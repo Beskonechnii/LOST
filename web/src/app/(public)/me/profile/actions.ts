@@ -20,7 +20,9 @@ export async function saveProfile(_state: SaveState, form: FormData): Promise<Sa
     country: String(form.get("country") ?? ""),
     birthday: String(form.get("birthday") ?? ""),
     telegram: String(form.get("telegram") ?? ""),
-    profileLink: String(form.get("profileLink") ?? ""),
+    dotabuffUrl: String(form.get("dotabuffUrl") ?? ""),
+    stratzUrl: String(form.get("stratzUrl") ?? ""),
+    steamUrl: String(form.get("steamUrl") ?? ""),
     achievements: String(form.get("achievements") ?? ""),
   };
 

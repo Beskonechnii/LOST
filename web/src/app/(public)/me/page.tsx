@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { googleConfigured } from "@/lib/google-oauth";
-import { currentAccount, linkablePlayers, effectiveRole } from "@/lib/account";
+import { currentAccount, linkablePlayers, effectiveRole, accountStatus, accountApplication } from "@/lib/account";
 import type { Role } from "@/lib/player-auth";
 import { Button } from "@/components/ui/button";
 import { Onboarding } from "./onboarding";
+import { ApplicationFlow } from "./application-form";
 import { AuthForms } from "./auth-forms";
 import { logout } from "./actions";
 
@@ -13,6 +14,10 @@ export const metadata = { title: "Кабинет" };
 // Кабинет игрока и единственный вход в систему: логин через Google ИЛИ по email + паролю, привязка
 // профиля, его просмотр, а для админов/владельца — дверь в служебную часть. Публичная страница
 // (в needsAdmin не значится) — иначе входить было бы некуда.
+//
+// Что показывать, решает статус воронки (ACCOUNTS-PLAN.md §4): draft/rejected — только анкету
+// (пока она не отправлена, аккаунт в лиге ничего не значит), pending — «на рассмотрении»,
+// active — полноценный кабинет.
 
 // Тексты сообщений из ?error, которыми google-callback уводит обратно (коды — там же).
 const ERRORS: Record<string, string> = {
@@ -34,6 +39,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
   const { error } = await searchParams;
   const account = await currentAccount();
   const role = account ? effectiveRole(account) : null;
+  const status = account ? accountStatus(account) : null;
 
   return (
     <main className="flex-1 px-4 py-10 md:py-16">
@@ -52,9 +58,9 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
             <p className="mb-4 rounded-lg border border-rose-900 bg-rose-950/40 px-3 py-2 text-sm text-rose-300">{ERRORS[error]}</p>
           )}
 
-          {!account || !role ? (
+          {!account || !role || !status ? (
             <SignedOut />
-          ) : (
+          ) : status === "active" ? (
             <div className="space-y-4">
               <ProfileCard account={account} role={role} />
               <Link
@@ -72,6 +78,21 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
               ) : (
                 <Onboarding players={await linkablePlayers()} />
               )}
+            </div>
+          ) : status === "pending" ? (
+            <div className="space-y-4">
+              <ProfileCard account={account} role={role} />
+              <UnderReview account={account} />
+            </div>
+          ) : (
+            // draft и rejected: кроме анкеты, в кабинете ничего нет — заявку сначала надо отправить
+            <div className="space-y-4">
+              <ProfileCard account={account} role={role} />
+              <ApplicationFlow
+                application={accountApplication(account)}
+                players={await linkablePlayers()}
+                rejectedReason={account.rejectedReason}
+              />
             </div>
           )}
         </div>
@@ -188,6 +209,35 @@ function Linked({ account }: { account: Account }) {
           <Link href={`/roster/players/${player.id}`}>Открыть мой профиль</Link>
         </Button>
       </div>
+    </div>
+  );
+}
+
+/** Аккаунт в pending: заявка отправлена, решения ещё нет. Полный экран решения — этап 3 плана. */
+function UnderReview({ account }: { account: Account }) {
+  const app = accountApplication(account);
+  const sent = account.submittedAt
+    ? new Intl.DateTimeFormat("ru", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }).format(
+        account.submittedAt,
+      )
+    : null;
+
+  return (
+    <div className="rounded-xl border border-amber-900 bg-amber-950/30 px-4 py-3">
+      <p className="text-xs uppercase tracking-wide text-amber-400/80">Заявка на рассмотрении</p>
+      <p className="mt-1 text-sm text-ink-muted">
+        {account.claim ? (
+          <>
+            Вы заявили привязку к профилю <span className="font-semibold text-ink">{account.claim.nickname}</span>.
+          </>
+        ) : (
+          <>
+            Анкета отправлена{app?.nickname ? <> под ником <span className="font-semibold text-ink">{app.nickname}</span></> : null}.
+          </>
+        )}{" "}
+        Организатор проверит её и откроет доступ — до этого в кабинете больше ничего нет.
+      </p>
+      {sent && <p className="mt-2 text-xs text-ink-subtle">Отправлено {sent}</p>}
     </div>
   );
 }

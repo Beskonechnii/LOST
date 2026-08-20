@@ -5,10 +5,13 @@ import { createProfile, claim } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-// Онбординг после первого входа: аккаунт есть, профиля ещё нет. Развилка ровно по ТЗ —
-// «новый игрок» заводит профиль сразу, «уже в ростере» подаёт заявку на подтверждение.
+// Онбординг УЖЕ ОДОБРЕННОГО аккаунта, у которого почему-то нет профиля: «новый игрок» заводит
+// Player сразу, «уже в ростере» подаёт заявку на привязку. Путь новичка (draft → анкета → модерация)
+// живёт отдельно, в application-form.tsx: там Player до апрува не создаётся вовсе.
+//
+// Поиск себя в ростере нужен обоим экранам, поэтому вынесен сюда как PlayerPicker.
 
-type LinkablePlayer = { id: number; nickname: string; slug: string };
+export type LinkablePlayer = { id: number; nickname: string; slug: string };
 
 const errorBox = "rounded-md border border-rose-900 bg-rose-950/40 px-3 py-2 text-sm text-rose-300";
 
@@ -67,8 +70,32 @@ function NewProfileForm() {
 
 function ClaimForm({ players }: { players: LinkablePlayer[] }) {
   const [error, action, pending] = useActionState(claim, null);
-  const [query, setQuery] = useState("");
   const [picked, setPicked] = useState<LinkablePlayer | null>(null);
+
+  return (
+    <form action={action} className="space-y-3">
+      <input type="hidden" name="playerId" value={picked?.id ?? ""} />
+      <PlayerPicker players={players} picked={picked} onPick={setPicked} />
+      <Button type="submit" disabled={pending || !picked} className="w-full">
+        {pending ? "Отправляю…" : "Подать заявку на привязку"}
+      </Button>
+      {error && <p className={errorBox}>{error}</p>}
+    </form>
+  );
+}
+
+/** Поиск себя в ростере: подсказка по нику, выбранный игрок отдаётся наружу (id кладут в hidden-поле).
+ *  Общий для онбординга и для заявки на привязку из анкеты — списки и тексты должны совпадать. */
+export function PlayerPicker({
+  players,
+  picked,
+  onPick,
+}: {
+  players: LinkablePlayer[];
+  picked: LinkablePlayer | null;
+  onPick: (player: LinkablePlayer | null) => void;
+}) {
+  const [query, setQuery] = useState("");
 
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -77,45 +104,40 @@ function ClaimForm({ players }: { players: LinkablePlayer[] }) {
   }, [players, query]);
 
   return (
-    <form action={action} className="space-y-3">
-      <input type="hidden" name="playerId" value={picked?.id ?? ""} />
-      <div>
-        <label className="mb-1 block text-sm text-ink-muted">Ваш ник в ростере</label>
-        <Input
-          autoFocus
-          placeholder="Начните вводить ник"
-          value={picked ? picked.nickname : query}
-          onChange={(e) => {
-            setPicked(null);
-            setQuery(e.target.value);
-          }}
-        />
-        {!picked && matches.length > 0 && (
-          <ul className="mt-1 overflow-hidden rounded-md border border-hairline bg-surface-1">
-            {matches.map((p) => (
-              <li key={p.id}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPicked(p);
-                    setQuery("");
-                  }}
-                  className="block w-full px-3 py-2 text-left text-sm transition-colors hover:bg-surface-2"
-                >
-                  {p.nickname}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-        {!picked && query.trim() && matches.length === 0 && (
-          <p className="mt-1 text-xs text-ink-subtle">Никого не нашли. Возможно, вас ещё нет в ростере — тогда заведите новый профиль.</p>
-        )}
-      </div>
-      <Button type="submit" disabled={pending || !picked} className="w-full">
-        {pending ? "Отправляю…" : "Подать заявку на привязку"}
-      </Button>
-      {error && <p className={errorBox}>{error}</p>}
-    </form>
+    <div>
+      <label className="mb-1 block text-sm text-ink-muted">Ваш ник в ростере</label>
+      <Input
+        autoFocus
+        placeholder="Начните вводить ник"
+        value={picked ? picked.nickname : query}
+        onChange={(e) => {
+          onPick(null);
+          setQuery(e.target.value);
+        }}
+      />
+      {!picked && matches.length > 0 && (
+        <ul className="mt-1 overflow-hidden rounded-md border border-hairline bg-surface-1">
+          {matches.map((p) => (
+            <li key={p.id}>
+              <button
+                type="button"
+                onClick={() => {
+                  onPick(p);
+                  setQuery("");
+                }}
+                className="block w-full px-3 py-2 text-left text-sm transition-colors hover:bg-surface-2"
+              >
+                {p.nickname}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {!picked && query.trim() && matches.length === 0 && (
+        <p className="mt-1 text-xs text-ink-subtle">
+          Никого не нашли. Возможно, вас ещё нет в ростере — тогда заполните анкету нового игрока.
+        </p>
+      )}
+    </div>
   );
 }

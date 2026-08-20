@@ -67,13 +67,13 @@ export async function createProfile(_state: string | null, form: FormData): Prom
   if (id == null) return "Сессия истекла — войдите снова";
   const nick = String(form.get("nickname") ?? "").trim();
   if (!nick) return "Укажите ник";
-  let slug: string;
+  let playerId: number;
   try {
-    slug = await createProfileFor(id, nick);
+    playerId = await createProfileFor(id, nick);
   } catch (e) {
     return e instanceof Error ? e.message : "Не удалось создать профиль";
   }
-  redirect(`/roster/players/${slug}`);
+  redirect(`/roster/players/${playerId}`);
 }
 
 /** Заявка на существующего игрока — уходит оператору на подтверждение. */

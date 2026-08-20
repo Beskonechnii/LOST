@@ -6,7 +6,7 @@ import "server-only";
 import { prisma } from "./prisma";
 import { currentAccountId, setSessionCookie } from "./player-session";
 import type { Role } from "./player-auth";
-import { slugify } from "./profiles";
+import { slugify, accountIdFromUrl, normalizeTelegram, parseBirthday } from "./profiles";
 import { hashPassword, verifyPassword, passwordProblem } from "./password";
 import { issueToken, consumeToken } from "./auth-tokens";
 import { sendVerifyEmail, sendResetEmail } from "./mailer";
@@ -61,14 +61,114 @@ async function uniqueSlug(base: string): Promise<string> {
   return slug;
 }
 
-/** Новый игрок сам завёл профиль: создаём Player и сразу привязываем. Возвращает slug профиля. */
-export async function createProfileFor(accountId: number, nickname: string): Promise<string> {
+/** Новый игрок сам завёл профиль: создаём Player и сразу привязываем. Возвращает id профиля
+ *  (карточки ростера адресуются числовым id, а не slug — см. /roster/players/[id]). */
+export async function createProfileFor(accountId: number, nickname: string): Promise<number> {
   const nick = nickname.trim();
   if (!nick) throw new Error("Укажите ник");
   const slug = await uniqueSlug(slugify(nick));
   const player = await prisma.player.create({ data: { slug, nickname: nick } });
   await prisma.userAccount.update({ where: { id: accountId }, data: { playerId: player.id, claimId: null } });
-  return slug;
+  return player.id;
+}
+
+// ── правка своей анкеты игроком (self-service) ─────────────────────────────────
+//
+// Игрок правит только СВОИ анкетные поля. То, что принадлежит лиге (MMR, роль в составе, TP,
+// номер, фото/баннер), редактирует лишь оператор в /admin — здесь этих полей нет намеренно.
+// slug не трогаем никогда (см. schema): от него зависят файлы картинок, поэтому меняется ник,
+// а адрес ассета — нет.
+
+// Сколько ждать между сменами ника самим игроком. Формального понятия «сезон» в модели пока нет
+// (см. §9 в CLAUDE.md), поэтому приближаем скользящим окном «примерно раз в сезон».
+const NICKNAME_COOLDOWN_DAYS = 120;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+export type OwnProfileInput = {
+  nickname?: string;
+  realName?: string;
+  city?: string;
+  country?: string;
+  birthday?: string;
+  telegram?: string;
+  profileLink?: string; // ссылка на Dotabuff/Steam/Stratz → account_id (одно поле для игрока)
+  achievements?: string;
+};
+
+/** Записать правки анкеты от имени вошедшего игрока. Возвращает ошибку строкой или null при успехе. */
+export async function updateOwnProfile(accountId: number, input: OwnProfileInput): Promise<string | null> {
+  const account = await prisma.userAccount.findUnique({ where: { id: accountId }, select: { playerId: true } });
+  if (!account?.playerId) return "Профиль не привязан";
+  const player = await prisma.player.findUnique({
+    where: { id: account.playerId },
+    select: { nickname: true, nicknameChangedAt: true },
+  });
+  if (!player) return "Профиль не найден";
+
+  const data: Record<string, unknown> = {};
+
+  // Ник — единственное поле с лимитом: slug не меняем, но саму смену ограничиваем «раз в сезон».
+  if (input.nickname !== undefined) {
+    const nick = input.nickname.trim();
+    if (!nick) return "Ник не может быть пустым";
+    if (nick !== player.nickname) {
+      const last = player.nicknameChangedAt?.getTime();
+      if (last != null) {
+        const daysLeft = Math.ceil((last + NICKNAME_COOLDOWN_DAYS * DAY_MS - Date.now()) / DAY_MS);
+        if (daysLeft > 0) {
+          return `Ник в этом сезоне уже менялся. Сменить снова можно через ${daysLeft} дн. или попросить оператора.`;
+        }
+      }
+      data.nickname = nick;
+      data.nicknameChangedAt = new Date();
+    }
+  }
+
+  // Простые текстовые поля: пусто → null (дыр в анкете быть не должно).
+  const setText = (key: keyof OwnProfileInput, column: string) => {
+    if (input[key] !== undefined) data[column] = (input[key] as string).trim() || null;
+  };
+  setText("realName", "realName");
+  setText("city", "city");
+  setText("country", "country");
+  setText("achievements", "achievements");
+
+  if (input.telegram !== undefined) {
+    const raw = input.telegram.trim();
+    if (raw === "") data.telegram = null;
+    else {
+      const handle = normalizeTelegram(raw);
+      if (!handle) return `«${raw}» не похоже на телеграм-хендл`;
+      data.telegram = handle;
+    }
+  }
+
+  if (input.birthday !== undefined) {
+    const raw = input.birthday.trim();
+    if (raw === "") data.birthday = null;
+    else {
+      const date = parseBirthday(raw);
+      if (!date) return `Дата «${raw}» не разобрана — ждём 21.04.1998`;
+      data.birthday = date;
+    }
+  }
+
+  // Ссылка на профиль → account_id: одно поле для игрока, три ссылки (Dotabuff/Stratz/Steam)
+  // выводятся из него автоматически (profiles.ts). Пусто → отвязываем account_id.
+  if (input.profileLink !== undefined) {
+    const raw = input.profileLink.trim();
+    if (raw === "") data.accountId = null;
+    else {
+      const id = accountIdFromUrl(raw);
+      if (!id) return `Не разобрал «${raw}». Нужна ссылка на Dotabuff, Stratz или steamcommunity.com/profiles/…`;
+      data.accountId = id;
+    }
+  }
+
+  if (Object.keys(data).length > 0) {
+    await prisma.player.update({ where: { id: account.playerId }, data });
+  }
+  return null;
 }
 
 /** Заявка на существующего игрока — ждёт подтверждения оператора. Занятого игрока заявить нельзя. */

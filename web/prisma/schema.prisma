@@ -36,8 +36,10 @@ model Team {
 
 model Player {
   id          Int       @id @default(autoincrement())
-  slug        String    @unique // ключ импорта и имя файла фото
+  slug        String    @unique // ключ импорта и имя файла фото; ставится один раз и НЕ меняется —
+                                 // от него зависят файлы картинок (uploads.ts), поэтому ник правится, а slug нет
   nickname    String
+  nicknameChangedAt DateTime? // когда игрок сам менял ник — для лимита «раз в сезон»; правка оператором не в счёт
   realName    String?
   accountId   String? // Dota/Steam32 account id (для OpenDota)
   mmr         Int? // из таблицы сезона; у команды не хранится — считается по составу

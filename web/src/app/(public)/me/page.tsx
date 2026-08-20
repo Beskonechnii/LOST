@@ -183,9 +183,14 @@ function Linked({ account }: { account: Account }) {
         <p className="text-xs uppercase tracking-wide text-emerald-400/80">Профиль привязан</p>
         <p className="mt-1 text-lg font-semibold">{player.nickname}</p>
       </div>
-      <Button asChild variant="outline" className="w-full">
-        <Link href={`/roster/players/${player.slug}`}>Открыть мой профиль</Link>
-      </Button>
+      <div className="grid gap-2">
+        <Button asChild className="w-full">
+          <Link href="/me/profile">Редактировать анкету</Link>
+        </Button>
+        <Button asChild variant="outline" className="w-full">
+          <Link href={`/roster/players/${player.id}`}>Открыть мой профиль</Link>
+        </Button>
+      </div>
     </div>
   );
 }

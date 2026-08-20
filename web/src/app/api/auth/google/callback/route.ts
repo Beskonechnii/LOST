@@ -2,11 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { exchangeCode, googleConfigured } from "@/lib/google-oauth";
 import { prisma } from "@/lib/prisma";
-import { setSessionCookie } from "@/lib/player-session";
-import { effectiveRole, isOwnerEmail } from "@/lib/account";
+import { establishSession } from "@/lib/account";
 
 // Возврат от Google: сверяем state, меняем код на профиль, заводим/находим аккаунт по googleSub,
 // выдаём сессию и уводим на /me — там онбординг (новый профиль или заявка) или готовый кабинет.
+// Новый аккаунт заводится в статусе draft (дефолт схемы) — то есть попадает в воронку регистрации
+// сам, без «не забыть проставить» здесь.
 // Ошибки не роняем страницей, а возвращаем на /me с ?error — форма покажет человеку, что случилось.
 
 export const dynamic = "force-dynamic";
@@ -42,11 +43,8 @@ export async function GET(req: NextRequest) {
     ? await prisma.userAccount.update({ where: { id: existing.id }, data: { googleSub: user.sub, ...common } })
     : await prisma.userAccount.create({ data: { googleSub: user.sub, ...common } });
 
-  // Владелец (OWNER_EMAIL) закрепляется в БД при входе — чтобы он был виден в панели как owner,
-  // а не только жил в куке. Роль для куки берём эффективную (owner по почте перекрывает запись).
-  if (isOwnerEmail(account.email) && account.role !== "owner") {
-    await prisma.userAccount.update({ where: { id: account.id }, data: { role: "owner" } });
-  }
-  await setSessionCookie(account.id, effectiveRole(account));
+  // Сессию выдаёт общий establishSession: он же закрепляет владельца (OWNER_EMAIL) в БД — роль owner
+  // и статус active, чтобы владелец был виден в панели и не застревал в воронке регистрации.
+  await establishSession(account.id);
   return NextResponse.redirect(new URL("/me", req.url));
 }

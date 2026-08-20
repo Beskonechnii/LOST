@@ -66,7 +66,7 @@ async function main() {
     matchKey(m, m.teamA.slug, m.teamB.slug);
 
   const snapshot = {
-    version: 10, // 10 — вход по паролю: passwordHash/emailVerified, googleSub опционален
+    version: 11, // 11 — воронка регистрации и права: status/application/permissions у аккаунта
     exportedAt: new Date().toISOString(),
 
     teams: teams.map((t) => omit(t, "id")),
@@ -136,7 +136,8 @@ async function main() {
 
     // Аккаунты — реальные данные пользователей, а не производные: должны переживать db:import (зеркало),
     // иначе привязки и пароли потерялись бы. Ключ переноса — email (уникален и есть всегда, в отличие
-    // от googleSub — у парольного аккаунта его нет); профиль/заявка — по slug игрока.
+    // от googleSub — у парольного аккаунта его нет); профиль/заявка — по slug игрока. `reviewedById`
+    // не переносим: это id аккаунта, а id на другой машине другие — след «кто рассмотрел» не связь.
     accounts: accounts
       .map((a) => ({
         email: a.email,
@@ -146,6 +147,13 @@ async function main() {
         name: a.name,
         avatar: a.avatar,
         role: a.role,
+        permissions: a.permissions,
+        status: a.status,
+        application: a.application,
+        policyAcceptedAt: a.policyAcceptedAt,
+        submittedAt: a.submittedAt,
+        reviewedAt: a.reviewedAt,
+        rejectedReason: a.rejectedReason,
         createdAt: a.createdAt,
         playerSlug: a.player?.slug ?? null,
         claimSlug: a.claim?.slug ?? null,

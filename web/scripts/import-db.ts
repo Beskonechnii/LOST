@@ -28,9 +28,9 @@ const d = (v: string | Date | null | undefined) => (v ? new Date(v) : null);
 
 async function main() {
   const snap = JSON.parse(readFileSync(input, "utf8"));
-  if (snap.version !== 10) {
+  if (snap.version !== 11) {
     throw new Error(
-      `Снимок версии ${snap.version}, а нужен 10. Снимки не мигрируются: пересними базу свежим ` +
+      `Снимок версии ${snap.version}, а нужен 11. Снимки не мигрируются: пересними базу свежим ` +
         `scripts/export-db.ts на той машине, где данные актуальны.`,
     );
   }
@@ -224,6 +224,13 @@ async function main() {
         name: a.name ?? null,
         avatar: a.avatar ?? null,
         role: a.role ?? "player",
+        permissions: a.permissions ?? null,
+        status: a.status ?? "draft",
+        application: a.application ?? null,
+        policyAcceptedAt: d(a.policyAcceptedAt),
+        submittedAt: d(a.submittedAt),
+        reviewedAt: d(a.reviewedAt),
+        rejectedReason: a.rejectedReason ?? null,
         createdAt: d(a.createdAt) ?? new Date(),
         playerId: a.playerSlug ? playerId.get(a.playerSlug) ?? null : null,
         claimId: a.claimSlug ? playerId.get(a.claimSlug) ?? null : null,

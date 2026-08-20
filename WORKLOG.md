@@ -5,6 +5,60 @@
 
 ---
 
+## 2026-08-20 — Аккаунты, этап 1: фундамент доступа (воронка, права, отказ от писем)
+
+**Сделано** (по `ACCOUNTS-PLAN.md`, этап 1):
+- **Схема + миграция** `20260820170000_accounts_funnel_permissions`: у `UserAccount` появились `status`
+  (`draft` по умолчанию), `application`, `policyAcceptedAt`, `submittedAt`, `reviewedAt`, `reviewedById`,
+  `rejectedReason`, `permissions`; модель `AuthToken` удалена. Одноразовым `UPDATE` в той же миграции все
+  существующие аккаунты переведены в `active` — иначе действующие люди (включая владельца) заперлись бы
+  в воронке. `prisma generate` прогнан.
+- **`src/lib/permissions.ts`** (новый, чистый — как `roles.ts`): реестр 10 прав (ключ/подпись/группа/подсказка),
+  `parsePermissions`/`formatPermissions`/`permissionsOf`/`hasPermission`. Хранение — строка через запятую.
+- **`src/lib/account.ts`**: воронка (`AccountStatus`, `accountStatus` — владелец по `OWNER_EMAIL` всегда
+  `active`, `isActiveAccount`) и **гарды прав по БД** (`currentPermissions`, `can`, `requirePermission`) —
+  намеренно здесь, а не в `permissions.ts`: реестр должен оставаться чистым (его потянут чекбоксы UI),
+  а гард читает БД и сессию. `establishSession` теперь закрепляет владельцу и роль `owner`, и `active`;
+  google-callback переведён на неё (меньше дублей, новый аккаунт заводится `draft` дефолтом схемы).
+- **Почтовый флоу удалён:** файлы `mailer.ts`, `auth-tokens.ts`, `app-url.ts` (его единственным
+  потребителем были ссылки в письмах), роут `/api/auth/verify`, страница `/reset`; из `account.ts` ушли
+  `verifyEmail`/`resendVerification`/`startPasswordReset`/`completePasswordReset` и блок `emailVerified`
+  во входе; из форм `/me` — «Забыли пароль» и «выслать подтверждение», из `/me/security` — повторное
+  письмо. Регистрация теперь сразу выдаёт сессию и ведёт в кабинет (аккаунт всё равно в `draft`).
+  Плашка «почта подтверждена» показывается только когда `true` (её поднимает лишь Google).
+  Почтовые ключи убраны из `web/.env.example`.
+- **Снимок БД:** версия **10 → 11**, в аккаунтах добавлены `permissions`/`status`/`application`/даты/
+  `rejectedReason` (`reviewedById` не переносим — id на другой машине другие). `npm run db:export` прогнан.
+
+**Проверено:** `npx tsc --noEmit` — чисто (перед прогоном `rm -rf .next/dev/types`: валидатор помнил
+удалённые роуты). `npm run lint` — 1 ошибка + 1 предупреждение, обе предсуществующие и в чужих файлах
+(`admin/tp/_components/tp-admin.tsx`, `components/pouf/media.tsx`). В браузере (:4203): `/me` и
+`/me/security` под владельцем (блока повторного письма нет, «Почта — подтверждена Google»),
+`/admin/roles` и `/admin/claims` живы, `/reset` → 404, анонимный `/me` (fetch без кук) — без «Забыли
+пароль» и без «выслать подтверждение». Логика прогнана скриптом на **временном** аккаунте (заведён и
+удалён, в БД остались прежние 2): регистрация → `status=draft`, вход сразу после регистрации проходит
+(почта не подтверждена), неверный пароль отбивается, владелец с записью `draft` читается как `active`,
+админ без выданных прав получает `[]`, владелец — все 10.
+
+**Важно про данные:** аккаунт `mehhhh12221@…` в `dev.db` ещё **до** этого этапа (бэкап базы до миграции
+это подтверждает) пересоздан заново — без Google-привязки и без `playerId` (профиль `npq` отвязан).
+Свежий `snapshot.json` фиксирует это состояние; если привязку надо вернуть — это отдельная правка в
+`/admin/claims`, к этапу отношения не имеет.
+
+**Файлы:** `web/prisma/schema.prisma`, `web/prisma/migrations/20260820170000_accounts_funnel_permissions/`,
+`web/src/lib/{permissions.ts,account.ts}`, `web/src/app/(public)/me/{page.tsx,actions.ts,auth-forms.tsx}`,
+`web/src/app/(public)/me/security/{page.tsx,actions.ts,security-forms.tsx}`,
+`web/src/app/api/auth/google/callback/route.ts`, `web/scripts/{export-db.ts,import-db.ts}`,
+`web/data/snapshot.json`, `web/.env.example`, `CLAUDE.md`, `ARCHITECTURE.md`, `ACCOUNTS-PLAN.md`.
+Удалены: `web/src/lib/{mailer.ts,auth-tokens.ts,app-url.ts}`, `web/src/app/api/auth/verify/`,
+`web/src/app/(public)/reset/`.
+
+**Дальше:** этап 2 — публичная `/rules`, принудительная анкета на `/me` для `draft` (ссылки отдельными
+полями, заявленный MMR), согласие с политикой → `pending`. Возврат писем, если понадобится, — из коммита
+`3bcab36` (см. §2.4 плана).
+
+---
+
 ## 2026-08-20 — План: аккаунты, модерация регистраций, права админов
 
 **Сделано:** продуман и записан план большой задачи — `ACCOUNTS-PLAN.md` (добавлен в индекс доков в

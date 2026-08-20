@@ -14,16 +14,11 @@ export const metadata = { title: "Кабинет" };
 // профиля, его просмотр, а для админов/владельца — дверь в служебную часть. Публичная страница
 // (в needsAdmin не значится) — иначе входить было бы некуда.
 
-// Тексты сообщений из ?error/?ok, которыми callback/verify уводят обратно (коды — там же).
+// Тексты сообщений из ?error, которыми google-callback уводит обратно (коды — там же).
 const ERRORS: Record<string, string> = {
   off: "Вход через Google не настроен на этом сервере.",
   state: "Сессия входа истекла или не совпала. Попробуйте войти ещё раз.",
   google: "Google не подтвердил вход. Попробуйте ещё раз.",
-  verify: "Ссылка подтверждения недействительна или устарела. Войдите и запросите письмо заново.",
-};
-const OKS: Record<string, string> = {
-  verified: "Почта подтверждена — вы вошли. Добро пожаловать!",
-  reset: "Пароль обновлён — вы вошли.",
 };
 
 type Account = NonNullable<Awaited<ReturnType<typeof currentAccount>>>;
@@ -35,8 +30,8 @@ const ROLE_META: Record<Role, { label: string; cls: string }> = {
   player: { label: "Игрок", cls: "border-sky-800/60 bg-sky-950/40 text-sky-300" },
 };
 
-export default async function AccountPage({ searchParams }: { searchParams: Promise<{ error?: string; ok?: string }> }) {
-  const { error, ok } = await searchParams;
+export default async function AccountPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const { error } = await searchParams;
   const account = await currentAccount();
   const role = account ? effectiveRole(account) : null;
 
@@ -55,9 +50,6 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         <div className="rounded-2xl border border-hairline bg-surface-1/60 p-5 shadow-xl shadow-black/20 backdrop-blur">
           {error && ERRORS[error] && (
             <p className="mb-4 rounded-lg border border-rose-900 bg-rose-950/40 px-3 py-2 text-sm text-rose-300">{ERRORS[error]}</p>
-          )}
-          {ok && OKS[ok] && (
-            <p className="mb-4 rounded-lg border border-emerald-900 bg-emerald-950/40 px-3 py-2 text-sm text-emerald-300">{OKS[ok]}</p>
           )}
 
           {!account || !role ? (
@@ -117,13 +109,11 @@ function ProfileCard({ account, role }: { account: Account; role: Role }) {
       {/* Роль — обязательно на виду */}
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${meta.cls}`}>{meta.label}</span>
-        {account.emailVerified ? (
+        {/* Плашка только у подтверждённой почты: её поднимает лишь Google, а «не подтверждена»
+            после отказа от писем ничего не значит — подтверждать нечем */}
+        {account.emailVerified && (
           <span className="rounded-full border border-emerald-800/60 bg-emerald-950/30 px-2.5 py-0.5 text-xs text-emerald-400">
             почта подтверждена
-          </span>
-        ) : (
-          <span className="rounded-full border border-amber-800/60 bg-amber-950/30 px-2.5 py-0.5 text-xs text-amber-400">
-            почта не подтверждена
           </span>
         )}
       </div>

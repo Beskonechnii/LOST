@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { currentAccountId, clearSessionCookie } from "@/lib/player-session";
-import { changePassword, deleteOwnAccount, resendVerification, loadAccount } from "@/lib/account";
+import { changePassword, deleteOwnAccount } from "@/lib/account";
 
 // Управление своим входом из кабинета. Все действия берут id аккаунта из сессии, а не из формы.
 
@@ -25,16 +25,6 @@ export async function savePassword(_state: SecState, form: FormData): Promise<Se
   revalidatePath("/me/security");
   revalidatePath("/me");
   return { ok: "Пароль сохранён." };
-}
-
-/** Повторно выслать письмо-подтверждение на почту текущего аккаунта. Email берём из сессии, не из формы,
- *  чтобы вошедший не рассылал подтверждения на чужие адреса. */
-export async function resendVerify(): Promise<SecState> {
-  const accountId = await currentAccountId();
-  if (accountId == null) return { error: "Сессия истекла — войдите снова" };
-  const account = await loadAccount(accountId);
-  if (account) await resendVerification(account.email);
-  return { ok: "Письмо отправлено — проверьте почту." };
 }
 
 /** Удалить свой аккаунт: рвём вход, гасим сессию, уводим на страницу входа. Профиль игрока остаётся. */

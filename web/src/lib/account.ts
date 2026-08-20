@@ -8,9 +8,7 @@ import { currentAccountId, setSessionCookie } from "./player-session";
 import type { Role } from "./player-auth";
 import { slugify, accountIdFromUrl, normalizeTelegram, parseBirthday } from "./profiles";
 import { hashPassword, verifyPassword, passwordProblem } from "./password";
-import { issueToken, consumeToken } from "./auth-tokens";
-import { sendVerifyEmail, sendResetEmail } from "./mailer";
-import { appUrl } from "./app-url";
+import { hasPermission, permissionsOf, type PermissionKey } from "./permissions";
 
 /** Аккаунт по id — вместе с привязанным профилем и заявкой (обе связи опциональны). */
 export function loadAccount(id: number) {
@@ -49,6 +47,55 @@ export function effectiveRole(account: { email: string; role: string }): Role {
 export async function currentRole(): Promise<Role | null> {
   const acc = await currentAccount();
   return acc ? effectiveRole(acc) : null;
+}
+
+// ── воронка регистрации ───────────────────────────────────────────────────────
+//
+// Регистрация — это заявка, а не пропуск: вошёл → draft (анкеты нет) → pending (анкета отправлена)
+// → active (одобрен) либо rejected (отказ с причиной, анкету можно поправить и отправить снова).
+// Сам Player заводится только при апруве — иначе неодобренный сразу попал бы в публичный ростер
+// (витрины читают Player без фильтров). Владелец вне воронки: он всегда active, иначе, зачистив
+// базу, он запер бы сам себя — апрувить его было бы некому.
+
+export type AccountStatus = "draft" | "pending" | "active" | "rejected";
+
+const STATUSES: AccountStatus[] = ["draft", "pending", "active", "rejected"];
+
+/** Статус, с которым аккаунт реально живёт: у владельца по OWNER_EMAIL всегда active. */
+export function accountStatus(account: { email: string; status: string }): AccountStatus {
+  if (isOwnerEmail(account.email)) return "active";
+  return STATUSES.includes(account.status as AccountStatus) ? (account.status as AccountStatus) : "draft";
+}
+
+/** Одобрен ли аккаунт (прошёл модерацию). */
+export const isActiveAccount = (account: { email: string; status: string }) => accountStatus(account) === "active";
+
+// ── гранулярные права ─────────────────────────────────────────────────────────
+//
+// Реестр прав — чистый permissions.ts, а гарды здесь: они читают БД. Роль вшита в подписанную куку и
+// обновляется лишь при следующем входе, для прав это неприемлемо — снял право, оно обязано пропасть
+// сразу. Служебная часть не горячий путь, лишний запрос там дешевле дырки в доступе.
+
+/** Права вошедшего: пусто, если не вошёл. */
+export async function currentPermissions(): Promise<PermissionKey[]> {
+  const acc = await currentAccount();
+  return acc ? permissionsOf(effectiveRole(acc), acc.permissions) : [];
+}
+
+/** Есть ли у вошедшего право — для «показывать ли плитку/подвкладку». Не бросает. */
+export async function can(key: PermissionKey): Promise<boolean> {
+  const acc = await currentAccount();
+  return !!acc && hasPermission(effectiveRole(acc), acc.permissions, key);
+}
+
+/** Гард страницы/экшена/роута: вернуть аккаунт с правом или бросить. Гейт в роуте обязателен —
+ *  страницу можно и не открывать, дойдя до API напрямую. */
+export async function requirePermission(key: PermissionKey): Promise<Account> {
+  const acc = await currentAccount();
+  if (!acc || !hasPermission(effectiveRole(acc), acc.permissions, key)) {
+    throw new Error("Недостаточно прав");
+  }
+  return acc;
 }
 
 /** Свободный slug на основе ника: `nick`, `nick-2`, `nick-3`… — slug уникален у Player. */
@@ -250,17 +297,20 @@ export async function requireOwner() {
 // Второй способ входа рядом с Google. Ключ аккаунта — email (уникален): один человек ↔ один аккаунт,
 // хоть Google, хоть пароль, хоть оба. Правила безопасности:
 //   • регистрация НЕ трогает уже существующий email — иначе, зная чужую почту, можно было бы
-//     подсадить свой пароль в чужой Google-аккаунт (перехват). Забыл/хочет пароль — через сброс.
-//   • сброс/подтверждение доказывают владение почтой (ссылка приходит на неё) — только они ставят
-//     пароль существующему аккаунту и поднимают emailVerified.
-//   • вход по паролю закрыт до подтверждения почты; Google-вход подтверждён самим Google.
+//     подсадить свой пароль в чужой Google-аккаунт (перехват).
+//   • писем нет вообще (почтовый флоу убран), поэтому подтверждение почты не гейт входа: вход по
+//     паролю открыт сразу, а `emailVerified` поднимает только Google. Пускать внутрь не страшно —
+//     новый аккаунт всё равно попадает в воронку (draft) и до апрува ничего в лиге не значит.
+//   • «забыли пароль» из-за этого не работает: пути обхода — вход через Google той же почтой либо
+//     удаление аккаунта и повторная регистрация (см. ACCOUNTS-PLAN.md §2.4).
 
-/** Выдать сессию аккаунту с правильной ролью: владельца по OWNER_EMAIL закрепляем в БД (как в OAuth). */
+/** Выдать сессию аккаунту с правильной ролью: владельца по OWNER_EMAIL закрепляем в БД (как в OAuth):
+ *  роль owner и статус active — он вне воронки, апрувить его некому. */
 export async function establishSession(accountId: number): Promise<void> {
   const account = await prisma.userAccount.findUnique({ where: { id: accountId } });
   if (!account) return;
-  if (isOwnerEmail(account.email) && account.role !== "owner") {
-    await prisma.userAccount.update({ where: { id: account.id }, data: { role: "owner" } });
+  if (isOwnerEmail(account.email) && (account.role !== "owner" || account.status !== "active")) {
+    await prisma.userAccount.update({ where: { id: account.id }, data: { role: "owner", status: "active" } });
   }
   await setSessionCookie(account.id, effectiveRole(account));
 }
@@ -275,15 +325,10 @@ export function emailProblem(email: string): string | null {
   return EMAIL_RE.test(normEmail(email)) ? null : "Введите корректный email";
 }
 
-/** Отправить письмо с подтверждением почты аккаунту (выпуск токена + ссылка). */
-async function sendVerification(accountId: number, email: string): Promise<void> {
-  const token = await issueToken(accountId, "verify");
-  await sendVerifyEmail(email, `${await appUrl()}/api/auth/verify?token=${token}`);
-}
+export type RegisterResult = { ok: true; accountId: number } | { ok: false; error: string };
 
-export type RegisterResult = { ok: true } | { ok: false; error: string };
-
-/** Регистрация по email + паролю. Заводит аккаунт (почта не подтверждена) и шлёт письмо-подтверждение. */
+/** Регистрация по email + паролю. Заводит аккаунт в статусе draft (дефолт схемы) и отдаёт его id —
+ *  сессию выдаёт вызывающий, а дальше кабинет требует анкету. Писем не шлём: почтового флоу нет. */
 export async function registerWithPassword(email: string, password: string, name: string): Promise<RegisterResult> {
   const mail = normEmail(email);
   const ep = emailProblem(mail);
@@ -292,18 +337,15 @@ export async function registerWithPassword(email: string, password: string, name
   if (pp) return { ok: false, error: pp };
 
   const existing = await prisma.userAccount.findUnique({ where: { email: mail }, select: { id: true } });
-  if (existing) return { ok: false, error: "Почта уже занята. Войдите или восстановите пароль." };
+  if (existing) return { ok: false, error: "Почта уже занята — войдите под ней." };
 
   const account = await prisma.userAccount.create({
     data: { email: mail, passwordHash: hashPassword(password), name: name.trim() || null },
   });
-  await sendVerification(account.id, mail);
-  return { ok: true };
+  return { ok: true, accountId: account.id };
 }
 
-export type LoginResult =
-  | { ok: true; accountId: number }
-  | { ok: false; error: string; unverified?: boolean };
+export type LoginResult = { ok: true; accountId: number } | { ok: false; error: string };
 
 /** Вход по email + паролю. Возвращает id аккаунта для выдачи сессии, либо ошибку. */
 export async function loginWithPassword(email: string, password: string): Promise<LoginResult> {
@@ -313,47 +355,7 @@ export async function loginWithPassword(email: string, password: string): Promis
   if (!account || !verifyPassword(password, account.passwordHash)) {
     return { ok: false, error: "Неверная почта или пароль" };
   }
-  if (!account.emailVerified) {
-    return { ok: false, error: "Почта не подтверждена — проверьте письмо", unverified: true };
-  }
   return { ok: true, accountId: account.id };
-}
-
-/** Повторно выслать подтверждение почты (если аккаунт есть и ещё не подтверждён). Молча — без утечки. */
-export async function resendVerification(email: string): Promise<void> {
-  const account = await prisma.userAccount.findUnique({ where: { email: normEmail(email) } });
-  if (account && !account.emailVerified) await sendVerification(account.id, account.email);
-}
-
-/** Подтверждение почты по токену из письма. Возвращает id аккаунта (для выдачи сессии) или null. */
-export async function verifyEmail(token: string): Promise<number | null> {
-  const accountId = await consumeToken(token, "verify");
-  if (accountId == null) return null;
-  await prisma.userAccount.update({ where: { id: accountId }, data: { emailVerified: true } });
-  return accountId;
-}
-
-/** Запрос сброса пароля: шлём ссылку, если аккаунт есть. Наружу всегда «письмо отправлено» — без утечки. */
-export async function startPasswordReset(email: string): Promise<void> {
-  const account = await prisma.userAccount.findUnique({ where: { email: normEmail(email) } });
-  if (!account) return;
-  const token = await issueToken(account.id, "reset");
-  await sendResetEmail(account.email, `${await appUrl()}/reset?token=${token}`);
-}
-
-export type ResetResult = { ok: true; accountId: number } | { ok: false; error: string };
-
-/** Завершение сброса: гасим токен, ставим новый пароль. Сброс доказывает почту → и подтверждаем её. */
-export async function completePasswordReset(token: string, password: string): Promise<ResetResult> {
-  const pp = passwordProblem(password);
-  if (pp) return { ok: false, error: pp };
-  const accountId = await consumeToken(token, "reset");
-  if (accountId == null) return { ok: false, error: "Ссылка недействительна или устарела. Запросите сброс заново." };
-  await prisma.userAccount.update({
-    where: { id: accountId },
-    data: { passwordHash: hashPassword(password), emailVerified: true },
-  });
-  return { ok: true, accountId };
 }
 
 // ── управление своим входом из кабинета (уже вошедший игрок) ────────────────────
@@ -381,7 +383,7 @@ export async function changePassword(
 }
 
 /** Удалить свой аккаунт. Профиль игрока (Player) и его турнирная история остаются — рвётся только вход
- *  (Player.account через onDelete: SetNull; токены гасятся каскадом). Q4 концепта. */
+ *  (Player.account через onDelete: SetNull). Q4 концепта. */
 export async function deleteOwnAccount(accountId: number): Promise<void> {
   await prisma.userAccount.delete({ where: { id: accountId } });
 }

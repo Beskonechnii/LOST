@@ -1,16 +1,19 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { currentAccount } from "@/lib/account";
-import { PasswordForm, ResendVerify, DeleteAccount } from "./security-forms";
+import { PasswordForm, DeleteAccount } from "./security-forms";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Вход и защита" };
 
-// Отдельная приватная страница управления входом (решение Q5): способы входа, пароль, подтверждение
-// почты, удаление аккаунта. Доступна любому вошедшему — привязка к игроку тут не нужна.
+// Отдельная приватная страница управления входом (решение Q5): способы входа, пароль, удаление
+// аккаунта. Доступна любому вошедшему — привязка к игроку тут не нужна.
+//
+// Писем в проекте нет, поэтому подтверждать почту тут нечем: строку «Почта» показываем, только
+// когда её подтвердил Google (ACCOUNTS-PLAN.md §3).
 
 /** Строка статуса способа входа — как «connected accounts» на привычных сайтах. */
-function MethodRow({ label, on, onText, offText }: { label: string; on: boolean; onText: string; offText: string }) {
+function MethodRow({ label, on, onText, offText }: { label: string; on: boolean; onText: string; offText?: string }) {
   return (
     <div className="flex items-center justify-between py-2">
       <span className="text-sm text-ink">{label}</span>
@@ -59,13 +62,8 @@ export default async function SecurityPage() {
           <div className="divide-y divide-hairline">
             <MethodRow label="Google" on={hasGoogle} onText="привязан" offText="не привязан" />
             <MethodRow label="Пароль" on={hasPassword} onText="задан" offText="не задан" />
-            <MethodRow label="Почта" on={account.emailVerified} onText="подтверждена" offText="не подтверждена" />
+            {account.emailVerified && <MethodRow label="Почта" on onText="подтверждена Google" />}
           </div>
-          {!account.emailVerified && (
-            <div className="mt-3">
-              <ResendVerify />
-            </div>
-          )}
         </Section>
 
         <Section

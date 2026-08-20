@@ -8,8 +8,6 @@ import {
   claimExisting,
   registerWithPassword,
   loginWithPassword,
-  startPasswordReset,
-  resendVerification,
   establishSession,
 } from "@/lib/account";
 
@@ -24,10 +22,11 @@ export async function logout(): Promise<void> {
 
 // ── вход/регистрация по email + паролю ─────────────────────────────────────────
 
-// Состояние форм входа: текст ошибки, флаг «покажи ссылку подтвердить/выслать снова», флаг «готово».
-export type AuthState = { error?: string; unverified?: boolean; done?: string } | null;
+// Состояние форм входа: только текст ошибки — успех уводит редиректом, показывать нечего.
+export type AuthState = { error?: string } | null;
 
-/** Регистрация: заводим аккаунт и шлём письмо-подтверждение. В сессию НЕ пускаем до подтверждения. */
+/** Регистрация: заводим аккаунт и сразу пускаем в кабинет. Писем нет — подтверждать нечего, а до
+ *  апрува аккаунт всё равно в воронке (draft) и в лиге ничего не значит. */
 export async function register(_state: AuthState, form: FormData): Promise<AuthState> {
   const email = String(form.get("email") ?? "");
   const password = String(form.get("password") ?? "");
@@ -36,29 +35,18 @@ export async function register(_state: AuthState, form: FormData): Promise<AuthS
   if (password !== confirm) return { error: "Пароли не совпадают" };
   const res = await registerWithPassword(email, password, name);
   if (!res.ok) return { error: res.error };
-  return { done: "Готово! Мы отправили письмо со ссылкой подтверждения на вашу почту." };
-}
-
-/** Вход по паролю: успех → сессия и redirect в кабинет; неподтверждённая почта → предложить выслать снова. */
-export async function login(_state: AuthState, form: FormData): Promise<AuthState> {
-  const email = String(form.get("email") ?? "");
-  const password = String(form.get("password") ?? "");
-  const res = await loginWithPassword(email, password);
-  if (!res.ok) return { error: res.error, unverified: res.unverified };
   await establishSession(res.accountId);
   redirect("/me");
 }
 
-/** Повторно выслать подтверждение почты. Всегда «отправлено» — не выдаём, есть ли такой аккаунт. */
-export async function resend(_state: AuthState, form: FormData): Promise<AuthState> {
-  await resendVerification(String(form.get("email") ?? ""));
-  return { done: "Если аккаунт есть и не подтверждён — письмо отправлено повторно." };
-}
-
-/** Запрос сброса пароля с формы кабинета. Ответ одинаковый независимо от того, есть ли почта. */
-export async function forgot(_state: AuthState, form: FormData): Promise<AuthState> {
-  await startPasswordReset(String(form.get("email") ?? ""));
-  return { done: "Если такая почта зарегистрирована — мы отправили на неё ссылку для сброса пароля." };
+/** Вход по паролю: успех → сессия и redirect в кабинет. */
+export async function login(_state: AuthState, form: FormData): Promise<AuthState> {
+  const email = String(form.get("email") ?? "");
+  const password = String(form.get("password") ?? "");
+  const res = await loginWithPassword(email, password);
+  if (!res.ok) return { error: res.error };
+  await establishSession(res.accountId);
+  redirect("/me");
 }
 
 /** Новый игрок завёл профиль по нику — создаём и уводим на его страницу в ростере. */

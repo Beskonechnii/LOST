@@ -1,12 +1,12 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
-import { savePassword, resendVerify, deleteAccount, type SecState } from "./actions";
+import { useActionState, useState } from "react";
+import { savePassword, deleteAccount, type SecState } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-// Формы вкладки «Вход и защита»: смена/задание пароля, повторное письмо-подтверждение, удаление аккаунта.
+// Формы вкладки «Вход и защита»: смена/задание пароля и удаление аккаунта.
 
 const box = {
   error: "rounded-md border border-rose-900 bg-rose-950/40 px-3 py-2 text-sm text-rose-300",
@@ -44,28 +44,6 @@ export function PasswordForm({ hasPassword }: { hasPassword: boolean }) {
       {state?.error && <p className={box.error}>{state.error}</p>}
       {state?.ok && <p className={box.done}>{state.ok}</p>}
     </form>
-  );
-}
-
-/** Кнопка «выслать письмо-подтверждение снова» — для неподтверждённой почты. Email берётся из сессии
- *  на сервере, форме передавать нечего — потому просто вызов action через transition. */
-export function ResendVerify() {
-  const [state, setState] = useState<SecState>(null);
-  const [pending, start] = useTransition();
-  return (
-    <div className="space-y-2">
-      <Button
-        type="button"
-        variant="outline"
-        disabled={pending}
-        className="w-full"
-        onClick={() => start(async () => setState(await resendVerify()))}
-      >
-        {pending ? "Отправляю…" : "Выслать письмо-подтверждение"}
-      </Button>
-      {state?.ok && <p className={box.done}>{state.ok}</p>}
-      {state?.error && <p className={box.error}>{state.error}</p>}
-    </div>
   );
 }
 

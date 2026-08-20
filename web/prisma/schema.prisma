@@ -84,8 +84,8 @@ model UserAccount {
   // Хеш пароля (scrypt, формат `salt:hash` hex — см. src/lib/password.ts). null = входа по паролю нет,
   // только через Google. Сам пароль в БД не хранится нигде.
   passwordHash String?
-  // Подтверждена ли почта. Google-вход подтверждён самим Google (ставим true в callback); при
-  // регистрации паролем — false до перехода по ссылке из письма (src/lib/auth-tokens.ts).
+  // Подтверждена ли почта. Гейтом входа НЕ является: почтовый флоу убран (писем нет), поэтому
+  // true ставит только Google-вход — и значит это честно «почту подтвердил Google».
   emailVerified Boolean @default(false)
   name      String? // имя (из google-профиля или введённое при регистрации) — для списка заявок
   avatar    String? // ссылка на аватар google
@@ -93,32 +93,33 @@ model UserAccount {
   // OWNER_EMAIL (src/lib/account.ts): совпал email при входе — роль owner, и её нельзя отобрать из UI.
   // admin раздаёт владелец в панели ролей; проверка доступа в proxy читает роль из подписанной куки.
   role      String   @default("player")
+  // Гранулярные права админа: ключи через запятую (как Player.tags — sqlite не умеет массивы, а
+  // таблица ради десятка флагов избыточна). Канон ключей — src/lib/permissions.ts. У владельца
+  // права все и неявно, поле ему не нужно.
+  permissions String?
+
+  // Воронка регистрации: draft (вошёл, анкеты нет) | pending (анкета отправлена, ждёт решения) |
+  // active (одобрен) | rejected (отказ с причиной, можно поправить анкету и отправить снова).
+  // Дефолт именно draft, чтобы новый аккаунт — в том числе заведённый Google-callback'ом — попадал
+  // в воронку сам, без «не забыть проставить» в каждом месте создания. Владелец (OWNER_EMAIL) вне
+  // воронки: он всегда active, иначе апрувить его было бы некому (src/lib/account.ts).
+  status String @default("draft")
+  // Анкета-заявка целиком, JSON (src/lib/account.ts). Player из неё создаётся только при апруве:
+  // публичные витрины читают Player без фильтров, и заведённый заранее неодобренный сразу попал бы
+  // в ростер.
+  application      String?
+  policyAcceptedAt DateTime? // когда согласился с политикой площадки (/rules)
+  submittedAt      DateTime? // когда отправил заявку — по нему порядок очереди модерации
+  reviewedAt       DateTime? // когда рассмотрели
+  reviewedById     Int? // кто рассмотрел (id аккаунта). Без relation: это след в истории, а не связь
+  rejectedReason   String? // причина отказа — человек видит её в кабинете и правит анкету
 
   player   Player? @relation("AccountPlayer", fields: [playerId], references: [id], onDelete: SetNull)
   playerId Int?    @unique // подтверждённая привязка; уникальна — один профиль на один аккаунт
   claim    Player? @relation("AccountClaim", fields: [claimId], references: [id], onDelete: SetNull)
   claimId  Int? // заявка на существующего игрока, ждёт подтверждения оператора
 
-  tokens    AuthToken[]
   createdAt DateTime @default(now())
-}
-
-/// Одноразовый токен: подтверждение почты (`verify`) или сброс пароля (`reset`). В БД лежит только
-/// sha256-хеш токена — сам токен уходит человеку в ссылке письма и в базе не хранится (утечка БД не
-/// раздаёт доступы). Гасится при использовании (`usedAt`) и протухает по сроку. В снапшот НЕ входит:
-/// эфемерный, как DraftSession — протух за час/сутки, переносить нечего.
-model AuthToken {
-  id        Int       @id @default(autoincrement())
-  tokenHash String    @unique // sha256(raw) hex — ищем по нему, не зная самого токена
-  purpose   String    // verify | reset (src/lib/auth-tokens.ts)
-  expiresAt DateTime
-  usedAt    DateTime? // проставляется при погашении; повторно тот же токен не сработает
-  createdAt DateTime  @default(now())
-
-  account   UserAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  accountId Int
-
-  @@index([accountId])
 }
 
 /// Место игрока в составе команды. Роль и капитанство живут здесь, а не у игрока: один человек

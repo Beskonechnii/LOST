@@ -65,6 +65,13 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           ) : (
             <div className="space-y-4">
               <ProfileCard account={account} role={role} />
+              <Link
+                href="/me/security"
+                className="flex items-center justify-between gap-2 rounded-xl border border-hairline bg-surface-2/40 px-4 py-3 text-sm transition-colors hover:border-accent"
+              >
+                <span className="text-ink">Вход и защита</span>
+                <span className="text-xs text-ink-subtle">пароль, способы входа →</span>
+              </Link>
               {role !== "player" && <AdminEntry role={role} />}
               {account.player ? (
                 <Linked account={account} />

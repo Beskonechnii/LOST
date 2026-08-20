@@ -355,3 +355,33 @@ export async function completePasswordReset(token: string, password: string): Pr
   });
   return { ok: true, accountId };
 }
+
+// ── управление своим входом из кабинета (уже вошедший игрок) ────────────────────
+
+/** Сменить (или задать впервые) пароль из кабинета. Текущий пароль спрашиваем, только если он есть —
+ *  у входившего лишь через Google его нет, а владение аккаунтом уже доказано активной сессией. */
+export async function changePassword(
+  accountId: number,
+  current: string,
+  next: string,
+): Promise<string | null> {
+  const account = await prisma.userAccount.findUnique({
+    where: { id: accountId },
+    select: { passwordHash: true },
+  });
+  if (!account) return "Сессия истекла — войдите снова";
+  // Пароль уже задан → без верного текущего менять нельзя (защита от смены по угнанной сессии).
+  if (account.passwordHash && !verifyPassword(current, account.passwordHash)) {
+    return "Текущий пароль неверен";
+  }
+  const pp = passwordProblem(next);
+  if (pp) return pp;
+  await prisma.userAccount.update({ where: { id: accountId }, data: { passwordHash: hashPassword(next) } });
+  return null;
+}
+
+/** Удалить свой аккаунт. Профиль игрока (Player) и его турнирная история остаются — рвётся только вход
+ *  (Player.account через onDelete: SetNull; токены гасятся каскадом). Q4 концепта. */
+export async function deleteOwnAccount(accountId: number): Promise<void> {
+  await prisma.userAccount.delete({ where: { id: accountId } });
+}

@@ -93,6 +93,9 @@ model TeamApplication {
   payload      String
   status       String   @default("pending") // pending | approved | rejected
   notes        String? // причина возврата — её видит подавший
+  /// Кто подал (id аккаунта) — заполнено у заявок с сайта, у импорта пусто. Без relation, как
+  /// reviewedById: это след «чью заявку показывать в кабинете», а не связь (id на машинах разные).
+  submittedById Int?
   submittedAt  DateTime @default(now())
   reviewedAt   DateTime?
   reviewedById Int? // след в истории, без relation — как UserAccount.reviewedById

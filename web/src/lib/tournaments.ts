@@ -175,6 +175,14 @@ export async function setTournamentStatus(id: number, status: string) {
   return prisma.tournament.update({ where: { id }, data: { status } });
 }
 
+/**
+ * Открыт ли приём заявок: статус «Приём заявок» и срок не прошёл. Одно место правды — правило
+ * нужно и странице заявки (показывать ли форму), и записи (`submitTeamApplication`), а два
+ * одинаковых условия в разных файлах однажды разъедутся.
+ */
+export const registrationOpen = (t: { status: string; regCloseAt: Date | null }): boolean =>
+  t.status === "registration" && (!t.regCloseAt || t.regCloseAt.getTime() > Date.now());
+
 // ── дивизионы ────────────────────────────────────────────────────────────────
 
 export type DivisionInput = {

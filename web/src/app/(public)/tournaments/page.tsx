@@ -33,6 +33,11 @@ export default async function TournamentsIndex() {
                 {t.divisions.length > 0 && ` · ${t.divisions.map((d) => d.short ?? d.slug).join(", ")}`}
               </p>
               {t.description && <p className="mt-2 line-clamp-3 text-sm text-ink-muted">{t.description}</p>}
+              {t.status === "registration" && (
+                <Link href={`/tournaments/${t.slug}/apply`} className="mt-2 inline-block text-sm text-accent-bright hover:underline">
+                  Подать заявку командой →
+                </Link>
+              )}
             </li>
           ))}
         </ul>

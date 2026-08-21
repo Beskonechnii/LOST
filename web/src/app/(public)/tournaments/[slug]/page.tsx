@@ -37,6 +37,17 @@ export default async function TournamentPage({ params }: { params: Promise<{ slu
       <h1 className="mt-2 text-2xl font-black tracking-tight">{tournament.name}</h1>
       <p className="mt-1.5 text-sm text-ink-subtle">{facts.join(" · ")}</p>
 
+      {tournament.status === "registration" && (
+        <p className="mt-4">
+          <Link
+            href={`/tournaments/${tournament.slug}/apply`}
+            className="rounded-[14px] bg-purple px-4 py-2 text-sm font-black text-[var(--on-accent)] cushion-control"
+          >
+            Подать заявку командой
+          </Link>
+        </p>
+      )}
+
       {tournament.description && (
         <p className="mt-4 max-w-3xl whitespace-pre-line text-sm text-ink-muted">{tournament.description}</p>
       )}

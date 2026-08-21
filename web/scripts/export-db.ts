@@ -127,7 +127,9 @@ async function main() {
 
     teamApplications: applications
       .map((a) => ({
-        ...omit(a, "id", "tournamentId", "divisionId", "teamId", "tournament", "division", "team", "reviewedById"),
+        // reviewedById/submittedById не переносим: это id аккаунтов, а они на машинах разные —
+        // след в истории, а не связь (то же правило, что у UserAccount.reviewedById).
+        ...omit(a, "id", "tournamentId", "divisionId", "teamId", "tournament", "division", "team", "reviewedById", "submittedById"),
         tournamentSlug: a.tournament.slug,
         divisionKey: divKey(a.division),
         teamSlug: a.team?.slug ?? null,

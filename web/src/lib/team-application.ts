@@ -11,7 +11,7 @@
 import { prisma } from "./prisma";
 import { slugify, playerAccountId } from "./profiles";
 import { isCoreRole, spotConflict } from "./roster-spots";
-import { setTeamDivision } from "./tournaments";
+import { registrationOpen, setTeamDivision } from "./tournaments";
 import type { TeamDraft, PlayerDraft } from "./roster-import";
 
 export type { TeamDraft, PlayerDraft };
@@ -57,6 +57,57 @@ export async function createApplications(
   }
   return teams.length;
 }
+
+/**
+ * Заявка капитана с сайта. Отдельно от `createApplications` (импорта) по трём причинам: её подаёт
+ * не оператор, а человек снаружи; её нужно проверить на месте (пустые поля, слишком короткий
+ * состав); и у неё есть автор — по нему кабинет показывает статус.
+ *
+ * Приём заявок открыт только у турнира в статусе `registration` и до `regCloseAt` — проверяем
+ * здесь, а не только в форме: до экшена можно дойти и мимо страницы.
+ */
+export async function submitTeamApplication(
+  accountId: number,
+  tournamentId: number,
+  divisionId: number | null,
+  draft: TeamDraft,
+) {
+  const tournament = await prisma.tournament.findUnique({ where: { id: tournamentId } });
+  if (!tournament) throw new Error("Турнир не найден");
+  if (!registrationOpen(tournament)) throw new Error("Приём заявок на этот турнир закрыт");
+
+  const name = draft.name.trim();
+  if (!name) throw new Error("Укажите название команды");
+  const players = draft.players.filter((p) => p.nickname.trim());
+  if (players.length < 5) throw new Error("В составе должно быть не меньше пяти игроков");
+
+  // Одна команда — одна заявка на турнир: повторную отправку трактуем как правку прежней, пока по
+  // ней не приняли решение. Иначе очередь заполняется дублями одного и того же состава.
+  const mine = await prisma.teamApplication.findFirst({
+    where: { tournamentId, submittedById: accountId, status: "pending" },
+  });
+  const data = {
+    tournamentId,
+    divisionId,
+    source: "web",
+    payload: formatDraft({ ...draft, name, players, slug: draft.slug || slugify(name) }),
+    submittedById: accountId,
+    status: "pending",
+    notes: null,
+    submittedAt: new Date(),
+  };
+  return mine
+    ? prisma.teamApplication.update({ where: { id: mine.id }, data })
+    : prisma.teamApplication.create({ data });
+}
+
+/** Заявки, поданные этим аккаунтом — кабинет показывает их статус и причину возврата. */
+export const myApplications = (accountId: number, tournamentId?: number) =>
+  prisma.teamApplication.findMany({
+    where: { submittedById: accountId, ...(tournamentId ? { tournamentId } : {}) },
+    orderBy: { submittedAt: "desc" },
+    include: { tournament: true, division: true },
+  });
 
 // ── проверки до записи ───────────────────────────────────────────────────────
 

@@ -58,6 +58,18 @@ export default async function TournamentPage({ params }: { params: Promise<{ slu
         </span>
       </div>
 
+      <nav className="mt-3 flex flex-wrap gap-3 text-sm">
+        <Link href={`/admin/tournaments/${tournament.slug}/import`} className="text-accent-bright hover:underline">
+          Импорт составов →
+        </Link>
+        <Link href={`/admin/tournaments/${tournament.slug}/registrations`} className="text-accent-bright hover:underline">
+          Заявки команд →
+        </Link>
+        <Link href={`/tournaments/${tournament.slug}`} className="text-ink-subtle hover:text-ink">
+          Публичная страница →
+        </Link>
+      </nav>
+
       <section className="mt-4 rounded-lg border border-hairline bg-surface-1 p-4">
         <h2 className="text-sm font-semibold">Статус</h2>
         <p className="mt-1 text-xs text-ink-subtle">

@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { currentAccount, requirePermission } from "@/lib/account";
-import { approveApplication, deleteApplication, rejectApplication } from "@/lib/team-application";
+import { approveApplication, deleteApplication, formatDraft, parseDraft, rejectApplication } from "@/lib/team-application";
+import { enrichTeam } from "@/lib/enrich";
 import { prisma } from "@/lib/prisma";
 
 // Решения по заявкам команд. Право проверяется здесь, у самой записи: страницу можно и не
@@ -49,6 +50,22 @@ export async function reject(_prev: ReviewState, form: FormData): Promise<Review
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Не удалось вернуть заявку" };
   }
+}
+
+/**
+ * Дотянуть данные по заявке, уже лежащей в очереди: заявка могла приехать из бота или из файла без
+ * ссылок, и обогащать её на импорте было нечего. Результат пишем обратно в payload — заявка остаётся
+ * единственным местом, где живёт состав до апрува.
+ */
+export async function enrich(form: FormData): Promise<void> {
+  await requirePermission("tournaments.edit");
+  const id = Number(form.get("id"));
+  const application = await prisma.teamApplication.findUnique({ where: { id } });
+  const draft = application ? parseDraft(application.payload) : null;
+  if (!draft) return;
+  const { team } = await enrichTeam(draft);
+  await prisma.teamApplication.update({ where: { id }, data: { payload: formatDraft(team) } });
+  revalidatePath(path(String(form.get("tournamentSlug") ?? "")));
 }
 
 export async function remove(form: FormData): Promise<void> {

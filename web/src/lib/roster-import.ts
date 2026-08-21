@@ -25,6 +25,12 @@ export type PlayerDraft = {
   steamUrl: string | null;
   telegram: string | null;
   isCaptain: boolean;
+  /** Подтянутое из OpenDota (src/lib/enrich.ts) — в заявке живёт как справка. */
+  rank?: number | null;
+  /** Ник в клиенте Доты: не переписываем им заявку, но расхождение показываем оператору. */
+  dotaName?: string | null;
+  /** Аватар Steam — только для превью: Player.photo у нас всегда локальный файл. */
+  avatar?: string | null;
 };
 
 export type TeamDraft = {

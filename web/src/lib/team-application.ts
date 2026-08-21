@@ -96,6 +96,14 @@ export async function applicationProblems(team: TeamDraft, divisionName: string 
   }
 
   for (const p of team.players) {
+    const known = await findPlayer(p);
+    if (known)
+      problems.push({
+        level: "info",
+        text: `«${p.nickname}» уже в ростере (${known.nickname}) — заявка привяжет его, второй профиль не заведётся`,
+      });
+    if (p.dotaName && p.dotaName.toLowerCase() !== p.nickname.toLowerCase())
+      problems.push({ level: "info", text: `«${p.nickname}»: в клиенте Доты он «${p.dotaName}»` });
     if (!p.accountId && !p.dotabuffUrl && !p.stratzUrl && !p.steamUrl)
       problems.push({ level: "warn", text: `«${p.nickname}»: нет ни одной ссылки на профиль — в архиве матчей его не опознать` });
     if (!p.role) problems.push({ level: "warn", text: `«${p.nickname}»: не разобрана роль` });
@@ -190,6 +198,7 @@ export async function approveApplication(applicationId: number, reviewerId: numb
           realName: p.realName,
           accountId: p.accountId,
           mmr: p.mmr,
+          rank: p.rank ?? null,
           dotabuffUrl: p.dotabuffUrl,
           stratzUrl: p.stratzUrl,
           steamUrl: p.steamUrl,
@@ -208,6 +217,9 @@ export async function approveApplication(applicationId: number, reviewerId: numb
           stratzUrl: existing.stratzUrl ?? p.stratzUrl,
           steamUrl: existing.steamUrl ?? p.steamUrl,
           telegram: existing.telegram ?? p.telegram,
+          // Ранг — не мнение, а факт из OpenDota: свежий перекрывает старый (в отличие от MMR,
+          // который у существующего профиля ставил оператор).
+          rank: p.rank ?? existing.rank,
         },
       });
     }

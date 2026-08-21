@@ -140,6 +140,9 @@ model Player {
   realName    String?
   accountId   String? // Dota/Steam32 account id (для OpenDota)
   mmr         Int? // из таблицы сезона; у команды не хранится — считается по составу
+  /// Ранг (rank_tier OpenDota: десятки — медаль, единицы — звезда; 80 = Immortal). В отличие от
+  /// mmr — не со слов игрока, а подтянут по account_id при импорте состава (src/lib/enrich.ts).
+  rank        Int?
   tp          Int      @default(0) // сезонные TP (очки MVP), оператор правит вручную раз в неделю
   photo       String?
   steamUrl    String? // перекрывает ссылку, выведенную из accountId

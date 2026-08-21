@@ -6,6 +6,7 @@ import { getPlayerRecord, getTeammates } from "@/lib/player-record";
 import { getPlayerLeague, mmss } from "@/lib/player-league";
 import { ageOf, formatBirthday, playerGaps, playerLinks, teamAccent, telegramUrl, yearsLabel } from "@/lib/profiles";
 import { heroImg } from "@/lib/assets";
+import { rankLabel } from "@/lib/dota-rank";
 import { roleLabel } from "@/lib/roles";
 import { parseTags, tagLabel } from "@/lib/player-tags";
 import { can } from "@/lib/account";
@@ -138,6 +139,8 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                 </Link>
               )}
               {player.mmr && <Chip>{player.mmr.toLocaleString("ru")} MMR</Chip>}
+              {/* Ранг — из OpenDota при импорте состава, в отличие от MMR (его ставит оператор). */}
+              {rankLabel(player.rank) && <Chip>{rankLabel(player.rank)}</Chip>}
               {player.tp > 0 && (
                 <Link href="/tp" className="rounded-pill bg-purple px-3 py-1 text-xs font-black text-[var(--on-accent)] cushion-control transition-transform hover:-translate-y-px">
                   {player.tp} TP

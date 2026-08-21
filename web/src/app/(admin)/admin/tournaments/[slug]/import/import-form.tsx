@@ -2,7 +2,8 @@
 
 import { useActionState, useState } from "react";
 import { useRouter } from "next/navigation";
-import { parseUpload, saveDrafts, type ParseState, type SaveState } from "./actions";
+import { enrichDrafts, parseUpload, saveDrafts, type EnrichState, type ParseState, type SaveState } from "./actions";
+import { rankLabel } from "@/lib/dota-rank";
 import { roleLabel } from "@/lib/roles";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,11 +26,13 @@ export function ImportForm({
   divisions: { id: number; name: string; short: string }[];
 }) {
   const [parsed, parseAction, parsing] = useActionState<ParseState, FormData>(parseUpload, null);
+  const [enriched, enrichAction, enriching] = useActionState<EnrichState, FormData>(enrichDrafts, null);
   const [saved, saveAction, saving] = useActionState<SaveState, FormData>(saveDrafts, null);
   const [skip, setSkip] = useState<Record<string, boolean>>({});
   const router = useRouter();
 
-  const teams = parsed?.teams ?? [];
+  // Обогащённый черновик главнее исходного разбора: после «подтянуть» и превью, и запись идут по нему.
+  const teams = enriched?.teams ?? parsed?.teams ?? [];
 
   return (
     <div className="space-y-4">
@@ -69,6 +72,26 @@ export function ImportForm({
             <h2 className="text-sm font-semibold">Разобрано команд: {teams.length}</h2>
             {parsed?.note && <span className="text-xs text-ink-subtle">{parsed.note}</span>}
           </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <Button type="submit" size="sm" variant="outline" formAction={enrichAction} disabled={enriching || saving}>
+              {enriching ? "Тяну из Steam и OpenDota…" : "Подтянуть данные"}
+            </Button>
+            <span className="text-[11px] text-ink-subtle">
+              Именные ссылки Steam → account_id, ранг и ник из OpenDota. Ходит в сеть — на большом
+              файле это минута.
+            </span>
+          </div>
+          {enriched?.error && <p className={errorBox}>{enriched.error}</p>}
+          {enriched?.notes && enriched.notes.length > 0 && (
+            <ul className="max-h-48 space-y-0.5 overflow-y-auto rounded-md border border-hairline bg-surface-2 p-2">
+              {enriched.notes.map((n, i) => (
+                <li key={i} className={`text-[11px] ${n.level === "warn" ? "text-amber-300" : "text-ink-subtle"}`}>
+                  {n.nickname}: {n.text}
+                </li>
+              ))}
+            </ul>
+          )}
 
           <label className="block max-w-xs">
             <span className="text-xs text-ink-muted">Дивизион для этих заявок</span>
@@ -112,6 +135,10 @@ export function ImportForm({
                       <span className={p.accountId ? "text-emerald-400" : "text-amber-400"}>
                         {p.accountId ? ` · id ${p.accountId}` : " · без account_id"}
                       </span>
+                      {rankLabel(p.rank) && <span className="text-ink-subtle"> · {rankLabel(p.rank)}</span>}
+                      {p.dotaName && p.dotaName.toLowerCase() !== p.nickname.toLowerCase() && (
+                        <span className="text-ink-subtle"> · в доте «{p.dotaName}»</span>
+                      )}
                     </li>
                   ))}
                 </ul>

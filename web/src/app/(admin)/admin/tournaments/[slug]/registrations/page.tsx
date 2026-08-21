@@ -6,7 +6,8 @@ import { roleLabel } from "@/lib/roles";
 import { Button } from "@/components/ui/button";
 import { denyUnlessPermission } from "../../../../_components/permission-gate";
 import { ReviewForms } from "./review-forms";
-import { remove, setDivision } from "./actions";
+import { enrich, remove, setDivision } from "./actions";
+import { rankLabel } from "@/lib/dota-rank";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Заявки команд" };
@@ -100,6 +101,7 @@ export default async function TeamRegistrationsPage({ params }: { params: Promis
                         <span className="text-ink-subtle"> · {roleLabel(p.role) ?? "роль не разобрана"}</span>
                         {p.mmr ? <span className="text-ink-subtle"> · {p.mmr} MMR (заявленный)</span> : null}
                         {p.accountId ? <span className="text-ink-subtle"> · id {p.accountId}</span> : null}
+                        {rankLabel(p.rank) ? <span className="text-ink-subtle"> · {rankLabel(p.rank)}</span> : null}
                       </li>
                     ))}
                   </ul>
@@ -124,6 +126,12 @@ export default async function TeamRegistrationsPage({ params }: { params: Promis
                         </select>
                       </label>
                       <Button type="submit" size="sm" variant="outline">Сохранить дивизион</Button>
+                    </form>
+
+                    <form action={enrich} className="mt-2">
+                      <input type="hidden" name="id" value={a.id} />
+                      <input type="hidden" name="tournamentSlug" value={tournament.slug} />
+                      <Button type="submit" size="sm" variant="ghost">Подтянуть данные из Steam и OpenDota</Button>
                     </form>
 
                     {problems[i].length > 0 && (

@@ -5,6 +5,7 @@ import { requirePermission } from "@/lib/account";
 import { createApplications } from "@/lib/team-application";
 import { normalizeDrafts, parseDelimited, parseGrid, type TeamDraft } from "@/lib/roster-import";
 import { readWorkbook } from "@/lib/xlsx";
+import { enrichTeams, type EnrichNote } from "@/lib/enrich";
 
 // Импорт составов: разбор — отдельным шагом от записи (TOURNAMENTS-PLAN.md §2.4). Сначала оператор
 // видит, что разобралось, и только потом заводятся заявки: файл из чужих рук — это всегда сюрприз,
@@ -64,6 +65,24 @@ export async function parseUpload(_prev: ParseState, form: FormData): Promise<Pa
     return { teams: normalized, note };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Не удалось разобрать файл" };
+  }
+}
+
+export type EnrichState = { teams?: TeamDraft[]; notes?: EnrichNote[]; error?: string } | null;
+
+/**
+ * Дотянуть данные из Steam и OpenDota по уже разобранному черновику. Отдельной кнопкой, а не внутри
+ * разбора: это единственный шаг, ходящий в сеть, и он может занять минуту на большой файл.
+ */
+export async function enrichDrafts(_prev: EnrichState, form: FormData): Promise<EnrichState> {
+  await requirePermission("tournaments.edit");
+  try {
+    const teams = JSON.parse(String(form.get("teams") ?? "[]")) as TeamDraft[];
+    if (teams.length === 0) return { error: "Нечего обогащать" };
+    const { teams: enriched, notes } = await enrichTeams(teams);
+    return { teams: enriched, notes };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Не удалось подтянуть данные" };
   }
 }
 

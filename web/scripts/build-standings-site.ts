@@ -16,13 +16,17 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { getStandings, type StandingGroup } from "@/lib/standings";
 import { QUALIFICATION, qualificationOf, type Qualification } from "@/lib/qualification";
-import { DIVISIONS, divisionBySlug } from "@/lib/divisions";
+import { divisionBySlug } from "@/lib/divisions";
+import { listDivisions } from "@/lib/tournaments";
 
 const args = process.argv.slice(2);
 const outDir = path.resolve(process.cwd(), argValue("--out") ?? "dist/standings");
 const light = args.includes("--light");
 // Какой дивизион собирать: --div d1|d2 (по умолчанию первый).
-const division = (argValue("--div") && divisionBySlug(argValue("--div")!)) || DIVISIONS[0];
+// Дивизионы теперь в БД (турнир), поэтому справочник читаем, а не берём из константы.
+const divisions = await listDivisions();
+const division = (argValue("--div") && divisionBySlug(divisions, argValue("--div")!)) || divisions[0];
+if (!division) throw new Error("В базе нет ни одного дивизиона — заведите турнир (см. TOURNAMENTS-PLAN.md)");
 
 function argValue(flag: string): string | null {
   const i = args.indexOf(flag);

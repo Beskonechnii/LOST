@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { SITE_MAX_W } from "../../../_components/ui";
 import { BackButton } from "../../../_components/back-button";
-import { divisionBySlug } from "@/lib/divisions";
+import { divisionBySlug } from "@/lib/tournaments";
 
 // Раздел дивизиона. Один шаблон на оба дивизиона: слаг в URL (d1/d2) выбирает дивизион, а этапы
 // (групповая / плей-офф / статистика) — плитки на хабе дивизиона (page.tsx), не ряд вкладок.
@@ -14,7 +14,7 @@ export default async function DivisionLayout({
   params: Promise<{ div: string }>;
 }) {
   const { div } = await params;
-  const division = divisionBySlug(div);
+  const division = await divisionBySlug(div);
   if (!division) notFound();
 
   // Акцент секции = цвет дивизиона. D1 держит бренд-фиолетовый (дефолт токенов), D2 — бирюзовый

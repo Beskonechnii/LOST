@@ -5,6 +5,7 @@ import { Icon, TeamCrest } from "@/app/_components/postgame/blocks";
 import { Eyebrow } from "@/app/_components/ui";
 import { BackButton } from "@/app/_components/back-button";
 import { divisionSlug } from "@/lib/divisions";
+import { getDivisions } from "@/lib/tournaments";
 import { getSeriesDetail, type GamePlayer, type SeriesDetail, type SeriesGameDetail } from "@/lib/series";
 import { playoffLabel, stageLabel } from "@/lib/stages";
 
@@ -150,7 +151,7 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
   const s = await getSeriesDetail(slug);
   if (!s) notFound();
 
-  const div = divisionSlug(s.division);
+  const div = divisionSlug(await getDivisions(), s.division);
   const winner = s.homeScore > s.awayScore ? s.home.id : s.awayScore > s.homeScore ? s.away.id : null;
   const bo = s.homeScore + s.awayScore <= 1 ? "Bo1" : "Bo3";
 

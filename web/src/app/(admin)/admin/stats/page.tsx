@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getLeaders, METRICS, type Subject } from "@/lib/leaders";
-import { DIVISIONS } from "@/lib/divisions";
+import { getDivisions } from "@/lib/tournaments";
 import { isStage } from "@/lib/stages";
 import { Eyebrow } from "@/app/_components/ui";
 import { denyUnlessPermission } from "../../_components/permission-gate";
@@ -68,7 +68,8 @@ export default async function AdminStatsPage({ searchParams }: { searchParams: P
   if (denied) return denied;
 
   const q = await searchParams;
-  const division = DIVISIONS.find((d) => d.slug === q.div)?.name; // undefined = оба дивизиона
+  const divisions = await getDivisions();
+  const division = divisions.find((d) => d.slug === q.div)?.name; // undefined = оба дивизиона
   const stage = isStage(q.stage) ? q.stage : undefined; // undefined = вся дистанция
   const kind = q.kind === "teams" ? "teams" : "players";
 
@@ -113,7 +114,7 @@ export default async function AdminStatsPage({ searchParams }: { searchParams: P
         <span className="text-hairline-strong">·</span>
         <div className="flex flex-wrap gap-2">
           {chip(link({ div: undefined }), !q.div, "Оба дивизиона")}
-          {DIVISIONS.map((d) => chip(link({ div: d.slug }), q.div === d.slug, d.short))}
+          {divisions.map((d) => chip(link({ div: d.slug }), q.div === d.slug, d.short))}
         </div>
         <span className="text-hairline-strong">·</span>
         <div className="flex flex-wrap gap-2">

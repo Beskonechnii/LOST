@@ -8,6 +8,7 @@ import { CreateForm } from "@/app/_components/roster-editors";
 import { SectionHeader } from "@/app/_components/ui";
 import { PlayerMiniCard } from "../_components/player-card";
 import { DivTabs, parseDiv, divName } from "../_components/div-tabs";
+import { getDivisions } from "@/lib/tournaments";
 
 export const dynamic = "force-dynamic";
 
@@ -28,14 +29,15 @@ const isSort = (v: unknown): v is SortKey => SORTS.some((s) => s.key === v);
 export default async function PlayersPage({ searchParams }: { searchParams: Promise<{ sort?: string; div?: string }> }) {
   const q = await searchParams;
   const sort: SortKey = isSort(q.sort) ? q.sort : "tp";
-  const div = parseDiv(q.div);
+  const divisions = await getDivisions();
+  const div = parseDiv(divisions, q.div);
 
   const [allPlayers, records] = await Promise.all([listPlayers(), getPlayerRecords(null)]);
   const authed = await can("roster.edit"); // формы и диагностика — те же права, что у пишущих роутов
 
   // Дивизион игрока — по его командам (Team.group): игрок попадает в D1/D2, если в этом дивизионе
   // у него есть место в составе. «Все» — весь пул, включая игроков без команды.
-  const name = divName(div);
+  const name = divName(divisions, div);
   const players = name ? allPlayers.filter((p) => p.spots.some((s) => s.team.group === name)) : allPlayers;
 
   // Карьерка игрока (игры/победы/поражения) — из турнирной статы (кирпич B). Нет статы → нули.
@@ -82,7 +84,7 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
         />
       )}
 
-      <DivTabs current={div} base="/roster/players" keep={{ sort: sort === "tp" ? undefined : sort }} />
+      <DivTabs divisions={divisions} current={div} base="/roster/players" keep={{ sort: sort === "tp" ? undefined : sort }} />
 
       <div className="flex flex-wrap gap-2 font-pouf">
         {SORTS.map((s) => {

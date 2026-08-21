@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { RosterMember, TeamWithRoster } from "@/lib/roster-data";
-import { DIVISIONS } from "@/lib/divisions";
+import type { Division } from "@/lib/divisions";
 import { countryCode, teamAccent, teamTag } from "@/lib/profiles";
 import { roleLabel } from "@/lib/roles";
 import { Chip, Meter } from "@/app/_components/ui";
@@ -188,7 +188,7 @@ function TeamCard({ team, defaultOpen }: { team: TeamWithRoster; defaultOpen: bo
   );
 }
 
-export function TeamCards({ teams }: { teams: TeamWithRoster[] }) {
+export function TeamCards({ teams, divisions: all }: { teams: TeamWithRoster[]; divisions: Division[] }) {
   // Ключ по «свёрнутости всех» — самый дешёвый способ разом переоткрыть карточки:
   // меняем ключ, React пересоздаёт их с нужным начальным состоянием.
   const [generation, setGeneration] = useState(0);
@@ -198,7 +198,7 @@ export function TeamCards({ teams }: { teams: TeamWithRoster[] }) {
   // Под-вкладки дивизионов: команды делим по Team.group, а общий пулл игроков остаётся единым
   // (страница /roster/players его не трогает). Показываем только те дивизионы, где есть команды,
   // в порядке справочника; безгрупповые (если появятся) сваливаем в отдельную вкладку «Прочие».
-  const divisions = DIVISIONS.filter((d) => teams.some((t) => t.group === d.name));
+  const divisions = all.filter((d) => teams.some((t) => t.group === d.name));
   const hasOther = teams.some((t) => !divisions.some((d) => d.name === t.group));
   const tabs = [
     ...divisions.map((d) => ({ key: d.name, label: d.short })),

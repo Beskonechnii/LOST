@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { divisionBySlug } from "@/lib/divisions";
+import { divisionBySlug } from "@/lib/tournaments";
 import { HubTiles, type HubTile } from "@/app/_components/hub-tiles";
 import { BackButton } from "@/app/_components/back-button";
 
@@ -7,7 +7,7 @@ import { BackButton } from "@/app/_components/back-button";
 // чтобы адрес дивизиона держал список разделов, как «Админ» держит список инструментов.
 export default async function DivisionHome({ params }: { params: Promise<{ div: string }> }) {
   const { div } = await params;
-  const division = divisionBySlug(div);
+  const division = await divisionBySlug(div);
   if (!division) notFound();
 
   const base = `/standings/${division.slug}`;

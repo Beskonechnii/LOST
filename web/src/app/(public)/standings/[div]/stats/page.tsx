@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { divisionBySlug } from "@/lib/divisions";
+import { divisionBySlug } from "@/lib/tournaments";
 import { getLeaders, METRICS, type Subject } from "@/lib/leaders";
 import { BRACKETS, isBracket, isStage, STAGES } from "@/lib/stages";
 import { SectionHeader } from "@/app/_components/ui";
@@ -112,7 +112,7 @@ export default async function StatsPage({
 }) {
   const { div } = await params;
   const q = await searchParams;
-  const division = divisionBySlug(div);
+  const division = await divisionBySlug(div);
   if (!division) notFound();
 
   const stage = isStage(q.stage) ? q.stage : undefined;

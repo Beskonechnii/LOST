@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTeamProfile, type RosterMember } from "@/lib/roster-data";
 import { getStandings } from "@/lib/standings";
-import { DIVISIONS, divisionSlug } from "@/lib/divisions";
+import { divisionSlug } from "@/lib/divisions";
+import { getDivisions } from "@/lib/tournaments";
 import { teamAccent, teamTag } from "@/lib/profiles";
 import { buttonClasses } from "@/components/pouf/Button";
 import { roleLabel } from "@/lib/roles";
@@ -20,8 +21,9 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
   if (!team) notFound();
 
   // Таблицу берём по дивизиону команды — тому же, что показывает раздел «LOST D1»/«LOST D2».
-  const divSlug = divisionSlug(team.group);
-  const [standings, authed] = await Promise.all([getStandings(team.group ?? DIVISIONS[0].name), can("roster.edit")]);
+  const divisions = await getDivisions();
+  const divSlug = divisionSlug(divisions, team.group);
+  const [standings, authed] = await Promise.all([getStandings(team.group ?? divisions[0]?.name ?? ""), can("roster.edit")]);
 
   const accent = teamAccent(team);
   const core = team.players.filter((p) => p.position !== null);
@@ -30,7 +32,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
   // Место берём из общей таблицы, а не считаем заново: один источник с разделом «LOST D1».
   const group = standings.find((g) => g.rows.some((r) => r.teamId === team.id));
   const row = group?.rows.find((r) => r.teamId === team.id) ?? null;
-  const zone = row?.place ? qualificationOf(row.place, group!.rows.length, team.group ?? DIVISIONS[0].name) : null;
+  const zone = row?.place ? qualificationOf(row.place, group!.rows.length, team.group ?? divisions[0]?.name ?? "") : null;
 
   return (
     <div className="space-y-6 font-pouf">

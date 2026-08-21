@@ -10,7 +10,7 @@
 import { prisma } from "@/lib/prisma";
 import { getQualified } from "@/lib/group-stage";
 import { PLAYOFF_SLOTS, slotByKey, type SlotSource } from "@/lib/playoff-bracket";
-import { DIVISIONS } from "@/lib/divisions";
+import { listDivisions } from "@/lib/tournaments";
 
 const dry = process.argv.includes("--dry");
 const need = (bestOf: 3 | 5) => (bestOf === 5 ? 3 : 2);
@@ -82,7 +82,7 @@ async function backfillDivision(division: string) {
 
 async function main() {
   console.log(dry ? "— dry-run: база не тронута —\n" : "— запись —\n");
-  for (const d of DIVISIONS) {
+  for (const d of await listDivisions()) {
     console.log(`${d.label} (${d.name}):`);
     const { assigned, total } = await backfillDivision(d.name);
     console.log(`  итого: размечено ${assigned} из ${total} плей-офф серий\n`);

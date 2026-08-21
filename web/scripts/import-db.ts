@@ -28,9 +28,9 @@ const d = (v: string | Date | null | undefined) => (v ? new Date(v) : null);
 
 async function main() {
   const snap = JSON.parse(readFileSync(input, "utf8"));
-  if (snap.version !== 11) {
+  if (snap.version !== 12) {
     throw new Error(
-      `Снимок версии ${snap.version}, а нужен 11. Снимки не мигрируются: пересними базу свежим ` +
+      `Снимок версии ${snap.version}, а нужен 12. Снимки не мигрируются: пересними базу свежим ` +
         `scripts/export-db.ts на той машине, где данные актуальны.`,
     );
   }
@@ -62,6 +62,7 @@ async function main() {
     ["группы (строки)", await prisma.groupEntry.count(), snap.groupEntries.length],
     ["составы", await prisma.rosterSpot.count(), snap.rosterSpots.length],
     ["стата матчей", await prisma.matchStat.count(), snap.matchStats.length],
+    ["турниры", await prisma.tournament.count(), snap.tournaments.length],
   ] as const) {
     if (inSnap < inDb) shrink.push(`  ${label}: в базе ${inDb} → в снимке ${inSnap} (минус ${inDb - inSnap})`);
   }
@@ -87,6 +88,12 @@ async function main() {
   await prisma.series.deleteMany();
   await prisma.groupEntry.deleteMany();
   await prisma.rosterSpot.deleteMany();
+  // Турниры — после серий и итогов групп: те ссылаются на дивизион (SetNull), и снос в обратном
+  // порядке обнулил бы им дивизион ровно перед тем, как мы их всё равно пересоздаём.
+  await prisma.teamApplication.deleteMany();
+  await prisma.tournamentEntry.deleteMany();
+  await prisma.division.deleteMany();
+  await prisma.tournament.deleteMany();
   // Аккаунты ссылаются на игрока (SetNull) — сносим до игроков и создаём заново из снимка.
   await prisma.userAccount.deleteMany();
   await prisma.team.deleteMany({ where: { slug: { notIn: keepTeams } } });
@@ -107,6 +114,29 @@ async function main() {
       update: p,
     });
   }
+
+  // ── турниры ────────────────────────────────────────────────────────────────
+  // Раньше серий и итогов групп: те ссылаются на дивизион. Ключ дивизиона в снимке — «турнир/слаг»
+  // (см. export-db): слаг дивизиона уникален только внутри своего турнира.
+  const divisionId = new Map<string, number>();
+  for (const t of snap.tournaments) {
+    const { divisions, createdAt, startAt, endAt, regOpenAt, regCloseAt, ...rest } = t;
+    const row = await prisma.tournament.create({
+      data: {
+        ...rest,
+        startAt: d(startAt),
+        endAt: d(endAt),
+        regOpenAt: d(regOpenAt),
+        regCloseAt: d(regCloseAt),
+        createdAt: d(createdAt) ?? new Date(),
+      },
+    });
+    for (const div of divisions) {
+      const created = await prisma.division.create({ data: { ...div, tournamentId: row.id } });
+      divisionId.set(`${row.slug}/${created.slug}`, created.id);
+    }
+  }
+  const divRef = (key: string | null | undefined) => (key ? divisionId.get(key) ?? null : null);
 
   const teamId = new Map((await prisma.team.findMany({ select: { id: true, slug: true } })).map((t) => [t.slug, t.id]));
   const playerId = new Map((await prisma.player.findMany({ select: { id: true, slug: true } })).map((p) => [p.slug, p.id]));
@@ -132,10 +162,11 @@ async function main() {
   // Серии — раньше матчей: карта ссылается на серию по ключу из снимка.
   const seriesId = new Map<string, number>();
   for (const s of snap.series) {
-    const { homeSlug, awaySlug, playedAt, ...rest } = s;
+    const { homeSlug, awaySlug, playedAt, divisionKey, ...rest } = s;
     const row = await prisma.series.create({
       data: {
         ...rest,
+        divisionId: divRef(divisionKey),
         playedAt: d(playedAt),
         homeId: need(teamId, homeSlug, "Команда"),
         awayId: need(teamId, awaySlug, "Команда"),
@@ -169,8 +200,35 @@ async function main() {
   }
 
   for (const g of snap.groupEntries) {
-    const { teamSlug, ...rest } = g;
-    await prisma.groupEntry.create({ data: { ...rest, teamId: need(teamId, teamSlug, "Команда") } });
+    const { teamSlug, divisionKey, ...rest } = g;
+    await prisma.groupEntry.create({
+      data: { ...rest, divisionId: divRef(divisionKey), teamId: need(teamId, teamSlug, "Команда") },
+    });
+  }
+
+  for (const e of snap.tournamentEntries) {
+    const { divisionKey, teamSlug, createdAt, ...rest } = e;
+    const division = divRef(divisionKey);
+    if (!division) continue; // дивизион уехал из снимка — участие без него смысла не имеет
+    await prisma.tournamentEntry.create({
+      data: { ...rest, divisionId: division, teamId: need(teamId, teamSlug, "Команда"), createdAt: d(createdAt) ?? new Date() },
+    });
+  }
+
+  for (const a of snap.teamApplications) {
+    const { tournamentSlug, divisionKey, teamSlug, submittedAt, reviewedAt, ...rest } = a;
+    const tournament = await prisma.tournament.findUnique({ where: { slug: tournamentSlug }, select: { id: true } });
+    if (!tournament) continue;
+    await prisma.teamApplication.create({
+      data: {
+        ...rest,
+        tournamentId: tournament.id,
+        divisionId: divRef(divisionKey),
+        teamId: teamSlug ? teamId.get(teamSlug) ?? null : null,
+        submittedAt: d(submittedAt) ?? new Date(),
+        reviewedAt: d(reviewedAt),
+      },
+    });
   }
 
   for (const s of snap.matchStats) {

@@ -42,7 +42,7 @@ function omit<T extends object, K extends keyof T>(row: T, ...keys: K[]): Omit<T
 }
 
 async function main() {
-  const [teams, players, spots, matches, groupEntries, series, stats, points, renders, wards, accounts] =
+  const [teams, players, spots, matches, groupEntries, series, stats, points, renders, wards, accounts, tournaments, entries, applications] =
     await Promise.all([
       prisma.team.findMany({ orderBy: { slug: "asc" } }),
       prisma.player.findMany({ orderBy: { slug: "asc" } }),
@@ -57,7 +57,20 @@ async function main() {
       prisma.render.findMany({ include: { match: { include: { teamA: true, teamB: true } } } }),
       prisma.ward.findMany({ include: { team: true, match: { include: { teamA: true, teamB: true } } } }),
       prisma.userAccount.findMany({ include: { player: true, claim: true } }),
+      prisma.tournament.findMany({ orderBy: { slug: "asc" }, include: { divisions: { orderBy: { orderNo: "asc" } } } }),
+      prisma.tournamentEntry.findMany({ include: { team: true, division: { include: { tournament: true } } } }),
+      prisma.teamApplication.findMany({
+        include: { team: true, tournament: true, division: { include: { tournament: true } } },
+      }),
     ]);
+
+  // Дивизион в связях — пара «слаг турнира / слаг дивизиона»: id автоинкрементные и на другой
+  // машине другие, а слаг дивизиона уникален только внутри своего турнира.
+  const divKey = (d: { slug: string; tournament: { slug: string } } | null | undefined) =>
+    d ? `${d.tournament.slug}/${d.slug}` : null;
+  const divById = new Map(
+    tournaments.flatMap((t) => t.divisions.map((d) => [d.id, `${t.slug}/${d.slug}`] as const)),
+  );
 
   // Баллы ссылаются на субъекта сырым id + типом, без relation — разворачиваем в slug вручную.
   const teamById = new Map(teams.map((t) => [t.id, t.slug]));
@@ -66,7 +79,7 @@ async function main() {
     matchKey(m, m.teamA.slug, m.teamB.slug);
 
   const snapshot = {
-    version: 11, // 11 — воронка регистрации и права: status/application/permissions у аккаунта
+    version: 12, // 12 — турниры: Tournament/Division/TournamentEntry/TeamApplication, дивизион в связях по слагу
     exportedAt: new Date().toISOString(),
 
     teams: teams.map((t) => omit(t, "id")),
@@ -97,12 +110,41 @@ async function main() {
       }))
       .sort((a, b) => a.key.localeCompare(b.key)),
 
+    tournaments: tournaments.map((t) => ({
+      ...omit(t, "id", "divisions"),
+      divisions: t.divisions.map((d) => omit(d, "id", "tournamentId")),
+    })),
+
+    tournamentEntries: entries
+      .map((e) => ({
+        divisionKey: divKey(e.division),
+        teamSlug: e.team.slug,
+        seed: e.seed,
+        group: e.group,
+        createdAt: e.createdAt,
+      }))
+      .sort((a, b) => `${a.divisionKey}${a.teamSlug}`.localeCompare(`${b.divisionKey}${b.teamSlug}`)),
+
+    teamApplications: applications
+      .map((a) => ({
+        ...omit(a, "id", "tournamentId", "divisionId", "teamId", "tournament", "division", "team", "reviewedById"),
+        tournamentSlug: a.tournament.slug,
+        divisionKey: divKey(a.division),
+        teamSlug: a.team?.slug ?? null,
+      }))
+      .sort((a, b) => a.submittedAt.getTime() - b.submittedAt.getTime()),
+
     groupEntries: groupEntries
-      .map((g) => ({ ...omit(g, "id", "teamId", "team"), teamSlug: g.team.slug }))
+      .map((g) => ({ ...omit(g, "id", "teamId", "team", "divisionId"), teamSlug: g.team.slug, divisionKey: divById.get(g.divisionId ?? -1) ?? null }))
       .sort((a, b) => `${a.division}${a.group}${a.place}`.localeCompare(`${b.division}${b.group}${b.place}`)),
 
     series: series
-      .map((s) => ({ ...omit(s, "id", "homeId", "awayId", "home", "away"), homeSlug: s.home.slug, awaySlug: s.away.slug }))
+      .map((s) => ({
+        ...omit(s, "id", "homeId", "awayId", "home", "away", "divisionId"),
+        homeSlug: s.home.slug,
+        awaySlug: s.away.slug,
+        divisionKey: divById.get(s.divisionId ?? -1) ?? null,
+      }))
       .sort((a, b) => a.slug.localeCompare(b.slug)),
 
     matchStats: stats
@@ -176,6 +218,9 @@ async function main() {
     генерации: snapshot.renders.length,
     варды: snapshot.wards.length,
     аккаунты: snapshot.accounts.length,
+    турниры: snapshot.tournaments.length,
+    "участие команд": snapshot.tournamentEntries.length,
+    "заявки команд": snapshot.teamApplications.length,
   });
 }
 

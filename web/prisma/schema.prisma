@@ -10,6 +10,101 @@ datasource db {
   provider = "sqlite"
 }
 
+/// Турнир — сезон лиги или отдельный кубок. До него дивизион был строкой («Division 1») плюс
+/// хардкод-справочник в коде: описание, даты и регламент вешать было некуда, а второй сезон с теми
+/// же именами дивизионов слился бы с первым. Теперь турнир — сущность, дивизион — его часть.
+/// Разбор решений — ../../TOURNAMENTS-PLAN.md.
+model Tournament {
+  id          Int       @id @default(autoincrement())
+  slug        String    @unique // s2, winter-cup — живёт в URL
+  name        String // «LOST Season 2»
+  short       String? // «S2» — для навигации, где длинное имя не влезает
+  description String? // регламент и описание, длинный текст
+  format      String? // «2 дивизиона, группа + плей-офф»
+  prize       String?
+  logo        String?
+  banner      String?
+  /// draft (заводят) | registration (приём заявок) | running (идёт) | finished (сыгран).
+  /// «Текущий» турнир для публичных витрин — running, иначе последний по startAt (src/lib/tournaments.ts).
+  status      String    @default("draft")
+  startAt     DateTime?
+  endAt       DateTime?
+  regOpenAt   DateTime?
+  regCloseAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  divisions    Division[]
+  applications TeamApplication[]
+}
+
+/// Дивизион внутри турнира. `slug` живёт в адресе (/standings/d1) и уникален в пределах турнира —
+/// «d1» есть в каждом сезоне, и это разные дивизионы. `name` дублируется в Team.group /
+/// Series.division / GroupEntry.division: строки остались как denormalized-зеркало ради полутора
+/// десятков выборок, которые фильтруют по имени; единственный, кто их пишет — src/lib/tournaments.ts.
+model Division {
+  id      Int     @id @default(autoincrement())
+  slug    String // d1 | d2
+  name    String // «Division 1» — то же значение, что в Team.group
+  label   String? // «LOST D1» — подпись вкладки
+  short   String? // «D1»
+  orderNo Int     @default(0) // порядок вкладок в навигации
+  mmrFrom Int? // порог входа, если у дивизиона он есть
+  mmrTo   Int?
+
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  tournamentId Int
+
+  entries      TournamentEntry[]
+  series       Series[]
+  groupEntries GroupEntry[]
+  applications TeamApplication[]
+
+  @@unique([tournamentId, slug])
+  @@unique([tournamentId, name])
+}
+
+/// Участие команды в дивизионе турнира. Отдельной строкой, а не полем у команды: команда живёт
+/// дольше турнира, и с полем переход на следующий сезон стирал бы, где она играла в прошлом.
+/// Состав (RosterSpot) при этом остаётся текущим составом команды — сезонные составы это отдельный
+/// долг (§9 CLAUDE.md); историю игр он не рвёт, кто играл на карте помнит MatchStat.
+model TournamentEntry {
+  id         Int      @id @default(autoincrement())
+  seed       Int? // посев в жеребьёвке
+  group      String? // «A» | «B» — группа, если дивизион делится
+  createdAt  DateTime @default(now())
+
+  division   Division @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+  divisionId Int
+  team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId     Int
+
+  @@unique([divisionId, teamId])
+}
+
+/// Заявка команды на турнир: состав целиком JSON'ом, `Team`/`Player` из неё создаются только при
+/// апруве. Причина ровно та же, что у анкеты игрока (UserAccount.application, ACCOUNTS-PLAN §2.1):
+/// публичные витрины читают ростер без фильтров, и залитый сразу кривой файл на дюжину команд
+/// немедленно виден на /roster/teams, а откатить его нечем.
+model TeamApplication {
+  id           Int      @id @default(autoincrement())
+  /// import (файл в админке) | web (капитан из кабинета) | telegram (бот) — откуда пришла заявка.
+  source       String   @default("import")
+  /// Состав целиком, JSON (src/lib/team-application.ts → TeamDraft).
+  payload      String
+  status       String   @default("pending") // pending | approved | rejected
+  notes        String? // причина возврата — её видит подавший
+  submittedAt  DateTime @default(now())
+  reviewedAt   DateTime?
+  reviewedById Int? // след в истории, без relation — как UserAccount.reviewedById
+
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  tournamentId Int
+  division     Division?  @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  divisionId   Int? // предложенный дивизион; оператор может переставить перед апрувом
+  team         Team?      @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  teamId       Int? // проставляется при апруве — по нему видно, что заявка уже заведена
+}
+
 model Team {
   id        Int      @id @default(autoincrement())
   slug      String   @unique // ключ импорта и имя файла ассета
@@ -20,7 +115,7 @@ model Team {
   photo     String? // командное фото в рамку
   banner    String? // баннер команды (широкая подложка шапки); путь как у logo
   color     String? // акцент команды, hex
-  group     String?
+  group     String? // имя дивизиона текущего турнира — зеркало TournamentEntry (src/lib/tournaments.ts)
   createdAt DateTime @default(now())
 
   roster         RosterSpot[]
@@ -32,6 +127,8 @@ model Team {
   seriesHome     Series[]      @relation("SeriesHome")
   seriesAway     Series[]      @relation("SeriesAway")
   wards          Ward[]
+  entries        TournamentEntry[] // в каких дивизионах каких турниров команда играла
+  applications   TeamApplication[]
 }
 
 model Player {
@@ -194,6 +291,9 @@ model GroupEntry {
 
   team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
   teamId Int
+  /// Дивизион турнира; строка `division` — зеркало (см. Division).
+  divisionRef Division? @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  divisionId  Int?
 
   @@unique([division, group, teamId])
 }
@@ -215,7 +315,7 @@ model Series {
   /// Нужен потому, что `id` автоинкрементный и после `db:import` меняется — ссылка на встречу,
   /// отданная наружу, ломалась бы на каждом переносе данных. Слаг едет в снимке и переживает его.
   slug      String    @unique
-  division  String // «Division 1»
+  division  String // «Division 1» — зеркало divisionId, см. Division
   stage     String    @default("group") // group | playoff (src/lib/stages.ts)
   group     String? // «A» | «B» — только у групповой стадии
   bracket   String? // плей-офф: upper | lower | grand — по нему режут архив и статистику
@@ -230,6 +330,11 @@ model Series {
   homeScore Int
   awayScore Int
   guessed   Boolean   @default(true)
+
+  /// Дивизион турнира. Строка `division` осталась зеркалом: по ней фильтруют полтора десятка
+  /// выборок. Nullable — у серий, заведённых до появления турниров, пока может быть пусто.
+  divisionRef Division? @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  divisionId  Int?
 
   home   Team @relation("SeriesHome", fields: [homeId], references: [id], onDelete: Cascade)
   homeId Int

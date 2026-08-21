@@ -1,6 +1,6 @@
 {
-  "version": 11,
-  "exportedAt": "2026-08-20T20:04:37.020Z",
+  "version": 12,
+  "exportedAt": "2026-08-21T23:09:25.002Z",
   "teams": [
     {
       "slug": "300",
@@ -2133,6 +2133,29 @@
       "achievements": null,
       "tags": null,
       "createdAt": "2026-07-22T18:52:37.277Z"
+    },
+    {
+      "slug": "miracle",
+      "nickname": "miracle",
+      "nicknameChangedAt": null,
+      "realName": "Desin",
+      "accountId": "288687180",
+      "mmr": 9999,
+      "tp": 0,
+      "photo": null,
+      "steamUrl": null,
+      "dotabuffUrl": "https://www.dotabuff.com/players/288687180",
+      "stratzUrl": null,
+      "telegram": "bsknchni",
+      "birthday": "2007-05-17T12:00:00.000Z",
+      "city": "Minsk",
+      "country": "Belarus",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": "основатель ебки",
+      "tags": null,
+      "createdAt": "2026-08-20T21:43:06.510Z"
     },
     {
       "slug": "moiofc",
@@ -8561,6 +8584,243 @@
       "gameNumber": 3
     }
   ],
+  "tournaments": [
+    {
+      "slug": "s2",
+      "name": "LOST Season 2",
+      "short": "S2",
+      "description": null,
+      "format": "2 дивизион(а), групповая стадия + плей-офф",
+      "prize": null,
+      "logo": null,
+      "banner": null,
+      "status": "running",
+      "startAt": null,
+      "endAt": null,
+      "regOpenAt": null,
+      "regCloseAt": null,
+      "createdAt": "2026-08-21T23:04:25.798Z",
+      "divisions": [
+        {
+          "slug": "d1",
+          "name": "Division 1",
+          "label": "LOST D1",
+          "short": "D1",
+          "orderNo": 0,
+          "mmrFrom": null,
+          "mmrTo": null
+        },
+        {
+          "slug": "d2",
+          "name": "Division 2",
+          "label": "LOST D2",
+          "short": "D2",
+          "orderNo": 1,
+          "mmrFrom": null,
+          "mmrTo": null
+        }
+      ]
+    }
+  ],
+  "tournamentEntries": [
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "300",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.822Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "4naturala",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.826Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "5kn",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.828Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "bbc",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.838Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "cruiser-aurora-team",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.848Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "eclipse-gaming",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.851Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "ethereal",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.857Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "etherial-prime",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.858Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "from-paris",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.860Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "gitlz",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.863Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "guzliki",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.865Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "malchishki",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.866Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "moloko",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.870Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "morbus-mentis",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.872Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "psixdispancer",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.880Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "remix",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.882Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "acolytes",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.831Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "alt-q-q",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.834Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "chubriki",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.845Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "dark-aria",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.849Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "eclipse-gaming-young",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.854Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "navi",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.874Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "pasechniki",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.876Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "pomidory",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.878Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "remix-d2",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.884Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "slonimskiy-pachastunok",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.888Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "team-sausages-disbanded",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.889Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "u-s-burgers",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.891Z"
+    }
+  ],
+  "teamApplications": [],
   "groupEntries": [
     {
       "division": "Division 1",
@@ -8570,7 +8830,8 @@
       "wins": 6,
       "losses": 1,
       "points": 15,
-      "teamSlug": "guzliki"
+      "teamSlug": "guzliki",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8580,7 +8841,8 @@
       "wins": 5,
       "losses": 2,
       "points": 15,
-      "teamSlug": "ethereal"
+      "teamSlug": "ethereal",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8590,7 +8852,8 @@
       "wins": 4,
       "losses": 3,
       "points": 13,
-      "teamSlug": "300"
+      "teamSlug": "300",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8600,7 +8863,8 @@
       "wins": 4,
       "losses": 3,
       "points": 12,
-      "teamSlug": "morbus-mentis"
+      "teamSlug": "morbus-mentis",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8610,7 +8874,8 @@
       "wins": 4,
       "losses": 3,
       "points": 12,
-      "teamSlug": "eclipse-gaming"
+      "teamSlug": "eclipse-gaming",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8620,7 +8885,8 @@
       "wins": 3,
       "losses": 4,
       "points": 8,
-      "teamSlug": "gitlz"
+      "teamSlug": "gitlz",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8630,7 +8896,8 @@
       "wins": 2,
       "losses": 5,
       "points": 7,
-      "teamSlug": "4naturala"
+      "teamSlug": "4naturala",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8640,7 +8907,8 @@
       "wins": 0,
       "losses": 7,
       "points": 2,
-      "teamSlug": "5kn"
+      "teamSlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8650,7 +8918,8 @@
       "wins": 7,
       "losses": 0,
       "points": 18,
-      "teamSlug": "moloko"
+      "teamSlug": "moloko",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8660,7 +8929,8 @@
       "wins": 5,
       "losses": 2,
       "points": 17,
-      "teamSlug": "psixdispancer"
+      "teamSlug": "psixdispancer",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8670,7 +8940,8 @@
       "wins": 5,
       "losses": 2,
       "points": 13,
-      "teamSlug": "etherial-prime"
+      "teamSlug": "etherial-prime",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8680,7 +8951,8 @@
       "wins": 4,
       "losses": 3,
       "points": 11,
-      "teamSlug": "from-paris"
+      "teamSlug": "from-paris",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8690,7 +8962,8 @@
       "wins": 3,
       "losses": 4,
       "points": 10,
-      "teamSlug": "bbc"
+      "teamSlug": "bbc",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8700,7 +8973,8 @@
       "wins": 2,
       "losses": 5,
       "points": 7,
-      "teamSlug": "remix"
+      "teamSlug": "remix",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8710,7 +8984,8 @@
       "wins": 1,
       "losses": 6,
       "points": 4,
-      "teamSlug": "cruiser-aurora-team"
+      "teamSlug": "cruiser-aurora-team",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8720,7 +8995,8 @@
       "wins": 1,
       "losses": 6,
       "points": 4,
-      "teamSlug": "malchishki"
+      "teamSlug": "malchishki",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 2",
@@ -8730,7 +9006,8 @@
       "wins": 5,
       "losses": 0,
       "points": 13,
-      "teamSlug": "eclipse-gaming-young"
+      "teamSlug": "eclipse-gaming-young",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8740,7 +9017,8 @@
       "wins": 4,
       "losses": 1,
       "points": 11,
-      "teamSlug": "pomidory"
+      "teamSlug": "pomidory",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8750,7 +9028,8 @@
       "wins": 3,
       "losses": 2,
       "points": 11,
-      "teamSlug": "alt-q-q"
+      "teamSlug": "alt-q-q",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8760,7 +9039,8 @@
       "wins": 2,
       "losses": 3,
       "points": 6,
-      "teamSlug": "acolytes"
+      "teamSlug": "acolytes",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8770,7 +9050,8 @@
       "wins": 1,
       "losses": 4,
       "points": 4,
-      "teamSlug": "slonimskiy-pachastunok"
+      "teamSlug": "slonimskiy-pachastunok",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8780,7 +9061,8 @@
       "wins": 0,
       "losses": 5,
       "points": 0,
-      "teamSlug": "team-sausages-disbanded"
+      "teamSlug": "team-sausages-disbanded",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8790,7 +9072,8 @@
       "wins": 4,
       "losses": 1,
       "points": 12,
-      "teamSlug": "u-s-burgers"
+      "teamSlug": "u-s-burgers",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8800,7 +9083,8 @@
       "wins": 3,
       "losses": 2,
       "points": 10,
-      "teamSlug": "remix-d2"
+      "teamSlug": "remix-d2",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8810,7 +9094,8 @@
       "wins": 3,
       "losses": 2,
       "points": 8,
-      "teamSlug": "chubriki"
+      "teamSlug": "chubriki",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8820,7 +9105,8 @@
       "wins": 3,
       "losses": 2,
       "points": 7,
-      "teamSlug": "pasechniki"
+      "teamSlug": "pasechniki",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8830,7 +9116,8 @@
       "wins": 1,
       "losses": 4,
       "points": 5,
-      "teamSlug": "dark-aria"
+      "teamSlug": "dark-aria",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8840,7 +9127,8 @@
       "wins": 1,
       "losses": 4,
       "points": 3,
-      "teamSlug": "navi"
+      "teamSlug": "navi",
+      "divisionKey": "s2/d2"
     }
   ],
   "series": [
@@ -8859,7 +9147,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "300",
-      "awaySlug": "5kn"
+      "awaySlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "300-vs-bbc",
@@ -8876,7 +9165,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "300",
-      "awaySlug": "bbc"
+      "awaySlug": "bbc",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "300-vs-guzliki",
@@ -8893,7 +9183,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "300",
-      "awaySlug": "guzliki"
+      "awaySlug": "guzliki",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "300-vs-morbus-mentis",
@@ -8910,7 +9201,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "300",
-      "awaySlug": "morbus-mentis"
+      "awaySlug": "morbus-mentis",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "4naturala-vs-300",
@@ -8927,7 +9219,8 @@
       "awayScore": 2,
       "guessed": false,
       "homeSlug": "4naturala",
-      "awaySlug": "300"
+      "awaySlug": "300",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "4naturala-vs-5kn",
@@ -8944,7 +9237,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "4naturala",
-      "awaySlug": "5kn"
+      "awaySlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "4naturala-vs-gitlz",
@@ -8961,7 +9255,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "4naturala",
-      "awaySlug": "gitlz"
+      "awaySlug": "gitlz",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "4naturala-vs-morbus-mentis",
@@ -8978,7 +9273,8 @@
       "awayScore": 2,
       "guessed": false,
       "homeSlug": "4naturala",
-      "awaySlug": "morbus-mentis"
+      "awaySlug": "morbus-mentis",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "acolytes-vs-slonimskiy-pachastunok",
@@ -8995,7 +9291,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "acolytes",
-      "awaySlug": "slonimskiy-pachastunok"
+      "awaySlug": "slonimskiy-pachastunok",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "acolytes-vs-team-sausages-disbanded",
@@ -9012,7 +9309,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "acolytes",
-      "awaySlug": "team-sausages-disbanded"
+      "awaySlug": "team-sausages-disbanded",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "alt-q-q-vs-acolytes",
@@ -9029,7 +9327,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "alt-q-q",
-      "awaySlug": "acolytes"
+      "awaySlug": "acolytes",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "alt-q-q-vs-dark-aria",
@@ -9046,7 +9345,8 @@
       "awayScore": 2,
       "guessed": false,
       "homeSlug": "alt-q-q",
-      "awaySlug": "dark-aria"
+      "awaySlug": "dark-aria",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "alt-q-q-vs-slonimskiy-pachastunok",
@@ -9063,7 +9363,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "alt-q-q",
-      "awaySlug": "slonimskiy-pachastunok"
+      "awaySlug": "slonimskiy-pachastunok",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "alt-q-q-vs-team-sausages-disbanded",
@@ -9080,7 +9381,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "alt-q-q",
-      "awaySlug": "team-sausages-disbanded"
+      "awaySlug": "team-sausages-disbanded",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "bbc-vs-cruiser-aurora-team",
@@ -9097,7 +9399,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "bbc",
-      "awaySlug": "cruiser-aurora-team"
+      "awaySlug": "cruiser-aurora-team",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "bbc-vs-from-paris",
@@ -9114,7 +9417,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "bbc",
-      "awaySlug": "from-paris"
+      "awaySlug": "from-paris",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "bbc-vs-malchishki",
@@ -9131,7 +9435,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "bbc",
-      "awaySlug": "malchishki"
+      "awaySlug": "malchishki",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "chubriki-vs-dark-aria",
@@ -9148,7 +9453,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "chubriki",
-      "awaySlug": "dark-aria"
+      "awaySlug": "dark-aria",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "chubriki-vs-remix-d2",
@@ -9165,7 +9471,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "chubriki",
-      "awaySlug": "remix-d2"
+      "awaySlug": "remix-d2",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "chubriki-vs-u-s-burgers",
@@ -9182,7 +9489,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "chubriki",
-      "awaySlug": "u-s-burgers"
+      "awaySlug": "u-s-burgers",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "cruiser-aurora-team-vs-malchishki",
@@ -9199,7 +9507,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "cruiser-aurora-team",
-      "awaySlug": "malchishki"
+      "awaySlug": "malchishki",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "dark-aria-vs-navi",
@@ -9216,7 +9525,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "dark-aria",
-      "awaySlug": "navi"
+      "awaySlug": "navi",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "eclipse-gaming-vs-300",
@@ -9233,7 +9543,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "eclipse-gaming",
-      "awaySlug": "300"
+      "awaySlug": "300",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "eclipse-gaming-vs-4naturala",
@@ -9250,7 +9561,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "eclipse-gaming",
-      "awaySlug": "4naturala"
+      "awaySlug": "4naturala",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "eclipse-gaming-vs-5kn",
@@ -9267,7 +9579,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "eclipse-gaming",
-      "awaySlug": "5kn"
+      "awaySlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "eclipse-gaming-vs-gitlz",
@@ -9284,7 +9597,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "eclipse-gaming",
-      "awaySlug": "gitlz"
+      "awaySlug": "gitlz",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "eclipse-gaming-young-vs-acolytes",
@@ -9301,7 +9615,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "eclipse-gaming-young",
-      "awaySlug": "acolytes"
+      "awaySlug": "acolytes",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "eclipse-gaming-young-vs-alt-q-q",
@@ -9318,7 +9633,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "eclipse-gaming-young",
-      "awaySlug": "alt-q-q"
+      "awaySlug": "alt-q-q",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "eclipse-gaming-young-vs-pasechniki",
@@ -9335,7 +9651,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "eclipse-gaming-young",
-      "awaySlug": "pasechniki"
+      "awaySlug": "pasechniki",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "eclipse-gaming-young-vs-pomidory",
@@ -9352,7 +9669,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "eclipse-gaming-young",
-      "awaySlug": "pomidory"
+      "awaySlug": "pomidory",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "eclipse-gaming-young-vs-remix-d2",
@@ -9369,7 +9687,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "eclipse-gaming-young",
-      "awaySlug": "remix-d2"
+      "awaySlug": "remix-d2",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "eclipse-gaming-young-vs-slonimskiy-pachastunok",
@@ -9386,7 +9705,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "eclipse-gaming-young",
-      "awaySlug": "slonimskiy-pachastunok"
+      "awaySlug": "slonimskiy-pachastunok",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "eclipse-gaming-young-vs-team-sausages-disbanded",
@@ -9403,7 +9723,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "eclipse-gaming-young",
-      "awaySlug": "team-sausages-disbanded"
+      "awaySlug": "team-sausages-disbanded",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "ethereal-vs-300",
@@ -9420,7 +9741,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "ethereal",
-      "awaySlug": "300"
+      "awaySlug": "300",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "ethereal-vs-4naturala",
@@ -9437,7 +9759,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "ethereal",
-      "awaySlug": "4naturala"
+      "awaySlug": "4naturala",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "ethereal-vs-5kn",
@@ -9454,7 +9777,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "ethereal",
-      "awaySlug": "5kn"
+      "awaySlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "ethereal-vs-eclipse-gaming",
@@ -9471,7 +9795,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "ethereal",
-      "awaySlug": "eclipse-gaming"
+      "awaySlug": "eclipse-gaming",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "ethereal-vs-eclipse-gaming-2",
@@ -9488,7 +9813,8 @@
       "awayScore": 1,
       "guessed": true,
       "homeSlug": "ethereal",
-      "awaySlug": "eclipse-gaming"
+      "awaySlug": "eclipse-gaming",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "ethereal-vs-gitlz",
@@ -9505,7 +9831,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "ethereal",
-      "awaySlug": "gitlz"
+      "awaySlug": "gitlz",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "etherial-prime-vs-bbc",
@@ -9522,7 +9849,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "etherial-prime",
-      "awaySlug": "bbc"
+      "awaySlug": "bbc",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "etherial-prime-vs-cruiser-aurora-team",
@@ -9539,7 +9867,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "etherial-prime",
-      "awaySlug": "cruiser-aurora-team"
+      "awaySlug": "cruiser-aurora-team",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "etherial-prime-vs-ethereal",
@@ -9556,7 +9885,8 @@
       "awayScore": 1,
       "guessed": true,
       "homeSlug": "etherial-prime",
-      "awaySlug": "ethereal"
+      "awaySlug": "ethereal",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "etherial-prime-vs-from-paris",
@@ -9573,7 +9903,8 @@
       "awayScore": 2,
       "guessed": false,
       "homeSlug": "etherial-prime",
-      "awaySlug": "from-paris"
+      "awaySlug": "from-paris",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "etherial-prime-vs-malchishki",
@@ -9590,7 +9921,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "etherial-prime",
-      "awaySlug": "malchishki"
+      "awaySlug": "malchishki",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "etherial-prime-vs-psixdispancer",
@@ -9607,7 +9939,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "etherial-prime",
-      "awaySlug": "psixdispancer"
+      "awaySlug": "psixdispancer",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "etherial-prime-vs-remix",
@@ -9624,7 +9957,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "etherial-prime",
-      "awaySlug": "remix"
+      "awaySlug": "remix",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "from-paris-vs-cruiser-aurora-team",
@@ -9641,7 +9975,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "from-paris",
-      "awaySlug": "cruiser-aurora-team"
+      "awaySlug": "cruiser-aurora-team",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "from-paris-vs-malchishki",
@@ -9658,7 +9993,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "from-paris",
-      "awaySlug": "malchishki"
+      "awaySlug": "malchishki",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "from-paris-vs-remix",
@@ -9675,7 +10011,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "from-paris",
-      "awaySlug": "remix"
+      "awaySlug": "remix",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "gitlz-vs-300",
@@ -9692,7 +10029,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "gitlz",
-      "awaySlug": "300"
+      "awaySlug": "300",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "gitlz-vs-5kn",
@@ -9709,7 +10047,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "gitlz",
-      "awaySlug": "5kn"
+      "awaySlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "gitlz-vs-morbus-mentis",
@@ -9726,7 +10065,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "gitlz",
-      "awaySlug": "morbus-mentis"
+      "awaySlug": "morbus-mentis",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "guzliki-vs-4naturala",
@@ -9743,7 +10083,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "guzliki",
-      "awaySlug": "4naturala"
+      "awaySlug": "4naturala",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "guzliki-vs-5kn",
@@ -9760,7 +10101,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "guzliki",
-      "awaySlug": "5kn"
+      "awaySlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "guzliki-vs-eclipse-gaming",
@@ -9777,7 +10119,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "guzliki",
-      "awaySlug": "eclipse-gaming"
+      "awaySlug": "eclipse-gaming",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "guzliki-vs-ethereal",
@@ -9794,7 +10137,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "guzliki",
-      "awaySlug": "ethereal"
+      "awaySlug": "ethereal",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "guzliki-vs-from-paris",
@@ -9811,7 +10155,8 @@
       "awayScore": 1,
       "guessed": true,
       "homeSlug": "guzliki",
-      "awaySlug": "from-paris"
+      "awaySlug": "from-paris",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "guzliki-vs-gitlz",
@@ -9828,7 +10173,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "guzliki",
-      "awaySlug": "gitlz"
+      "awaySlug": "gitlz",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "guzliki-vs-morbus-mentis",
@@ -9845,7 +10191,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "guzliki",
-      "awaySlug": "morbus-mentis"
+      "awaySlug": "morbus-mentis",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "malchishki-vs-remix",
@@ -9862,7 +10209,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "malchishki",
-      "awaySlug": "remix"
+      "awaySlug": "remix",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-bbc",
@@ -9879,7 +10227,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "moloko",
-      "awaySlug": "bbc"
+      "awaySlug": "bbc",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-cruiser-aurora-team",
@@ -9896,7 +10245,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "moloko",
-      "awaySlug": "cruiser-aurora-team"
+      "awaySlug": "cruiser-aurora-team",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-etherial-prime",
@@ -9913,7 +10263,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "moloko",
-      "awaySlug": "etherial-prime"
+      "awaySlug": "etherial-prime",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-from-paris",
@@ -9930,7 +10281,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "moloko",
-      "awaySlug": "from-paris"
+      "awaySlug": "from-paris",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-malchishki",
@@ -9947,7 +10299,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "moloko",
-      "awaySlug": "malchishki"
+      "awaySlug": "malchishki",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-psixdispancer",
@@ -9964,7 +10317,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "moloko",
-      "awaySlug": "psixdispancer"
+      "awaySlug": "psixdispancer",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-remix",
@@ -9981,7 +10335,8 @@
       "awayScore": 0,
       "guessed": true,
       "homeSlug": "moloko",
-      "awaySlug": "remix"
+      "awaySlug": "remix",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-remix-2",
@@ -9998,7 +10353,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "moloko",
-      "awaySlug": "remix"
+      "awaySlug": "remix",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "morbus-mentis-vs-5kn",
@@ -10015,7 +10371,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "morbus-mentis",
-      "awaySlug": "5kn"
+      "awaySlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "morbus-mentis-vs-eclipse-gaming",
@@ -10032,7 +10389,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "morbus-mentis",
-      "awaySlug": "eclipse-gaming"
+      "awaySlug": "eclipse-gaming",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "morbus-mentis-vs-ethereal",
@@ -10049,7 +10407,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "morbus-mentis",
-      "awaySlug": "ethereal"
+      "awaySlug": "ethereal",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "morbus-mentis-vs-etherial-prime",
@@ -10066,7 +10425,8 @@
       "awayScore": 1,
       "guessed": true,
       "homeSlug": "morbus-mentis",
-      "awaySlug": "etherial-prime"
+      "awaySlug": "etherial-prime",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "morbus-mentis-vs-moloko",
@@ -10083,7 +10443,8 @@
       "awayScore": 0,
       "guessed": true,
       "homeSlug": "morbus-mentis",
-      "awaySlug": "moloko"
+      "awaySlug": "moloko",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "navi-vs-chubriki",
@@ -10100,7 +10461,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "navi",
-      "awaySlug": "chubriki"
+      "awaySlug": "chubriki",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pasechniki-vs-chubriki",
@@ -10117,7 +10479,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "pasechniki",
-      "awaySlug": "chubriki"
+      "awaySlug": "chubriki",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pasechniki-vs-dark-aria",
@@ -10134,7 +10497,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "pasechniki",
-      "awaySlug": "dark-aria"
+      "awaySlug": "dark-aria",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pasechniki-vs-navi",
@@ -10151,7 +10515,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "pasechniki",
-      "awaySlug": "navi"
+      "awaySlug": "navi",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pomidory-vs-acolytes",
@@ -10168,7 +10533,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "pomidory",
-      "awaySlug": "acolytes"
+      "awaySlug": "acolytes",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pomidory-vs-alt-q-q",
@@ -10185,7 +10551,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "pomidory",
-      "awaySlug": "alt-q-q"
+      "awaySlug": "alt-q-q",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pomidory-vs-chubriki",
@@ -10202,7 +10569,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "pomidory",
-      "awaySlug": "chubriki"
+      "awaySlug": "chubriki",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pomidory-vs-slonimskiy-pachastunok",
@@ -10219,7 +10587,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "pomidory",
-      "awaySlug": "slonimskiy-pachastunok"
+      "awaySlug": "slonimskiy-pachastunok",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pomidory-vs-team-sausages-disbanded",
@@ -10236,7 +10605,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "pomidory",
-      "awaySlug": "team-sausages-disbanded"
+      "awaySlug": "team-sausages-disbanded",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pomidory-vs-u-s-burgers",
@@ -10253,7 +10623,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "pomidory",
-      "awaySlug": "u-s-burgers"
+      "awaySlug": "u-s-burgers",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "psixdispancer-vs-300",
@@ -10270,7 +10641,8 @@
       "awayScore": 0,
       "guessed": true,
       "homeSlug": "psixdispancer",
-      "awaySlug": "300"
+      "awaySlug": "300",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "psixdispancer-vs-bbc",
@@ -10287,7 +10659,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "psixdispancer",
-      "awaySlug": "bbc"
+      "awaySlug": "bbc",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "psixdispancer-vs-cruiser-aurora-team",
@@ -10304,7 +10677,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "psixdispancer",
-      "awaySlug": "cruiser-aurora-team"
+      "awaySlug": "cruiser-aurora-team",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "psixdispancer-vs-from-paris",
@@ -10321,7 +10695,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "psixdispancer",
-      "awaySlug": "from-paris"
+      "awaySlug": "from-paris",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "psixdispancer-vs-malchishki",
@@ -10338,7 +10713,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "psixdispancer",
-      "awaySlug": "malchishki"
+      "awaySlug": "malchishki",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "psixdispancer-vs-remix",
@@ -10355,7 +10731,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "psixdispancer",
-      "awaySlug": "remix"
+      "awaySlug": "remix",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "remix-d2-vs-alt-q-q",
@@ -10372,7 +10749,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "remix-d2",
-      "awaySlug": "alt-q-q"
+      "awaySlug": "alt-q-q",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "remix-d2-vs-dark-aria",
@@ -10389,7 +10767,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "remix-d2",
-      "awaySlug": "dark-aria"
+      "awaySlug": "dark-aria",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "remix-d2-vs-navi",
@@ -10406,7 +10785,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "remix-d2",
-      "awaySlug": "navi"
+      "awaySlug": "navi",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "remix-d2-vs-pasechniki",
@@ -10423,7 +10803,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "remix-d2",
-      "awaySlug": "pasechniki"
+      "awaySlug": "pasechniki",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "remix-vs-bbc",
@@ -10440,7 +10821,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "remix",
-      "awaySlug": "bbc"
+      "awaySlug": "bbc",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "remix-vs-cruiser-aurora-team",
@@ -10457,7 +10839,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "remix",
-      "awaySlug": "cruiser-aurora-team"
+      "awaySlug": "cruiser-aurora-team",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "slonimskiy-pachastunok-vs-team-sausages-disbanded",
@@ -10474,7 +10857,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "slonimskiy-pachastunok",
-      "awaySlug": "team-sausages-disbanded"
+      "awaySlug": "team-sausages-disbanded",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "u-s-burgers-vs-acolytes",
@@ -10491,7 +10875,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "u-s-burgers",
-      "awaySlug": "acolytes"
+      "awaySlug": "acolytes",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "u-s-burgers-vs-dark-aria",
@@ -10508,7 +10893,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "u-s-burgers",
-      "awaySlug": "dark-aria"
+      "awaySlug": "dark-aria",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "u-s-burgers-vs-navi",
@@ -10525,7 +10911,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "u-s-burgers",
-      "awaySlug": "navi"
+      "awaySlug": "navi",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "u-s-burgers-vs-pasechniki",
@@ -10542,7 +10929,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "u-s-burgers",
-      "awaySlug": "pasechniki"
+      "awaySlug": "pasechniki",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "u-s-burgers-vs-remix-d2",
@@ -10559,7 +10947,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "u-s-burgers",
-      "awaySlug": "remix-d2"
+      "awaySlug": "remix-d2",
+      "divisionKey": "s2/d2"
     }
   ],
   "matchStats": [
@@ -325976,13 +326365,13 @@
   "accounts": [
     {
       "email": "mehhhh12221@gmail.com",
-      "googleSub": null,
+      "googleSub": "109864542485506344784",
       "passwordHash": "bb8fe04426c79060351fe6f2db1c8525:23ba156c67e36ce9f4d91715f5eae2fc0f486abb521715d775e2311f0cf0fc6aa3c9bbbf5b6b051ee872a3236e289edc56b3eea9b763288873e5650a567212e7",
-      "emailVerified": false,
-      "name": "NPQ",
-      "avatar": null,
-      "role": "player",
-      "permissions": null,
+      "emailVerified": true,
+      "name": "Mehdi larbi",
+      "avatar": "https://lh3.googleusercontent.com/a/ACg8ocImqaDGXYqE9bm9vNWM_R0qlRflaLhF2VdEynrDTKN0SkQ2Og=s96-c",
+      "role": "admin",
+      "permissions": "accounts.admins,roster.edit",
       "status": "active",
       "application": null,
       "policyAcceptedAt": null,
@@ -325990,7 +326379,26 @@
       "reviewedAt": null,
       "rejectedReason": null,
       "createdAt": "2026-08-20T19:08:56.496Z",
-      "playerSlug": null,
+      "playerSlug": "sett",
+      "claimSlug": null
+    },
+    {
+      "email": "razel55a@gmail.com",
+      "googleSub": null,
+      "passwordHash": "608aa2f118b433ec12fd4e43e3a74dd1:4a22e673818b8d6338e542b5cd14844e073aa338a2ac9c9b122d32d73bf757918b515d1fa278a50df43769d47061c152a0803f78947ecf6e0aa5bc7692f29240",
+      "emailVerified": false,
+      "name": "NPQ",
+      "avatar": null,
+      "role": "admin",
+      "permissions": "tp.edit",
+      "status": "active",
+      "application": "{\"nickname\":\"miracle\",\"realName\":\"Desin\",\"birthday\":\"2007-05-17\",\"city\":\"Minsk\",\"country\":\"Belarus\",\"dotabuff\":\"https://www.dotabuff.com/players/288687180\",\"stratz\":\"\",\"steam\":\"\",\"telegram\":\"bsknchni\",\"position\":\"carry\",\"mmr\":9999,\"achievements\":\"основатель ебки\"}",
+      "policyAcceptedAt": "2026-08-20T21:42:25.937Z",
+      "submittedAt": "2026-08-20T21:42:25.937Z",
+      "reviewedAt": "2026-08-20T21:43:06.512Z",
+      "rejectedReason": null,
+      "createdAt": "2026-08-20T21:40:24.371Z",
+      "playerSlug": "miracle",
       "claimSlug": null
     },
     {

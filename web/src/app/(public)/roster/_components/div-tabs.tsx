@@ -1,17 +1,21 @@
 import Link from "next/link";
-import { DIVISIONS } from "@/lib/divisions";
+import type { Division } from "@/lib/divisions";
 
 // Вкладки дивизиона для страниц ростера: D1 / D2 / Все. Разрез живёт в query (?div=d1),
 // как и в /standings и в рейтингах — ссылку с нужным дивизионом можно кинуть в чат.
 // «Все» (значение null) — весь пул: игроки без команды видны только здесь.
-export type DivFilter = "d1" | "d2" | null;
+export type DivFilter = string | null;
 
-/** Значение query → фильтр. Всё, кроме d1/d2, считаем «Все» (в т.ч. отсутствие параметра). */
-export const parseDiv = (v: unknown): DivFilter => (v === "d1" || v === "d2" ? v : null);
+/**
+ * Значение query → фильтр. Слаг сверяем со списком дивизионов турнира (он приходит из БД, а не
+ * из константы, как раньше): чужой слаг — это «Все», иначе вкладка подсветилась бы пустой.
+ */
+export const parseDiv = (list: Division[], v: unknown): DivFilter =>
+  typeof v === "string" && list.some((d) => d.slug === v) ? v : null;
 
 /** Имя дивизиона (Team.group) по фильтру; null — без фильтра. */
-export const divName = (f: DivFilter): string | null =>
-  f ? (DIVISIONS.find((d) => d.slug === f)?.name ?? null) : null;
+export const divName = (list: Division[], f: DivFilter): string | null =>
+  f ? (list.find((d) => d.slug === f)?.name ?? null) : null;
 
 /**
  * Ссылка вкладки: базовый путь + div + сохранённые прочие параметры (напр. sort на игроках).
@@ -26,16 +30,18 @@ function href(base: string, f: DivFilter, keep: Record<string, string | undefine
 }
 
 export function DivTabs({
+  divisions,
   current,
   base,
   keep = {},
 }: {
+  divisions: Division[];
   current: DivFilter;
   base: string;
   keep?: Record<string, string | undefined>;
 }) {
   const tabs: { key: DivFilter; label: string }[] = [
-    ...DIVISIONS.map((d) => ({ key: d.slug as DivFilter, label: d.short })),
+    ...divisions.map((d) => ({ key: d.slug as DivFilter, label: d.short })),
     { key: null, label: "Все" },
   ];
   return (

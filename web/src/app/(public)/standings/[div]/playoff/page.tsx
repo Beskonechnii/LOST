@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { divisionBySlug } from "@/lib/divisions";
+import { divisionBySlug } from "@/lib/tournaments";
 import { QUALIFICATION } from "@/lib/qualification";
 import { resolveBracket } from "@/lib/playoff";
 import { Eyebrow, SectionHeader } from "@/app/_components/ui";
@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PlayoffPage({ params }: { params: Promise<{ div: string }> }) {
   const { div } = await params;
-  const division = divisionBySlug(div);
+  const division = await divisionBySlug(div);
   if (!division) notFound();
 
   const bracket = await resolveBracket(division.name);

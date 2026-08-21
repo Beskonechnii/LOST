@@ -5,6 +5,39 @@
 
 ---
 
+## 2026-08-22 — Турниры, этап 1: модель и миграция сезона
+
+**Сделано:**
+- Схема: `Tournament` (сезон/кубок: описание, формат, даты, статус), `Division` (внутри турнира,
+  слаг уникален в его пределах), `TournamentEntry` (участие команды — отдельной строкой, команда
+  живёт дольше турнира), `TeamApplication` (заявка команды, состав JSON'ом — пригодится этапу 3).
+  `Series.divisionId` / `GroupEntry.divisionId` — FK. Миграция `20260821230205_tournaments`.
+- **Строки-зеркала оставлены намеренно.** `Team.group`, `Series.division`, `GroupEntry.division`
+  по-прежнему хранят имя дивизиона: по ним фильтруют полтора десятка выборок (standings, leaders,
+  архив, витрины), и переписывать их все разом ради FK — способ уронить работающий сезон. Пишет их
+  теперь только `src/lib/tournaments.ts` (`setTeamDivision`, `updateDivision`).
+- `src/lib/divisions.ts` из хардкод-списка стал чистым справочником-хелпером над списком;
+  сам список отдаёт `getDivisions()` (БД, текущий турнир). Клиентские компоненты (`DivTabs`,
+  `TeamCards`) получают его пропом — БД в них не тянем.
+- `scripts/seed-tournaments.ts` — разовая миграция данных: завела турнир «LOST Season 2» (`s2`,
+  running), дивизионы D1/D2 из встреченных строк, 28 участий, 101 серии и 28 строк таблицы
+  проставлен `divisionId`. Идемпотентно.
+- Снимок БД v12: турниры/дивизионы/участие/заявки; дивизион в связях — по ключу «турнир/слаг»,
+  а не по id (id на машинах разные). Круг `db:export` → `db:import` проверен на копии базы.
+
+**Проверено:** `npx tsc --noEmit` чисто; в браузере `/standings/d1/groups` (таблицы и кросс-таблица
+на месте), `/roster/teams?div=d2` (12 команд), 200 на `/standings/d2`, `/series/<slug>`,
+`/api/standings?div=d2`, `/roster/players?div=d1`.
+
+**Файлы:** `prisma/schema.prisma`, `src/lib/tournaments.ts` (новый), `src/lib/divisions.ts`,
+`scripts/seed-tournaments.ts` (новый), `scripts/{export-db,import-db,build-standings-site,backfill-playoff-slots}.ts`,
+страницы `standings/[div]/*`, `roster/{teams,players}`, `roster/_components/{div-tabs,team-cards}.tsx`,
+`admin/{series,stats}`, `api/standings`, `data/snapshot.json`.
+
+**Дальше:** этап 2 — админка турниров (`/admin/tournaments`), право `tournaments.edit`.
+
+---
+
 ## 2026-08-21 — Аккаунты, этап 4: команда лиги и раздача прав (план закрыт)
 
 **Сделано** (по `ACCOUNTS-PLAN.md`, этап 4 — последний, план закрыт целиком):

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getGroupStage } from "@/lib/group-stage";
 import { QUALIFICATION } from "@/lib/qualification";
-import { divisionBySlug } from "@/lib/divisions";
+import { divisionBySlug } from "@/lib/tournaments";
 import { Chip, SectionHeader } from "@/app/_components/ui";
 import { GroupStage } from "../../_components/group-stage";
 
@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 // групповым сериям (stage="group") — плей-офф и разовые матчи сюда не попадают.
 export default async function StandingsPage({ params }: { params: Promise<{ div: string }> }) {
   const { div } = await params;
-  const division = divisionBySlug(div);
+  const division = await divisionBySlug(div);
   if (!division) notFound();
 
   const tables = await getGroupStage(division.name);

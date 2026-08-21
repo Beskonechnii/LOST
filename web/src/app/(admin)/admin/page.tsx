@@ -15,6 +15,7 @@ type Tool = HubTile & { perm: PermissionKey };
 
 const TOOLS: Tool[] = [
   { href: "/underbeer", perm: "underbeer", label: "UNDERBEER 2.0", icon: "🍺", desc: "Шоу-драфт: капитаны по очереди собирают команды из ростера." },
+  { href: "/admin/tournaments", perm: "tournaments.edit", label: "Турниры", icon: "🏟️", desc: "Завести турнир, описать его, раздать дивизионы и составы." },
   { href: "/admin/series", perm: "series.edit", label: "Архив серий", icon: "🗂️", desc: "Встречи турнира и карты в них — отсюда стата идёт в статистику." },
   { href: "/admin/tp", perm: "tp.edit", label: "TP", icon: "🏅", desc: "Начисление сезонных очков MVP игрокам." },
   { href: "/admin/registrations", perm: "accounts.approve", label: "Регистрации", icon: "📝", desc: "Очередь новых заявок: анкета, одобрение с заведением профиля или возврат с причиной." },

@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { parseId } from "@/lib/api";
 import { attachGame } from "@/lib/series";
+import { guard } from "@/lib/api-guard";
 
 /**
  * Привязать карту к серии: `{ gameNumber, openDotaMatchId }`. Стата читается тут же — отдельной
  * кнопки «синхронизировать» нет намеренно: карта без статы в архиве бесполезна.
  */
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("series.edit");
+  if (denied) return denied;
   const id = parseId((await params).id);
   if (!id) return NextResponse.json({ ok: false, error: "id: ожидался числовой id" }, { status: 400 });
   try {

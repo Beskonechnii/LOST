@@ -2,7 +2,7 @@ import Link from "next/link";
 import { listPlayers } from "@/lib/roster-data";
 import { teamAccent } from "@/lib/profiles";
 import { roleLabel } from "@/lib/roles";
-import { isAdmin } from "@/lib/admin-session";
+import { can } from "@/lib/account";
 import { SectionHeader } from "@/app/_components/ui";
 import { PlayerAvatar } from "../roster/_components/avatar";
 
@@ -17,7 +17,7 @@ const MEDAL = ["🥇", "🥈", "🥉"];
 // Игроки с нулём в таблицу не идут — она про тех, кто уже что-то набрал.
 export default async function TpPage() {
   const players = await listPlayers();
-  const authed = await isAdmin();
+  const authed = await can("tp.edit"); // ссылка на панель начисления — только тем, кто начисляет
   const ranked = players.filter((p) => p.tp > 0).sort((a, b) => b.tp - a.tp);
 
   return (

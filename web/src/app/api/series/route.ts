@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createSeries, listSeries } from "@/lib/series";
 import { isBracket, isStage } from "@/lib/stages";
+import { guard } from "@/lib/api-guard";
 
 /** Архив встреч. Чтение публичное (как и таблица), фильтры — теми же именами, что в URL страниц. */
 export async function GET(req: Request) {
@@ -20,6 +21,8 @@ export async function GET(req: Request) {
 
 /** Завести встречу руками — в первую очередь плей-офф: групповые залиты импортом таблицы сезона. */
 export async function POST(req: Request) {
+  const denied = await guard("series.edit");
+  if (denied) return denied;
   try {
     const body = await req.json();
     const series = await createSeries({

@@ -7,6 +7,7 @@ import { heroImg } from "@/lib/assets";
 import { teamAccent } from "@/lib/profiles";
 import { FEARLESS_VERSION, type FearlessState } from "@/lib/fearless";
 import { FearlessBoard, type HeroRef, type TeamRef } from "../_components/fearless-board";
+import { denyUnlessPermission } from "../../../_components/permission-gate";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,9 @@ export const dynamic = "force-dynamic";
 // payload = стартуем с экрана настройки (initialState=null).
 
 export default async function FearlessSessionPage({ params }: { params: Promise<{ id: string }> }) {
+  const denied = await denyUnlessPermission("tools", "Fearless draft");
+  if (denied) return denied;
+
   const { id } = await params;
   const sessionId = Number(id);
   if (!Number.isInteger(sessionId)) notFound();

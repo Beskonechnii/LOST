@@ -7,7 +7,7 @@ import { teamAccent, teamTag } from "@/lib/profiles";
 import { buttonClasses } from "@/components/pouf/Button";
 import { roleLabel } from "@/lib/roles";
 import { QUALIFICATION, qualificationOf } from "@/lib/qualification";
-import { isAdmin } from "@/lib/admin-session";
+import { can } from "@/lib/account";
 import { Eyebrow, StatTile } from "@/app/_components/ui";
 import { PlayerMiniCard } from "../../_components/player-card";
 import { TeamCover } from "../../_components/team-cover";
@@ -21,7 +21,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
 
   // Таблицу берём по дивизиону команды — тому же, что показывает раздел «LOST D1»/«LOST D2».
   const divSlug = divisionSlug(team.group);
-  const [standings, authed] = await Promise.all([getStandings(team.group ?? DIVISIONS[0].name), isAdmin()]);
+  const [standings, authed] = await Promise.all([getStandings(team.group ?? DIVISIONS[0].name), can("roster.edit")]);
 
   const accent = teamAccent(team);
   const core = team.players.filter((p) => p.position !== null);

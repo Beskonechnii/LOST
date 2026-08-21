@@ -3,11 +3,15 @@ import { notFound } from "next/navigation";
 import { getPlayer, listTeams } from "@/lib/roster-data";
 import { roleOrder } from "@/lib/roles";
 import { PlayerEditor, SpotsEditor } from "@/app/_components/roster-editors";
+import { denyUnlessPermission } from "../../../../../_components/permission-gate";
 
 export const dynamic = "force-dynamic";
 
 // Правка отделена от профиля: страница игрока читается как карточка, а формы живут здесь.
 export default async function PlayerEditPage({ params }: { params: Promise<{ id: string }> }) {
+  const denied = await denyUnlessPermission("roster.edit", "Правка игрока");
+  if (denied) return denied;
+
   const { id } = await params;
   const [player, teams] = await Promise.all([getPlayer(Number(id)), listTeams()]);
   if (!player) notFound();

@@ -8,7 +8,7 @@ import { ageOf, formatBirthday, playerGaps, playerLinks, teamAccent, telegramUrl
 import { heroImg } from "@/lib/assets";
 import { roleLabel } from "@/lib/roles";
 import { parseTags, tagLabel } from "@/lib/player-tags";
-import { isAdmin } from "@/lib/admin-session";
+import { can } from "@/lib/account";
 import { buttonClasses } from "@/components/pouf/Button";
 import { Eyebrow } from "@/app/_components/ui";
 import { PlayerAvatar, TeamLogo } from "../../_components/avatar";
@@ -43,7 +43,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
   const pid = Number(id);
   const [player, authed, heroes, record, teammates, league] = await Promise.all([
     getPlayerProfile(pid),
-    isAdmin(),
+    can("roster.edit"), // кнопка «Править» — ровно то право, что откроет саму страницу правки
     getPlayerHeroes(pid),
     getPlayerRecord(pid),
     getTeammates(pid),

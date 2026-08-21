@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { newDraftState } from "@/lib/draft";
+import { guard } from "@/lib/api-guard";
 
 // Сессии шоу-драфта UNDERBEER 2.0. Запись за паролем (needsAdmin в proxy.ts):
 // это операторский инструмент, публике отдаём только «голый» рендер-оверлей.
@@ -15,6 +16,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const denied = await guard("underbeer");
+  if (denied) return denied;
   const body = (await req.json().catch(() => ({}))) as { title?: string };
   const saved = await prisma.draftSession.create({
     data: { title: body.title?.trim() || null, payload: JSON.stringify(newDraftState()) },

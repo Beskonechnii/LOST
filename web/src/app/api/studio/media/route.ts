@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/prisma";
+import { guard } from "@/lib/api-guard";
 
 // Медиатека редактора: GET — список материалов, POST — загрузка картинки.
 // Файл кладём в public/uploads/library (локально — обязательно для корректного PNG-снимка),
@@ -26,6 +27,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const denied = await guard("studio");
+  if (denied) return denied;
   const form = await req.formData();
   const file = form.get("file");
   if (!(file instanceof File)) return bad("file: не пришёл файл");

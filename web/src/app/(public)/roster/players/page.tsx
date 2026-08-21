@@ -3,7 +3,7 @@ import { listPlayers } from "@/lib/roster-data";
 import { getPlayerRecords } from "@/lib/player-record";
 import { roleLabel } from "@/lib/roles";
 import { playerGaps, teamAccent } from "@/lib/profiles";
-import { isAdmin } from "@/lib/admin-session";
+import { can } from "@/lib/account";
 import { CreateForm } from "@/app/_components/roster-editors";
 import { SectionHeader } from "@/app/_components/ui";
 import { PlayerMiniCard } from "../_components/player-card";
@@ -31,7 +31,7 @@ export default async function PlayersPage({ searchParams }: { searchParams: Prom
   const div = parseDiv(q.div);
 
   const [allPlayers, records] = await Promise.all([listPlayers(), getPlayerRecords(null)]);
-  const authed = await isAdmin();
+  const authed = await can("roster.edit"); // формы и диагностика — те же права, что у пишущих роутов
 
   // Дивизион игрока — по его командам (Team.group): игрок попадает в D1/D2, если в этом дивизионе
   // у него есть место в составе. «Все» — весь пул, включая игроков без команды.

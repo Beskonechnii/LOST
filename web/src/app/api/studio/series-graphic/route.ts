@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buildSeriesData, fillDoc } from "@/lib/series-graphic";
 import { normalizeDoc } from "@/studio/editor/model";
+import { guard } from "@/lib/api-guard";
 
 // Собрать графику серии из мастер-шаблона: по {seriesId, kind} клонирует мастер (Design с этим kind
 // и пустым seriesId), подставляет данные серии, создаёт инстанс (Design с seriesId+kind) и отдаёт id.
@@ -11,6 +12,8 @@ const KINDS = new Set(["announce", "announce2", "score", "result"]);
 const bad = (error: string, status = 400) => NextResponse.json({ error }, { status });
 
 export async function POST(req: Request) {
+  const denied = await guard("studio");
+  if (denied) return denied;
   const body = (await req.json().catch(() => ({}))) as { seriesId?: number; kind?: string; mapNumber?: number };
   const seriesId = Number(body.seriesId);
   const kind = String(body.kind ?? "");

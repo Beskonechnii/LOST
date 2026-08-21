@@ -3,9 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { bad, parseId } from "@/lib/api";
 import { isRole } from "@/lib/roles";
 import { spotConflict } from "@/lib/roster-spots";
+import { guard } from "@/lib/api-guard";
 
 /** Поменять роль или капитанство на месте в составе. */
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("roster.edit");
+  if (denied) return denied;
   const spotId = parseId((await params).id);
   if (!spotId) return bad("id: ожидался числовой id");
   const body = (await req.json()) as Record<string, unknown>;
@@ -37,6 +40,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 /** Убрать игрока из состава. Сама карточка игрока остаётся — со статой, фото и account_id. */
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("roster.edit");
+  if (denied) return denied;
   const id = parseId((await params).id);
   if (!id) return bad("id: ожидался числовой id");
   const { count } = await prisma.rosterSpot.deleteMany({ where: { id } });

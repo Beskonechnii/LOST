@@ -4,6 +4,7 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { uploadUrl, type UploadKind } from "@/lib/profiles";
 import { invalidateUploads } from "@/lib/uploads";
+import { guard } from "@/lib/api-guard";
 
 // Загрузка картинки профиля: multipart { kind: teams|players, file } → файл в public/uploads + путь.
 // Путь дальше кладётся в Team.logo / Team.wordmark / Team.photo / Player.photo.
@@ -16,6 +17,8 @@ const EXT_BY_MIME: Record<string, string> = {
 };
 
 export async function POST(req: Request) {
+  const denied = await guard("roster.edit");
+  if (denied) return denied;
   const form = await req.formData();
   const kind = String(form.get("kind") ?? "") as UploadKind;
   const file = form.get("file");

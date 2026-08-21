@@ -2,12 +2,15 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { syncMatch } from "@/lib/match-sync";
 import { detachGame } from "@/lib/series";
+import { guard } from "@/lib/api-guard";
 
 /**
  * Перечитать карту из OpenDota. Нужно, когда отчёт дозрел: непарсенный матч через какое-то время
  * обрастает вардами, стаками и таймингами, а привязка их уже не увидит — она была раньше.
  */
 export async function POST(_req: Request, { params }: { params: Promise<{ matchId: string }> }) {
+  const denied = await guard("series.edit");
+  if (denied) return denied;
   const { matchId } = await params;
   try {
     return NextResponse.json({ ok: true, ...(await syncMatch(prisma, Number(matchId))) });
@@ -18,6 +21,8 @@ export async function POST(_req: Request, { params }: { params: Promise<{ matchI
 
 /** Отцепить карту от серии. Если на матче висят генерации или баллы — он остаётся, но без серии. */
 export async function DELETE(_req: Request, { params }: { params: Promise<{ matchId: string }> }) {
+  const denied = await guard("series.edit");
+  if (denied) return denied;
   const { matchId } = await params;
   try {
     await detachGame(Number(matchId));

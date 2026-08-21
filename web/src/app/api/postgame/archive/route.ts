@@ -7,8 +7,11 @@ import {
   saveShot,
   type ArchiveMeta,
 } from "@/lib/postgame-archive";
+import { guard } from "@/lib/api-guard";
 
 // Полка выгруженных постгеймов: GET — список, POST — положить свежий PNG, DELETE — убрать матч.
+// Право tools здесь и на чтении, а не только на записи: полка — черновики оператора, а не факт о
+// лиге (то же исключение уже описано в needsAdmin, см. lib/auth.ts).
 // PNG приходит готовым с клиента: он снимается там же, где рисуется превью (modern-screenshot),
 // поэтому «что видел — то и в архиве». Серверу остаётся проверить формат и записать файл.
 
@@ -17,10 +20,14 @@ const MAX_BYTES = 16 * 1024 * 1024; // 1920×1080 PNG — единицы мег�
 const bad = (error: string, status = 400) => NextResponse.json({ ok: false, error }, { status });
 
 export async function GET() {
+  const denied = await guard("tools");
+  if (denied) return denied;
   return NextResponse.json({ ok: true, items: await listEntries() });
 }
 
 export async function POST(req: Request) {
+  const denied = await guard("tools");
+  if (denied) return denied;
   const form = await req.formData();
 
   const kind = form.get("kind");
@@ -59,6 +66,8 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const denied = await guard("tools");
+  if (denied) return denied;
   const matchId = safeMatchId(new URL(req.url).searchParams.get("matchId"));
   if (!matchId) return bad("matchId: ожидался числовой id матча");
   await dropEntry(matchId);

@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { isAdmin } from "@/lib/admin-session";
 import { MatchReportView } from "../_components/report";
+import { denyUnlessPermission } from "../../_components/permission-gate";
 
 // Постоянная ссылка на отчёт. Сам матч грузится на клиенте (те же /api/<src>/match/<id>),
 // поэтому страница остаётся тонкой: её дело — проверить id, узнать оператора и отдать вид.
@@ -23,13 +23,14 @@ export default async function MatchReportPage({ params }: Props) {
   // id матча у Valve — только цифры. Всё остальное — не «пустой отчёт», а несуществующий адрес.
   if (!/^\d+$/.test(id)) notFound();
 
-  const admin = await isAdmin();
+  const denied = await denyUnlessPermission("tools", `Матч #${id}`);
+  if (denied) return denied;
 
   return (
     // useSearchParams внутри требует границы Suspense — иначе Next не отдаст оболочку страницы.
     // key по id: переход на другой матч сбрасывает ручные правки названий, они относились к прошлому.
     <Suspense fallback={<p className="p-8 text-sm text-ink-subtle">Загружаю матч #{id}…</p>}>
-      <MatchReportView key={id} matchId={id} canArchive={admin} />
+      <MatchReportView key={id} matchId={id} canArchive />
     </Suspense>
   );
 }

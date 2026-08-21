@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Eyebrow } from "@/app/_components/ui";
 import { NewFearlessButton } from "./_components/new-fearless-button";
+import { denyUnlessPermission } from "../../_components/permission-gate";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Fearless draft" };
@@ -10,6 +11,9 @@ export const metadata = { title: "Fearless draft" };
 // Как UNDERBEER: сессия эфемерная, состояние в payload (не в снимке БД).
 
 export default async function FearlessHome() {
+  const denied = await denyUnlessPermission("tools", "Fearless draft");
+  if (denied) return denied;
+
   const sessions = await prisma.fearlessSession.findMany({ orderBy: { updatedAt: "desc" }, take: 50 });
 
   return (

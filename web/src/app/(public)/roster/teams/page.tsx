@@ -1,5 +1,5 @@
 import { listTeamRosters } from "@/lib/roster-data";
-import { isAdmin } from "@/lib/admin-session";
+import { can } from "@/lib/account";
 import { CreateForm } from "@/app/_components/roster-editors";
 import { SectionHeader } from "@/app/_components/ui";
 import { TeamCards } from "../_components/team-cards";
@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 // закрыта в needsAdmin() на уровне API.
 export default async function TeamsPage({ searchParams }: { searchParams: Promise<{ div?: string }> }) {
   const div = parseDiv((await searchParams).div);
-  const authed = await isAdmin();
+  const authed = await can("roster.edit");
 
   // Дивизион команды — её Team.group; «Все» показывает весь список.
   const name = divName(div);

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { SITE_MAX_W } from "@/app/_components/ui";
 import { VisionMap } from "@/app/_components/postgame/vision-map";
 import { listTeamsWithWards, teamVision, mapVision } from "@/lib/vision";
+import { denyUnlessPermission } from "../../_components/permission-gate";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Карта вардов" };
@@ -25,6 +26,9 @@ export default async function VisionPage({
 }: {
   searchParams: Promise<{ team?: string; map?: string }>;
 }) {
+  const denied = await denyUnlessPermission("tools", "Карта вардов");
+  if (denied) return denied;
+
   const q = await searchParams;
   const teams = await listTeamsWithWards();
   const vision = q.team ? await teamVision(q.team) : null;

@@ -5,6 +5,7 @@ import { listSeries } from "@/lib/series";
 import { resolveBracket } from "@/lib/playoff";
 import { SITE_MAX_W } from "@/app/_components/ui";
 import { SeriesAdmin, type SlotOptions } from "./_components/series-admin";
+import { denyUnlessPermission } from "../../_components/permission-gate";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,9 @@ export const metadata = { title: "Архив серий" };
 // (/standings/<div>/stats) — других путей в архив нет, поэтому страница живёт в (admin).
 
 export default async function SeriesAdminPage() {
+  const denied = await denyUnlessPermission("series.edit", "Архив серий");
+  if (denied) return denied;
+
   const [teams, series, ...brackets] = await Promise.all([
     prisma.team.findMany({ orderBy: [{ group: "asc" }, { name: "asc" }], select: { id: true, name: true, tag: true, group: true } }),
     listSeries(),

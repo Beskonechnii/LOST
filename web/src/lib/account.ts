@@ -8,7 +8,7 @@ import { currentAccountId, setSessionCookie } from "./player-session";
 import type { Role } from "./player-auth";
 import { slugify, playerAccountId, normalizeTelegram, parseBirthday } from "./profiles";
 import { hashPassword, verifyPassword, passwordProblem } from "./password";
-import { hasPermission, permissionsOf, type PermissionKey } from "./permissions";
+import { formatPermissions, hasPermission, permissionsOf, type PermissionKey } from "./permissions";
 import {
   normalizeApplication,
   formatApplication,
@@ -350,6 +350,7 @@ export function pendingClaims() {
 
 /** Оператор подтвердил заявку: claim → привязка. Если игрока успели занять — отказываем. */
 export async function approveClaim(accountId: number): Promise<void> {
+  await requirePermission("accounts.approve"); // право проверяем здесь же, как в очереди регистраций
   const acc = await prisma.userAccount.findUnique({ where: { id: accountId }, select: { claimId: true } });
   if (!acc?.claimId) return;
   const taken = await prisma.userAccount.findUnique({ where: { playerId: acc.claimId }, select: { id: true } });
@@ -359,6 +360,7 @@ export async function approveClaim(accountId: number): Promise<void> {
 
 /** Оператор отклонил заявку: просто снимаем claim, аккаунт остаётся без привязки. */
 export async function rejectClaim(accountId: number): Promise<void> {
+  await requirePermission("accounts.approve");
   await prisma.userAccount.update({ where: { id: accountId }, data: { claimId: null } });
 }
 
@@ -466,30 +468,54 @@ export async function rejectRegistration(accountId: number, reason: string): Pro
   return null;
 }
 
-// ── панель ролей (только владелец) ────────────────────────────────────────────
+// ── панель команды лиги (/admin/staff) ────────────────────────────────────────
+//
+// Раздача ролей и прав. Раньше это была панель только для владельца (requireOwner); теперь право
+// на неё — обычный ключ реестра (accounts.admins), у владельца он есть всегда. Так владелец может
+// разгрузить себя, не отдавая никому OWNER_EMAIL.
+//
+// Свой аккаунт из панели не правится намеренно: иначе админ снял бы себе роль и запер сам себя,
+// а «выдать себе всё» превратилось бы в один клик. Своё меняет только тот, у кого право есть выше.
 
-/** Все аккаунты для панели владельца — с профилем/заявкой и эффективной ролью. */
+/** Все аккаунты для панели: профиль/заявка, эффективная роль и её права. */
 export async function listAccounts() {
   const rows = await prisma.userAccount.findMany({
     include: { player: true, claim: true },
     orderBy: { createdAt: "asc" },
   });
-  return rows.map((a) => ({ ...a, effectiveRole: effectiveRole(a) }));
+  return rows.map((a) => {
+    const role = effectiveRole(a);
+    return { ...a, effectiveRole: role, perms: permissionsOf(role, a.permissions) };
+  });
 }
 
-/** Владелец меняет роль аккаунта. Владельца по почте не трогаем — его роль задаёт OWNER_EMAIL. */
-export async function setAccountRole(targetId: number, role: "admin" | "player"): Promise<void> {
-  const target = await prisma.userAccount.findUnique({ where: { id: targetId }, select: { email: true } });
+export type StaffAccount = Awaited<ReturnType<typeof listAccounts>>[number];
+
+/** Кого вообще можно трогать в панели: не владелец (его роль задаёт OWNER_EMAIL) и не ты сам. */
+async function editableTarget(targetId: number) {
+  const actor = await requirePermission("accounts.admins");
+  if (actor.id === targetId) throw new Error("Свою роль и права здесь не меняют — попросите владельца лиги");
+  const target = await prisma.userAccount.findUnique({ where: { id: targetId }, select: { email: true, role: true } });
   if (!target) throw new Error("Аккаунт не найден");
-  if (isOwnerEmail(target.email)) throw new Error("Роль владельца задаётся через OWNER_EMAIL");
-  await prisma.userAccount.update({ where: { id: targetId }, data: { role } });
+  if (isOwnerEmail(target.email)) throw new Error("Владелец задаётся через OWNER_EMAIL — его роль и права неотчуждаемы");
+  return target;
 }
 
-/** Гард для страниц/экшенов владельца: вернуть аккаунт владельца или бросить. */
-export async function requireOwner() {
-  const acc = await currentAccount();
-  if (!acc || effectiveRole(acc) !== "owner") throw new Error("Доступ только для владельца");
-  return acc;
+/** Назначить админом или снять. Снятие гасит права: вернув роль, админ начинает с нуля — иначе
+ *  снятый и возвращённый человек молча получил бы обратно весь прежний набор. */
+export async function setAccountRole(targetId: number, role: "admin" | "player"): Promise<void> {
+  await editableTarget(targetId);
+  await prisma.userAccount.update({
+    where: { id: targetId },
+    data: role === "admin" ? { role } : { role, permissions: null },
+  });
+}
+
+/** Выдать админу набор прав (чекбоксы в панели). Неизвестные ключи отсекает formatPermissions. */
+export async function setAccountPermissions(targetId: number, keys: string[]): Promise<void> {
+  const target = await editableTarget(targetId);
+  if (target.role !== "admin") throw new Error("Права выдаются админам — сначала назначьте роль");
+  await prisma.userAccount.update({ where: { id: targetId }, data: { permissions: formatPermissions(keys) } });
 }
 
 // ── вход по email + паролю ─────────────────────────────────────────────────────

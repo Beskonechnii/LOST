@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { pendingClaims } from "@/lib/account";
 import { Button } from "@/components/ui/button";
+import { denyUnlessPermission } from "../../_components/permission-gate";
 import { approve, reject } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -11,6 +12,10 @@ export const metadata = { title: "Заявки на привязку" };
 // сюда они не попадают.
 
 export default async function ClaimsPage() {
+  // Привязка — то же решение «пускать в лигу», что и очередь регистраций: одно право на обе очереди.
+  const denied = await denyUnlessPermission("accounts.approve", "Заявки на привязку");
+  if (denied) return denied;
+
   const claims = await pendingClaims();
 
   return (

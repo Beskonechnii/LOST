@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { can, pendingRegistrations, accountApplication, type PendingRegistration } from "@/lib/account";
+import { pendingRegistrations, accountApplication, type PendingRegistration } from "@/lib/account";
 import { ApplicationSummary } from "@/app/_components/application-summary";
+import { denyUnlessPermission } from "../../_components/permission-gate";
 import { ReviewForms } from "./review-forms";
 
 export const dynamic = "force-dynamic";
@@ -21,17 +22,8 @@ const dateTime = new Intl.DateTimeFormat("ru", {
 });
 
 export default async function RegistrationsPage() {
-  if (!(await can("accounts.approve"))) {
-    return (
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 md:px-6">
-        <h1 className="text-xl font-bold tracking-tight">Регистрации</h1>
-        <p className="mt-4 rounded-md border border-amber-900 bg-amber-950/40 px-3 py-2 text-sm text-amber-300">
-          Приём регистраций — отдельное право (<code>accounts.approve</code>). Попросите владельца лиги
-          выдать его вашему аккаунту.
-        </p>
-      </main>
-    );
-  }
+  const denied = await denyUnlessPermission("accounts.approve", "Регистрации");
+  if (denied) return denied;
 
   const queue = await pendingRegistrations();
 

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { bad, parseId } from "@/lib/api";
 import { accountIdFromUrl, normalizeTelegram, parseBirthday } from "@/lib/profiles";
 import { parseTags } from "@/lib/player-tags";
+import { guard } from "@/lib/api-guard";
 
 const TEXT_FIELDS = [
   "nickname", "realName", "photo", "steamUrl", "dotabuffUrl", "stratzUrl", "city", "country",
@@ -13,6 +14,18 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const id = parseId((await params).id);
   if (!id) return bad("id: ожидался числовой id");
   const body = (await req.json()) as Record<string, unknown>;
+
+  // Через этот же PATCH пишет панель TP (одним полем tp), поэтому право зависит от тела запроса:
+  // за TP отвечает tp.edit, за всё остальное в анкете — roster.edit. Иначе «начислить очки»
+  // потребовало бы полного доступа к ростеру, а правка анкеты открывала бы сезонный зачёт.
+  if ("tp" in body) {
+    const denied = await guard("tp.edit");
+    if (denied) return denied;
+  }
+  if (Object.keys(body).some((k) => k !== "tp")) {
+    const denied = await guard("roster.edit");
+    if (denied) return denied;
+  }
 
   const data: Record<string, unknown> = {};
   for (const f of TEXT_FIELDS) {
@@ -109,6 +122,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("roster.delete");
+  if (denied) return denied;
   const playerId = parseId((await params).id);
   if (!playerId) return bad("id: ожидался числовой id");
 

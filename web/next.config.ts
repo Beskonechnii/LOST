@@ -8,6 +8,12 @@ import type { NextConfig } from "next";
 const frameAncestors = process.env.FRAME_ANCESTORS?.trim() || "'self'";
 
 const nextConfig: NextConfig = {
+  // Старая панель ролей заменена «Командой лиги» (роль + гранулярные права). Редирект, а не удаление
+  // молча: адрес мог осесть в закладках оператора.
+  async redirects() {
+    return [{ source: "/admin/roles", destination: "/admin/staff", permanent: true }];
+  },
+
   async headers() {
     return [
       {

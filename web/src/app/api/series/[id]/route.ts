@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { bad, parseId } from "@/lib/api";
 import { VALID_SCORES } from "@/lib/series";
+import { guard } from "@/lib/api-guard";
 
 /**
  * Поправить счёт встречи. Кросс-таблица сезона не подписана, пары групповой стадии восстановлены
@@ -9,6 +10,8 @@ import { VALID_SCORES } from "@/lib/series";
  * `flipped` — счёт пришёл со стороны гостя, разворачиваем перед записью.
  */
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("series.edit");
+  if (denied) return denied;
   const id = parseId((await params).id);
   if (!id) return bad("id: ожидался числовой id");
   const body = (await req.json()) as { score?: string; flipped?: boolean };
@@ -30,6 +33,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 /** Снести встречу целиком — вместе с её картами: без серии карте в архиве места нет. */
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("series.edit");
+  if (denied) return denied;
   const seriesId = parseId((await params).id);
   if (!seriesId) return bad("id: ожидался числовой id");
   await prisma.match.deleteMany({ where: { seriesId } });

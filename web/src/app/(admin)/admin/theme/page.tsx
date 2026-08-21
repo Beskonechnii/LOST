@@ -1,5 +1,6 @@
 import { readTheme } from "@/lib/theme-store";
 import { ThemeAdmin } from "./_components/theme-admin";
+import { denyUnlessPermission } from "../../_components/permission-gate";
 
 export const metadata = { title: "Тема" };
 
@@ -7,6 +8,9 @@ export const metadata = { title: "Тема" };
 // редактор; тот правит локально (живое превью) и сохраняет через PUT /api/theme.
 
 export default async function ThemePage() {
+  const denied = await denyUnlessPermission("theme", "Тема");
+  if (denied) return denied;
+
   const theme = await readTheme();
   return (
     <main className="mx-auto w-full max-w-[96rem] flex-1 px-4 py-8 md:px-6">

@@ -3,12 +3,15 @@ import { prisma } from "@/lib/prisma";
 import { listPlayers } from "@/lib/roster-data";
 import { accountIdFromUrl, slugify } from "@/lib/profiles";
 import { isRole } from "@/lib/roles";
+import { guard } from "@/lib/api-guard";
 
 export async function GET() {
   return NextResponse.json(await listPlayers());
 }
 
 export async function POST(req: Request) {
+  const denied = await guard("roster.edit");
+  if (denied) return denied;
   const body = (await req.json()) as {
     nickname?: string;
     slug?: string;

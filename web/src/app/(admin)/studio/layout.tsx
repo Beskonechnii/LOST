@@ -1,5 +1,6 @@
 import { SubNav } from "../../_components/site-nav";
 import { SITE_MAX_W } from "../../_components/ui";
+import { denyUnlessPermission } from "../_components/permission-gate";
 
 // Студия — только генерация графики. Профили команд и игроков живут в разделе «Ростер»,
 // студия берёт их оттуда как справочник (src/lib/studio-refs.ts).
@@ -10,7 +11,11 @@ const TABS = [
   { href: "/studio/generate", label: "Генерация", hint: "Картинки по промту через OpenAI" },
 ];
 
-export default function StudioLayout({ children }: { children: React.ReactNode }) {
+export default async function StudioLayout({ children }: { children: React.ReactNode }) {
+  // Гейт на layout, а не на каждой странице: студия — целый раздел, и платная генерация в нём тоже.
+  const denied = await denyUnlessPermission("studio", "Студия");
+  if (denied) return denied;
+
   return (
     <>
       <SubNav items={TABS} />

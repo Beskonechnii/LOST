@@ -2,9 +2,12 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isRole } from "@/lib/roles";
 import { spotConflict } from "@/lib/roster-spots";
+import { guard } from "@/lib/api-guard";
 
 /** Поставить игрока в состав команды. */
 export async function POST(req: Request) {
+  const denied = await guard("roster.edit");
+  if (denied) return denied;
   const body = (await req.json()) as { playerId?: number; teamId?: number; role?: string | null };
   const playerId = Number(body.playerId);
   const teamId = Number(body.teamId);

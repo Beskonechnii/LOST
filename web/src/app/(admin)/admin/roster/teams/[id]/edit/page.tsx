@@ -2,11 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTeam } from "@/lib/roster-data";
 import { TeamEditor } from "@/app/_components/roster-editors";
+import { denyUnlessPermission } from "../../../../../_components/permission-gate";
 
 export const dynamic = "force-dynamic";
 
 // Как и у игрока: страница команды — витрина, формы живут отдельно.
 export default async function TeamEditPage({ params }: { params: Promise<{ id: string }> }) {
+  const denied = await denyUnlessPermission("roster.edit", "Правка команды");
+  if (denied) return denied;
+
   const { id } = await params;
   const team = await getTeam(Number(id));
   if (!team) notFound();

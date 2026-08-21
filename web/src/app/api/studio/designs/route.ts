@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { emptyDoc, normalizeDoc } from "@/studio/editor/model";
+import { guard } from "@/lib/api-guard";
 
 // Документы редактора: GET — список (без тяжёлого doc), POST — создать новый.
 // doc хранится JSON-строкой в Design.doc (как Render.payload).
@@ -15,6 +16,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const denied = await guard("studio");
+  if (denied) return denied;
   const body = (await req.json().catch(() => ({}))) as { title?: string; w?: number; h?: number };
   const doc = normalizeDoc(emptyDoc(body.w, body.h));
   const design = await prisma.design.create({

@@ -3,6 +3,7 @@ import { getLeaders, METRICS, type Subject } from "@/lib/leaders";
 import { DIVISIONS } from "@/lib/divisions";
 import { isStage } from "@/lib/stages";
 import { Eyebrow } from "@/app/_components/ui";
+import { denyUnlessPermission } from "../../_components/permission-gate";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Показатели" };
@@ -63,6 +64,9 @@ function Board({ label, hint, rows, decimals, perLabel }: {
 }
 
 export default async function AdminStatsPage({ searchParams }: { searchParams: Promise<Query> }) {
+  const denied = await denyUnlessPermission("tools", "Показатели");
+  if (denied) return denied;
+
   const q = await searchParams;
   const division = DIVISIONS.find((d) => d.slug === q.div)?.name; // undefined = оба дивизиона
   const stage = isStage(q.stage) ? q.stage : undefined; // undefined = вся дистанция

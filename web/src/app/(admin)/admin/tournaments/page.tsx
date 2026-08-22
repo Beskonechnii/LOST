@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { listTournaments, TOURNAMENT_STATUS_LABELS, type TournamentStatus } from "@/lib/tournaments";
+import { currentTournament, listTournaments, TOURNAMENT_STATUS_LABELS, type TournamentStatus } from "@/lib/tournaments";
 import { Button } from "@/components/ui/button";
 import { denyUnlessPermission } from "../../_components/permission-gate";
 import { addTournament } from "./actions";
@@ -20,15 +20,15 @@ export default async function TournamentsPage() {
   const denied = await denyUnlessPermission("tournaments.edit", "Турниры");
   if (denied) return denied;
 
-  const tournaments = await listTournaments();
+  const [tournaments, current] = await Promise.all([listTournaments(), currentTournament()]);
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 md:px-6">
       <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-300/80">Служебная часть</p>
       <h1 className="mt-1.5 text-xl font-bold tracking-tight">Турниры</h1>
       <p className="mt-1.5 text-sm text-ink-muted">
-        Сезон или кубок целиком: описание, сроки, дивизионы и составы. Публичные витрины показывают
-        турнир со статусом «Идёт» — если такого нет, последний заведённый.
+        Сезон или кубок целиком: описание, сроки, дивизионы и составы. Вкладкой в шапке сайта
+        открывается турнир со статусом «Идёт» — если такого нет, последний заведённый.
       </p>
 
       {tournaments.length === 0 ? (
@@ -47,6 +47,13 @@ export default async function TournamentsPage() {
                   {t.name}
                 </Link>
                 <span className="text-xs text-ink-subtle">/{t.slug}</span>
+                {/* Какой турнир открывает вкладка в шапке — видно сразу: при двух-трёх сразу
+                    непонятно, чьи таблицы показывает сайт. */}
+                {t.id === current?.id && (
+                  <span className="rounded-md border border-violet-900 bg-violet-950/40 px-2 py-0.5 text-xs text-violet-300">
+                    вкладка в шапке
+                  </span>
+                )}
               </div>
               <p className="mt-1.5 text-xs text-ink-subtle">
                 {range(t.startAt, t.endAt)} · дивизионов: {t.divisions.length}

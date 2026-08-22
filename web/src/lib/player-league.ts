@@ -114,7 +114,20 @@ export async function getPlayerLeague(playerId: number, gamesLimit = 15): Promis
           winnerTeamId: true,
           teamA: teamSelect,
           teamB: teamSelect,
-          series: { select: { slug: true, division: true, stage: true, group: true, bracket: true, round: true } },
+          series: {
+            select: {
+              slug: true,
+              division: true,
+              divisionId: true,
+              // Подпись разреза берём из самого дивизиона с турниром: имена дивизионов повторяются
+              // из сезона в сезон, и по имени разрезы двух турниров слиплись бы в один.
+              divisionRef: { select: { short: true, name: true, tournament: { select: { short: true, name: true } } } },
+              stage: true,
+              group: true,
+              bracket: true,
+              round: true,
+            },
+          },
         },
       },
     },
@@ -125,7 +138,7 @@ export async function getPlayerLeague(playerId: number, gamesLimit = 15): Promis
   const sum = { games: 0, wins: 0, kills: 0, deaths: 0, assists: 0, gpm: 0, xpm: 0, dur: 0, durCount: 0 };
 
   // --- Разрез по турнирам: ключ «division|stage» ---
-  type Bucket = { division: string; stage: string; games: number; wins: number; heroes: Map<string, number> };
+  type Bucket = { key: string; division: string; stage: string; games: number; wins: number; heroes: Map<string, number> };
   const buckets = new Map<string, Bucket>();
 
   // --- Лента карт ---
@@ -147,8 +160,15 @@ export async function getPlayerLeague(playerId: number, gamesLimit = 15): Promis
       sum.durCount += 1;
     }
 
-    const key = `${series.division}|${series.stage}`;
-    const b = buckets.get(key) ?? { division: series.division, stage: series.stage, games: 0, wins: 0, heroes: new Map() };
+    // Ключ разреза — id дивизиона, а не имя: «Division 1» есть в каждом сезоне.
+    const key = `${series.divisionId ?? series.division}|${series.stage}`;
+    const divisionLabel = series.divisionRef
+      ? [
+          series.divisionRef.tournament.short ?? series.divisionRef.tournament.name,
+          series.divisionRef.short ?? series.divisionRef.name,
+        ].join(" · ")
+      : series.division;
+    const b = buckets.get(key) ?? { key, division: divisionLabel, stage: series.stage, games: 0, wins: 0, heroes: new Map() };
     b.games += 1;
     if (s.won) b.wins += 1;
     if (s.heroSlug) b.heroes.set(s.heroSlug, (b.heroes.get(s.heroSlug) ?? 0) + 1);
@@ -184,7 +204,9 @@ export async function getPlayerLeague(playerId: number, gamesLimit = 15): Promis
       myTeam,
       opponent,
       seriesSlug: series.slug,
-      division: series.division,
+      // Та же подпись, что и у разрезов: турнир + дивизион, иначе в ленте карт два сезона выглядят
+      // как один «Division 1».
+      division: divisionLabel,
       stageText: series.stage === "playoff" ? playoffLabel(series.bracket, series.round) || stageLabel(series.stage) : series.group ? `Группа ${series.group}` : stageLabel(series.stage),
     });
   }

@@ -3,7 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { requirePermission } from "@/lib/account";
 
-import { normalizeDrafts, parseDelimited, parseGrid, unparsedRows, type TeamDraft } from "@/lib/roster-import";
+import {
+  normalizeDrafts,
+  parseDelimited,
+  parseGridDetailed,
+  unparsedRows,
+  type TeamDraft,
+} from "@/lib/roster-import";
 import { readWorkbook, type Grid } from "@/lib/xlsx";
 import { enrichTeams, type EnrichNote } from "@/lib/enrich";
 import { applicationProblems, writeTeamToRoster, type Problem } from "@/lib/team-application";
@@ -16,7 +22,22 @@ import { applicationProblems, writeTeamToRoster, type Problem } from "@/lib/team
 // а импорт делает сам оператор, и подтверждать самому себе нечего. Проверки при этом те же
 // (`applicationProblems`): блокирующее замечание команду не пропускает.
 
-export type ParseState = { teams?: TeamDraft[]; error?: string; note?: string; skipped?: string[] } | null;
+/** Что дал каждый лист книги — по этому отчёту видно, какой лист портит разбор. */
+export type SheetReport = { name: string; layout: string; teams: number; players: number };
+
+export type ParseState = {
+  teams?: TeamDraft[];
+  error?: string;
+  note?: string;
+  skipped?: string[];
+  sheets?: SheetReport[];
+} | null;
+
+const LAYOUT_LABEL: Record<string, string> = {
+  columns: "колонки",
+  blocks: "блоки",
+  empty: "ничего не нашлось",
+};
 
 /** Гугл-таблица открывается как xlsx по своему export-адресу — id достаём из любой формы ссылки. */
 async function fetchSheet(src: string): Promise<Uint8Array> {
@@ -37,31 +58,39 @@ export async function parseUpload(_prev: ParseState, form: FormData): Promise<Pa
     let teams: TeamDraft[] = [];
     let note = "";
     const grids: Grid[] = []; // сетки листов — по ним потом считаем, какие строки не разобрались
+    const sheetReport: SheetReport[] = [];
+
+    /** Разобрать лист и записать его в отчёт. */
+    const takeSheet = (name: string, grid: Grid) => {
+      const report = parseGridDetailed(grid);
+      grids.push(grid);
+      sheetReport.push({
+        name,
+        layout: LAYOUT_LABEL[report.layout] ?? report.layout,
+        teams: report.teams.length,
+        players: report.teams.reduce((n, t) => n + t.players.length, 0),
+      });
+      return report.teams;
+    };
 
     if (file instanceof File && file.size > 0) {
       const bytes = new Uint8Array(await file.arrayBuffer());
       if (/\.xlsx$/i.test(file.name)) {
         const sheets = readWorkbook(bytes).filter((s) => !sheetFilter || s.name.toLowerCase().includes(sheetFilter));
-        grids.push(...sheets.map((s) => s.grid));
-        teams = sheets.flatMap((s) => parseGrid(s.grid));
-        note = `Листы: ${sheets.map((s) => s.name).join(", ") || "не нашлось"}`;
+        teams = sheets.flatMap((s) => takeSheet(s.name, s.grid));
+        note = `Листов взято: ${sheets.length}`;
       } else {
-        const grid = parseDelimited(new TextDecoder().decode(bytes));
-        grids.push(grid);
-        teams = parseGrid(grid);
+        teams = takeSheet(file.name, parseDelimited(new TextDecoder().decode(bytes)));
         note = `Файл ${file.name}`;
       }
     } else if (link) {
       const sheets = readWorkbook(await fetchSheet(link)).filter(
         (s) => !sheetFilter || s.name.toLowerCase().includes(sheetFilter),
       );
-      grids.push(...sheets.map((s) => s.grid));
-      teams = sheets.flatMap((s) => parseGrid(s.grid));
-      note = `Листы: ${sheets.map((s) => s.name).join(", ") || "не нашлось"}`;
+      teams = sheets.flatMap((s) => takeSheet(s.name, s.grid));
+      note = `Листов взято: ${sheets.length}`;
     } else if (pasted) {
-      const grid = parseDelimited(pasted);
-      grids.push(grid);
-      teams = parseGrid(grid);
+      teams = takeSheet("вставленный текст", parseDelimited(pasted));
       note = "Вставленный текст";
     } else {
       return { error: "Дайте файл, ссылку на таблицу или вставьте текст" };
@@ -77,7 +106,7 @@ export async function parseUpload(_prev: ParseState, form: FormData): Promise<Pa
     // Что не легло ни в одну команду — показываем списком: «22 игрока» без этого выглядят успехом,
     // даже если в таблице их было тридцать.
     const skipped = grids.flatMap((g) => unparsedRows(g, normalized)).slice(0, 40);
-    return { teams: normalized, note, skipped };
+    return { teams: normalized, note, skipped, sheets: sheetReport };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Не удалось разобрать файл" };
   }

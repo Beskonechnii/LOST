@@ -130,6 +130,31 @@ export function ImportForm({
                 {parsed?.note && <span className="text-xs text-ink-subtle">{parsed.note}</span>}
               </div>
 
+              {parsed?.sheets && parsed.sheets.length > 0 && (
+                <div className="overflow-x-auto rounded-md border border-hairline bg-surface-2">
+                  <table className="w-full text-xs">
+                    <thead className="text-ink-subtle">
+                      <tr>
+                        <th className="px-2 py-1 text-left font-semibold">Лист</th>
+                        <th className="px-2 py-1 text-left font-semibold">Раскладка</th>
+                        <th className="px-2 py-1 text-right font-semibold">Команд</th>
+                        <th className="px-2 py-1 text-right font-semibold">Игроков</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {parsed.sheets.map((sh) => (
+                        <tr key={sh.name} className={sh.players === 0 ? "text-ink-subtle" : ""}>
+                          <td className="px-2 py-1">{sh.name}</td>
+                          <td className="px-2 py-1">{sh.layout}</td>
+                          <td className="px-2 py-1 text-right tabular-nums">{sh.teams}</td>
+                          <td className="px-2 py-1 text-right tabular-nums">{sh.players}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
               <form action={enrichAction} className="flex flex-wrap items-center gap-3">
                 <input type="hidden" name="teams" value={JSON.stringify(teams)} />
                 <Button type="submit" size="sm" variant="outline" disabled={enriching}>

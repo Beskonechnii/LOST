@@ -194,6 +194,7 @@ function parseColumns(grid: Grid, header: { row: number; map: Map<Column, number
     if (team && parsedTeam && !team.tag) team.tag = at(row, "tag") || parsedTeam.tag;
     if (!team || !nick) continue;
 
+    if (BLOCK_HEADERS.test(nick)) continue; // повторённая шапка посреди листа
     const parsed = splitPlayerName(nick);
     if (!parsed) continue;
     const player = emptyPlayer(parsed.nickname);
@@ -218,6 +219,15 @@ function parseColumns(grid: Grid, header: { row: number; map: Map<Column, number
 
 // ── блочная раскладка (таблица сезона LOST) ──────────────────────────────────
 
+/**
+ * Слова шапки внутри блока. В сезонной таблице LOST шапка блока — «Роль | ИНФ | MMR», но колонки
+ * в разных таблицах сдвинуты, и проверять одну ячейку мало: строка «ИНФ» уезжала в состав игроком
+ * с ником «ИНФ». Поэтому шапкой считаем строку, где узнаётся любое из этих слов.
+ */
+const BLOCK_HEADERS = /^(роль|инф|инфо|mmr|ммр|ник|игрок|имя|позиция|поз\.?|ссылка|профиль|№|n|номер|телеграм|tg|капитан)$/i;
+
+const isHeaderRow = (row: Cell[]) => row.some((c) => c?.text && BLOCK_HEADERS.test(c.text.trim()));
+
 function parseBlocks(grid: Grid): TeamDraft[] {
   const teams: TeamDraft[] = [];
   let current: TeamDraft | null = null;
@@ -236,8 +246,8 @@ function parseBlocks(grid: Grid): TeamDraft[] {
     }
     if (!current) continue;
 
+    if (isHeaderRow(row)) continue; // шапка блока, а не игрок
     const role = cell(3);
-    if (role === "Роль") continue; // шапка блока
     const parsed = cell(4) ? splitPlayerName(cell(4)) : null;
     if (!parsed) continue;
 
@@ -318,11 +328,33 @@ export function parsePlayerLines(text: string): PlayerDraft[] {
  * дешевле, чем угадывать по одному признаку.
  */
 export function parseGrid(grid: Grid): TeamDraft[] {
+  return parseGridDetailed(grid).teams;
+}
+
+export type GridReport = {
+  /** Какая раскладка победила — оператору это подсказка, куда смотреть, если игроки потерялись. */
+  layout: "columns" | "blocks" | "empty";
+  teams: TeamDraft[];
+  /** Сколько игроков дала каждая раскладка — видно, что вторая была близка (или не нашла ничего). */
+  columnsPlayers: number;
+  blocksPlayers: number;
+};
+
+/** Тот же разбор, но с отчётом: чем закончилась каждая раскладка. */
+export function parseGridDetailed(grid: Grid): GridReport {
   const header = findHeader(grid);
   const columns = header ? parseColumns(grid, header) : [];
   const blocks = parseBlocks(grid);
   const size = (teams: TeamDraft[]) => teams.reduce((n, t) => n + t.players.length, 0);
-  return size(columns) >= size(blocks) ? columns : blocks;
+  const columnsPlayers = size(columns);
+  const blocksPlayers = size(blocks);
+  const teams = columnsPlayers >= blocksPlayers ? columns : blocks;
+  return {
+    layout: teams.length === 0 ? "empty" : columnsPlayers >= blocksPlayers ? "columns" : "blocks",
+    teams,
+    columnsPlayers,
+    blocksPlayers,
+  };
 }
 
 /**

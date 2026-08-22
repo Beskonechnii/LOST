@@ -45,7 +45,7 @@ export default async function TeamRegistrationsPage({ params }: { params: Promis
     applications.map(async (a) => {
       if (a.status !== "pending") return [] as Problem[];
       const draft = parseDraft(a.payload);
-      return draft ? applicationProblems(draft, a.division?.name ?? null) : [];
+      return draft ? applicationProblems(draft, a.divisionId) : [];
     }),
   );
 

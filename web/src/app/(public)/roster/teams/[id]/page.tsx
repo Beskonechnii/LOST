@@ -123,7 +123,13 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
         </section>
       )}
 
-      <RosterSection title="Основа" players={core} accent={accent} empty="Основа не заведена." />
+      {/* Состав сезонный (RosterSpot принадлежит дивизиону), поэтому подписываем, чей это состав */}
+      <RosterSection
+        title={division ? `Основа · ${division.tournament.short ?? division.tournament.name}` : "Основа"}
+        players={core}
+        accent={accent}
+        empty="Основа не заведена."
+      />
       {staff.length > 0 && <RosterSection title="Штаб" players={staff} accent={accent} empty="" />}
     </div>
   );

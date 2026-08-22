@@ -193,7 +193,13 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
               {spot.team.name}
             </Link>
             <span className="text-xs text-ink-subtle">
-              {[roleLabel(spot.role) ?? "роль не задана", spot.team.group].filter(Boolean).join(" · ")}
+              {/* Состав сезонный: подписываем место турниром и дивизионом, а не текущей группой команды */}
+              {[
+                roleLabel(spot.role) ?? "роль не задана",
+                spot.division && `${spot.division.tournament.short ?? spot.division.tournament.name} · ${spot.division.short ?? spot.division.name}`,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
             </span>
           </div>
 

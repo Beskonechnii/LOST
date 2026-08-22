@@ -46,7 +46,7 @@ async function main() {
     await Promise.all([
       prisma.team.findMany({ orderBy: { slug: "asc" } }),
       prisma.player.findMany({ orderBy: { slug: "asc" } }),
-      prisma.rosterSpot.findMany({ include: { team: true, player: true } }),
+      prisma.rosterSpot.findMany({ include: { team: true, player: true, division: { include: { tournament: true } } } }),
       prisma.match.findMany({
         include: { teamA: true, teamB: true, winner: true, radiantTeam: true, series: { select: { slug: true } } },
       }),
@@ -79,14 +79,22 @@ async function main() {
     matchKey(m, m.teamA.slug, m.teamB.slug);
 
   const snapshot = {
-    version: 12, // 12 — турниры: Tournament/Division/TournamentEntry/TeamApplication, дивизион в связях по слагу
+    version: 13, // 13 — сезонные составы: у RosterSpot появился дивизион (divisionKey)
     exportedAt: new Date().toISOString(),
 
     teams: teams.map((t) => omit(t, "id")),
     players: players.map((p) => omit(p, "id")),
 
     rosterSpots: spots
-      .map((s) => ({ teamSlug: s.team.slug, playerSlug: s.player.slug, role: s.role, isCaptain: s.isCaptain, createdAt: s.createdAt }))
+      .map((s) => ({
+        teamSlug: s.team.slug,
+        playerSlug: s.player.slug,
+        // Состав сезонный: место принадлежит дивизиону турнира. Ключ — «турнир/дивизион», как везде.
+        divisionKey: divKey(s.division),
+        role: s.role,
+        isCaptain: s.isCaptain,
+        createdAt: s.createdAt,
+      }))
       .sort((a, b) => `${a.teamSlug}${a.playerSlug}`.localeCompare(`${b.teamSlug}${b.playerSlug}`)),
 
     matches: matches

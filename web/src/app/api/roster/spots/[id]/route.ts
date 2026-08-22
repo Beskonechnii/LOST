@@ -13,7 +13,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (!spotId) return bad("id: ожидался числовой id");
   const body = (await req.json()) as Record<string, unknown>;
 
-  const spot = await prisma.rosterSpot.findUnique({ where: { id: spotId }, include: { team: { select: { group: true } } } });
+  const spot = await prisma.rosterSpot.findUnique({ where: { id: spotId } });
   if (!spot) return bad("Место не найдено", 404);
 
   const data: Record<string, unknown> = {};
@@ -24,11 +24,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     // повышение до действующего может столкнуться с другой командой — проверяем до записи
     const others = await prisma.rosterSpot.findMany({
       where: { playerId: spot.playerId, id: { not: spotId } },
-      include: { team: { select: { name: true, group: true } } },
+      include: { team: { select: { name: true } } },
     });
     const conflict = spotConflict(
-      others.map((s) => ({ teamId: s.teamId, role: s.role, teamName: s.team.name, division: s.team.group })),
-      { teamId: spot.teamId, role, division: spot.team.group },
+      others.map((s) => ({ teamId: s.teamId, role: s.role, teamName: s.team.name, divisionId: s.divisionId })),
+      { teamId: spot.teamId, role, divisionId: spot.divisionId },
     );
     if (conflict) return bad(conflict, 409);
     data.role = role;

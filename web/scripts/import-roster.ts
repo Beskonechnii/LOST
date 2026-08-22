@@ -118,11 +118,15 @@ async function importPlayer(p: PlayerInput, teamId: number, teamSlug: string) {
   if (existing) stat.playersUpd++;
   else stat.playersNew++;
 
-  await prisma.rosterSpot.upsert({
-    where: { teamId_playerId: { teamId, playerId: player.id } },
-    create: { teamId, playerId: player.id, role, isCaptain: p.isCaptain ?? false },
-    update: { role, isCaptain: p.isCaptain ?? false },
-  });
+  // Состав сезонный: место заводим в дивизион, где команда участвует сейчас (нет участия — NULL).
+  const entry = await prisma.tournamentEntry.findFirst({ where: { teamId } });
+  const divisionId = entry?.divisionId ?? null;
+  const existingSpot = await prisma.rosterSpot.findFirst({ where: { teamId, playerId: player.id, divisionId } });
+  if (existingSpot) {
+    await prisma.rosterSpot.update({ where: { id: existingSpot.id }, data: { role, isCaptain: p.isCaptain ?? false } });
+  } else {
+    await prisma.rosterSpot.create({ data: { teamId, playerId: player.id, divisionId, role, isCaptain: p.isCaptain ?? false } });
+  }
   seenSpots.add(`${teamId}:${player.id}`);
 }
 

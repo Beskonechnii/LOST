@@ -117,7 +117,7 @@ export type Problem = { level: "block" | "warn" | "info"; text: string };
  * Что не так с заявкой. `block` не даёт апрувить (данные развалят ростер), `warn` — на усмотрение
  * оператора, `info` — просто «вот что произойдёт при записи».
  */
-export async function applicationProblems(team: TeamDraft, divisionName: string | null): Promise<Problem[]> {
+export async function applicationProblems(team: TeamDraft, divisionId: number | null): Promise<Problem[]> {
   const problems: Problem[] = [];
 
   const existingTeam = await prisma.team.findUnique({ where: { slug: team.slug } });
@@ -167,13 +167,13 @@ export async function applicationProblems(team: TeamDraft, divisionName: string 
     if (!found) continue;
     const spots = await prisma.rosterSpot.findMany({
       where: { playerId: found.id },
-      include: { team: { select: { id: true, name: true, group: true } } },
+      include: { team: { select: { id: true, name: true } } },
     });
     const conflict = spotConflict(
       spots
         .filter((s) => s.team.id !== existingTeam?.id)
-        .map((s) => ({ teamId: s.team.id, role: s.role, division: s.team.group, teamName: s.team.name })),
-      { teamId: existingTeam?.id ?? -1, role: p.role, division: divisionName },
+        .map((s) => ({ teamId: s.team.id, role: s.role, divisionId: s.divisionId, teamName: s.team.name })),
+      { teamId: existingTeam?.id ?? -1, role: p.role, divisionId },
     );
     if (conflict) problems.push({ level: "block", text: `«${p.nickname}»: ${conflict}` });
   }
@@ -275,11 +275,22 @@ export async function approveApplication(applicationId: number, reviewerId: numb
       });
     }
 
-    await prisma.rosterSpot.upsert({
-      where: { teamId_playerId: { teamId: team.id, playerId: player.id } },
-      create: { teamId: team.id, playerId: player.id, role: p.role, isCaptain: p.isCaptain },
-      update: { role: p.role, isCaptain: p.isCaptain },
+    // Место заводим в дивизион заявки: состав сезонный, и апрув нового турнира не должен
+    // переписывать состав прошлого.
+    const spot = await prisma.rosterSpot.findFirst({
+      where: { teamId: team.id, playerId: player.id, divisionId: application.divisionId },
     });
+    await (spot
+      ? prisma.rosterSpot.update({ where: { id: spot.id }, data: { role: p.role, isCaptain: p.isCaptain } })
+      : prisma.rosterSpot.create({
+          data: {
+            teamId: team.id,
+            playerId: player.id,
+            divisionId: application.divisionId,
+            role: p.role,
+            isCaptain: p.isCaptain,
+          },
+        }));
   }
 
   await setTeamDivision(team.id, application.divisionId);

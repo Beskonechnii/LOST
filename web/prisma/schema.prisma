@@ -59,6 +59,7 @@ model Division {
   tournamentId Int
 
   entries      TournamentEntry[]
+  rosterSpots  RosterSpot[]
   series       Series[]
   groupEntries GroupEntry[]
   applications TeamApplication[]
@@ -243,8 +244,13 @@ model RosterSpot {
   teamId   Int
   player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
   playerId Int
+  /// Дивизион турнира, к которому относится это место. Появился вместе с турнирами: состав команды
+  /// меняется от сезона к сезону, и без него заявка нового сезона затирала бы прошлый. NULL —
+  /// состав вне турнира (места, заведённые до модели, и команды, ни в чём не участвующие).
+  division   Division? @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  divisionId Int?
 
-  @@unique([teamId, playerId]) // дважды в одном составе стоять нельзя
+  @@unique([teamId, playerId, divisionId]) // дважды в одном составе сезона стоять нельзя
 }
 
 /// Одна карта. Внутри серии их до трёх — `seriesId` + `gameNumber` (см. `Series`).

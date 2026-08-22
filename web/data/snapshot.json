@@ -1,6 +1,6 @@
 {
-  "version": 12,
-  "exportedAt": "2026-08-22T09:51:05.165Z",
+  "version": 13,
+  "exportedAt": "2026-08-22T09:58:52.145Z",
   "teams": [
     {
       "slug": "300",
@@ -3777,6 +3777,7 @@
     {
       "teamSlug": "300",
       "playerSlug": "andryusha",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3784,6 +3785,7 @@
     {
       "teamSlug": "300",
       "playerSlug": "devileye",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3791,6 +3793,7 @@
     {
       "teamSlug": "300",
       "playerSlug": "kolpaks",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3798,6 +3801,7 @@
     {
       "teamSlug": "300",
       "playerSlug": "mangekyou6o",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3805,6 +3809,7 @@
     {
       "teamSlug": "300",
       "playerSlug": "tokyomane",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3812,6 +3817,7 @@
     {
       "teamSlug": "4naturala",
       "playerSlug": "ark",
+      "divisionKey": "s2/d1",
       "role": "coach",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3819,6 +3825,7 @@
     {
       "teamSlug": "4naturala",
       "playerSlug": "askme",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3826,6 +3833,7 @@
     {
       "teamSlug": "4naturala",
       "playerSlug": "danya-ze-faker",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3833,6 +3841,7 @@
     {
       "teamSlug": "4naturala",
       "playerSlug": "nikita",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3840,6 +3849,7 @@
     {
       "teamSlug": "4naturala",
       "playerSlug": "svinovizhimalka",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3847,6 +3857,7 @@
     {
       "teamSlug": "4naturala",
       "playerSlug": "yng",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3854,6 +3865,7 @@
     {
       "teamSlug": "5kn",
       "playerSlug": "amok",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3861,6 +3873,7 @@
     {
       "teamSlug": "5kn",
       "playerSlug": "qsarigama",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3868,6 +3881,7 @@
     {
       "teamSlug": "5kn",
       "playerSlug": "sanek",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3875,6 +3889,7 @@
     {
       "teamSlug": "5kn",
       "playerSlug": "treshzor",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3882,6 +3897,7 @@
     {
       "teamSlug": "5kn",
       "playerSlug": "zhozik",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3889,6 +3905,7 @@
     {
       "teamSlug": "acolytes",
       "playerSlug": "chervyak",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.457Z"
@@ -3896,6 +3913,7 @@
     {
       "teamSlug": "acolytes",
       "playerSlug": "happysadman",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.458Z"
@@ -3903,6 +3921,7 @@
     {
       "teamSlug": "acolytes",
       "playerSlug": "l-bionix-l",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.460Z"
@@ -3910,6 +3929,7 @@
     {
       "teamSlug": "acolytes",
       "playerSlug": "lonely",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.455Z"
@@ -3917,6 +3937,7 @@
     {
       "teamSlug": "acolytes",
       "playerSlug": "saldatau",
+      "divisionKey": "s2/d2",
       "role": "coach",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.461Z"
@@ -3924,6 +3945,7 @@
     {
       "teamSlug": "acolytes",
       "playerSlug": "serhio",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.454Z"
@@ -3931,6 +3953,7 @@
     {
       "teamSlug": "alt-q-q",
       "playerSlug": "da-eto-zhestko",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.529Z"
@@ -3938,6 +3961,7 @@
     {
       "teamSlug": "alt-q-q",
       "playerSlug": "gata-me-liga",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.524Z"
@@ -3945,6 +3969,7 @@
     {
       "teamSlug": "alt-q-q",
       "playerSlug": "kislyy",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.526Z"
@@ -3952,6 +3977,7 @@
     {
       "teamSlug": "alt-q-q",
       "playerSlug": "shastik",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.527Z"
@@ -3959,6 +3985,7 @@
     {
       "teamSlug": "alt-q-q",
       "playerSlug": "tpabka",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.522Z"
@@ -3966,6 +3993,7 @@
     {
       "teamSlug": "bbc",
       "playerSlug": "ayori",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3973,6 +4001,7 @@
     {
       "teamSlug": "bbc",
       "playerSlug": "fallen",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3980,6 +4009,7 @@
     {
       "teamSlug": "bbc",
       "playerSlug": "moonrise",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3987,6 +4017,7 @@
     {
       "teamSlug": "bbc",
       "playerSlug": "p1rat",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3994,6 +4025,7 @@
     {
       "teamSlug": "bbc",
       "playerSlug": "pugovichka-otorvalasya",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4001,6 +4033,7 @@
     {
       "teamSlug": "bbc",
       "playerSlug": "turtle",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4008,6 +4041,7 @@
     {
       "teamSlug": "bbc",
       "playerSlug": "v1ole",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4015,6 +4049,7 @@
     {
       "teamSlug": "chubriki",
       "playerSlug": "chomoske",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.471Z"
@@ -4022,6 +4057,7 @@
     {
       "teamSlug": "chubriki",
       "playerSlug": "cookei-1",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.468Z"
@@ -4029,6 +4065,7 @@
     {
       "teamSlug": "chubriki",
       "playerSlug": "egorkanoobas",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.466Z"
@@ -4036,6 +4073,7 @@
     {
       "teamSlug": "chubriki",
       "playerSlug": "kislomolochnyy",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.470Z"
@@ -4043,6 +4081,7 @@
     {
       "teamSlug": "chubriki",
       "playerSlug": "mel",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.464Z"
@@ -4050,6 +4089,7 @@
     {
       "teamSlug": "chubriki",
       "playerSlug": "sett",
+      "divisionKey": "s2/d2",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.473Z"
@@ -4057,6 +4097,7 @@
     {
       "teamSlug": "cruiser-aurora-team",
       "playerSlug": "b-u-r-i-z-a",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4064,6 +4105,7 @@
     {
       "teamSlug": "cruiser-aurora-team",
       "playerSlug": "chervyak",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4071,6 +4113,7 @@
     {
       "teamSlug": "cruiser-aurora-team",
       "playerSlug": "frizzing",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4078,6 +4121,7 @@
     {
       "teamSlug": "cruiser-aurora-team",
       "playerSlug": "manjalord",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4085,6 +4129,7 @@
     {
       "teamSlug": "cruiser-aurora-team",
       "playerSlug": "pasteroni-ja",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4092,6 +4137,7 @@
     {
       "teamSlug": "cruiser-aurora-team",
       "playerSlug": "renaissance",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4099,6 +4145,7 @@
     {
       "teamSlug": "cruiser-aurora-team",
       "playerSlug": "rom-o-ne",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4106,6 +4153,7 @@
     {
       "teamSlug": "dark-aria",
       "playerSlug": "chiga",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.490Z"
@@ -4113,6 +4161,7 @@
     {
       "teamSlug": "dark-aria",
       "playerSlug": "frvr",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.489Z"
@@ -4120,6 +4169,7 @@
     {
       "teamSlug": "dark-aria",
       "playerSlug": "glebasta-cmstorm",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.488Z"
@@ -4127,6 +4177,7 @@
     {
       "teamSlug": "dark-aria",
       "playerSlug": "nimpo",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.486Z"
@@ -4134,6 +4185,7 @@
     {
       "teamSlug": "dark-aria",
       "playerSlug": "the-one",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.485Z"
@@ -4141,6 +4193,7 @@
     {
       "teamSlug": "eclipse-gaming-young",
       "playerSlug": "b-u-r-i-z-a",
+      "divisionKey": "s2/d2",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.481Z"
@@ -4148,6 +4201,7 @@
     {
       "teamSlug": "eclipse-gaming-young",
       "playerSlug": "bronepoezd",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.480Z"
@@ -4155,6 +4209,7 @@
     {
       "teamSlug": "eclipse-gaming-young",
       "playerSlug": "flint-lockwood",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.477Z"
@@ -4162,6 +4217,7 @@
     {
       "teamSlug": "eclipse-gaming-young",
       "playerSlug": "p1rat",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.478Z"
@@ -4169,6 +4225,7 @@
     {
       "teamSlug": "eclipse-gaming-young",
       "playerSlug": "pugovichka-otorvalasya",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.475Z"
@@ -4176,6 +4233,7 @@
     {
       "teamSlug": "eclipse-gaming-young",
       "playerSlug": "smn",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.476Z"
@@ -4183,6 +4241,7 @@
     {
       "teamSlug": "eclipse-gaming-young",
       "playerSlug": "v1ole",
+      "divisionKey": "s2/d2",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.483Z"
@@ -4190,6 +4249,7 @@
     {
       "teamSlug": "eclipse-gaming",
       "playerSlug": "bann",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4197,6 +4257,7 @@
     {
       "teamSlug": "eclipse-gaming",
       "playerSlug": "benzo",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4204,6 +4265,7 @@
     {
       "teamSlug": "eclipse-gaming",
       "playerSlug": "burlesk",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4211,6 +4273,7 @@
     {
       "teamSlug": "eclipse-gaming",
       "playerSlug": "dafutka",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4218,6 +4281,7 @@
     {
       "teamSlug": "eclipse-gaming",
       "playerSlug": "foxxxyyy",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4225,6 +4289,7 @@
     {
       "teamSlug": "eclipse-gaming",
       "playerSlug": "rost1k",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4232,6 +4297,7 @@
     {
       "teamSlug": "ethereal",
       "playerSlug": "despair",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4239,6 +4305,7 @@
     {
       "teamSlug": "ethereal",
       "playerSlug": "gerein3008",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4246,6 +4313,7 @@
     {
       "teamSlug": "ethereal",
       "playerSlug": "maxtree",
+      "divisionKey": "s2/d1",
       "role": "coach",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4253,6 +4321,7 @@
     {
       "teamSlug": "ethereal",
       "playerSlug": "neverland",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4260,6 +4329,7 @@
     {
       "teamSlug": "ethereal",
       "playerSlug": "pizzacodeine",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4267,6 +4337,7 @@
     {
       "teamSlug": "ethereal",
       "playerSlug": "xus",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4274,6 +4345,7 @@
     {
       "teamSlug": "ethereal",
       "playerSlug": "zodiak",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4281,6 +4353,7 @@
     {
       "teamSlug": "etherial-prime",
       "playerSlug": "blas",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4288,6 +4361,7 @@
     {
       "teamSlug": "etherial-prime",
       "playerSlug": "dezesmol",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4295,6 +4369,7 @@
     {
       "teamSlug": "etherial-prime",
       "playerSlug": "mrkekman",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4302,6 +4377,7 @@
     {
       "teamSlug": "etherial-prime",
       "playerSlug": "rox",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4309,6 +4385,7 @@
     {
       "teamSlug": "etherial-prime",
       "playerSlug": "sdd",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4316,6 +4393,7 @@
     {
       "teamSlug": "etherial-prime",
       "playerSlug": "seraphim",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4323,6 +4401,7 @@
     {
       "teamSlug": "from-paris",
       "playerSlug": "destro",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4330,6 +4409,7 @@
     {
       "teamSlug": "from-paris",
       "playerSlug": "flint-lockwood",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4337,6 +4417,7 @@
     {
       "teamSlug": "from-paris",
       "playerSlug": "foolovskiy",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4344,6 +4425,7 @@
     {
       "teamSlug": "from-paris",
       "playerSlug": "frvr",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4351,6 +4433,7 @@
     {
       "teamSlug": "from-paris",
       "playerSlug": "nohara",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4358,6 +4441,7 @@
     {
       "teamSlug": "gitlz",
       "playerSlug": "akama",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4365,6 +4449,7 @@
     {
       "teamSlug": "gitlz",
       "playerSlug": "astarotzio",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4372,6 +4457,7 @@
     {
       "teamSlug": "gitlz",
       "playerSlug": "breaoutlik",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4379,6 +4465,7 @@
     {
       "teamSlug": "gitlz",
       "playerSlug": "fmy",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4386,6 +4473,7 @@
     {
       "teamSlug": "gitlz",
       "playerSlug": "moody",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4393,6 +4481,7 @@
     {
       "teamSlug": "gitlz",
       "playerSlug": "nico",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4400,6 +4489,7 @@
     {
       "teamSlug": "gitlz",
       "playerSlug": "osumayosu",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4407,6 +4497,7 @@
     {
       "teamSlug": "guzliki",
       "playerSlug": "kurame",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4414,6 +4505,7 @@
     {
       "teamSlug": "guzliki",
       "playerSlug": "pashcock",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4421,6 +4513,7 @@
     {
       "teamSlug": "guzliki",
       "playerSlug": "rty",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4428,6 +4521,7 @@
     {
       "teamSlug": "guzliki",
       "playerSlug": "sexmachine",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4435,6 +4529,7 @@
     {
       "teamSlug": "guzliki",
       "playerSlug": "sunlive",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4442,6 +4537,7 @@
     {
       "teamSlug": "malchishki",
       "playerSlug": "elamashka",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4449,6 +4545,7 @@
     {
       "teamSlug": "malchishki",
       "playerSlug": "ilyushka",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4456,6 +4553,7 @@
     {
       "teamSlug": "malchishki",
       "playerSlug": "katyushka",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4463,6 +4561,7 @@
     {
       "teamSlug": "malchishki",
       "playerSlug": "maksimka",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4470,6 +4569,7 @@
     {
       "teamSlug": "malchishki",
       "playerSlug": "petka",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4477,6 +4577,7 @@
     {
       "teamSlug": "malchishki",
       "playerSlug": "sashka",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4484,6 +4585,7 @@
     {
       "teamSlug": "malchishki",
       "playerSlug": "timurka",
+      "divisionKey": "s2/d1",
       "role": "coach",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4491,6 +4593,7 @@
     {
       "teamSlug": "moloko",
       "playerSlug": "brazil",
+      "divisionKey": "s2/d1",
       "role": "coach",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4498,6 +4601,7 @@
     {
       "teamSlug": "moloko",
       "playerSlug": "ehot",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4505,6 +4609,7 @@
     {
       "teamSlug": "moloko",
       "playerSlug": "irishtea",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4512,6 +4617,7 @@
     {
       "teamSlug": "moloko",
       "playerSlug": "morgan",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4519,6 +4625,7 @@
     {
       "teamSlug": "moloko",
       "playerSlug": "npq",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4526,6 +4633,7 @@
     {
       "teamSlug": "moloko",
       "playerSlug": "saldatau",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4533,6 +4641,7 @@
     {
       "teamSlug": "morbus-mentis",
       "playerSlug": "armyanman",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4540,6 +4649,7 @@
     {
       "teamSlug": "morbus-mentis",
       "playerSlug": "ash",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4547,6 +4657,7 @@
     {
       "teamSlug": "morbus-mentis",
       "playerSlug": "chipollino",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4554,6 +4665,7 @@
     {
       "teamSlug": "morbus-mentis",
       "playerSlug": "e-sim",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4561,6 +4673,7 @@
     {
       "teamSlug": "morbus-mentis",
       "playerSlug": "sh1za-qb",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4568,6 +4681,7 @@
     {
       "teamSlug": "navi",
       "playerSlug": "beda",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.513Z"
@@ -4575,6 +4689,7 @@
     {
       "teamSlug": "navi",
       "playerSlug": "kit-ano",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.510Z"
@@ -4582,6 +4697,7 @@
     {
       "teamSlug": "navi",
       "playerSlug": "nicolas-sarcozy",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.518Z"
@@ -4589,6 +4705,7 @@
     {
       "teamSlug": "navi",
       "playerSlug": "snorlax212",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.516Z"
@@ -4596,6 +4713,7 @@
     {
       "teamSlug": "navi",
       "playerSlug": "wilkinson",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.511Z"
@@ -4603,6 +4721,7 @@
     {
       "teamSlug": "navi",
       "playerSlug": "ya-pinayu-eti-dengi",
+      "divisionKey": "s2/d2",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.519Z"
@@ -4610,6 +4729,7 @@
     {
       "teamSlug": "pasechniki",
       "playerSlug": "borts",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.544Z"
@@ -4617,6 +4737,7 @@
     {
       "teamSlug": "pasechniki",
       "playerSlug": "brokeboi",
+      "divisionKey": "s2/d2",
       "role": "coach",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.552Z"
@@ -4624,6 +4745,7 @@
     {
       "teamSlug": "pasechniki",
       "playerSlug": "dezzare",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.542Z"
@@ -4631,6 +4753,7 @@
     {
       "teamSlug": "pasechniki",
       "playerSlug": "light",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.550Z"
@@ -4638,6 +4761,7 @@
     {
       "teamSlug": "pasechniki",
       "playerSlug": "morda",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.548Z"
@@ -4645,6 +4769,7 @@
     {
       "teamSlug": "pasechniki",
       "playerSlug": "treshzor",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.546Z"
@@ -4652,6 +4777,7 @@
     {
       "teamSlug": "pomidory",
       "playerSlug": "kungfury",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.507Z"
@@ -4659,6 +4785,7 @@
     {
       "teamSlug": "pomidory",
       "playerSlug": "let-s-dance",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.502Z"
@@ -4666,6 +4793,7 @@
     {
       "teamSlug": "pomidory",
       "playerSlug": "rty",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.505Z"
@@ -4673,6 +4801,7 @@
     {
       "teamSlug": "pomidory",
       "playerSlug": "sexmachine",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.503Z"
@@ -4680,6 +4809,7 @@
     {
       "teamSlug": "pomidory",
       "playerSlug": "xrumiks",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.504Z"
@@ -4687,6 +4817,7 @@
     {
       "teamSlug": "psixdispancer",
       "playerSlug": "dmetrodiy",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4694,6 +4825,7 @@
     {
       "teamSlug": "psixdispancer",
       "playerSlug": "maxina",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4701,6 +4833,7 @@
     {
       "teamSlug": "psixdispancer",
       "playerSlug": "qwick",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4708,6 +4841,7 @@
     {
       "teamSlug": "psixdispancer",
       "playerSlug": "savety",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4715,6 +4849,7 @@
     {
       "teamSlug": "psixdispancer",
       "playerSlug": "zagada",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4722,6 +4857,7 @@
     {
       "teamSlug": "remix-d2",
       "playerSlug": "44",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.532Z"
@@ -4729,6 +4865,7 @@
     {
       "teamSlug": "remix-d2",
       "playerSlug": "mayonez1s",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.534Z"
@@ -4736,6 +4873,7 @@
     {
       "teamSlug": "remix-d2",
       "playerSlug": "mr-daddy",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.539Z"
@@ -4743,6 +4881,7 @@
     {
       "teamSlug": "remix-d2",
       "playerSlug": "staryy-ezh",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.533Z"
@@ -4750,6 +4889,7 @@
     {
       "teamSlug": "remix-d2",
       "playerSlug": "vargos",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.536Z"
@@ -4757,6 +4897,7 @@
     {
       "teamSlug": "remix",
       "playerSlug": "mayonez1s",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4764,6 +4905,7 @@
     {
       "teamSlug": "remix",
       "playerSlug": "mini-bayk",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4771,6 +4913,7 @@
     {
       "teamSlug": "remix",
       "playerSlug": "morphine",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4778,6 +4921,7 @@
     {
       "teamSlug": "remix",
       "playerSlug": "nosferatu",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4785,6 +4929,7 @@
     {
       "teamSlug": "remix",
       "playerSlug": "staryy-ezh",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4792,6 +4937,7 @@
     {
       "teamSlug": "slonimskiy-pachastunok",
       "playerSlug": "1-01b",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.441Z"
@@ -4799,6 +4945,7 @@
     {
       "teamSlug": "slonimskiy-pachastunok",
       "playerSlug": "brazil",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.443Z"
@@ -4806,6 +4953,7 @@
     {
       "teamSlug": "slonimskiy-pachastunok",
       "playerSlug": "chipollino",
+      "divisionKey": "s2/d2",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.449Z"
@@ -4813,6 +4961,7 @@
     {
       "teamSlug": "slonimskiy-pachastunok",
       "playerSlug": "estacada",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.447Z"
@@ -4820,6 +4969,7 @@
     {
       "teamSlug": "slonimskiy-pachastunok",
       "playerSlug": "highlight-provider",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.445Z"
@@ -4827,6 +4977,7 @@
     {
       "teamSlug": "slonimskiy-pachastunok",
       "playerSlug": "irishtea",
+      "divisionKey": "s2/d2",
       "role": "coach",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.451Z"
@@ -4834,6 +4985,7 @@
     {
       "teamSlug": "slonimskiy-pachastunok",
       "playerSlug": "npq",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.442Z"
@@ -4841,6 +4993,7 @@
     {
       "teamSlug": "team-sausages-disbanded",
       "playerSlug": "gommage",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.555Z"
@@ -4848,6 +5001,7 @@
     {
       "teamSlug": "team-sausages-disbanded",
       "playerSlug": "masterokxd",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.560Z"
@@ -4855,6 +5009,7 @@
     {
       "teamSlug": "team-sausages-disbanded",
       "playerSlug": "mini-bayk",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.558Z"
@@ -4862,6 +5017,7 @@
     {
       "teamSlug": "team-sausages-disbanded",
       "playerSlug": "moiofc",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.556Z"
@@ -4869,6 +5025,7 @@
     {
       "teamSlug": "team-sausages-disbanded",
       "playerSlug": "roma-shkereberd",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.561Z"
@@ -4876,6 +5033,7 @@
     {
       "teamSlug": "u-s-burgers",
       "playerSlug": "andryusha",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.496Z"
@@ -4883,6 +5041,7 @@
     {
       "teamSlug": "u-s-burgers",
       "playerSlug": "delovo1",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.500Z"
@@ -4890,6 +5049,7 @@
     {
       "teamSlug": "u-s-burgers",
       "playerSlug": "devileye",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.492Z"
@@ -4897,6 +5057,7 @@
     {
       "teamSlug": "u-s-burgers",
       "playerSlug": "kolpaks",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.497Z"
@@ -4904,6 +5065,7 @@
     {
       "teamSlug": "u-s-burgers",
       "playerSlug": "twilightnest",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.495Z"

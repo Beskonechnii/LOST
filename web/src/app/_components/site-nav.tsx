@@ -24,12 +24,27 @@ export type NavItem = { href: string; label: string; hint?: string; match?: stri
  * теперь и подпись, и адрес приходят из БД (layout спрашивает `currentTournament`), иначе новый
  * сезон требовал бы правки исходников — ровно того, от чего уходили в TOURNAMENTS-PLAN.md.
  */
-const productSection = (tournament: { slug: string; short: string | null; name: string; status: string } | null): NavItem => ({
-  href: tournament ? `/tournaments/${tournament.slug}` : "/tournaments",
-  label: tournament ? tournament.short ?? tournament.name : "Турниры",
-  hint: tournament ? `${tournament.name}: дивизионы и ростер` : "Турниры лиги",
-  match: ["/tournaments", "/standings", "/roster", "/series", "/tp"],
-});
+const productSection = (tournament: { slug: string; short: string | null; name: string; status: string } | null): NavItem | null =>
+  tournament
+    ? {
+        href: `/tournaments/${tournament.slug}`,
+        label: tournament.short ?? tournament.name,
+        hint: `${tournament.name}: дивизионы и ростер`,
+        // Ростер, встречи и TP живут вне адреса турнира, но принадлежат текущему сезону — поэтому
+        // подсвечивают его вкладку.
+        match: ["/standings", "/roster", "/series", "/tp"],
+      }
+    : null;
+
+/**
+ * Все турниры — отдельная вкладка рядом с текущим сезоном: прошлые сезоны и кубки никуда не
+ * деваются, и попадать в них через ссылку внутри хаба было неудобно.
+ */
+const TOURNAMENTS_SECTION: NavItem = {
+  href: "/tournaments",
+  label: "Турниры",
+  hint: "Все сезоны и кубки лиги",
+};
 const ADMIN_SECTION: NavItem = {
   href: "/admin",
   label: "Админ",
@@ -42,9 +57,14 @@ function matchesHref(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/** Пункт активен по своему href или по любому из дополнительных префиксов match. */
-function isActive(pathname: string, item: NavItem) {
-  return matchesHref(pathname, item.href) || (item.match ?? []).some((m) => matchesHref(pathname, m));
+/**
+ * Насколько точно пункт подходит пути — длина совпавшего префикса, 0 = не подходит. Точность нужна
+ * потому, что вкладки вложены: `/tournaments/s2` подходит и «Турниры», и вкладке сезона, а
+ * подсветиться должна одна — самая конкретная (тот же приём, что в SubNav).
+ */
+function matchScore(pathname: string, item: NavItem) {
+  const all = [item.href, ...(item.match ?? [])].filter((h) => matchesHref(pathname, h));
+  return all.reduce((best, h) => Math.max(best, h.length), 0);
 }
 
 const focus = "outline-none focus-visible:ring-[3px] focus-visible:ring-purple";
@@ -62,6 +82,11 @@ function Bar({
   aside: React.ReactNode;
 }) {
   const pathname = usePathname();
+  // Подсвечиваем ровно одну вкладку — ту, чей адрес совпал с путём точнее прочих.
+  const active = sections
+    .map((s) => ({ href: s.href, score: matchScore(pathname, s) }))
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score)[0]?.href;
 
   return (
     <header className="pouf-lost sticky top-0 z-50 border-b border-hairline bg-canvas/85 font-pouf backdrop-blur" data-theme="dark">
@@ -70,15 +95,15 @@ function Bar({
 
         <nav className="-mx-1 flex flex-1 gap-2 overflow-x-auto px-1 py-2">
           {sections.map((s) => {
-            const active = isActive(pathname, s);
+            const current = s.href === active;
             return (
               <Link
                 key={s.href}
                 href={s.href}
                 title={s.hint}
-                aria-current={active ? "page" : undefined}
+                aria-current={current ? "page" : undefined}
                 className={`shrink-0 rounded-[14px] px-4 py-[9px] text-[13px] font-black transition-[box-shadow,transform,background] ${focus} ${
-                  active
+                  current
                     ? "bg-purple text-[var(--on-accent)] cushion-control"
                     : "text-ink-muted hover:bg-surface-1 hover:text-ink hover:cushion-field"
                 }`}
@@ -124,7 +149,11 @@ export type CurrentTournament = { slug: string; short: string | null; name: stri
 
 function TopBar({ isAdmin, tournament }: { isAdmin: boolean; tournament: CurrentTournament }) {
   const product = productSection(tournament);
-  const sections = isAdmin ? [product, ADMIN_SECTION] : [product];
+  const sections = [
+    ...(product ? [product] : []),
+    TOURNAMENTS_SECTION,
+    ...(isAdmin ? [ADMIN_SECTION] : []),
+  ];
   return <Bar sections={sections} brand={brand} aside={cabinetLink} />;
 }
 
@@ -142,8 +171,9 @@ export function AdminNav({ isAdmin, tournament }: { isAdmin: boolean; tournament
 export function SubNav({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
   const active = items
-    .filter((t) => isActive(pathname, t))
-    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+    .map((t) => ({ href: t.href, score: matchScore(pathname, t) }))
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score)[0]?.href;
 
   return (
     // 57px = высота верхней строки (h-14) вместе с её нижней границей — иначе при скролле щель в 1px

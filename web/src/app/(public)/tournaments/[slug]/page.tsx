@@ -76,9 +76,6 @@ export default async function TournamentHome({ params }: { params: Promise<{ slu
             Подать заявку командой
           </Link>
         )}
-        <Link href="/tournaments" className="text-xs font-bold text-ink-subtle hover:text-ink">
-          Все турниры →
-        </Link>
       </div>
 
       <HubTiles

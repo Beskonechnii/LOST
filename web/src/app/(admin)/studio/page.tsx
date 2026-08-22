@@ -20,7 +20,7 @@ export default async function StudioHome() {
         <h1 className="text-[28px] font-black tracking-[-0.5px] text-ink md:text-4xl">Студия</h1>
         <p className="mt-1.5 text-sm font-bold text-muted">
           Графика собирается по данным ростера: {teams} команд(ы) и {players} игрок(ов). Лого, фото и составы правятся в{" "}
-          <Link href="/roster/teams" className="text-[var(--purple)] hover:underline">
+          <Link href="/roster" className="text-[var(--purple)] hover:underline">
             разделе «Ростер»
           </Link>
           .

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { AdminNav } from "../_components/site-nav";
 import { BackBar } from "../_components/back-button";
 import { isAdmin } from "@/lib/admin-session";
-import { currentTournament } from "@/lib/tournaments";
 
 // Служебная часть: студия графики, правка ростера, вход. Всё это закрыто паролем
 // (`needsAdmin()` в src/lib/auth.ts) и посетителю не показывается.
@@ -17,7 +16,7 @@ export const metadata: Metadata = {
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <AdminNav isAdmin={await isAdmin()} tournament={await currentTournament()} />
+      <AdminNav isAdmin={await isAdmin()} />
       <BackBar fallback="/admin" hideOn={["/admin"]} />
       {children}
     </>

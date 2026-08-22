@@ -20,30 +20,16 @@ export type NavItem = { href: string; label: string; hint?: string; match?: stri
 // Обе группы маршрутов рисуют эти же вкладки, поэтому переход между ними бесшовный: строка
 // не меняется, меняется только второй ряд (подвкладки сезона / инструменты админки).
 /**
- * Продуктовая вкладка = текущий турнир. Раньше здесь была строка «LOST S2» и адрес /standings;
- * теперь и подпись, и адрес приходят из БД (layout спрашивает `currentTournament`), иначе новый
- * сезон требовал бы правки исходников — ровно того, от чего уходили в TOURNAMENTS-PLAN.md.
- */
-const productSection = (tournament: { slug: string; short: string | null; name: string; status: string } | null): NavItem | null =>
-  tournament
-    ? {
-        href: `/tournaments/${tournament.slug}`,
-        label: tournament.short ?? tournament.name,
-        hint: `${tournament.name}: дивизионы и ростер`,
-        // Ростер, встречи и TP живут вне адреса турнира, но принадлежат текущему сезону — поэтому
-        // подсвечивают его вкладку.
-        match: ["/standings", "/roster", "/series", "/tp"],
-      }
-    : null;
-
-/**
- * Все турниры — отдельная вкладка рядом с текущим сезоном: прошлые сезоны и кубки никуда не
- * деваются, и попадать в них через ссылку внутри хаба было неудобно.
+ * Единственная продуктовая вкладка. Отдельной вкладки «текущий сезон» больше нет: всё, что
+ * относится к турниру — дивизионы, таблицы, ростер — живёт внутри него (/tournaments/<slug>/…),
+ * и две вкладки, ведущие в одно и то же место, только путали. Ростер и встречи подсвечивают её же:
+ * они принадлежат сезону, хотя карточки команд и игроков лежат по общим адресам.
  */
 const TOURNAMENTS_SECTION: NavItem = {
   href: "/tournaments",
   label: "Турниры",
-  hint: "Все сезоны и кубки лиги",
+  hint: "Сезоны и кубки лиги: таблицы, сетка, составы",
+  match: ["/tournaments", "/standings", "/roster", "/series", "/tp"],
 };
 const ADMIN_SECTION: NavItem = {
   href: "/admin",
@@ -145,26 +131,19 @@ const cabinetLink = (
 
 // Верхняя строка: продукт всем, «Админ» — только админам (роль приходит из layout'а). PublicNav/AdminNav
 // оставлены отдельными функциями лишь потому, что их зовут разные layout'ы — содержимое у них общее.
-export type CurrentTournament = { slug: string; short: string | null; name: string; status: string } | null;
-
-function TopBar({ isAdmin, tournament }: { isAdmin: boolean; tournament: CurrentTournament }) {
-  const product = productSection(tournament);
-  const sections = [
-    ...(product ? [product] : []),
-    TOURNAMENTS_SECTION,
-    ...(isAdmin ? [ADMIN_SECTION] : []),
-  ];
+function TopBar({ isAdmin }: { isAdmin: boolean }) {
+  const sections = isAdmin ? [TOURNAMENTS_SECTION, ADMIN_SECTION] : [TOURNAMENTS_SECTION];
   return <Bar sections={sections} brand={brand} aside={cabinetLink} />;
 }
 
 /** Навигация продукта (группа public). `isAdmin` управляет видимостью вкладки «Админ». */
-export function PublicNav({ isAdmin, tournament }: { isAdmin: boolean; tournament: CurrentTournament }) {
-  return <TopBar isAdmin={isAdmin} tournament={tournament} />;
+export function PublicNav({ isAdmin }: { isAdmin: boolean }) {
+  return <TopBar isAdmin={isAdmin} />;
 }
 
 /** Навигация служебной части (группа admin) — та же верхняя строка, что и у продукта. */
-export function AdminNav({ isAdmin, tournament }: { isAdmin: boolean; tournament: CurrentTournament }) {
-  return <TopBar isAdmin={isAdmin} tournament={tournament} />;
+export function AdminNav({ isAdmin }: { isAdmin: boolean }) {
+  return <TopBar isAdmin={isAdmin} />;
 }
 
 /** Подразделы секции (ростер, студия). Подсвечивается самый конкретный подходящий пункт. */

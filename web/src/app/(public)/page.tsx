@@ -34,10 +34,11 @@ const SECTIONS = [
     cta: "Открыть турниры",
     accent: "none",
   },
+  // Ростер живёт внутри турнира (состав сезонный) — ссылку достраиваем ниже, когда знаем текущий.
   {
-    href: "/roster/teams",
+    href: "/roster",
     title: "Ростер",
-    text: "Команды дивизиона и их составы: роли, MMR основы, профили игроков со ссылками на Dotabuff и Stratz.",
+    text: "Команды турнира и их составы: роли, MMR основы, профили игроков со ссылками на Dotabuff и Stratz.",
     cta: "Открыть команды",
     accent: "none",
   },
@@ -66,7 +67,10 @@ export default async function Home() {
       cta: "Смотреть таблицу",
       accent: i === 0 ? "d1" : i === 1 ? "d2" : "none",
     })),
-    ...SECTIONS,
+    ...SECTIONS.map((x) => ({
+      ...x,
+      href: x.href === "/roster" && current ? `/tournaments/${current.slug}/roster/teams` : x.href,
+    })),
   ];
 
   const stats = [
@@ -102,7 +106,10 @@ export default async function Home() {
             <Link href={sections[0]?.href ?? "/tournaments"} className={buttonClasses({ size: "lg" })}>
               Таблица дивизиона
             </Link>
-            <Link href="/roster/teams" className={buttonClasses({ size: "lg", variant: "quiet" })}>
+            <Link
+              href={current ? `/tournaments/${current.slug}/roster/teams` : "/tournaments"}
+              className={buttonClasses({ size: "lg", variant: "quiet" })}
+            >
               Составы команд
             </Link>
           </div>

@@ -49,7 +49,12 @@ export default async function TournamentHome({ params }: { params: Promise<{ slu
       icon: NUMERALS[i] ?? "🏆",
       desc: `Таблицы групп, плей-офф и статистика. Команд: ${rosters[i].length}.`,
     })),
-    { href: "/roster", label: "Ростер", icon: "👥", desc: "Команды и игроки лиги." },
+    {
+      href: `/tournaments/${slug}/roster/teams`,
+      label: "Ростер",
+      icon: "👥",
+      desc: `Команды и игроки, заявленные в турнир${teamsTotal ? `: ${teamsTotal} команд(ы)` : ""}.`,
+    },
     { href: "/tp", label: "TP", icon: "🏅", desc: "Зачёт очков MVP." },
   ];
 

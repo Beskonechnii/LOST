@@ -253,6 +253,60 @@ function parseBlocks(grid: Grid): TeamDraft[] {
   return teams;
 }
 
+// ── построчный разбор («ник; роль; MMR; ссылка») ─────────────────────────────
+
+/**
+ * Состав, присланный сообщением: строка = игрок, а порядок колонок — как получится. Именно так
+ * составы чаще всего и приходят капитану в личку, поэтому разбираем не по позициям, а по смыслу
+ * ячейки: адрес — ссылка, «1»–«5» или слово — роль, число подходящего порядка — MMR, «@…» —
+ * телеграм, остальное — ник (и настоящее имя, если оно рядом в кавычках).
+ *
+ * Отдельно от табличных раскладок: там смысл колонки задаёт шапка, а здесь её нет вовсе.
+ */
+export function parsePlayerLines(text: string): PlayerDraft[] {
+  const players: PlayerDraft[] = [];
+
+  for (const line of text.split(/\r?\n/)) {
+    const raw = line.trim();
+    if (!raw) continue;
+    const cells = raw.split(/[;|\t]|,(?=\s)/).map((c) => c.trim()).filter(Boolean);
+    if (cells.length === 0) continue;
+
+    const player = emptyPlayer("");
+    const leftovers: string[] = [];
+
+    for (const cell of cells) {
+      if (/^https?:\/\//i.test(cell) || /^(www\.)?(dotabuff|stratz|steamcommunity)\./i.test(cell)) {
+        applyLink(player, /^https?:/i.test(cell) ? cell : `https://${cell}`);
+        continue;
+      }
+      if (/^@/.test(cell)) {
+        player.telegram ??= normalizeTelegram(cell);
+        continue;
+      }
+      const role = parseRole(cell);
+      if (role && !player.role && !/^\d{3,}/.test(cell)) {
+        player.role = role;
+        continue;
+      }
+      const mmr = /^[\d\s.,k]+$/i.test(cell) ? parseMmr(cell) : null;
+      if (mmr && mmr >= 500 && !player.mmr) {
+        player.mmr = mmr;
+        continue;
+      }
+      leftovers.push(cell);
+    }
+
+    const named = leftovers.length ? splitPlayerName(leftovers[0]) : null;
+    if (!named) continue; // строка без имени — это шапка или мусор, а не игрок
+    player.nickname = named.nickname;
+    player.realName = named.realName ?? leftovers[1] ?? null;
+    players.push(player);
+  }
+
+  return players;
+}
+
 // ── вход ─────────────────────────────────────────────────────────────────────
 
 /** Разбор одного листа: сначала пробуем колоночную раскладку, иначе блочную. */

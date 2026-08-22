@@ -56,9 +56,14 @@ export default async function TeamRegistrationsPage({ params }: { params: Promis
       </Link>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-bold tracking-tight">Заявки команд</h1>
-        <Link href={`/admin/tournaments/${tournament.slug}/import`} className="text-sm text-accent-bright hover:underline">
-          Импорт составов →
-        </Link>
+        <span className="flex flex-wrap gap-3">
+          <Link href={`/admin/tournaments/${tournament.slug}/teams/new`} className="text-sm text-accent-bright hover:underline">
+            Завести команду →
+          </Link>
+          <Link href={`/admin/tournaments/${tournament.slug}/import`} className="text-sm text-accent-bright hover:underline">
+            Импорт составов →
+          </Link>
+        </span>
       </div>
       <p className="mt-1.5 text-sm text-ink-muted">
         Одобрение заводит команду, игроков и состав, и ставит команду в выбранный дивизион.

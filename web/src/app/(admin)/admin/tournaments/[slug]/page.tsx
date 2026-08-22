@@ -59,8 +59,11 @@ export default async function TournamentPage({ params }: { params: Promise<{ slu
       </div>
 
       <nav className="mt-3 flex flex-wrap gap-3 text-sm">
+        <Link href={`/admin/tournaments/${tournament.slug}/teams/new`} className="text-accent-bright hover:underline">
+          Завести команду →
+        </Link>
         <Link href={`/admin/tournaments/${tournament.slug}/import`} className="text-accent-bright hover:underline">
-          Импорт составов →
+          Импорт составов (пачкой) →
         </Link>
         <Link href={`/admin/tournaments/${tournament.slug}/registrations`} className="text-accent-bright hover:underline">
           Заявки команд →

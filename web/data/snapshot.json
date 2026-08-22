@@ -1,6 +1,6 @@
 {
   "version": 14,
-  "exportedAt": "2026-08-22T12:07:47.948Z",
+  "exportedAt": "2026-08-22T13:05:03.524Z",
   "teams": [
     {
       "slug": "300",
@@ -8955,6 +8955,23 @@
           "relegation": false
         }
       ]
+    },
+    {
+      "slug": "trdrt",
+      "name": "yftft",
+      "short": "gcf",
+      "description": null,
+      "format": "hgv",
+      "prize": null,
+      "logo": null,
+      "banner": null,
+      "status": "draft",
+      "startAt": "2026-07-30T00:00:00.000Z",
+      "endAt": "2026-09-02T00:00:00.000Z",
+      "regOpenAt": null,
+      "regCloseAt": null,
+      "createdAt": "2026-08-22T12:40:36.139Z",
+      "divisions": []
     }
   ],
   "tournamentEntries": [

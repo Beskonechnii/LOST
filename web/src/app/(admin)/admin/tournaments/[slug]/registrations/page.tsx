@@ -12,9 +12,12 @@ import { rankLabel } from "@/lib/dota-rank";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Заявки команд" };
 
-// Очередь заявок команд турнира. Показываем не «файл загружен», а что именно попадёт в ростер:
-// состав целиком и список замечаний, посчитанных по текущей базе (TOURNAMENTS-PLAN.md §2.4).
-// Красное замечание закрывает апрув, жёлтое — на усмотрение оператора.
+// Очередь заявок команд турнира — то, что прислали **снаружи**: капитан с сайта, позже бот.
+// Импорт таблицы сюда не попадает: его делает сам оператор, и подтверждать себе нечего — он пишет
+// в ростер сразу (см. import/actions.ts).
+//
+// Показываем не «заявка пришла», а что именно попадёт в ростер: состав целиком и замечания,
+// посчитанные по текущей базе. Красное замечание закрывает апрув, жёлтое — на усмотрение оператора.
 
 const dateTime = new Intl.DateTimeFormat("ru", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
 
@@ -56,23 +59,17 @@ export default async function TeamRegistrationsPage({ params }: { params: Promis
       </Link>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-bold tracking-tight">Заявки команд</h1>
-        <span className="flex flex-wrap gap-3">
-          <Link href={`/admin/tournaments/${tournament.slug}/teams/new`} className="text-sm text-accent-bright hover:underline">
-            Завести команду →
-          </Link>
-          <Link href={`/admin/tournaments/${tournament.slug}/import`} className="text-sm text-accent-bright hover:underline">
-            Импорт составов →
-          </Link>
-        </span>
+
       </div>
       <p className="mt-1.5 text-sm text-ink-muted">
-        Одобрение заводит команду, игроков и состав, и ставит команду в выбранный дивизион.
-        До одобрения в ростере не появляется ничего.
+        Заявки капитанов с сайта. Одобрение заводит команду, игроков и состав и ставит команду в
+        выбранный дивизион — до него в ростере не появляется ничего. Составы, которые вы заводите
+        сами, идут мимо очереди: импортом таблицы.
       </p>
 
       {applications.length === 0 ? (
         <p className="mt-6 rounded-md border border-hairline bg-surface-1 px-3 py-6 text-center text-sm text-ink-subtle">
-          Заявок нет. Начните с импорта составов.
+          Заявок с сайта пока нет.
         </p>
       ) : (
         <ul className="mt-6 space-y-3">

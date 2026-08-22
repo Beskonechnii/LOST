@@ -309,10 +309,54 @@ export function parsePlayerLines(text: string): PlayerDraft[] {
 
 // ── вход ─────────────────────────────────────────────────────────────────────
 
-/** Разбор одного листа: сначала пробуем колоночную раскладку, иначе блочную. */
+/**
+ * Разбор одного листа. Пробуем **обе** раскладки и берём ту, где игроков вышло больше.
+ *
+ * Раньше выбор был по наличию шапки: нашлись слова «Команда» и «Ник» — значит таблица колоночная.
+ * На сезонной таблице LOST это подводило: там блочная раскладка, но слова из шапки в листе тоже
+ * встречаются, и колоночный разбор молча забирал только часть игроков. Сравнить два результата
+ * дешевле, чем угадывать по одному признаку.
+ */
 export function parseGrid(grid: Grid): TeamDraft[] {
   const header = findHeader(grid);
-  return header ? parseColumns(grid, header) : parseBlocks(grid);
+  const columns = header ? parseColumns(grid, header) : [];
+  const blocks = parseBlocks(grid);
+  const size = (teams: TeamDraft[]) => teams.reduce((n, t) => n + t.players.length, 0);
+  return size(columns) >= size(blocks) ? columns : blocks;
+}
+
+/**
+ * Строки листа, которые не попали ни в одну команду. Оператору важно видеть не только то, что
+ * разобралось, но и то, что потерялось: «22 игрока» без этого списка выглядят как успех, даже если
+ * в таблице их было тридцать.
+ */
+export function unparsedRows(grid: Grid, teams: TeamDraft[]): string[] {
+  const known = new Set<string>();
+  for (const t of teams) {
+    known.add(t.name.toLowerCase());
+    for (const p of t.players) {
+      known.add(p.nickname.toLowerCase());
+      if (p.realName) known.add(p.realName.toLowerCase());
+    }
+  }
+
+  const out: string[] = [];
+  for (const row of grid) {
+    if (!row) continue;
+    const text = row.map((c) => c?.text ?? "").filter(Boolean).join(" · ").trim();
+    if (!text || text.length < 3) continue;
+    // Шапку за потерянную строку не считаем: она и не должна была стать игроком.
+    const headerCells = row.filter((c) => c?.text && columnOf(c.text)).length;
+    if (headerCells >= 2) continue;
+    // Строка считается разобранной, если хоть одна её ячейка узнаётся как имя команды или игрока.
+    const seen = row.some((c) => {
+      const v = c?.text?.trim().toLowerCase();
+      if (!v) return false;
+      return known.has(v) || [...known].some((k) => k.length > 2 && v.includes(k));
+    });
+    if (!seen) out.push(text);
+  }
+  return out;
 }
 
 /**

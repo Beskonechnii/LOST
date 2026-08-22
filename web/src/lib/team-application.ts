@@ -1,12 +1,14 @@
-// Только сервер: заявки команд — от разбора файла до апрува, который заводит их в ростер.
+// Только сервер: заявки команд снаружи и запись состава в ростер.
 //
-// Заявка хранит состав целиком JSON'ом в `TeamApplication.payload`, а `Team`/`Player`/`RosterSpot`
-// появляются только в момент одобрения. Причина та же, что у анкеты игрока (ACCOUNTS-PLAN.md §2.1):
-// публичные витрины читают ростер без фильтров, и залитый сразу кривой файл на дюжину команд
-// немедленно виден на /roster/teams, а откатить его нечем.
+// Два разных потока, но одно место записи. **Заявка** — то, что прислал человек со стороны (капитан
+// с сайта, позже бот): состав лежит JSON'ом в `TeamApplication.payload`, а `Team`/`Player`/
+// `RosterSpot` появляются только при одобрении — публичные витрины читают ростер без фильтров, и
+// заявка от постороннего иначе сразу оказалась бы на /roster/teams. **Импорт** таблицы оператор
+// пишет в ростер сразу, мимо очереди: подтверждать самому себе нечего.
 //
-// Всё, что могло бы удивить оператора при записи (игрок уже действующий в другой команде дивизиона,
-// один account_id под двумя никами, занятый слаг), считается ДО апрува — `applicationProblems`.
+// Пишет ростер одна функция — `writeTeamToRoster`; проверки перед записью тоже общие
+// (`applicationProblems`: игрок уже действующий в другой команде дивизиона, один account_id под
+// двумя никами, занятый слаг). Два пути записи разошлись бы правилами уже на второй правке.
 
 import { prisma } from "./prisma";
 import { slugify, playerAccountId } from "./profiles";
@@ -43,25 +45,10 @@ export const listApplications = (tournamentId: number) =>
 
 export type ApplicationRow = Awaited<ReturnType<typeof listApplications>>[number];
 
-/** Завести заявки из разбора файла. Возвращает, сколько создано — оператор видит это в отчёте. */
-export async function createApplications(
-  tournamentId: number,
-  divisionId: number | null,
-  teams: TeamDraft[],
-  source = "import",
-) {
-  for (const team of teams) {
-    await prisma.teamApplication.create({
-      data: { tournamentId, divisionId, source, payload: formatDraft(team) },
-    });
-  }
-  return teams.length;
-}
-
 /**
- * Заявка капитана с сайта. Отдельно от `createApplications` (импорта) по трём причинам: её подаёт
- * не оператор, а человек снаружи; её нужно проверить на месте (пустые поля, слишком короткий
- * состав); и у неё есть автор — по нему кабинет показывает статус.
+ * Заявка капитана с сайта — единственный способ, которым состав попадает в очередь: импорт таблицы
+ * оператор пишет в ростер сразу (подтверждать себе нечего). Здесь же проверяем на месте пустые поля
+ * и слишком короткий состав, и запоминаем автора — по нему кабинет показывает статус.
  *
  * Приём заявок открыт только у турнира в статусе `registration` и до `regCloseAt` — проверяем
  * здесь, а не только в форме: до экшена можно дойти и мимо страницы.
@@ -223,17 +210,15 @@ async function freePlayerSlug(nickname: string) {
  * MMR из заявки пишем только новым игрокам и только как заявленный: у существующего профиля цифру
  * ставил оператор, и чужая таблица не должна её перебивать (то же правило, что в анкете кабинета).
  */
-export async function approveApplication(applicationId: number, reviewerId: number | null) {
-  const application = await prisma.teamApplication.findUnique({
-    where: { id: applicationId },
-    include: { division: true },
-  });
-  if (!application) throw new Error("Заявка не найдена");
-  if (application.status === "approved") throw new Error("Заявка уже одобрена");
-  const draft = parseDraft(application.payload);
-  if (!draft) throw new Error("Заявка пустая или битая — верните её с причиной");
-  if (!application.divisionId) throw new Error("Сначала выберите дивизион для команды");
-
+/**
+ * Записать состав в ростер: завести (или дополнить) команду, игроков и состав, поставить команду
+ * в дивизион. Единственное место, которое пишет ростер из черновика — его зовут и импорт таблицы,
+ * и апрув заявки: два пути записи разошлись бы правилами уже на второй правке.
+ *
+ * MMR из черновика пишем только новым игрокам и только как заявленный: у существующего профиля
+ * цифру ставил оператор, и чужая таблица не должна её перебивать (то же правило, что в анкете).
+ */
+export async function writeTeamToRoster(draft: TeamDraft, divisionId: number) {
   const team =
     (await prisma.team.findUnique({ where: { slug: draft.slug } })) ??
     (await prisma.team.create({ data: { slug: draft.slug, name: draft.name, tag: draft.tag } }));
@@ -275,25 +260,35 @@ export async function approveApplication(applicationId: number, reviewerId: numb
       });
     }
 
-    // Место заводим в дивизион заявки: состав сезонный, и апрув нового турнира не должен
+    // Место заводим в дивизион турнира: состав сезонный, и запись нового турнира не должна
     // переписывать состав прошлого.
     const spot = await prisma.rosterSpot.findFirst({
-      where: { teamId: team.id, playerId: player.id, divisionId: application.divisionId },
+      where: { teamId: team.id, playerId: player.id, divisionId },
     });
     await (spot
       ? prisma.rosterSpot.update({ where: { id: spot.id }, data: { role: p.role, isCaptain: p.isCaptain } })
       : prisma.rosterSpot.create({
-          data: {
-            teamId: team.id,
-            playerId: player.id,
-            divisionId: application.divisionId,
-            role: p.role,
-            isCaptain: p.isCaptain,
-          },
+          data: { teamId: team.id, playerId: player.id, divisionId, role: p.role, isCaptain: p.isCaptain },
         }));
   }
 
-  await setTeamDivision(team.id, application.divisionId);
+  await setTeamDivision(team.id, divisionId);
+  return team;
+}
+
+/** Одобрить заявку: тот же путь записи, что у импорта, плюс отметка о решении. */
+export async function approveApplication(applicationId: number, reviewerId: number | null) {
+  const application = await prisma.teamApplication.findUnique({
+    where: { id: applicationId },
+    include: { division: true },
+  });
+  if (!application) throw new Error("Заявка не найдена");
+  if (application.status === "approved") throw new Error("Заявка уже одобрена");
+  const draft = parseDraft(application.payload);
+  if (!draft) throw new Error("Заявка пустая или битая — верните её с причиной");
+  if (!application.divisionId) throw new Error("Сначала выберите дивизион для команды");
+
+  const team = await writeTeamToRoster(draft, application.divisionId);
 
   return prisma.teamApplication.update({
     where: { id: applicationId },

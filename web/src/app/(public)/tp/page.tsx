@@ -3,6 +3,8 @@ import { listPlayers } from "@/lib/roster-data";
 import { teamAccent } from "@/lib/profiles";
 import { roleLabel } from "@/lib/roles";
 import { can } from "@/lib/account";
+import { currentTournament } from "@/lib/tournaments";
+import { tpByTournament } from "@/lib/tp";
 import { SectionHeader } from "@/app/_components/ui";
 import { PlayerAvatar } from "../roster/_components/avatar";
 
@@ -13,19 +15,40 @@ export const metadata = { title: "TP" };
 // Медали тройки лидеров — только визуальный акцент, порядок задаёт tp.
 const MEDAL = ["🥇", "🥈", "🥉"];
 
-// Публичный зачёт TP: очки MVP за сезон, оператор проставляет их вручную (/admin/tp).
+// Публичный зачёт TP: очки MVP, оператор проставляет их вручную (/admin/tp).
+// Зачёт **турнирный**: по умолчанию показываем текущий турнир, `?all=1` — сумму за всё время
+// (она же `Player.tp`, кеш реестра начислений — см. src/lib/tp.ts).
 // Игроки с нулём в таблицу не идут — она про тех, кто уже что-то набрал.
-export default async function TpPage() {
-  const players = await listPlayers();
-  const authed = await can("tp.edit"); // ссылка на панель начисления — только тем, кто начисляет
-  const ranked = players.filter((p) => p.tp > 0).sort((a, b) => b.tp - a.tp);
+export default async function TpPage({ searchParams }: { searchParams: Promise<{ all?: string }> }) {
+  const all = (await searchParams).all === "1";
+  const [players, current, authed] = await Promise.all([
+    listPlayers(),
+    currentTournament(),
+    can("tp.edit"), // ссылка на панель начисления — только тем, кто начисляет
+  ]);
+  const season = await tpByTournament(all ? null : current?.id ?? null);
+  const scoreOf = (id: number, lifetime: number) => (all ? lifetime : season.get(id) ?? 0);
+  const ranked = players
+    .map((p) => ({ ...p, score: scoreOf(p.id, p.tp) }))
+    .filter((p) => p.score > 0)
+    .sort((a, b) => b.score - a.score);
 
   return (
     <div className="space-y-6 font-pouf">
       <SectionHeader
         eyebrow="Сезонный зачёт"
         title="TP"
-        aside={<span>Очки MVP за сезон LOST S2</span>}
+        aside={
+          <span className="flex flex-wrap items-center gap-2">
+            <span>Очки MVP{all ? " за всё время" : current ? ` · ${current.short ?? current.name}` : ""}</span>
+            <Link
+              href={all ? "/tp" : "/tp?all=1"}
+              className="rounded-[12px] bg-surface-2 px-3 py-1 text-xs font-black hover:text-[var(--purple)]"
+            >
+              {all ? "Текущий турнир" : "За всё время"}
+            </Link>
+          </span>
+        }
       />
 
       {ranked.length === 0 ? (
@@ -66,7 +89,7 @@ export default async function TpPage() {
                     </div>
                   </div>
                   <span className="shrink-0 text-right">
-                    <span className="text-xl font-black tabular-nums text-[var(--purple)]">{p.tp}</span>
+                    <span className="text-xl font-black tabular-nums text-[var(--purple)]">{p.score}</span>
                     <span className="ml-1 text-xs font-bold text-muted">TP</span>
                   </span>
                 </Link>

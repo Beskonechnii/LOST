@@ -28,9 +28,9 @@ const d = (v: string | Date | null | undefined) => (v ? new Date(v) : null);
 
 async function main() {
   const snap = JSON.parse(readFileSync(input, "utf8"));
-  if (snap.version !== 13) {
+  if (snap.version !== 14) {
     throw new Error(
-      `Снимок версии ${snap.version}, а нужен 13. Снимки не мигрируются: пересними базу свежим ` +
+      `Снимок версии ${snap.version}, а нужен 14. Снимки не мигрируются: пересними базу свежим ` +
         `scripts/export-db.ts на той машине, где данные актуальны.`,
     );
   }
@@ -240,7 +240,10 @@ async function main() {
   }
 
   for (const p of snap.pointsEntries) {
-    const { subjectSlug, subjectRawId, matchKey, createdAt, ...rest } = p;
+    const { subjectSlug, subjectRawId, matchKey, createdAt, tournamentSlug, ...rest } = p;
+    const tournament = tournamentSlug
+      ? await prisma.tournament.findUnique({ where: { slug: tournamentSlug }, select: { id: true } })
+      : null;
     await prisma.pointsEntry.create({
       data: {
         ...rest,
@@ -250,6 +253,7 @@ async function main() {
           : rest.subjectType === "player" ? need(playerId, subjectSlug, "Игрок")
           : subjectRawId,
         matchId: matchKey ? matchId.get(matchKey) ?? null : null,
+        tournamentId: tournament?.id ?? null,
         createdAt: d(createdAt) ?? new Date(),
       },
     });

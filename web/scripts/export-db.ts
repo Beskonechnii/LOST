@@ -53,7 +53,7 @@ async function main() {
       prisma.groupEntry.findMany({ include: { team: true } }),
       prisma.series.findMany({ include: { home: true, away: true } }),
       prisma.matchStat.findMany({ include: { player: true, match: { include: { teamA: true, teamB: true } } } }),
-      prisma.pointsEntry.findMany({ include: { match: { include: { teamA: true, teamB: true } } } }),
+      prisma.pointsEntry.findMany({ include: { match: { include: { teamA: true, teamB: true } }, tournament: true } }),
       prisma.render.findMany({ include: { match: { include: { teamA: true, teamB: true } } } }),
       prisma.ward.findMany({ include: { team: true, match: { include: { teamA: true, teamB: true } } } }),
       prisma.userAccount.findMany({ include: { player: true, claim: true } }),
@@ -79,7 +79,7 @@ async function main() {
     matchKey(m, m.teamA.slug, m.teamB.slug);
 
   const snapshot = {
-    version: 13, // 13 — сезонные составы: у RosterSpot появился дивизион (divisionKey)
+    version: 14, // 14 — сезонные составы (divisionKey у RosterSpot) и турнирный зачёт TP (tournamentSlug у начислений)
     exportedAt: new Date().toISOString(),
 
     teams: teams.map((t) => omit(t, "id")),
@@ -163,7 +163,9 @@ async function main() {
 
     pointsEntries: points
       .map((p) => ({
-        ...omit(p, "id", "matchId", "match", "subjectId"),
+        ...omit(p, "id", "matchId", "match", "subjectId", "tournamentId", "tournament"),
+        // Турнир — по слагу: id на машинах разные (то же правило, что у дивизионов).
+        tournamentSlug: p.tournament?.slug ?? null,
         // team | player разворачиваем в slug; caster/streamer пока не имеют своей таблицы — оставляем id как есть.
         subjectSlug:
           p.subjectType === "team" ? teamById.get(p.subjectId) ?? null

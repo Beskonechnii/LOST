@@ -7,7 +7,6 @@ import {
   TOURNAMENT_STATUS_LABELS,
   type TournamentStatus,
 } from "@/lib/tournaments";
-import { teamTag } from "@/lib/profiles";
 import { HubTiles, type HubTile } from "@/app/_components/hub-tiles";
 import { SITE_MAX_W } from "@/app/_components/ui";
 
@@ -92,28 +91,6 @@ export default async function TournamentHome({ params }: { params: Promise<{ slu
         </section>
       )}
 
-      {teamsTotal > 0 && (
-        <section className="mt-8 space-y-4 font-pouf">
-          <h2 className="text-sm font-black uppercase tracking-[0.12em] text-ink-subtle">Участники</h2>
-          {tournament.divisions.map((d, i) => (
-            <div key={d.id}>
-              <p className="text-xs font-bold text-ink-subtle">{d.label ?? d.name}</p>
-              <ul className="mt-2 flex flex-wrap gap-2">
-                {rosters[i].map((e) => (
-                  <li key={e.id}>
-                    <Link
-                      href={`/roster/teams/${e.team.id}`}
-                      className="rounded-[12px] bg-surface-2 px-3 py-1.5 text-sm hover:text-accent-bright"
-                    >
-                      {e.team.name} <span className="text-xs text-ink-subtle">{teamTag(e.team)}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </section>
-      )}
     </main>
   );
 }

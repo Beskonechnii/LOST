@@ -142,7 +142,11 @@ const HEADERS: [Column, RegExp][] = [
 const columnOf = (title: string): Column | null =>
   HEADERS.find(([, re]) => re.test(title.trim()))?.[0] ?? null;
 
-/** Строка-шапка: в ней узнаются и «команда», и «ник» — по одному совпадению шапку не объявляем. */
+/**
+ * Строка-шапка. Мало найти «команду» и «ник»: в таблице лиги есть лист нарушений с колонками
+ * «Игрок | Команда | Нарушение», и он разбирался как составы — по одному нарушителю на команду.
+ * Поэтому требуем ещё хотя бы один признак состава: MMR, роль или ссылку на профиль.
+ */
 function findHeader(grid: Grid): { row: number; map: Map<Column, number[]> } | null {
   for (let r = 0; r < Math.min(grid.length, 30); r++) {
     const row = grid[r];
@@ -153,7 +157,8 @@ function findHeader(grid: Grid): { row: number; map: Map<Column, number[]> } | n
       if (!col) return;
       map.set(col, [...(map.get(col) ?? []), i]);
     });
-    if (map.has("team") && map.has("nickname")) return { row: r, map };
+    const rosterish = map.has("mmr") || map.has("role") || map.has("link");
+    if (map.has("team") && map.has("nickname") && rosterish) return { row: r, map };
   }
   return null;
 }
@@ -228,33 +233,74 @@ const BLOCK_HEADERS = /^(роль|инф|инфо|mmr|ммр|ник|игрок|�
 
 const isHeaderRow = (row: Cell[]) => row.some((c) => c?.text && BLOCK_HEADERS.test(c.text.trim()));
 
+/**
+ * Колонки блока, вычитанные из его шапки («# | ИНФ | … | MMR | DOTABUFF»). Раньше они были вшиты
+ * числами (имя команды — колонка 3, ник — 4, MMR — 6), и это работало ровно на одном листе:
+ * у соседнего листа той же книги всё сдвинуто на колонку влево, и разбор давал ноль.
+ */
+type BlockCols = { num: number | null; name: number; mmr: number | null };
+
+const NUM_HEADER = /^(#|№|n|номер)$/i;
+const NAME_HEADER = /^(инф|инфо|ник|игрок|имя|фио)$/i;
+const MMR_HEADER = /^(mmr|ммр)$/i;
+
+function blockCols(row: Cell[]): BlockCols | null {
+  let num: number | null = null;
+  let name: number | null = null;
+  let mmr: number | null = null;
+  row.forEach((c, i) => {
+    const text = c?.text?.trim();
+    if (!text) return;
+    if (name === null && NAME_HEADER.test(text)) name = i;
+    else if (num === null && NUM_HEADER.test(text)) num = i;
+    // MMR в таблице встречается дважды (свой и с сайта) — берём первый, он и есть заявленный.
+    else if (mmr === null && MMR_HEADER.test(text)) mmr = i;
+  });
+  return name === null ? null : { num, name, mmr };
+}
+
 function parseBlocks(grid: Grid): TeamDraft[] {
   const teams: TeamDraft[] = [];
   let current: TeamDraft | null = null;
+  let cols: BlockCols | null = null;
   const int = (s: string) => (/^\d+(\.0+)?$/.test(s) ? String(Number(s)) : s);
 
   for (const row of grid) {
     if (!row) continue;
-    const cell = (i: number) => int(row[i]?.text ?? "");
+    const texts = row.map((c) => int(c?.text?.trim() ?? ""));
+    const filled = texts.map((t, i) => ({ t, i })).filter((x) => x.t);
+    if (filled.length === 0) continue;
 
-    // начало блока: номер команды во второй колонке и её название в четвёртой (не число)
-    if (/^\d+$/.test(cell(1)) && cell(3) && !/^\d+$/.test(cell(3))) {
-      const { name, tag } = splitTeamName(cell(3));
+    // Шапка блока задаёт колонки на весь блок — и заодно говорит, что предыдущая строка была командой.
+    const header = blockCols(row);
+    if (header) {
+      cols = header;
+      continue;
+    }
+
+    // Название команды: строка, где есть ровно одна текстовая ячейка (номер блока рядом не в счёт)
+    // и это не строка игрока текущего блока.
+    const words = filled.filter((x) => !/^\d+$/.test(x.t));
+    const playerCell = cols ? texts[cols.name] : "";
+    if (!playerCell && words.length === 1 && filled.length <= 2) {
+      const { name, tag } = splitTeamName(words[0].t);
       current = { slug: slugify(name), name, tag, players: [] };
+      cols = null; // у нового блока своя шапка
       teams.push(current);
       continue;
     }
-    if (!current) continue;
 
-    if (isHeaderRow(row)) continue; // шапка блока, а не игрок
-    const role = cell(3);
-    const parsed = cell(4) ? splitPlayerName(cell(4)) : null;
+    if (!current || !cols || !playerCell) continue;
+    const parsed = splitPlayerName(playerCell);
     if (!parsed) continue;
 
     const player = emptyPlayer(parsed.nickname);
     player.realName = parsed.realName;
-    player.role = parseRole(role) ?? "standin"; // пустая роль в этой таблице означает замену
-    player.mmr = parseMmr(cell(6));
+    // Роль в этих таблицах не пишут: номер 1–5 в колонке «#» и есть позиция, строка без номера —
+    // замена (так в них и отмечают шестого).
+    const num = cols.num === null ? "" : texts[cols.num];
+    player.role = /^[1-5]$/.test(num) ? roleByPosition(Number(num)) : "standin";
+    player.mmr = cols.mmr === null ? null : parseMmr(texts[cols.mmr]);
     for (const c of row) {
       if (c?.href) applyLink(player, c.href);
     }

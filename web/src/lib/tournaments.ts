@@ -287,6 +287,52 @@ export async function deleteDivision(id: number) {
   return prisma.division.delete({ where: { id } });
 }
 
+// ── жеребьёвка ───────────────────────────────────────────────────────────────
+
+/** Правка строки участия: группа и посев. Пустая группа — «не разведены», это законное состояние. */
+export async function setEntryDraw(entryId: number, draw: { group?: string | null; seed?: number | null }) {
+  const group = draw.group === undefined ? undefined : (draw.group ?? "").trim().toUpperCase() || null;
+  return prisma.tournamentEntry.update({
+    where: { id: entryId },
+    data: { ...(group === undefined ? {} : { group }), ...(draw.seed === undefined ? {} : { seed: draw.seed }) },
+  });
+}
+
+/**
+ * Развести команды дивизиона по группам «змейкой» по силе состава: 1-я команда в группу A, 2-я в B,
+ * 3-я в B, 4-я в A и так далее. Змейка, а не по кругу: она уравнивает суммарную силу групп, иначе
+ * в первой группе окажутся все сеяные.
+ *
+ * Сила — средний MMR основы (позиции 1–5), как на витрине команды. Без MMR команда идёт в конец
+ * посева: считать её сильной не за что.
+ */
+export async function drawGroups(divisionId: number, groupCount: number) {
+  if (groupCount < 1) throw new Error("Групп должно быть хотя бы одна");
+  const entries = await prisma.tournamentEntry.findMany({
+    where: { divisionId },
+    include: { team: { include: { roster: { where: { divisionId }, include: { player: true } } } } },
+  });
+
+  const strength = (e: (typeof entries)[number]) => {
+    // Основа — те же позиции 1–5, что считает teamMmr на витрине; роли живут строками (roles.ts).
+    const core = e.team.roster.filter((s) => s.role && !["coach", "standin"].includes(s.role) && s.player.mmr);
+    if (!core.length) return 0;
+    return core.reduce((sum, s) => sum + (s.player.mmr ?? 0), 0) / core.length;
+  };
+
+  const sorted = [...entries].sort((a, b) => strength(b) - strength(a));
+  const letters = Array.from({ length: groupCount }, (_, i) => String.fromCharCode(65 + i)); // A, B, C…
+
+  for (const [i, entry] of sorted.entries()) {
+    const row = Math.floor(i / groupCount);
+    const pos = i % groupCount;
+    // Каждый второй ряд посева идёт в обратном порядке — это и есть змейка.
+    const group = letters[row % 2 === 0 ? pos : groupCount - 1 - pos];
+    await prisma.tournamentEntry.update({ where: { id: entry.id }, data: { group, seed: i + 1 } });
+  }
+  return sorted.length;
+}
+
 // ── участие команд ───────────────────────────────────────────────────────────
 
 export const divisionTeams = (divisionId: number) =>

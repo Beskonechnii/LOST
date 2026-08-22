@@ -60,16 +60,42 @@ export async function getQualified(divisionId: number) {
  * в сезон («Division 1» есть у каждого), и по имени таблицы двух турниров слились бы в одну.
  */
 export async function getGroupStage(divisionId: number): Promise<GroupTable[]> {
-  const [division, entries, series] = await Promise.all([
+  const [division, sheet, participants, series] = await Promise.all([
     prisma.division.findUnique({ where: { id: divisionId } }),
     prisma.groupEntry.findMany({
       where: { divisionId },
       include: { team: { select: { id: true, slug: true, name: true, tag: true, logo: true } } },
       orderBy: [{ group: "asc" }, { place: "asc" }],
     }),
+    prisma.tournamentEntry.findMany({
+      where: { divisionId },
+      include: { team: { select: { id: true, slug: true, name: true, tag: true, logo: true } } },
+      orderBy: [{ group: "asc" }, { seed: "asc" }],
+    }),
     prisma.series.findMany({ where: { divisionId, stage: "group" } }),
   ]);
   if (!division) return [];
+
+  /**
+   * Строки таблицы. У сезона S2 они пришли снимком таблицы («GS»), поэтому там есть напечатанные
+   * место и очки. У турнира, заведённого в админке, снимка нет — берём жеребьёвку (`TournamentEntry`)
+   * и считаем всё из сетки. Так новый турнир показывает группы сразу после жеребьёвки, а не после
+   * ручной заливки итогов.
+   */
+  const entries = sheet.length
+    ? sheet
+    : participants
+        .filter((p) => p.group)
+        .map((p) => ({
+          teamId: p.teamId,
+          team: p.team,
+          group: p.group!,
+          place: p.seed ?? 0,
+          played: 0,
+          wins: 0,
+          losses: 0,
+          points: 0,
+        }));
 
   // Лого разрешаем разом до сборки таблиц: дальше идёт синхронный расчёт очков, асинхронность туда не тащим.
   const logoByTeam = new Map(
@@ -111,6 +137,16 @@ export async function getGroupStage(divisionId: number): Promise<GroupTable[]> {
         sheet: { played: e.played, wins: e.wins, losses: e.losses, points: e.points },
       };
     });
+
+    // Без снимка таблицы место считаем сами — по очкам, победам и алфавиту. Со снимком порядок
+    // задавал организатор (при равенстве очков его по цифрам не восстановить), и мы его не трогаем.
+    if (!sheet.length) {
+      rows.sort((a, b) => b.points - a.points || b.wins - a.wins || a.name.localeCompare(b.name));
+      rows.forEach((r, i) => {
+        r.place = i + 1;
+      });
+    }
+
     const grid = rows.map((r) =>
       rows.map<GroupCell>((c) => {
         if (r.teamId === c.teamId) return null; // диагональ — сам с собой не играет

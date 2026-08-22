@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { denyUnlessPermission } from "../../../_components/permission-gate";
 import { Field, STATUS_TONE } from "../_components/fields";
-import { addDivision, assignTeam, changeStatus, removeDivision, saveDivision, saveTournament } from "../actions";
+import { addDivision, assignTeam, autoDraw, changeStatus, removeDivision, saveDivision, saveDraw, saveTournament } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -149,11 +149,31 @@ export default async function TournamentPage({ params }: { params: Promise<{ slu
                 ) : (
                   <ul className="space-y-1.5">
                     {entries.map((e) => (
-                      <li key={e.id} className="flex items-center gap-2 text-sm">
+                      <li key={e.id} className="flex flex-wrap items-center gap-2 text-sm">
                         <Link href={`/roster/teams/${e.team.id}`} className="text-accent-bright hover:underline">
                           {e.team.name}
                         </Link>
                         <span className="text-xs text-ink-subtle">{teamTag(e.team)}</span>
+                        {/* Жеребьёвка: группа и посев живут в строке участия, а не у команды —
+                            в следующем турнире она может попасть в другую группу. */}
+                        <form action={saveDraw} className="flex items-center gap-1">
+                          <input type="hidden" name="entryId" value={e.id} />
+                          <input type="hidden" name="tournamentSlug" value={tournament.slug} />
+                          <input
+                            name="group"
+                            defaultValue={e.group ?? ""}
+                            placeholder="гр."
+                            className="h-8 w-12 rounded-md border border-hairline bg-surface-2 px-2 text-center text-xs uppercase"
+                          />
+                          <input
+                            name="seed"
+                            type="number"
+                            defaultValue={e.seed ?? ""}
+                            placeholder="№"
+                            className="h-8 w-14 rounded-md border border-hairline bg-surface-2 px-2 text-center text-xs"
+                          />
+                          <Button type="submit" size="sm" variant="ghost">Сохранить</Button>
+                        </form>
                         <form action={assignTeam} className="ml-auto">
                           <input type="hidden" name="teamId" value={e.team.id} />
                           <input type="hidden" name="divisionId" value="" />
@@ -164,6 +184,27 @@ export default async function TournamentPage({ params }: { params: Promise<{ slu
                     ))}
                   </ul>
                 )}
+
+                <form action={autoDraw} className="mt-3 flex flex-wrap items-end gap-2">
+                  <input type="hidden" name="divisionId" value={d.id} />
+                  <input type="hidden" name="tournamentSlug" value={tournament.slug} />
+                  <label className="block">
+                    <span className="text-xs text-ink-muted">Разбить на группы</span>
+                    <input
+                      name="groups"
+                      type="number"
+                      min={1}
+                      defaultValue={2}
+                      className="mt-1 h-9 w-20 rounded-md border border-hairline bg-surface-2 px-2 text-sm"
+                    />
+                  </label>
+                  <Button type="submit" size="sm" variant="outline" disabled={entries.length === 0}>
+                    Жеребьёвка змейкой
+                  </Button>
+                  <span className="text-[11px] text-ink-subtle">
+                    По среднему MMR основы: сильнейшие расходятся по разным группам.
+                  </span>
+                </form>
 
                 <form action={assignTeam} className="mt-3 flex flex-wrap items-end gap-2">
                   <input type="hidden" name="divisionId" value={d.id} />

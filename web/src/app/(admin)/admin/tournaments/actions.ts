@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { requirePermission } from "@/lib/account";
 import {
   createDivision,
+  drawGroups,
+  setEntryDraw,
   createTournament,
   deleteDivision,
   setTeamDivision,
@@ -86,6 +88,20 @@ export async function saveDivision(form: FormData): Promise<void> {
 export async function removeDivision(form: FormData): Promise<void> {
   await requirePermission("tournaments.edit");
   await deleteDivision(Number(form.get("id")));
+  revalidatePath(`/admin/tournaments/${text(form, "tournamentSlug")}`);
+}
+
+/** Правка жеребьёвки одной команды: группа и посев. */
+export async function saveDraw(form: FormData): Promise<void> {
+  await requirePermission("tournaments.edit");
+  await setEntryDraw(Number(form.get("entryId")), { group: text(form, "group"), seed: num(form, "seed") });
+  revalidatePath(`/admin/tournaments/${text(form, "tournamentSlug")}`);
+}
+
+/** Развести дивизион по группам змейкой — по силе состава (src/lib/tournaments.ts). */
+export async function autoDraw(form: FormData): Promise<void> {
+  await requirePermission("tournaments.edit");
+  await drawGroups(Number(form.get("divisionId")), Number(form.get("groups")) || 2);
   revalidatePath(`/admin/tournaments/${text(form, "tournamentSlug")}`);
 }
 

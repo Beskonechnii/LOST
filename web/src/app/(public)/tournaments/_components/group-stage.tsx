@@ -43,7 +43,7 @@ function StandingsCard({ t }: { t: GroupTable }) {
       <table className="w-full border-collapse text-sm">
         <tbody>
           {t.rows.map((r) => {
-            const zone = QUALIFICATION[qualificationOf(r.place, t.rows.length, t.division)];
+            const zone = QUALIFICATION[qualificationOf(r.place, t.rows.length, t.relegation)];
             const leader = r.place === 1;
             return (
               <tr key={r.teamId} className="group border-t border-hairline transition-colors hover:bg-surface-2/50">

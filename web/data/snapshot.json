@@ -1,6 +1,6 @@
 {
   "version": 12,
-  "exportedAt": "2026-08-21T23:43:51.947Z",
+  "exportedAt": "2026-08-22T09:51:05.165Z",
   "teams": [
     {
       "slug": "300",
@@ -8729,9 +8729,37 @@
   ],
   "tournaments": [
     {
+      "slug": "rtb",
+      "name": "test",
+      "short": "S3",
+      "description": "123qwe",
+      "format": "test",
+      "prize": "300$",
+      "logo": null,
+      "banner": null,
+      "status": "registration",
+      "startAt": "2026-08-24T00:00:00.000Z",
+      "endAt": "2026-08-31T00:00:00.000Z",
+      "regOpenAt": "2026-08-24T00:00:00.000Z",
+      "regCloseAt": "2026-10-30T00:00:00.000Z",
+      "createdAt": "2026-08-22T09:22:26.912Z",
+      "divisions": [
+        {
+          "slug": "d1",
+          "name": "div1",
+          "label": "ETSTT",
+          "short": "d12",
+          "orderNo": 0,
+          "mmrFrom": 32,
+          "mmrTo": 6000,
+          "relegation": true
+        }
+      ]
+    },
+    {
       "slug": "s2",
       "name": "LOST Season 2",
-      "short": "S2",
+      "short": "LOST S2",
       "description": null,
       "format": "2 дивизион(а), групповая стадия + плей-офф",
       "prize": null,
@@ -8751,7 +8779,8 @@
           "short": "D1",
           "orderNo": 0,
           "mmrFrom": null,
-          "mmrTo": null
+          "mmrTo": null,
+          "relegation": true
         },
         {
           "slug": "d2",
@@ -8760,7 +8789,8 @@
           "short": "D2",
           "orderNo": 1,
           "mmrFrom": null,
-          "mmrTo": null
+          "mmrTo": null,
+          "relegation": false
         }
       ]
     }

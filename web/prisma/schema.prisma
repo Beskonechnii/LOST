@@ -50,6 +50,10 @@ model Division {
   orderNo Int     @default(0) // порядок вкладок в навигации
   mmrFrom Int? // порог входа, если у дивизиона он есть
   mmrTo   Int?
+  /// Вылетают ли последние из группы. В D1 два последних вылетают, в D2 все непопавшие в верхнюю
+  /// сетку падают в нижнюю — раньше это правило различалось сравнением имени дивизиона со строкой
+  /// «Division 2» (src/lib/qualification.ts), что в новом турнире с другими именами не сработало бы.
+  relegation Boolean @default(true)
 
   tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   tournamentId Int

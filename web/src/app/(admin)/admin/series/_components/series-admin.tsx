@@ -21,8 +21,8 @@ import { Heading, Eyebrow, Text } from "@/components/pouf/text";
 // Форма и список архива. Пишет через /api/series/* — тот же путь, что и у любой правки в проекте,
 // поэтому серверных экшенов здесь нет: правило «не-GET к /api закрыт паролем» одно на всё.
 
-type TeamOpt = { id: number; name: string; tag: string; division: string | null };
-type DivOpt = { name: string; label: string };
+type TeamOpt = { id: number; name: string; tag: string; divisionId: number | null };
+type DivOpt = { id: number; name: string; label: string };
 
 /** Слот сетки для формы: подпись, команды (когда известны) и «занят ли». Считается на сервере. */
 export type SlotOption = {
@@ -36,7 +36,8 @@ export type SlotOption = {
   bName: string;
   taken: boolean;
 };
-export type SlotOptions = Record<string, SlotOption[]>;
+/** Слоты сетки по id дивизиона: имена дивизионов в разных турнирах совпадают, id — нет. */
+export type SlotOptions = Record<number, SlotOption[]>;
 
 const SCORES = ["2:0", "2:1", "1:2", "0:2"];
 
@@ -346,11 +347,14 @@ const bracketOrder = (b: string | null) => BRACKETS.findIndex((x) => x.key === b
 
 export function SeriesAdmin({
   divisions,
+  statsHref,
   teams,
   series,
   slots,
 }: {
   divisions: DivOpt[];
+  /** Куда ведёт «статистика»: раздел дивизиона живёт внутри турнира, слаг знает только сервер. */
+  statsHref: string;
   teams: TeamOpt[];
   series: SeriesRow[];
   slots: SlotOptions;
@@ -360,7 +364,7 @@ export function SeriesAdmin({
 
   // Дивизион — верхняя вкладка (как в ростере команд): D1 и D2 играют раздельно, поэтому список
   // всегда показывает ровно один дивизион. Он же — дивизион по умолчанию в форме новой встречи.
-  const [division, setDivision] = useState(divisions[0]?.name ?? "");
+  const [division, setDivision] = useState(divisions[0]?.id ?? 0);
   const [stage, setStage] = useState<string>("group");
   const [group, setGroup] = useState("A");
   const [slot, setSlot] = useState("");
@@ -391,7 +395,7 @@ export function SeriesAdmin({
   const [showForm, setShowForm] = useState(false);
 
   // Команды показываем только своего дивизиона: D1 и D2 играют раздельно, перемешать их — ошибка.
-  const options = teams.filter((t) => !t.division || t.division === division);
+  const options = teams.filter((t) => !t.divisionId || t.divisionId === division);
 
   const create = async () => {
     setBusy(true);
@@ -400,7 +404,7 @@ export function SeriesAdmin({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        division,
+        divisionId: division,
         stage,
         group: stage === "group" ? group : null,
         slot: stage === "playoff" ? slot : null,
@@ -435,7 +439,7 @@ export function SeriesAdmin({
   };
 
   // Встречи активного дивизиона — база для вкладок подраздела и для списка.
-  const inDivision = series.filter((s) => s.division === division);
+  const inDivision = series.filter((s) => s.divisionId === division);
 
   // Вкладки подраздела строим по факту: сколько групп есть — столько вкладок «Группа X»,
   // плюс «Плей-офф», плюс «Прочее» для всего, что не групповая стадия и не плей-офф.
@@ -470,7 +474,7 @@ export function SeriesAdmin({
         <div className="flex flex-wrap items-center gap-4">
           <Text size="sm" muted>
             Карты отсюда идут в{" "}
-            <Link href="/standings/d1/stats" className="font-bold text-[var(--purple)] hover:underline">
+            <Link href={statsHref} className="font-bold text-[var(--purple)] hover:underline">
               статистику
             </Link>
           </Text>
@@ -490,7 +494,11 @@ export function SeriesAdmin({
       <Sheet open={showForm} onOpenChange={setShowForm} title="Новая встреча">
         <div className="flex flex-col gap-4">
           <Labeled label="Дивизион">
-            <PoufSelect value={division} onChange={setDivision} options={divisions.map((d) => ({ value: d.name, label: d.label }))} />
+            <PoufSelect
+            value={String(division)}
+            onChange={(v) => setDivision(Number(v))}
+            options={divisions.map((d) => ({ value: String(d.id), label: d.label }))}
+          />
           </Labeled>
           <Labeled label="Стадия">
             <PoufSelect
@@ -539,11 +547,14 @@ export function SeriesAdmin({
       {/* Дивизион слева крупным Segmented, поиск и фильтр карт — справа. */}
       <div className="flex flex-wrap items-center gap-3">
         <Segmented
-          value={division}
-          onChange={setDivision}
+          value={String(division)}
+          onChange={(v) => setDivision(Number(v))}
           label="Дивизион"
           tone="purple"
-          options={divisions.map((d) => ({ value: d.name, label: `${d.label}  ${series.filter((s) => s.division === d.name).length}` }))}
+          options={divisions.map((d) => ({
+            value: String(d.id),
+            label: `${d.label}  ${series.filter((s) => s.divisionId === d.id).length}`,
+          }))}
         />
         <div className="ml-auto flex flex-wrap items-center gap-3">
           <div className="w-56">

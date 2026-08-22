@@ -15,13 +15,13 @@ import { listDivisions } from "@/lib/tournaments";
 const dry = process.argv.includes("--dry");
 const need = (bestOf: 3 | 5) => (bestOf === 5 ? 3 : 2);
 
-async function backfillDivision(division: string) {
-  const { upper, lower } = await getQualified(division);
+async function backfillDivision(division: { id: number; name: string }) {
+  const { upper, lower } = await getQualified(division.id);
   const seeds = new Map<string, number>(); // «A1» → teamId
   for (const r of [...upper, ...lower]) seeds.set(`${r.group}${r.place}`, r.teamId);
 
   const series = await prisma.series.findMany({
-    where: { division, stage: "playoff" },
+    where: { divisionId: division.id, stage: "playoff" },
     select: { id: true, slot: true, homeId: true, awayId: true, homeScore: true, awayScore: true },
   });
   const free = series.filter((s) => !s.slot); // уже размеченные не трогаем
@@ -84,7 +84,7 @@ async function main() {
   console.log(dry ? "— dry-run: база не тронута —\n" : "— запись —\n");
   for (const d of await listDivisions()) {
     console.log(`${d.label} (${d.name}):`);
-    const { assigned, total } = await backfillDivision(d.name);
+    const { assigned, total } = await backfillDivision(d);
     console.log(`  итого: размечено ${assigned} из ${total} плей-офф серий\n`);
   }
   await prisma.$disconnect();

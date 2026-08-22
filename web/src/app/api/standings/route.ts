@@ -8,5 +8,5 @@ export async function GET(req: Request) {
   const div = new URL(req.url).searchParams.get("div");
   const division = (div && (await divisionBySlug(div))) || (await getDivisions())[0];
   if (!division) return NextResponse.json([]); // турнир ещё не заведён — отдаём пустую таблицу
-  return NextResponse.json(await getStandings(division.name));
+  return NextResponse.json(await getStandings(division.id));
 }

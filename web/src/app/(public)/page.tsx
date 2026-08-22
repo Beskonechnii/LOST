@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { currentTournament, getDivisions } from "@/lib/tournaments";
 import { SITE_MAX_W, StatTile } from "@/app/_components/ui";
 import { buttonClasses } from "@/components/pouf/Button";
 import { Card } from "@/components/pouf/surface";
@@ -21,22 +22,11 @@ export const metadata: Metadata = {
 
 const SITE = "https://leagueofspirits.ru/lost_s1";
 
-/** Разделы продукта. Порядок тот же, что в верхней навигации, — карточки её и повторяют. */
+/**
+ * Разделы продукта. Дивизионы сюда подставляются из текущего турнира (см. ниже), а не вписаны
+ * руками: заведёшь новый сезон — карточки на лендинге сменятся сами.
+ */
 const SECTIONS = [
-  {
-    href: "/standings/d1/groups",
-    title: "LOST D1",
-    text: "Первый дивизион: таблица с зонами выхода, сетка групповой стадии и плей-офф. Правка результата встречи двигает и сетку, и таблицу.",
-    cta: "Смотреть таблицу",
-    accent: "d1",
-  },
-  {
-    href: "/standings/d2/groups",
-    title: "LOST D2",
-    text: "Второй дивизион: своя таблица, группы и плей-офф. Считается по тем же правилам, что и первый.",
-    cta: "Смотреть таблицу",
-    accent: "d2",
-  },
   {
     href: "/tournaments",
     title: "Турниры",
@@ -53,15 +43,31 @@ const SECTIONS = [
   },
 ] as const;
 
+type Section = { href: string; title: string; text: string; cta: string; accent: string };
+
 export default async function Home() {
   // Считаем прямо здесь: показать надо четыре числа, тянуть ради них выборки страниц незачем.
   // Считаем по всей лиге, а не по одному дивизиону: на витрине цифры общие (D1 + D2).
+  const current = await currentTournament();
+  const divisions = await getDivisions();
   const [teams, players, series, groups] = await Promise.all([
     prisma.team.count(),
     prisma.player.count(),
     prisma.series.count(),
     prisma.groupEntry.findMany({ distinct: ["division", "group"], select: { group: true } }),
   ]);
+
+  // Карточка на дивизион + постоянные разделы. Акцент первых двух — цвета D1/D2, дальше нейтральный.
+  const sections: Section[] = [
+    ...divisions.map((d, i) => ({
+      href: current ? `/tournaments/${current.slug}/${d.slug}/groups` : "/tournaments",
+      title: d.label,
+      text: `Таблица с зонами выхода, сетка групповой стадии и плей-офф. Правка результата встречи двигает и сетку, и таблицу.`,
+      cta: "Смотреть таблицу",
+      accent: i === 0 ? "d1" : i === 1 ? "d2" : "none",
+    })),
+    ...SECTIONS,
+  ];
 
   const stats = [
     { value: teams, label: "команд" },
@@ -93,7 +99,7 @@ export default async function Home() {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/standings/d1/groups" className={buttonClasses({ size: "lg" })}>
+            <Link href={sections[0]?.href ?? "/tournaments"} className={buttonClasses({ size: "lg" })}>
               Таблица дивизиона
             </Link>
             <Link href="/roster/teams" className={buttonClasses({ size: "lg", variant: "quiet" })}>
@@ -115,7 +121,7 @@ export default async function Home() {
       <section className={`mx-auto ${SITE_MAX_W} px-4 py-12 md:px-6 md:py-16`}>
         <Eyebrow>Разделы</Eyebrow>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {SECTIONS.map((s) => (
+          {sections.map((s) => (
             <Link key={s.href} href={s.href} className="group block">
               <Card motion="lift">
                 <div className="flex h-full flex-col gap-3">

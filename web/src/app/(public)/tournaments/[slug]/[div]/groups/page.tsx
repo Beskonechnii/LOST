@@ -2,25 +2,25 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getGroupStage } from "@/lib/group-stage";
 import { QUALIFICATION } from "@/lib/qualification";
-import { divisionBySlug } from "@/lib/tournaments";
+import { divisionOfTournament } from "@/lib/tournaments";
 import { Chip, SectionHeader } from "@/app/_components/ui";
-import { GroupStage } from "../../_components/group-stage";
+import { GroupStage } from "../../../_components/group-stage";
 
 export const dynamic = "force-dynamic";
 
 // Групповая стадия: таблица групп и сетка личных встреч на одной странице. Считается только по
 // групповым сериям (stage="group") — плей-офф и разовые матчи сюда не попадают.
-export default async function StandingsPage({ params }: { params: Promise<{ div: string }> }) {
-  const { div } = await params;
-  const division = await divisionBySlug(div);
+export default async function StandingsPage({ params }: { params: Promise<{ slug: string; div: string }> }) {
+  const { slug, div } = await params;
+  const division = await divisionOfTournament(slug, div);
   if (!division) notFound();
 
-  const tables = await getGroupStage(division.name);
+  const tables = await getGroupStage(division.id);
 
   return (
     <div className="space-y-6">
       <SectionHeader
-        eyebrow={`${division.label} · групповая стадия`}
+        eyebrow={`${division.label ?? division.name} · групповая стадия`}
         title="Групповая стадия"
         aside={<>Счёт и очки — из привязанных карт архива серий, автоматически</>}
       />
@@ -46,7 +46,7 @@ export default async function StandingsPage({ params }: { params: Promise<{ div:
         <GroupStage tables={tables} />
       )}
 
-      <Link href={`/standings/${division.slug}/playoff`} className="inline-block font-pouf text-xs font-bold text-muted hover:text-[var(--purple)]">
+      <Link href={`/tournaments/${slug}/${division.slug}/playoff`} className="inline-block font-pouf text-xs font-bold text-muted hover:text-[var(--purple)]">
         Дальше — плей-офф с посевом из групп →
       </Link>
     </div>

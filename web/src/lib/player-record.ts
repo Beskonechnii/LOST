@@ -38,7 +38,7 @@ export type Teammate = {
 };
 
 const where = (filter: LeadersFilter) => ({
-  match: { series: { is: { division: filter.division, stage: filter.stage, group: filter.group, bracket: filter.bracket } } },
+  match: { series: { is: { divisionId: filter.divisionId, stage: filter.stage, group: filter.group, bracket: filter.bracket } } },
 });
 
 /**

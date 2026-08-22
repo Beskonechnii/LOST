@@ -59,7 +59,7 @@ export async function getPlayersHeroes(
       ...(playerIds ? { playerId: { in: playerIds } } : {}),
       // Тот же барьер, что в leaders.ts: только карты, привязанные к серии турнира.
       match: {
-        series: { is: { division: filter.division, stage: filter.stage, group: filter.group, bracket: filter.bracket } },
+        series: { is: { divisionId: filter.divisionId, stage: filter.stage, group: filter.group, bracket: filter.bracket } },
       },
     },
     select: { playerId: true, heroSlug: true, won: true, kills: true, deaths: true, assists: true },

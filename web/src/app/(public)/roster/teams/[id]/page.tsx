@@ -2,8 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTeamProfile, type RosterMember } from "@/lib/roster-data";
 import { getStandings } from "@/lib/standings";
-import { divisionSlug } from "@/lib/divisions";
-import { getDivisions } from "@/lib/tournaments";
+import { teamDivision } from "@/lib/tournaments";
 import { teamAccent, teamTag } from "@/lib/profiles";
 import { buttonClasses } from "@/components/pouf/Button";
 import { roleLabel } from "@/lib/roles";
@@ -20,10 +19,13 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
   const team = await getTeamProfile(Number(id));
   if (!team) notFound();
 
-  // Таблицу берём по дивизиону команды — тому же, что показывает раздел «LOST D1»/«LOST D2».
-  const divisions = await getDivisions();
-  const divSlug = divisionSlug(divisions, team.group);
-  const [standings, authed] = await Promise.all([getStandings(team.group ?? divisions[0]?.name ?? ""), can("roster.edit")]);
+  // Таблицу берём по дивизиону команды в текущем турнире — тому же, что показывает его раздел.
+  // Команда вне турнира (например, из прошлого сезона) таблицы не получает — это не ошибка.
+  const division = await teamDivision(team.id);
+  const [standings, authed] = await Promise.all([
+    division ? getStandings(division.id) : Promise.resolve([]),
+    can("roster.edit"),
+  ]);
 
   const accent = teamAccent(team);
   const core = team.players.filter((p) => p.position !== null);
@@ -32,7 +34,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
   // Место берём из общей таблицы, а не считаем заново: один источник с разделом «LOST D1».
   const group = standings.find((g) => g.rows.some((r) => r.teamId === team.id));
   const row = group?.rows.find((r) => r.teamId === team.id) ?? null;
-  const zone = row?.place ? qualificationOf(row.place, group!.rows.length, team.group ?? divisions[0]?.name ?? "") : null;
+  const zone = row?.place && division ? qualificationOf(row.place, group!.rows.length, division.relegation) : null;
 
   return (
     <div className="space-y-6 font-pouf">
@@ -90,14 +92,20 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
         <section className="rounded-card bg-surface p-5 cushion-card">
           <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
             <Eyebrow>
-              {team.group ?? "Дивизион"}
+              {division?.label ?? division?.name ?? "Дивизион"}
               {group && <span className="ml-2 text-ink-muted">группа {group.group}</span>}
             </Eyebrow>
             <div className="flex flex-wrap gap-3 text-xs">
-              <Link href={`/standings/${divSlug}/groups`} className="font-black text-[var(--purple)] hover:underline">
+              <Link
+                href={`/tournaments/${division!.tournament.slug}/${division!.slug}/groups`}
+                className="font-black text-[var(--purple)] hover:underline"
+              >
                 Групповая стадия →
               </Link>
-              <Link href={`/standings/${divSlug}/playoff`} className="font-black text-[var(--purple)] hover:underline">
+              <Link
+                href={`/tournaments/${division!.tournament.slug}/${division!.slug}/playoff`}
+                className="font-black text-[var(--purple)] hover:underline"
+              >
                 Плей-офф →
               </Link>
             </div>

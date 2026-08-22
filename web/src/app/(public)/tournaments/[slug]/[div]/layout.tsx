@@ -1,20 +1,24 @@
 import { notFound } from "next/navigation";
-import { SITE_MAX_W } from "../../../_components/ui";
-import { BackButton } from "../../../_components/back-button";
-import { divisionBySlug } from "@/lib/tournaments";
+import { SITE_MAX_W } from "@/app/_components/ui";
+import { BackButton } from "@/app/_components/back-button";
+import { divisionOfTournament } from "@/lib/tournaments";
 
-// Раздел дивизиона. Один шаблон на оба дивизиона: слаг в URL (d1/d2) выбирает дивизион, а этапы
-// (групповая / плей-офф / статистика) — плитки на хабе дивизиона (page.tsx), не ряд вкладок.
+// Раздел дивизиона внутри турнира: /tournaments/<турнир>/<дивизион>. Турнир в адресе не для красоты —
+// имена и слаги дивизионов повторяются из сезона в сезон, и без него «d1» означал бы разное в разные
+// годы, а прошлый сезон исчезал бы с витрины при старте нового. Старые /standings/<div>/* остались
+// редиректом на текущий турнир, чтобы отданные наружу ссылки не ломались.
+//
+// Этапы (групповая / плей-офф / статистика) — плитки на хабе дивизиона (page.tsx), не ряд вкладок.
 
 export default async function DivisionLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ div: string }>;
+  params: Promise<{ slug: string; div: string }>;
 }) {
-  const { div } = await params;
-  const division = await divisionBySlug(div);
+  const { slug, div } = await params;
+  const division = await divisionOfTournament(slug, div);
   if (!division) notFound();
 
   // Акцент секции = цвет дивизиона. D1 держит бренд-фиолетовый (дефолт токенов), D2 — бирюзовый
@@ -34,7 +38,7 @@ export default async function DivisionLayout({
   // Ширина — единая на весь сайт (SITE_MAX_W): шапка и контент совпадают по краю.
   // Кнопку прячем на самом хабе дивизиона (page.tsx) — назад с него ведёт вкладка LOST S2;
   // на этапах (группы / плей-офф / статистика) она возвращает к хабу дивизиона.
-  const base = `/standings/${division.slug}`;
+  const base = `/tournaments/${slug}/${division.slug}`;
   return (
     <div style={accentVars}>
       <main className={`mx-auto w-full ${SITE_MAX_W} flex-1 px-4 py-8 md:px-6`}>

@@ -86,7 +86,7 @@ function tableFor(g: StandingGroup): string {
   const rows = g.rows
     .map((r, i) => {
       const place = r.place ?? i + 1;
-      const zone = qualificationOf(place, g.rows.length, division.name);
+      const zone = qualificationOf(place, g.rows.length, division.relegation);
       const color = ZONE_COLOR[zone];
       // Команда — просто текст, без ссылки: в статике страниц команд нет,
       // а битая ссылка хуже её отсутствия.
@@ -154,7 +154,7 @@ ${groups.map(tableFor).join("\n")}
 }
 
 async function main() {
-  const groups = await getStandings(division.name);
+  const groups = await getStandings(division.id);
   if (groups.length === 0) {
     console.error(`В базе нет команд дивизиона ${division.name} — сначала залей ростер (см. CLAUDE.md §7).`);
     process.exit(1);

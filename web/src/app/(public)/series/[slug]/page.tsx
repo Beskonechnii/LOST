@@ -4,8 +4,7 @@ import type { Metadata } from "next";
 import { Icon, TeamCrest } from "@/app/_components/postgame/blocks";
 import { Eyebrow } from "@/app/_components/ui";
 import { BackButton } from "@/app/_components/back-button";
-import { divisionSlug } from "@/lib/divisions";
-import { getDivisions } from "@/lib/tournaments";
+import { divisionWithTournament } from "@/lib/tournaments";
 import { getSeriesDetail, type GamePlayer, type SeriesDetail, type SeriesGameDetail } from "@/lib/series";
 import { playoffLabel, stageLabel } from "@/lib/stages";
 
@@ -151,7 +150,9 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
   const s = await getSeriesDetail(slug);
   if (!s) notFound();
 
-  const div = divisionSlug(await getDivisions(), s.division);
+  // Раздел дивизиона живёт внутри турнира, поэтому ссылку строим по самому дивизиону встречи.
+  const division = s.divisionId ? await divisionWithTournament(s.divisionId) : null;
+  const divHref = division ? `/tournaments/${division.tournament.slug}/${division.slug}` : "/tournaments";
   const winner = s.homeScore > s.awayScore ? s.home.id : s.awayScore > s.homeScore ? s.away.id : null;
   const bo = s.homeScore + s.awayScore <= 1 ? "Bo1" : "Bo3";
 
@@ -160,13 +161,13 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
       {/* Уже, чем остальной сайт (SITE_MAX_W), намеренно: это читательская страница одной встречи —
           счёт и составы по карте. На всю ширину экрана строки состава растянулись бы некрасиво. */}
       <div className="mx-auto max-w-6xl space-y-4">
-        <BackButton fallback={`/standings/${div}`} />
+        <BackButton fallback={divHref} />
 
         {/* Шапка встречи: крошки разреза + счёт серии одной карточкой с мягкой тенью */}
         <div className="overflow-hidden rounded-card bg-surface cushion-card">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline bg-surface-2 px-4 py-2.5">
             <div className="flex flex-wrap items-center gap-2 text-sm">
-              <Link href={`/standings/${div}`} className="font-black text-[var(--purple)] hover:underline">
+              <Link href={divHref} className="font-black text-[var(--purple)] hover:underline">
                 {s.division}
               </Link>
               <span className="text-ink-subtle">·</span>

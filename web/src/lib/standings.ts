@@ -29,19 +29,22 @@ export type StandingGroup = { group: string; rows: StandingRow[] };
  * Bo3 дал бы четыре сыгранных вместо одного.
  *
  * Считаем по одному дивизиону: у D1 и D2 свои группы A/B, и без фильтра их очки слились бы в один
- * блок. Команды берём по `Team.group` (его проставляет импорт), встречи и итоги — по `division`.
+ * блок. Ключ — `divisionId`: команды берём по участию в турнире (`TournamentEntry`), встречи и итоги —
+ * по тому же id. По имени дивизиона фильтровать нельзя — «Division 1» есть в каждом сезоне.
  */
-export async function getStandings(division: string): Promise<StandingGroup[]> {
-  const [teams, entries, series, matches, points] = await Promise.all([
-    prisma.team.findMany({ where: { group: division } }),
-    prisma.groupEntry.findMany({ where: { division } }),
-    prisma.series.findMany({ where: { division } }),
+export async function getStandings(divisionId: number): Promise<StandingGroup[]> {
+  const [participants, entries, series, matches, points] = await Promise.all([
+    prisma.tournamentEntry.findMany({ where: { divisionId }, include: { team: true } }),
+    prisma.groupEntry.findMany({ where: { divisionId } }),
+    prisma.series.findMany({ where: { divisionId } }),
     prisma.match.findMany({ where: { status: "finished", seriesId: null } }),
     prisma.pointsEntry.findMany({ where: { subjectType: "team" } }),
   ]);
 
   const groups = new Map<string, StandingRow[]>();
-  for (const t of teams) {
+  // Группа команды: из жеребьёвки участия, из таблицы сезона или из первой групповой встречи.
+  const drawGroup = new Map(participants.map((p) => [p.teamId, p.group]));
+  for (const t of participants.map((p) => p.team)) {
     const mine = series.filter((s) => s.homeId === t.id || s.awayId === t.id);
     let played = mine.length;
     let wins = 0;
@@ -69,12 +72,12 @@ export async function getStandings(division: string): Promise<StandingGroup[]> {
       losses: played - wins,
       points: pts,
       // Группа команды: из таблицы сезона, иначе — из первой групповой встречи (у плей-офф её нет).
-      stageGroup: entry?.group ?? mine.find((s) => s.group)?.group ?? null,
+      stageGroup: drawGroup.get(t.id) ?? entry?.group ?? mine.find((s) => s.group)?.group ?? null,
       place: entry?.place ?? null,
     };
     // Делим по группе группового этапа: команды из разных групп между собой не играли,
     // поэтому в одной таблице их очки несопоставимы. Без группы — отдельным блоком.
-    const g = row.stageGroup ?? t.group ?? "—";
+    const g = row.stageGroup ?? "—";
     if (!groups.has(g)) groups.set(g, []);
     groups.get(g)!.push(row);
   }

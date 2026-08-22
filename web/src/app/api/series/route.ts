@@ -10,7 +10,7 @@ export async function GET(req: Request) {
   const bracket = q.get("bracket");
   return NextResponse.json(
     await listSeries({
-      division: q.get("division") ?? undefined,
+      divisionId: q.get("divisionId") ? Number(q.get("divisionId")) : undefined,
       stage: isStage(stage) ? stage : undefined,
       group: q.get("group") ?? undefined,
       bracket: isBracket(bracket) ? bracket : undefined,
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const series = await createSeries({
-      division: String(body.division ?? ""),
+      divisionId: Number(body.divisionId),
       stage: String(body.stage ?? ""),
       group: body.group ? String(body.group) : null,
       slot: body.slot ? String(body.slot) : null,

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { divisionBySlug } from "@/lib/tournaments";
+import { divisionOfTournament } from "@/lib/tournaments";
 import { getLeaders, METRICS, type Subject } from "@/lib/leaders";
 import { BRACKETS, isBracket, isStage, STAGES } from "@/lib/stages";
 import { SectionHeader } from "@/app/_components/ui";
@@ -107,12 +107,12 @@ export default async function StatsPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ div: string }>;
+  params: Promise<{ slug: string; div: string }>;
   searchParams: Promise<Query>;
 }) {
-  const { div } = await params;
+  const { slug, div } = await params;
   const q = await searchParams;
-  const division = await divisionBySlug(div);
+  const division = await divisionOfTournament(slug, div);
   if (!division) notFound();
 
   const stage = isStage(q.stage) ? q.stage : undefined;
@@ -122,10 +122,10 @@ export default async function StatsPage({
   const bracket = stage === "playoff" && isBracket(q.bracket) ? q.bracket : undefined;
   const kind = q.kind === "teams" ? "teams" : "players";
 
-  const data = await getLeaders({ division: division.name, stage, group, bracket });
+  const data = await getLeaders({ divisionId: division.id, stage, group, bracket });
   const subjects = kind === "teams" ? data.teams : data.players;
 
-  const base = `/standings/${division.slug}/stats`;
+  const base = `/tournaments/${slug}/${division.slug}/stats`;
   const link = (patch: Query) => {
     const next = new URLSearchParams();
     const merged = { stage: q.stage, group: q.group, bracket: q.bracket, kind: q.kind, ...patch };
@@ -138,7 +138,7 @@ export default async function StatsPage({
   return (
     <div className="space-y-6 font-pouf">
       <SectionHeader
-        eyebrow={`${division.label} · рейтинги`}
+        eyebrow={`${division.label ?? division.name} · рейтинги`}
         title="Статистика"
         aside={
           <>

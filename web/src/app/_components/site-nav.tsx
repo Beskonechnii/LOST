@@ -13,18 +13,23 @@ import { SITE_MAX_W } from "./ui";
 // и админку, а оператор не видел границы между «это увидят все» и «это только моё».
 
 // match — дополнительные префиксы, при которых пункт считается активным. Нужно секции, которая в URL
-// живёт не под своим href: «LOST S2» ведёт на /standings/d1, но подсвечивается и на /roster.
+// живёт не под своим href: вкладка турнира ведёт на его хаб, но подсвечивается и на /roster.
 export type NavItem = { href: string; label: string; hint?: string; match?: string[] };
 
 // Верхняя строка: продукт (LOST S2) видят все, операторская (Админ) — только админы/владелец.
 // Обе группы маршрутов рисуют эти же вкладки, поэтому переход между ними бесшовный: строка
 // не меняется, меняется только второй ряд (подвкладки сезона / инструменты админки).
-const PRODUCT_SECTION: NavItem = {
-  href: "/standings",
-  label: "LOST S2",
-  hint: "Второй сезон: дивизионы и ростер",
-  match: ["/standings", "/roster", "/series", "/tp"],
-};
+/**
+ * Продуктовая вкладка = текущий турнир. Раньше здесь была строка «LOST S2» и адрес /standings;
+ * теперь и подпись, и адрес приходят из БД (layout спрашивает `currentTournament`), иначе новый
+ * сезон требовал бы правки исходников — ровно того, от чего уходили в TOURNAMENTS-PLAN.md.
+ */
+const productSection = (tournament: { slug: string; short: string | null; name: string; status: string } | null): NavItem => ({
+  href: tournament ? `/tournaments/${tournament.slug}` : "/tournaments",
+  label: tournament ? tournament.short ?? tournament.name : "Турниры",
+  hint: tournament ? `${tournament.name}: дивизионы и ростер` : "Турниры лиги",
+  match: ["/tournaments", "/standings", "/roster", "/series", "/tp"],
+});
 const ADMIN_SECTION: NavItem = {
   href: "/admin",
   label: "Админ",
@@ -115,19 +120,22 @@ const cabinetLink = (
 
 // Верхняя строка: продукт всем, «Админ» — только админам (роль приходит из layout'а). PublicNav/AdminNav
 // оставлены отдельными функциями лишь потому, что их зовут разные layout'ы — содержимое у них общее.
-function TopBar({ isAdmin }: { isAdmin: boolean }) {
-  const sections = isAdmin ? [PRODUCT_SECTION, ADMIN_SECTION] : [PRODUCT_SECTION];
+export type CurrentTournament = { slug: string; short: string | null; name: string; status: string } | null;
+
+function TopBar({ isAdmin, tournament }: { isAdmin: boolean; tournament: CurrentTournament }) {
+  const product = productSection(tournament);
+  const sections = isAdmin ? [product, ADMIN_SECTION] : [product];
   return <Bar sections={sections} brand={brand} aside={cabinetLink} />;
 }
 
 /** Навигация продукта (группа public). `isAdmin` управляет видимостью вкладки «Админ». */
-export function PublicNav({ isAdmin }: { isAdmin: boolean }) {
-  return <TopBar isAdmin={isAdmin} />;
+export function PublicNav({ isAdmin, tournament }: { isAdmin: boolean; tournament: CurrentTournament }) {
+  return <TopBar isAdmin={isAdmin} tournament={tournament} />;
 }
 
 /** Навигация служебной части (группа admin) — та же верхняя строка, что и у продукта. */
-export function AdminNav({ isAdmin }: { isAdmin: boolean }) {
-  return <TopBar isAdmin={isAdmin} />;
+export function AdminNav({ isAdmin, tournament }: { isAdmin: boolean; tournament: CurrentTournament }) {
+  return <TopBar isAdmin={isAdmin} tournament={tournament} />;
 }
 
 /** Подразделы секции (ростер, студия). Подсвечивается самый конкретный подходящий пункт. */

@@ -60,10 +60,10 @@ function decided(s: SeriesRow) {
  * поздние слоты — по исходам ранних. Считаем один проход сверху вниз: слоты в шаблоне уже идут
  * в турнирном порядке, поэтому к моменту разбора слота его источники-слоты уже разобраны.
  */
-export async function resolveBracket(division: string): Promise<ResolvedBracket> {
+export async function resolveBracket(divisionId: number): Promise<ResolvedBracket> {
   const [{ upper, lower, out }, series] = await Promise.all([
-    getQualified(division),
-    listSeries({ division, stage: "playoff" }),
+    getQualified(divisionId),
+    listSeries({ divisionId, stage: "playoff" }),
   ]);
 
   // Посев по «группа+место»: одно значение и в верхней, и в нижней сетке шаблона.

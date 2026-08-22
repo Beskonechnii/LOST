@@ -24,6 +24,7 @@ type DivisionRow = {
   label: string | null;
   short: string | null;
   orderNo: number;
+  relegation: boolean;
 };
 
 const toDivision = (d: DivisionRow): Division => ({
@@ -32,6 +33,7 @@ const toDivision = (d: DivisionRow): Division => ({
   name: d.name,
   label: d.label ?? d.name,
   short: d.short ?? d.slug.toUpperCase(),
+  relegation: d.relegation,
 });
 
 /**
@@ -78,6 +80,33 @@ export async function divisionByName(name: string | null | undefined): Promise<D
   if (!name) return null;
   const list = await getDivisions();
   return list.find((d) => d.name === name) ?? null;
+}
+
+/** Дивизион по id вместе с его турниром — по нему страницы разделов знают, чей это раздел. */
+export const divisionWithTournament = (id: number) =>
+  prisma.division.findUnique({ where: { id }, include: { tournament: true } });
+
+/** Дивизион турнира по паре слагов из URL: /tournaments/<турнир>/<дивизион>. */
+export async function divisionOfTournament(tournamentSlug: string, divisionSlug: string) {
+  const row = await prisma.division.findFirst({
+    where: { slug: divisionSlug, tournament: { slug: tournamentSlug } },
+    include: { tournament: true },
+  });
+  return row;
+}
+
+/**
+ * Дивизион команды в текущем турнире (с самим турниром) — по нему витрина команды знает, в какую
+ * таблицу и в какой раздел вести. Команда вне текущего турнира → null.
+ */
+export async function teamDivision(teamId: number) {
+  const current = await currentTournament();
+  if (!current) return null;
+  const entry = await prisma.tournamentEntry.findFirst({
+    where: { teamId, division: { tournamentId: current.id } },
+    include: { division: { include: { tournament: true } } },
+  });
+  return entry?.division ?? null;
 }
 
 // ── турниры ──────────────────────────────────────────────────────────────────

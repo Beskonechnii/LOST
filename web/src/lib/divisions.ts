@@ -9,7 +9,7 @@
 export type Division = {
   /** id строки в БД; нужен формам админки, витринам — нет. */
   id: number;
-  /** живёт в URL: /standings/d1 */
+  /** живёт в URL: /tournaments/<турнир>/d1 */
   slug: string;
   /** «Division 1» — то же значение, что в Team.group и Series.division */
   name: string;
@@ -17,6 +17,8 @@ export type Division = {
   label: string;
   /** «D1» — короткая подпись вкладки */
   short: string;
+  /** Вылетают ли последние из группы (см. qualification.ts). */
+  relegation: boolean;
 };
 
 /** Дивизион по слагу из URL — null, если такого нет (роут отдаёт notFound). */

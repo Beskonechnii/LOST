@@ -69,11 +69,11 @@ export default async function AdminStatsPage({ searchParams }: { searchParams: P
 
   const q = await searchParams;
   const divisions = await getDivisions();
-  const division = divisions.find((d) => d.slug === q.div)?.name; // undefined = оба дивизиона
+  const division = divisions.find((d) => d.slug === q.div)?.id; // undefined = оба дивизиона
   const stage = isStage(q.stage) ? q.stage : undefined; // undefined = вся дистанция
   const kind = q.kind === "teams" ? "teams" : "players";
 
-  const data = await getLeaders({ division, stage });
+  const data = await getLeaders({ divisionId: division, stage });
   const subjects: Subject[] = kind === "teams" ? data.teams : data.players;
 
   // Ссылка-фильтр: тот же адрес с подменённым параметром. Пустое значение убирает параметр («все»).

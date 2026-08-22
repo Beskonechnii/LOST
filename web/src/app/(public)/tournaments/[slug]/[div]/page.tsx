@@ -1,16 +1,16 @@
 import { notFound } from "next/navigation";
-import { divisionBySlug } from "@/lib/tournaments";
+import { divisionOfTournament } from "@/lib/tournaments";
 import { HubTiles, type HubTile } from "@/app/_components/hub-tiles";
 import { BackButton } from "@/app/_components/back-button";
 
 // Хаб дивизиона: плитки этапов вместо ряда вкладок. Сама групповая стадия уехала на /groups,
 // чтобы адрес дивизиона держал список разделов, как «Админ» держит список инструментов.
-export default async function DivisionHome({ params }: { params: Promise<{ div: string }> }) {
-  const { div } = await params;
-  const division = await divisionBySlug(div);
+export default async function DivisionHome({ params }: { params: Promise<{ slug: string; div: string }> }) {
+  const { slug, div } = await params;
+  const division = await divisionOfTournament(slug, div);
   if (!division) notFound();
 
-  const base = `/standings/${division.slug}`;
+  const base = `/tournaments/${slug}/${division.slug}`;
   const tiles: HubTile[] = [
     { href: `${base}/groups`, label: "Групповая стадия", icon: "📋", desc: "Таблицы групп и сетка личных встреч." },
     { href: `${base}/playoff`, label: "Плей-офф", icon: "🏆", desc: "Сетка плей-офф с посевом из групп." },
@@ -19,8 +19,8 @@ export default async function DivisionHome({ params }: { params: Promise<{ div: 
 
   return (
     <>
-      <BackButton fallback="/standings" className="mb-4" />
-      <HubTiles eyebrow={division.label} title={division.label} tiles={tiles} />
+      <BackButton fallback={`/tournaments/${slug}`} className="mb-4" />
+      <HubTiles eyebrow={division.tournament.name} title={division.label ?? division.name} tiles={tiles} />
     </>
   );
 }

@@ -127,7 +127,7 @@ export default async function TournamentPage({ params }: { params: Promise<{ slu
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-md border border-hairline bg-surface-2 px-2 py-0.5 text-xs">{d.short ?? d.slug}</span>
                 <span className="text-sm font-semibold">{d.name}</span>
-                <span className="text-xs text-ink-subtle">/standings/{d.slug} · команд: {entries.length}</span>
+                <span className="text-xs text-ink-subtle">/tournaments/{tournament.slug}/{d.slug} · команд: {entries.length}</span>
               </div>
 
               <form action={saveDivision} className="mt-3 grid gap-3 sm:grid-cols-3">

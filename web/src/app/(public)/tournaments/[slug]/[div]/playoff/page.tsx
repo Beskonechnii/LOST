@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { divisionBySlug } from "@/lib/tournaments";
+import { divisionOfTournament } from "@/lib/tournaments";
 import { QUALIFICATION } from "@/lib/qualification";
 import { resolveBracket } from "@/lib/playoff";
 import { Eyebrow, SectionHeader } from "@/app/_components/ui";
@@ -12,12 +12,12 @@ export const dynamic = "force-dynamic";
 // исходов ранних (см. src/lib/playoff.ts). Счёт и продвижение берутся из архива серий, руками
 // здесь ничего не задаётся: страница — отражение того, что заведено в /admin/series.
 
-export default async function PlayoffPage({ params }: { params: Promise<{ div: string }> }) {
-  const { div } = await params;
-  const division = await divisionBySlug(div);
+export default async function PlayoffPage({ params }: { params: Promise<{ slug: string; div: string }> }) {
+  const { slug, div } = await params;
+  const division = await divisionOfTournament(slug, div);
   if (!division) notFound();
 
-  const bracket = await resolveBracket(division.name);
+  const bracket = await resolveBracket(division.id);
   if (!bracket.seeded) {
     return <p className="font-pouf font-bold text-muted">Групповая стадия ещё не залита — посев брать неоткуда.</p>;
   }
@@ -25,7 +25,7 @@ export default async function PlayoffPage({ params }: { params: Promise<{ div: s
   return (
     <div className="space-y-8 font-pouf">
       <SectionHeader
-        eyebrow={`${division.label} · плей-офф`}
+        eyebrow={`${division.label ?? division.name} · плей-офф`}
         title="Плей-офф"
         aside={<span className="text-ink-subtle">Сетка и счёт — из архива серий</span>}
       />

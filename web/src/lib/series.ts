@@ -6,6 +6,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { syncMatch } from "@/lib/match-sync";
+import { loadMatchReport } from "@/lib/match-api";
 import { teamTag } from "@/lib/profiles";
 import { isStage, type Bracket, type Stage } from "@/lib/stages";
 import { slotByKey, validScores } from "@/lib/playoff-bracket";
@@ -354,8 +355,29 @@ export async function attachGame(seriesId: number, gameNumber: number, openDotaM
   if (!/^\d{1,20}$/.test(openDotaMatchId)) throw new Error("ID матча — это число, например 8907510684");
   if (gameNumber < 1 || gameNumber > 5) throw new Error("Номер карты в серии — от 1 до 5");
 
-  const series = await prisma.series.findUnique({ where: { id: seriesId } });
+  const series = await prisma.series.findUnique({
+    where: { id: seriesId },
+    include: { divisionRef: { select: { tournament: { select: { leagueId: true, name: true } } } } },
+  });
   if (!series) throw new Error(`Серия ${seriesId} не найдена`);
+
+  // Если у турнира задан league_id, сверяем его с лигой матча ДО записи: самая частая ошибка при
+  // ручном вводе — опечатка в id, и она привязывает к встрече чужой матч вместе с его статой.
+  // Проверка бесплатная: отчёт всё равно читается ниже, здесь он берётся из того же кэша.
+  const leagueId = series.divisionRef?.tournament.leagueId ?? null;
+  if (leagueId) {
+    const report = await loadMatchReport("opendota", openDotaMatchId).catch(() => null);
+    // `leagueId === null` — источник поля не отдал (Steam-фолбэк, отчёт из старого кэша): это
+    // «не знаем», а не «вне лиги», и блокировать по нему нельзя — иначе привязка ломается на
+    // ровном месте. Публичный матч приезжает с нулём, его отличаем и отбиваем.
+    if (report && report.leagueId !== null && report.leagueId !== leagueId) {
+      throw new Error(
+        report.leagueId
+          ? `Матч ${openDotaMatchId} сыгран в другой лиге (league_id ${report.leagueId}, у турнира ${leagueId}) — проверьте id`
+          : `Матч ${openDotaMatchId} сыгран вне лиги (обычное лобби), а у турнира league_id ${leagueId} — проверьте id`,
+      );
+    }
+  }
 
   const existing = await prisma.match.findUnique({ where: { openDotaMatchId } });
   const match = existing

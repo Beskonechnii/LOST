@@ -1,6 +1,6 @@
 {
   "version": 14,
-  "exportedAt": "2026-08-23T16:15:53.999Z",
+  "exportedAt": "2026-08-23T17:18:48.093Z",
   "teams": [
     {
       "slug": "123-gaming",
@@ -579,6 +579,30 @@
       "achievements": null,
       "tags": null,
       "createdAt": "2026-08-22T17:12:45.278Z"
+    },
+    {
+      "slug": "123",
+      "nickname": "123",
+      "nicknameChangedAt": null,
+      "realName": "123",
+      "accountId": "288687180",
+      "mmr": 123,
+      "rank": null,
+      "tp": 0,
+      "photo": null,
+      "steamUrl": null,
+      "dotabuffUrl": "https://www.dotabuff.com/players/288687180",
+      "stratzUrl": null,
+      "telegram": null,
+      "birthday": "2026-08-08T12:00:00.000Z",
+      "city": "123",
+      "country": "123",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
+      "createdAt": "2026-08-23T16:24:01.149Z"
     },
     {
       "slug": "44",
@@ -10972,6 +10996,7 @@
       "logo": null,
       "banner": null,
       "matchesUrl": null,
+      "leagueId": 19700,
       "status": "running",
       "startAt": null,
       "endAt": null,
@@ -11011,6 +11036,7 @@
       "logo": null,
       "banner": null,
       "matchesUrl": null,
+      "leagueId": null,
       "status": "registration",
       "startAt": "2026-08-24T00:00:00.000Z",
       "endAt": "2026-08-30T00:00:00.000Z",
@@ -11362,7 +11388,19 @@
       "createdAt": "2026-08-23T12:55:16.545Z"
     }
   ],
-  "teamApplications": [],
+  "teamApplications": [
+    {
+      "source": "web",
+      "payload": "{\"version\":1,\"team\":{\"slug\":\"ytsuyfv\",\"name\":\"йцуыфв\",\"tag\":\"йцу\",\"players\":[{\"nickname\":\"ц123\",\"realName\":null,\"role\":\"carry\",\"mmr\":null,\"accountId\":null,\"dotabuffUrl\":null,\"stratzUrl\":null,\"steamUrl\":null,\"telegram\":null,\"isCaptain\":true},{\"nickname\":\"123\",\"realName\":null,\"role\":\"mid\",\"mmr\":null,\"accountId\":null,\"dotabuffUrl\":null,\"stratzUrl\":null,\"steamUrl\":null,\"telegram\":null,\"isCaptain\":false},{\"nickname\":\"йцу\",\"realName\":null,\"role\":\"offlane\",\"mmr\":null,\"accountId\":null,\"dotabuffUrl\":null,\"stratzUrl\":null,\"steamUrl\":null,\"telegram\":null,\"isCaptain\":false},{\"nickname\":\"21123\",\"realName\":null,\"role\":\"soft-support\",\"mmr\":null,\"accountId\":null,\"dotabuffUrl\":null,\"stratzUrl\":null,\"steamUrl\":null,\"telegram\":null,\"isCaptain\":false},{\"nickname\":\"21321\",\"realName\":null,\"role\":\"hard-support\",\"mmr\":null,\"accountId\":null,\"dotabuffUrl\":null,\"stratzUrl\":null,\"steamUrl\":null,\"telegram\":null,\"isCaptain\":false},{\"nickname\":\"213\",\"realName\":null,\"role\":\"coach\",\"mmr\":null,\"accountId\":null,\"dotabuffUrl\":null,\"stratzUrl\":null,\"steamUrl\":null,\"telegram\":null,\"isCaptain\":false}]}}",
+      "status": "pending",
+      "notes": null,
+      "submittedAt": "2026-08-23T16:20:27.212Z",
+      "reviewedAt": null,
+      "tournamentSlug": "s3",
+      "divisionKey": null,
+      "teamSlug": null
+    }
+  ],
   "groupEntries": [
     {
       "division": "Division 1",
@@ -330116,20 +330154,20 @@
     {
       "email": "mehhhh12221@gmail.com",
       "googleSub": "109864542485506344784",
-      "passwordHash": "bb8fe04426c79060351fe6f2db1c8525:23ba156c67e36ce9f4d91715f5eae2fc0f486abb521715d775e2311f0cf0fc6aa3c9bbbf5b6b051ee872a3236e289edc56b3eea9b763288873e5650a567212e7",
+      "passwordHash": null,
       "emailVerified": true,
       "name": "Mehdi larbi",
       "avatar": "https://lh3.googleusercontent.com/a/ACg8ocImqaDGXYqE9bm9vNWM_R0qlRflaLhF2VdEynrDTKN0SkQ2Og=s96-c",
-      "role": "player",
-      "permissions": null,
+      "role": "admin",
+      "permissions": "accounts.approve,tournaments.edit,series.edit",
       "status": "active",
-      "application": null,
-      "policyAcceptedAt": null,
-      "submittedAt": null,
-      "reviewedAt": null,
+      "application": "{\"nickname\":\"123\",\"realName\":\"123\",\"birthday\":\"2026-08-08\",\"city\":\"123\",\"country\":\"123\",\"dotabuff\":\"https://www.dotabuff.com/players/288687180\",\"stratz\":\"\",\"steam\":\"\",\"telegram\":\"\",\"position\":\"\",\"mmr\":123,\"achievements\":\"\"}",
+      "policyAcceptedAt": "2026-08-23T16:23:54.574Z",
+      "submittedAt": "2026-08-23T16:23:54.574Z",
+      "reviewedAt": "2026-08-23T16:24:01.151Z",
       "rejectedReason": null,
-      "createdAt": "2026-08-20T19:08:56.496Z",
-      "playerSlug": "sett",
+      "createdAt": "2026-08-23T16:22:09.336Z",
+      "playerSlug": "123",
       "claimSlug": null
     },
     {

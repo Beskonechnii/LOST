@@ -92,6 +92,8 @@ type RawTeam = { name?: string; tag?: string; logo_url?: string } | null;
 type RawObjective = { type?: string; time?: number; player_slot?: number; team?: number; key?: string; killer?: number };
 export type RawMatch = {
   match_id: number;
+  /** Тикет лиги, под которым сыгран матч; 0 или отсутствует у обычных лобби. */
+  leagueid?: number | null;
   version?: number | null;
   radiant_win?: boolean;
   duration?: number;
@@ -270,6 +272,8 @@ export type Ward = {
 
 export type MatchReport = {
   matchId: string;
+  /** league_id матча — по нему архив проверяет, что карта из своего турнира (см. series.ts). */
+  leagueId: number | null;
   parsed: boolean;
   radiantWin: boolean;
   durationSeconds: number;
@@ -584,6 +588,7 @@ export async function buildMatchReport(matchId: string, m: RawMatch): Promise<Ma
 
   return {
     matchId: String(m.match_id ?? matchId),
+    leagueId: m.leagueid ?? null,
     parsed: m.version != null,
     radiantWin: !!m.radiant_win,
     durationSeconds: m.duration ?? 0,

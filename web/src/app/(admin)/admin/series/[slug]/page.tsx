@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { teamTag } from "@/lib/profiles";
 import { tournamentBySlug } from "@/lib/tournaments";
 import { listSeries } from "@/lib/series";
+import { leagueMatches } from "@/lib/league-matches";
 import { resolveBracket } from "@/lib/playoff";
 import { SITE_MAX_W } from "@/app/_components/ui";
 import { SeriesAdmin, type SlotOptions } from "../_components/series-admin";
@@ -42,6 +43,12 @@ export default async function TournamentSeriesPage({ params }: { params: Promise
     ...divisions.map((d) => resolveBracket(d.id)),
   ]);
 
+  // Матчи лиги — подсказка «какие id вообще есть», чтобы не вводить их из головы. Тянем только
+  // когда league_id задан; уже привязанные из списка убираем — оператору нужны недостающие.
+  const league = tournament.leagueId ? await leagueMatches(tournament.leagueId) : null;
+  const attached = new Set(series.flatMap((s) => s.games.map((g) => g.openDotaMatchId).filter(Boolean)));
+  const missing = league?.ok ? league.matches.filter((m) => !attached.has(m.matchId)) : [];
+
   // Слоты сетки для формы: с уже подставленными командами (когда исход известен) и пометкой
   // «занят». Форма выбирает дивизион на клиенте, поэтому шлём слоты всех дивизионов разом.
   const slots: SlotOptions = {};
@@ -65,36 +72,90 @@ export default async function TournamentSeriesPage({ params }: { params: Promise
         ← Все турниры
       </Link>
 
-      {/* Источник id матчей — у турнира, не у встречи: список матчей общий на сезон, и оператор
-          ходит за номерами карт по одной и той же ссылке (Liquipedia, Dotabuff — что найдётся). */}
-      <form action={saveMatchesUrl} className="mt-4 flex flex-wrap items-end gap-2 rounded-lg border border-hairline bg-surface-1 p-3">
+      {/* Источник id матчей — у турнира, не у встречи: список матчей общий на сезон. Ссылка — куда
+          смотреть глазами, league_id — тикет лиги в Dota 2, по нему список тянется программно и
+          проверяется, что привязываемая карта из этого турнира (src/lib/league-matches.ts). */}
+      <form action={saveMatchesUrl} className="mt-4 rounded-lg border border-hairline bg-surface-1 p-3">
         <input type="hidden" name="slug" value={tournament.slug} />
-        <div className="min-w-[16rem] flex-1">
-          <label htmlFor="matchesUrl" className="block text-xs text-ink-subtle">
-            Источник id матчей турнира
-          </label>
-          <input
-            id="matchesUrl"
-            name="matchesUrl"
-            defaultValue={tournament.matchesUrl ?? ""}
-            placeholder="https://liquipedia.net/dota2/… или ссылка на Dotabuff"
-            className="mt-1 w-full rounded-md border border-hairline bg-surface-2 px-3 py-1.5 text-sm text-ink"
-          />
+        <div className="flex flex-wrap items-end gap-2">
+          <div className="min-w-[16rem] flex-1">
+            <label htmlFor="matchesUrl" className="block text-xs text-ink-subtle">
+              Источник id матчей турнира
+            </label>
+            <input
+              id="matchesUrl"
+              name="matchesUrl"
+              defaultValue={tournament.matchesUrl ?? ""}
+              placeholder="https://liquipedia.net/dota2/… или ссылка на Dotabuff"
+              className="mt-1 w-full rounded-md border border-hairline bg-surface-2 px-3 py-1.5 text-sm text-ink"
+            />
+          </div>
+          <div className="w-36">
+            <label htmlFor="leagueId" className="block text-xs text-ink-subtle">
+              league_id
+            </label>
+            <input
+              id="leagueId"
+              name="leagueId"
+              inputMode="numeric"
+              defaultValue={tournament.leagueId ?? ""}
+              placeholder="19700"
+              className="mt-1 w-full rounded-md border border-hairline bg-surface-2 px-3 py-1.5 text-sm text-ink"
+            />
+          </div>
+          <button type="submit" className="rounded-md bg-purple px-3 py-1.5 text-sm font-semibold text-[var(--on-accent)]">
+            Сохранить
+          </button>
+          {tournament.matchesUrl && (
+            <a
+              href={tournament.matchesUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-md border border-hairline px-3 py-1.5 text-sm font-semibold text-accent-bright"
+            >
+              Открыть →
+            </a>
+          )}
         </div>
-        <button type="submit" className="rounded-md bg-purple px-3 py-1.5 text-sm font-semibold text-[var(--on-accent)]">
-          Сохранить
-        </button>
-        {tournament.matchesUrl && (
-          <a
-            href={tournament.matchesUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-md border border-hairline px-3 py-1.5 text-sm font-semibold text-accent-bright"
-          >
-            Открыть →
-          </a>
-        )}
+        <p className="mt-2 text-[11px] text-ink-subtle">
+          league_id виден в любом матче лиги на OpenDota (поле leagueid). Заполнен — привязка карты
+          проверит, что матч из этого турнира, и не даст подцепить чужой по опечатке.
+        </p>
       </form>
+
+      {/* Матчи лиги: те, которых в архиве ещё нет. Без ключа Steam список не приходит — тогда
+          показываем, чего не хватает, а не молчим. */}
+      {league && (
+        <section className="mt-3 rounded-lg border border-hairline bg-surface-1 p-3">
+          {!league.ok ? (
+            <p className="text-xs text-amber-300">{league.error}</p>
+          ) : missing.length === 0 ? (
+            <p className="text-xs text-ink-subtle">
+              Матчи лиги {tournament.leagueId}: все {league.matches.length} уже привязаны к встречам.
+            </p>
+          ) : (
+            <>
+              <p className="text-xs text-ink-muted">
+                Матчи лиги {tournament.leagueId}, которых нет в архиве: {missing.length}. Скопируйте id
+                в «Привязать» у нужной встречи.
+              </p>
+              <ul className="mt-2 max-h-56 space-y-1 overflow-y-auto">
+                {missing.map((m) => (
+                  <li key={m.matchId} className="flex flex-wrap items-center gap-2 text-xs">
+                    <code className="rounded bg-surface-2 px-2 py-0.5 text-ink">{m.matchId}</code>
+                    <span className="text-ink-subtle">
+                      {m.radiantName ?? "Radiant"} vs {m.direName ?? "Dire"}
+                    </span>
+                    {m.startedAt && (
+                      <span className="text-ink-subtle">{m.startedAt.toLocaleDateString("ru")}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </section>
+      )}
 
       <div className="mt-4">
         <SeriesAdmin

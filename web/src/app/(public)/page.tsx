@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
 import { currentTournament, getDivisions } from "@/lib/tournaments";
-import { SITE_MAX_W, StatTile } from "@/app/_components/ui";
-import { buttonClasses } from "@/components/pouf/Button";
+import { SITE_MAX_W } from "@/app/_components/ui";
 import { Card } from "@/components/pouf/surface";
 import { Heading, Eyebrow } from "@/components/pouf/text";
 
@@ -47,17 +45,8 @@ const SECTIONS = [
 type Section = { href: string; title: string; text: string; cta: string; accent: string };
 
 export default async function Home() {
-  // Считаем прямо здесь: показать надо четыре числа, тянуть ради них выборки страниц незачем.
-  // Считаем по всей лиге, а не по одному дивизиону: на витрине цифры общие (D1 + D2).
   const current = await currentTournament();
   const divisions = await getDivisions();
-  const [teams, players, series, groups] = await Promise.all([
-    prisma.team.count(),
-    prisma.player.count(),
-    prisma.series.count(),
-    prisma.groupEntry.findMany({ distinct: ["division", "group"], select: { group: true } }),
-  ]);
-
   // Карточка на дивизион + постоянные разделы. Акцент первых двух — цвета D1/D2, дальше нейтральный.
   const sections: Section[] = [
     ...divisions.map((d, i) => ({
@@ -73,16 +62,9 @@ export default async function Home() {
     })),
   ];
 
-  const stats = [
-    { value: teams, label: "команд" },
-    { value: players, label: "игроков" },
-    { value: groups.length, label: "групп" },
-    { value: series, label: "сыгранных серий" },
-  ];
-
   return (
     <main className="flex-1 font-pouf">
-      {/* Первый экран: кто мы и куда идти дальше */}
+      {/* Первый экран: одно название лиги */}
       <section className="relative overflow-hidden border-b border-hairline">
         {/* фирменное свечение — бренд-фиолетовый LOST */}
         <div
@@ -90,36 +72,12 @@ export default async function Home() {
           className="pointer-events-none absolute -top-40 left-1/2 h-96 w-[48rem] -translate-x-1/2 rounded-full bg-gradient-to-br from-d1/25 to-d2/15 blur-3xl"
         />
         <div className={`relative mx-auto ${SITE_MAX_W} px-4 py-16 md:px-6 md:py-24`}>
-          <Eyebrow>Dota 2 · Минск</Eyebrow>
-          {/* display-тип: плотный line-height + отрицательный трекинг — «голос» pouf */}
-          <h1 className="mt-4 text-5xl font-black uppercase leading-[1.05] tracking-[-0.03em] text-ink md:text-7xl">
+          {/* Только название лиги: подзаголовки, кнопки и цифры ушли — вход в разделы ниже,
+              дублировать его первым экраном незачем.
+              display-тип: плотный line-height + отрицательный трекинг — «голос» pouf */}
+          <h1 className="text-5xl font-black uppercase leading-[1.05] tracking-[-0.03em] text-ink md:text-7xl">
             League of Spirit
           </h1>
-          <p className="mt-5 max-w-xl text-lg font-bold leading-relaxed text-ink-muted">
-            Больше чем турнир — это твоё киберспортивное комьюнити.
-          </p>
-          <p className="mt-2 max-w-xl text-sm font-bold leading-relaxed text-muted">
-            Сезонные турниры по Dota 2 с собственным кастом. Здесь живут таблица дивизиона и составы команд.
-          </p>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={sections[0]?.href ?? "/tournaments"} className={buttonClasses({ size: "lg" })}>
-              Таблица дивизиона
-            </Link>
-            <Link
-              href={current ? `/tournaments/${current.slug}/roster/teams` : "/tournaments"}
-              className={buttonClasses({ size: "lg", variant: "quiet" })}
-            >
-              Составы команд
-            </Link>
-          </div>
-
-          {/* Цифры сезона — четыре «подушки» pouf (StatTile) */}
-          <dl className="mt-12 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
-            {stats.map((s) => (
-              <StatTile key={s.label} label={s.label} value={s.value} />
-            ))}
-          </dl>
         </div>
       </section>
 

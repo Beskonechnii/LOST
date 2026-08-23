@@ -17,24 +17,11 @@ const COLS: Record<number, string> = {
   4: "sm:grid-cols-2 lg:grid-cols-4",
 };
 
-export function HubTiles({
-  eyebrow,
-  title,
-  tiles,
-  cols = 3,
-}: {
-  eyebrow: string;
-  title: string;
-  tiles: HubTile[];
-  cols?: 2 | 3 | 4;
-}) {
+/** Сама сетка карточек — общая для плоского хаба и для хаба, разбитого на блоки. */
+function TileGrid({ tiles, cols }: { tiles: HubTile[]; cols: 2 | 3 | 4 }) {
   return (
-    <div className="font-pouf">
-      <Eyebrow className="mb-2">{eyebrow}</Eyebrow>
-      <h1 className="text-[28px] font-black leading-[1.2] tracking-[-0.5px] text-ink md:text-4xl">{title}</h1>
-
-      <div className={`mt-6 grid gap-4 ${COLS[cols]}`}>
-        {tiles.map((t) => (
+    <div className={`grid gap-4 ${COLS[cols]}`}>
+      {tiles.map((t) => (
           <Link key={t.href} href={t.href} className="group block">
             <Card motion="lift">
               <div className="flex items-start gap-3">
@@ -50,8 +37,73 @@ export function HubTiles({
                 </div>
               </div>
             </Card>
-          </Link>
-        ))}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+/** Заголовок хаба — общая шапка обоих вариантов. */
+function HubHead({ eyebrow, title }: { eyebrow: string; title: string }) {
+  return (
+    <>
+      <Eyebrow className="mb-2">{eyebrow}</Eyebrow>
+      <h1 className="text-[28px] font-black leading-[1.2] tracking-[-0.5px] text-ink md:text-4xl">{title}</h1>
+    </>
+  );
+}
+
+export function HubTiles({
+  eyebrow,
+  title,
+  tiles,
+  cols = 3,
+}: {
+  eyebrow: string;
+  title: string;
+  tiles: HubTile[];
+  cols?: 2 | 3 | 4;
+}) {
+  return (
+    <div className="font-pouf">
+      <HubHead eyebrow={eyebrow} title={title} />
+      <div className="mt-6">
+        <TileGrid tiles={tiles} cols={cols} />
+      </div>
+    </div>
+  );
+}
+
+export type HubGroup = { title: string; tiles: HubTile[] };
+
+/**
+ * Тот же хаб, но плитки разложены по блокам с подписью. Нужен там, где инструментов больше десятка:
+ * плоской сеткой уже не видно, что к чему относится. Пустые блоки (все плитки срезаны правами) не рисуем.
+ */
+export function HubGroupedTiles({
+  eyebrow,
+  title,
+  groups,
+  cols = 3,
+}: {
+  eyebrow: string;
+  title: string;
+  groups: HubGroup[];
+  cols?: 2 | 3 | 4;
+}) {
+  return (
+    <div className="font-pouf">
+      <HubHead eyebrow={eyebrow} title={title} />
+
+      <div className="mt-8 space-y-8">
+        {groups
+          .filter((g) => g.tiles.length > 0)
+          .map((g) => (
+            <section key={g.title}>
+              <h2 className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-muted">{g.title}</h2>
+              <TileGrid tiles={g.tiles} cols={cols} />
+            </section>
+          ))}
       </div>
     </div>
   );

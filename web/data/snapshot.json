@@ -1,6 +1,6 @@
 {
   "version": 14,
-  "exportedAt": "2026-08-23T16:10:34.577Z",
+  "exportedAt": "2026-08-23T16:15:53.999Z",
   "teams": [
     {
       "slug": "123-gaming",
@@ -330095,14 +330095,33 @@
   ],
   "accounts": [
     {
+      "email": "admin@admin.com",
+      "googleSub": null,
+      "passwordHash": "edaf9f4570af89f6fbfeaafdb6ab7313:e41e4c19c7091820dae70778cdbe6aa04644be407663a1798882134db4404f0df8f2bd95a090fc9c12725ec3b931bcdeb9dc789285fb01add4cb341ab794b859",
+      "emailVerified": false,
+      "name": "Админ (тест)",
+      "avatar": null,
+      "role": "admin",
+      "permissions": "accounts.approve,accounts.admins,roster.edit,roster.delete,tournaments.edit,series.edit,tp.edit,studio,underbeer,theme,tools",
+      "status": "active",
+      "application": null,
+      "policyAcceptedAt": null,
+      "submittedAt": null,
+      "reviewedAt": null,
+      "rejectedReason": null,
+      "createdAt": "2026-08-23T16:13:57.392Z",
+      "playerSlug": null,
+      "claimSlug": null
+    },
+    {
       "email": "mehhhh12221@gmail.com",
       "googleSub": "109864542485506344784",
       "passwordHash": "bb8fe04426c79060351fe6f2db1c8525:23ba156c67e36ce9f4d91715f5eae2fc0f486abb521715d775e2311f0cf0fc6aa3c9bbbf5b6b051ee872a3236e289edc56b3eea9b763288873e5650a567212e7",
       "emailVerified": true,
       "name": "Mehdi larbi",
       "avatar": "https://lh3.googleusercontent.com/a/ACg8ocImqaDGXYqE9bm9vNWM_R0qlRflaLhF2VdEynrDTKN0SkQ2Og=s96-c",
-      "role": "admin",
-      "permissions": "accounts.admins,roster.edit",
+      "role": "player",
+      "permissions": null,
       "status": "active",
       "application": null,
       "policyAcceptedAt": null,

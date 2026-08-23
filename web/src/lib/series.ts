@@ -48,7 +48,17 @@ const teamSelect = { select: { id: true, slug: true, name: true, tag: true, logo
 /** Счёт серии Bo3 — только эти исходы; всё прочее ломает формулу очков (см. qualification.ts). */
 export const VALID_SCORES = ["2:0", "2:1", "1:2", "0:2"];
 
-export type SeriesFilter = { id?: number; slug?: string; divisionId?: number; stage?: Stage; group?: string; bracket?: Bracket; teamId?: number };
+export type SeriesFilter = {
+  id?: number;
+  slug?: string;
+  divisionId?: number;
+  /** Все дивизионы турнира разом — архив режется по турнирам, а не по одному дивизиону. */
+  divisionIds?: number[];
+  stage?: Stage;
+  group?: string;
+  bracket?: Bracket;
+  teamId?: number;
+};
 
 /**
  * Серии по фильтру, свежие сверху. `playedAt` заполняется не всегда (групповую стадию заливали
@@ -59,7 +69,7 @@ export async function listSeries(filter: SeriesFilter = {}): Promise<SeriesRow[]
     where: {
       id: filter.id,
       slug: filter.slug,
-      divisionId: filter.divisionId,
+      divisionId: filter.divisionIds ? { in: filter.divisionIds } : filter.divisionId,
       stage: filter.stage,
       group: filter.group,
       bracket: filter.bracket,
@@ -315,6 +325,31 @@ export async function createSeries(input: NewSeries) {
  * привязка переносит существующий матч, а не плодит дубль. Стороны (кто был за свет) определяет
  * синк по составам, руками их вводить не нужно.
  */
+/**
+ * Перечитать уже привязанную карту из OpenDota.
+ *
+ * **Когда перечитывают.** Отчёт дозрел (непарсенный матч позже обрастает вардами и таймингами);
+ * стата легла неполной («стата не легла — игроков нет в ростере»); поправили ростер — завели
+ * игрока, проставили ему account_id, перевели в другую команду.
+ *
+ * **Что перезаписывается.** Всё, что выведено из отчёта: `MatchStat` опознанных игроков (upsert),
+ * `Ward` карты (сносятся и пишутся заново), у матча — длительность, время старта, счёт сторон,
+ * первый пик, стороны и победитель. Строки статы игроков, которых в свежем отчёте нет, удаляются.
+ * Счёт серии пересчитывается по победителям карт — иначе смена победителя карты не доехала бы до
+ * таблицы (раньше «перечитать» этого не делало, и счёт серии оставался старым).
+ *
+ * **Что остаётся.** Сама привязка (`seriesId`, `gameNumber`), дата серии, начисленные баллы
+ * (`PointsEntry`) и собранная графика: это решения оператора, а не производные отчёта.
+ */
+export async function resyncGame(matchId: number) {
+  const match = await prisma.match.findUnique({ where: { id: matchId }, select: { id: true, seriesId: true } });
+  if (!match) throw new Error(`Матч ${matchId} не найден`);
+
+  const synced = await syncMatch(prisma, match.id);
+  if (match.seriesId) await recomputeSeriesScore(match.seriesId);
+  return synced;
+}
+
 export async function attachGame(seriesId: number, gameNumber: number, openDotaMatchId: string) {
   if (!/^\d{1,20}$/.test(openDotaMatchId)) throw new Error("ID матча — это число, например 8907510684");
   if (gameNumber < 1 || gameNumber > 5) throw new Error("Номер карты в серии — от 1 до 5");
@@ -370,3 +405,43 @@ export async function detachGame(matchId: number) {
   if (seriesId) await recomputeSeriesScore(seriesId);
   return result;
 }
+
+/**
+ * Сводка архива по турнирам — вход в раздел. Оператор приходит за одним турниром, а раньше страница
+ * вываливала все встречи всех сезонов разом: техническая часть (заведение встречи, привязка карт)
+ * теперь живёт на уровень глубже, внутри турнира.
+ */
+export async function tournamentArchive() {
+  const tournaments = await prisma.tournament.findMany({
+    orderBy: [{ startAt: "desc" }, { id: "desc" }],
+    include: { divisions: { orderBy: [{ orderNo: "asc" }, { id: "asc" }] } },
+  });
+
+  return Promise.all(
+    tournaments.map(async (t) => {
+      const divisionIds = t.divisions.map((d) => d.id);
+      const [series, games] = await Promise.all([
+        prisma.series.count({ where: { divisionId: { in: divisionIds } } }),
+        prisma.match.count({ where: { series: { divisionId: { in: divisionIds } } } }),
+      ]);
+      // Встречи без единой карты — то, что оператору и надо добить: без карт стата в рейтинги не идёт.
+      const empty = await prisma.series.count({
+        where: { divisionId: { in: divisionIds }, games: { none: {} } },
+      });
+      return {
+        id: t.id,
+        slug: t.slug,
+        name: t.name,
+        short: t.short,
+        status: t.status,
+        matchesUrl: t.matchesUrl,
+        divisions: t.divisions.map((d) => ({ id: d.id, slug: d.slug, name: d.name, label: d.label, short: d.short })),
+        series,
+        games,
+        empty,
+      };
+    }),
+  );
+}
+
+export type TournamentArchiveRow = Awaited<ReturnType<typeof tournamentArchive>>[number];

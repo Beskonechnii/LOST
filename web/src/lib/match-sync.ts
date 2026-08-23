@@ -111,6 +111,8 @@ export async function syncMatch(prisma: PrismaClient, matchId: number) {
 
   let statsWritten = 0;
   const scored: { playerId: number; score: number }[] = [];
+  // Кого отчёт опознал в этот раз — по нему же чистим лишнее ниже.
+  const seen: number[] = [];
   for (const p of report.players) {
     const playerId = p.accountId != null ? byAccount.get(String(p.accountId)) : undefined;
     if (!playerId) continue;
@@ -122,7 +124,18 @@ export async function syncMatch(prisma: PrismaClient, matchId: number) {
       update: data,
     });
     statsWritten++;
+    seen.push(playerId);
     scored.push({ playerId, score: mvpScore(data) });
+  }
+
+  // Строки игроков, которых в свежем отчёте нет, удаляем: карту перечитывают в том числе после
+  // правки ростера (игрока завели, привязали account_id, переставили в другую команду), и без
+  // этой уборки на карте оставалась бы стата того, кто в ней уже не значится, — а рейтинги
+  // суммируют именно `MatchStat`.
+  // Пустой `seen` — отчёт не опознал никого (обычно у карты чужой ростер): тогда не трогаем ничего,
+  // иначе одно неудачное перечитывание стёрло бы всю стату карты.
+  if (seen.length > 0) {
+    await prisma.matchStat.deleteMany({ where: { matchId: match.id, playerId: { notIn: seen } } });
   }
 
   await prisma.match.update({

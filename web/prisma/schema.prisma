@@ -24,6 +24,9 @@ model Tournament {
   prize       String?
   logo        String?
   banner      String?
+  /// Внешний источник id матчей турнира (Liquipedia/Dotabuff и т.п.): откуда оператор берёт номера
+  /// карт для привязки в архиве. Живёт у турнира, а не у встречи — список матчей общий на сезон.
+  matchesUrl  String?
   /// draft (заводят) | registration (приём заявок) | running (идёт) | finished (сыгран).
   /// «Текущий» турнир для публичных витрин — running, иначе последний по startAt (src/lib/tournaments.ts).
   status      String    @default("draft")

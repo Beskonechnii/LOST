@@ -272,12 +272,34 @@ function SeriesCard({ s, onChange }: { s: SeriesRow; onChange: () => void }) {
 
         <Separator />
 
-        <div className="space-y-2">
-          {s.games.length === 0 && (
+        {/* Карты свёрнуты: в свёрнутом виде счёт и сколько карт, техчасть каждой карты
+            (перечитать, отцепить, графика) — по клику. Раньше всё было развёрнуто всегда, и
+            список встреч не помещался на экран. */}
+        <details className="group/games">
+          <summary className="flex cursor-pointer flex-wrap items-center gap-2">
             <Text size="sm" muted>
-              Карт пока нет — стата в рейтинги не идёт.
+              {s.games.length === 0 ? "карт нет — стата в рейтинги не идёт" : `карт: ${s.games.length}`}
             </Text>
-          )}
+            <span className="text-[13px] font-bold tabular-nums text-[var(--purple)]">
+              {s.homeScore}:{s.awayScore}
+            </span>
+            {s.games.length > 0 && (
+              <span className="text-[13px] font-bold text-[var(--purple)]">
+                <span className="group-open/games:hidden">развернуть</span>
+                <span className="hidden group-open/games:inline">свернуть</span>
+              </span>
+            )}
+          </summary>
+
+          <div className="mt-2 space-y-2">
+            {/* Правила перечитывания — рядом с кнопкой, а не в голове оператора (см. resyncGame). */}
+            {s.games.length > 0 && (
+              <Text size="sm" muted>
+                «Перечитать» — когда отчёт дозрел, стата легла неполной или поправили ростер:
+                перезапишет стату, варды, длительность и победителя карты и пересчитает счёт серии.
+                Привязка, дата и начисленные баллы останутся.
+              </Text>
+            )}
           {s.games.map((g) => (
             <div key={g.matchId} className="flex flex-wrap items-center gap-2">
               <span className="w-14 shrink-0">
@@ -331,7 +353,9 @@ function SeriesCard({ s, onChange }: { s: SeriesRow; onChange: () => void }) {
               </span>
             </div>
           ))}
-        </div>
+          </div>
+        </details>
+
         {s.games.length < 5 && (
           <div className="mt-auto pt-1">
             <AttachGame seriesId={s.id} nextNumber={nextNumber} onDone={onChange} />
@@ -351,6 +375,7 @@ export function SeriesAdmin({
   teams,
   series,
   slots,
+  tournamentName,
 }: {
   divisions: DivOpt[];
   /** Куда ведёт «статистика»: раздел дивизиона живёт внутри турнира, слаг знает только сервер. */
@@ -358,6 +383,8 @@ export function SeriesAdmin({
   teams: TeamOpt[];
   series: SeriesRow[];
   slots: SlotOptions;
+  /** Чей это архив — подпись над списком: страница открыта из блока конкретного турнира. */
+  tournamentName?: string;
 }) {
   const router = useRouter();
   const refresh = () => router.refresh();
@@ -468,8 +495,8 @@ export function SeriesAdmin({
     <div className="pouf-lost space-y-6" data-theme="dark">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Eyebrow>Служебная часть · архив</Eyebrow>
-          <Heading level={1}>Архив серий</Heading>
+          <Eyebrow>Служебная часть · архив{tournamentName ? ` · ${tournamentName}` : ""}</Eyebrow>
+          <Heading level={1}>{tournamentName ?? "Архив серий"}</Heading>
         </div>
         <div className="flex flex-wrap items-center gap-4">
           <Text size="sm" muted>

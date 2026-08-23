@@ -1,6 +1,6 @@
 {
   "version": 14,
-  "exportedAt": "2026-08-23T14:46:14.484Z",
+  "exportedAt": "2026-08-23T15:02:16.067Z",
   "teams": [
     {
       "slug": "123-gaming",
@@ -10971,6 +10971,7 @@
       "prize": null,
       "logo": null,
       "banner": null,
+      "matchesUrl": null,
       "status": "running",
       "startAt": null,
       "endAt": null,
@@ -11009,6 +11010,7 @@
       "prize": null,
       "logo": null,
       "banner": null,
+      "matchesUrl": null,
       "status": "registration",
       "startAt": "2026-08-24T00:00:00.000Z",
       "endAt": "2026-08-30T00:00:00.000Z",

@@ -1,62 +1,81 @@
-import { prisma } from "@/lib/prisma";
-import { teamTag } from "@/lib/profiles";
-import { currentTournament, getDivisions } from "@/lib/tournaments";
-import { listSeries } from "@/lib/series";
-import { resolveBracket } from "@/lib/playoff";
+import Link from "next/link";
+import { tournamentArchive } from "@/lib/series";
+import { TOURNAMENT_STATUS_LABELS, type TournamentStatus } from "@/lib/tournaments";
 import { SITE_MAX_W } from "@/app/_components/ui";
-import { SeriesAdmin, type SlotOptions } from "./_components/series-admin";
 import { denyUnlessPermission } from "../../_components/permission-gate";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Архив серий" };
 
-// Операторская: завести встречу и подвесить на неё карты. Отсюда стата попадает в рейтинги
-// (раздел «Статистика» дивизиона) — других путей в архив нет, поэтому страница живёт в (admin).
+// Вход в архив: блоки турниров, а не все встречи разом. Техническая часть — заведение встречи,
+// привязка и перечитывание карт — живёт на уровень глубже, в /admin/series/<турнир>: 90% времени
+// оператору нужен один сезон, а страница читалась как приборная панель всех сезонов сразу.
 
-export default async function SeriesAdminPage() {
+const TONE: Record<string, string> = {
+  draft: "bg-surface-2 text-ink-subtle",
+  registration: "bg-sky-500/20 text-sky-300",
+  running: "bg-emerald-500/20 text-emerald-300",
+  finished: "bg-amber-500/20 text-amber-300",
+};
+
+export default async function SeriesArchiveHome() {
   const denied = await denyUnlessPermission("series.edit", "Архив серий");
   if (denied) return denied;
 
-  const [current, divisions] = await Promise.all([currentTournament(), getDivisions()]);
-  const [teams, series, ...brackets] = await Promise.all([
-    // Команды берём через участие в турнире: дивизион команды — это строка `TournamentEntry`,
-    // а не поле у неё (см. src/lib/tournaments.ts).
-    prisma.tournamentEntry.findMany({
-      where: { divisionId: { in: divisions.map((d) => d.id) } },
-      include: { team: { select: { id: true, name: true, tag: true } } },
-      orderBy: { team: { name: "asc" } },
-    }),
-    listSeries(),
-    ...divisions.map((d) => resolveBracket(d.id)),
-  ]);
-
-  // Слоты сетки для формы: с уже подставленными командами (когда исход известен) и пометкой
-  // «занят». Форма выбирает дивизион на клиенте, поэтому шлём слоты обоих дивизионов разом.
-  const slots: SlotOptions = {};
-  divisions.forEach((d, i) => {
-    slots[d.id] = brackets[i].slots.map((s) => ({
-      key: s.key,
-      label: s.label,
-      round: s.round,
-      bestOf: s.bestOf,
-      aTeamId: s.a.team?.teamId ?? null,
-      bTeamId: s.b.team?.teamId ?? null,
-      aName: s.a.team?.name ?? s.a.placeholder ?? "—",
-      bName: s.b.team?.name ?? s.b.placeholder ?? "—",
-      taken: s.seriesSlug != null,
-    }));
-  });
+  const tournaments = await tournamentArchive();
 
   return (
     <main className={`mx-auto w-full ${SITE_MAX_W} flex-1 px-4 py-8 md:px-6`}>
-      <SeriesAdmin
-        divisions={divisions.map((d) => ({ id: d.id, name: d.name, label: d.label }))}
-        statsHref={current && divisions[0] ? `/tournaments/${current.slug}/${divisions[0].slug}/stats` : "/tournaments"}
-        teams={teams.map((e) => ({ id: e.team.id, name: e.team.name, tag: teamTag(e.team), divisionId: e.divisionId }))}
-        series={series}
-        slots={slots}
-      />
+      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-300/80">Служебная часть</p>
+      <h1 className="mt-1.5 text-xl font-bold tracking-tight">Архив серий</h1>
+      <p className="mt-1.5 text-sm text-ink-muted">
+        Выберите турнир — встречи, карты и перечитывание статы внутри. Отсюда стата попадает в
+        рейтинги: у встречи без карт в статистику не идёт ничего.
+      </p>
+
+      {tournaments.length === 0 ? (
+        <p className="mt-6 rounded-md border border-hairline bg-surface-1 px-3 py-6 text-center text-sm text-ink-subtle">
+          Турниров ещё нет — заведите первый в «Турнирах».
+        </p>
+      ) : (
+        <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+          {tournaments.map((t) => (
+            <li key={t.id}>
+              <Link
+                href={`/admin/series/${t.slug}`}
+                className="block rounded-lg border border-hairline bg-surface-1 p-4 transition hover:border-accent/60"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-semibold text-ink">{t.short ?? t.name}</span>
+                  <span className={`rounded-md px-2 py-0.5 text-xs ${TONE[t.status] ?? TONE.draft}`}>
+                    {TOURNAMENT_STATUS_LABELS[t.status as TournamentStatus] ?? t.status}
+                  </span>
+                  {/* Незаполненные встречи — то, ради чего сюда и заходят: без карт нет статы. */}
+                  {t.empty > 0 && (
+                    <span className="ml-auto rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-300">
+                      {t.empty} без карт
+                    </span>
+                  )}
+                </div>
+
+                <p className="mt-1 text-xs text-ink-subtle">
+                  {t.divisions.length > 0 ? t.divisions.map((d) => d.short ?? d.name).join(" · ") : "дивизионов нет"}
+                </p>
+
+                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm tabular-nums text-ink-muted">
+                  <span>
+                    <span className="font-semibold text-ink">{t.series}</span> встреч
+                  </span>
+                  <span>
+                    <span className="font-semibold text-ink">{t.games}</span> карт привязано
+                  </span>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </main>
   );
 }

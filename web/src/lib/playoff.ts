@@ -42,8 +42,12 @@ export type ResolvedBracket = {
   columns: { bracket: Bracket; round: string }[];
   /** Не прошедшие в плей-офф из групп — вылет ещё до сетки. */
   out: (SlotTeam & { group: string; place: number })[];
-  /** Достаточно ли залита групповая стадия, чтобы был посев. */
-  seeded: boolean;
+  /**
+   * Состояние групповой стадии: посев подставляется только когда она доиграна (`done`), до этого
+   * в сетке стоят заглушки. `decided`/`expected` — сколько встреч группы сыграно из ожидаемых по
+   * жеребьёвке; по ним страница объясняет, почему участников ещё нет.
+   */
+  groupStage: { done: boolean; decided: number; expected: number };
 };
 
 /**
@@ -61,7 +65,7 @@ function decided(s: SeriesRow) {
  * в турнирном порядке, поэтому к моменту разбора слота его источники-слоты уже разобраны.
  */
 export async function resolveBracket(divisionId: number): Promise<ResolvedBracket> {
-  const [{ upper, lower, out }, series] = await Promise.all([
+  const [{ upper, lower, out, done, decided: playedCount, expected }, series] = await Promise.all([
     getQualified(divisionId),
     listSeries({ divisionId, stage: "playoff" }),
   ]);
@@ -147,5 +151,10 @@ export async function resolveBracket(divisionId: number): Promise<ResolvedBracke
 
   const outTeams = out.map((r) => ({ teamId: r.teamId, name: r.name, tag: r.tag, logo: r.logo, group: r.group, place: r.place }));
 
-  return { slots, columns: PLAYOFF_ROUND_COLUMNS, out: outTeams, seeded: seeds.size > 0 };
+  return {
+    slots,
+    columns: PLAYOFF_ROUND_COLUMNS,
+    out: outTeams,
+    groupStage: { done, decided: playedCount, expected },
+  };
 }

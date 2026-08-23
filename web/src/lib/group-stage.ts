@@ -37,11 +37,45 @@ export type GroupTable = {
   grid: GroupCell[][];
   /** Сколько встреч восстановлено расчётом, а не прочитано из таблицы — их надо проверить руками. */
   guessedCount: number;
+  /** Сколько встреч в группе ожидается по жеребьёвке: круговая, n·(n−1)/2. */
+  expected: number;
+  /** Сколько из них уже с результатом (счёт неравный). Меньше ожидаемого — стадия не доиграна. */
+  decided: number;
 };
 
-/** Кто куда вышел: команды по зонам, в порядке места в группе. Для сетки плей-офф. */
+/**
+ * Групповая стадия дивизиона завершена? Признак **автоматический** (решение Стаса, 23.08.2026):
+ * стадия закрыта, когда у всех ожидаемых встреч всех групп есть результат. Ручного переключателя
+ * нет — иначе о нём забывают, и сетка стоит пустая при доигранных группах.
+ *
+ * Обратная сторона: незаведённой встречи для нас «не существует», поэтому недостача видна оператору
+ * числом «сыграно X из Y» на странице групповой стадии — иначе стадия закроется раньше времени тихо.
+ */
+export function groupStageDone(tables: GroupTable[]): boolean {
+  return tables.length > 0 && tables.every((t) => t.expected > 0 && t.decided >= t.expected);
+}
+
+/** Прогресс стадии по всем группам разом — для подписи «сыграно X из Y». */
+export function groupStageProgress(tables: GroupTable[]) {
+  return tables.reduce(
+    (acc, t) => ({ decided: acc.decided + t.decided, expected: acc.expected + t.expected }),
+    { decided: 0, expected: 0 },
+  );
+}
+
+/**
+ * Кто куда вышел: команды по зонам, в порядке места в группе. Для сетки плей-офф.
+ *
+ * Пока группа не доиграна, зоны пустые: посев из текущих позиций таблицы — это не жеребьёвка,
+ * а моментальный снимок, и сетка меняла бы участников после каждой сыгранной встречи. До конца
+ * стадии плей-офф показывает слоты-заглушки, а прогресс возвращается тут же (`decided`/`expected`).
+ */
 export async function getQualified(divisionId: number) {
   const tables = await getGroupStage(divisionId);
+  const done = groupStageDone(tables);
+  const progress = groupStageProgress(tables);
+  if (!done) return { upper: [], lower: [], out: [], done, ...progress };
+
   const seeded = tables.flatMap((t) =>
     t.rows.map((r) => ({ ...r, group: t.group, zone: qualificationOf(r.place, t.rows.length, t.relegation) })),
   );
@@ -52,6 +86,8 @@ export async function getQualified(divisionId: number) {
     upper: seeded.filter((r) => r.zone === "upper").sort(byPlace),
     lower: seeded.filter((r) => r.zone === "lower").sort(byPlace),
     out: seeded.filter((r) => r.zone === "out").sort(byPlace),
+    done,
+    ...progress,
   };
 }
 
@@ -168,6 +204,10 @@ export async function getGroupStage(divisionId: number): Promise<GroupTable[]> {
       rows,
       grid,
       guessedCount: mine.filter((s) => s.guessed).length,
+      expected: (rows.length * (rows.length - 1)) / 2,
+      // «Есть результат» — неравный счёт: в архив пишут итог встречи, а не ведут её вживую.
+      // Так же считается решённость серии в плей-офф (см. playoff.ts), включая техпоражения.
+      decided: mine.filter((s) => s.homeScore !== s.awayScore).length,
     };
   });
 }

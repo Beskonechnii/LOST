@@ -18,8 +18,10 @@ export default async function PlayoffPage({ params }: { params: Promise<{ slug: 
   if (!division) notFound();
 
   const bracket = await resolveBracket(division.id);
-  if (!bracket.seeded) {
-    return <p className="font-pouf font-bold text-muted">Групповая стадия ещё не залита — посев брать неоткуда.</p>;
+  const { done, decided, expected } = bracket.groupStage;
+  // Жеребьёвки нет вовсе — показывать нечего: в сетке не будет даже заглушек с номерами посева.
+  if (expected === 0) {
+    return <p className="font-pouf font-bold text-muted">Группы ещё не разведены — сетка появится после жеребьёвки.</p>;
   }
 
   return (
@@ -29,6 +31,16 @@ export default async function PlayoffPage({ params }: { params: Promise<{ slug: 
         title="Плей-офф"
         aside={<span className="text-ink-subtle">Сетка и счёт — из архива серий</span>}
       />
+
+      {/* Пока группа не доиграна, участников в сетке нет: команды подставляются только по итогам
+          стадии, а не из текущих позиций таблицы (решение 23.08.2026). Здесь же — чем именно
+          стадия не закрыта, чтобы не гадать. */}
+      {!done && (
+        <p className="rounded-[14px] bg-surface px-4 py-3 text-sm font-bold text-ink-muted cushion-field">
+          Групповая стадия не завершена: сыграно {decided} из {expected} встреч. Команды встанут в
+          сетку, когда у всех встреч группы будет результат.
+        </p>
+      )}
 
       {/* Сетка живёт в общей колонке SITE_MAX_W, как и весь сайт: её край совпадает с шапкой,
           подменю и заголовком. AutoScale подгоняет сетку под ширину колонки (натуральная ширина

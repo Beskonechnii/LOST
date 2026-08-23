@@ -9,6 +9,7 @@ import {
   setEntryDraw,
   createTournament,
   deleteDivision,
+  deleteTournament,
   setTeamDivision,
   setTournamentStatus,
   updateDivision,
@@ -53,6 +54,19 @@ export async function saveTournament(form: FormData): Promise<void> {
   const tournament = await updateTournament(Number(form.get("id")), tournamentInput(form));
   revalidatePath("/admin/tournaments");
   revalidatePath(`/admin/tournaments/${tournament.slug}`);
+}
+
+/**
+ * Снести турнир целиком — вместе с дивизионами, участием, составами сезона и его сеткой встреч
+ * (src/lib/tournaments.ts). Нужно для тестовых прогонов: заведённый «на попробовать» сезон иначе
+ * навсегда остаётся в списке и в снимке базы.
+ */
+export async function removeTournament(form: FormData): Promise<void> {
+  await requirePermission("tournaments.edit");
+  await deleteTournament(Number(form.get("id")));
+  revalidatePath("/admin/tournaments");
+  revalidatePath("/tournaments");
+  redirect("/admin/tournaments");
 }
 
 export async function changeStatus(form: FormData): Promise<void> {

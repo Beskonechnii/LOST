@@ -5,13 +5,15 @@ import { teamTag } from "@/lib/profiles";
 import {
   divisionTeams,
   tournamentBySlug,
+  tournamentUsage,
   TOURNAMENT_STATUS_LABELS,
   type TournamentStatus,
 } from "@/lib/tournaments";
 import { Button } from "@/components/ui/button";
 import { denyUnlessPermission } from "../../../_components/permission-gate";
 import { Field, STATUS_TONE } from "../_components/fields";
-import { addDivision, assignTeam, autoDraw, changeStatus, removeDivision, saveDivision, saveDraw, saveTournament } from "../actions";
+import { DeleteTournament } from "../_components/delete-tournament";
+import { addDivision, assignTeam, autoDraw, changeStatus, removeDivision, removeTournament, saveDivision, saveDraw, saveTournament } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -37,9 +39,10 @@ export default async function TournamentPage({ params }: { params: Promise<{ slu
   const tournament = await tournamentBySlug(slug);
   if (!tournament) notFound();
 
-  const [rosters, teams] = await Promise.all([
+  const [rosters, teams, usage] = await Promise.all([
     Promise.all(tournament.divisions.map((d) => divisionTeams(d.id))),
     prisma.team.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, tag: true } }),
+    tournamentUsage(tournament.id),
   ]);
   // Команда может играть только в одном дивизионе турнира, поэтому в выпадающем списке «добавить»
   // показываем лишь тех, кого в этом турнире ещё нет.
@@ -261,6 +264,19 @@ export default async function TournamentPage({ params }: { params: Promise<{ slu
               <Button type="submit" size="sm">Добавить дивизион</Button>
             </div>
           </form>
+        </div>
+      </section>
+
+      {/* Опасная зона — внизу и отдельной рамкой: удаление сносит сезон целиком, и нажать его
+          по дороге к формам выше не должно быть легко. */}
+      <section className="mt-8 rounded-lg border border-red-900/60 bg-surface-1 p-4">
+        <h2 className="text-sm font-semibold text-red-300">Удалить турнир</h2>
+        <p className="mt-1 text-xs text-ink-subtle">
+          Уедет весь сезон: дивизионы, участие команд, составы этого турнира, сетка встреч с картами
+          и начисления TP. Команды и игроки останутся в ростере.
+        </p>
+        <div className="mt-3">
+          <DeleteTournament id={tournament.id} name={tournament.name} usage={usage} action={removeTournament} />
         </div>
       </section>
     </main>

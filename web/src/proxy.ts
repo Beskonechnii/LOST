@@ -13,6 +13,11 @@ export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   if (!needsAdmin(pathname, request.method)) return NextResponse.next();
   if (sessionIsAdmin(request.cookies.get(SESSION_COOKIE)?.value)) return NextResponse.next();
+  // Dev-автовход (DEV_LOGIN_EMAIL, см. player-session.ts): пропускаем без куки — роль и права всё
+  // равно решит страница/роут по БД. На production переменная не действует.
+  if (process.env.NODE_ENV !== "production" && (process.env.DEV_LOGIN_EMAIL ?? "").trim()) {
+    return NextResponse.next();
+  }
 
   // API отвечает кодом, а не редиректом: fetch из формы должен получить внятную 401,
   // а не HTML страницы входа.

@@ -212,6 +212,84 @@ export async function setTournamentStatus(id: number, status: string) {
 export const registrationOpen = (t: { status: string; regCloseAt: Date | null }): boolean =>
   t.status === "registration" && (!t.regCloseAt || t.regCloseAt.getTime() > Date.now());
 
+/**
+ * Что уедет вместе с турниром. Считается до удаления и показывается в подтверждении: турнир —
+ * контейнер сезона, и «удалить» здесь означает снести весь его архив, а не одну строку.
+ */
+export async function tournamentUsage(id: number) {
+  const divisionIds = (await prisma.division.findMany({ where: { tournamentId: id }, select: { id: true } })).map(
+    (d) => d.id,
+  );
+  const where = { divisionId: { in: divisionIds } };
+  const [entries, series, games, spots, groupRows, applications, points] = await Promise.all([
+    prisma.tournamentEntry.count({ where }),
+    prisma.series.count({ where }),
+    prisma.match.count({ where: { series: { divisionId: { in: divisionIds } } } }),
+    prisma.rosterSpot.count({ where }),
+    prisma.groupEntry.count({ where }),
+    prisma.teamApplication.count({ where: { tournamentId: id } }),
+    prisma.pointsEntry.count({ where: { tournamentId: id } }),
+  ]);
+  return { divisions: divisionIds.length, entries, series, games, spots, groupRows, applications, points };
+}
+
+/**
+ * Удаление турнира со всем, что к нему привязано: дивизионы, участие команд, составы этих
+ * дивизионов, сетка встреч с картами и начисления TP. Задумано для тестовых прогонов — заводить и
+ * сносить сезон целиком, не оставляя сирот: строковые зеркала (`Series.division`, `GroupEntry`)
+ * FK-каскад не чистит, поэтому удаляем явно и в транзакции.
+ *
+ * Команды и игроки остаются: они переживают турнир (TOURNAMENTS-PLAN.md) — уходит только участие.
+ */
+export async function deleteTournament(id: number) {
+  const tournament = await prisma.tournament.findUnique({ where: { id }, include: { divisions: true } });
+  if (!tournament) throw new Error("Турнир не найден");
+  const divisionIds = tournament.divisions.map((d) => d.id);
+  const where = { divisionId: { in: divisionIds } };
+  const teamIds = (await prisma.tournamentEntry.findMany({ where, select: { teamId: true } })).map((e) => e.teamId);
+  // Кому пересчитать кеш Player.tp: сумма «за всё время» уменьшится ровно у этих игроков.
+  const tpPlayers = (
+    await prisma.pointsEntry.findMany({
+      where: { tournamentId: id, subjectType: "player", reason: "tp" },
+      select: { subjectId: true },
+    })
+  ).map((r) => r.subjectId);
+
+  await prisma.$transaction([
+    // Карты сначала: у Match связь с серией необязательная, то есть каскад бы их не тронул, а
+    // отвязанная карта осталась бы висеть в архиве без встречи.
+    prisma.match.deleteMany({ where: { series: { divisionId: { in: divisionIds } } } }),
+    prisma.series.deleteMany({ where }),
+    prisma.groupEntry.deleteMany({ where }),
+    prisma.rosterSpot.deleteMany({ where }),
+    prisma.pointsEntry.deleteMany({ where: { tournamentId: id } }),
+    // Дивизионы, участие и заявки уедут каскадом от турнира (см. schema.prisma).
+    prisma.tournament.delete({ where: { id } }),
+  ]);
+
+  // Зеркало `Team.group` каскад не чинит: команда осталась бы «в Division 1» несуществующего
+  // турнира. Ставим имя дивизиона по оставшемуся участию — команда могла играть и в другом.
+  for (const teamId of new Set(teamIds)) {
+    const left = await prisma.tournamentEntry.findFirst({
+      where: { teamId },
+      orderBy: { id: "desc" },
+      include: { division: true },
+    });
+    await prisma.team.update({ where: { id: teamId }, data: { group: left?.division.name ?? null } });
+  }
+
+  // Кеш TP — из реестра, как в setPlayerTp: истина в PointsEntry, поле лишь сумма по нему.
+  for (const playerId of new Set(tpPlayers)) {
+    const sum = await prisma.pointsEntry.aggregate({
+      where: { subjectType: "player", reason: "tp", subjectId: playerId },
+      _sum: { amount: true },
+    });
+    await prisma.player.update({ where: { id: playerId }, data: { tp: sum._sum.amount ?? 0 } });
+  }
+
+  return tournament;
+}
+
 // ── дивизионы ────────────────────────────────────────────────────────────────
 
 export type DivisionInput = {

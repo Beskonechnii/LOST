@@ -41,6 +41,12 @@ function Who({ account, me }: { account: StaffAccount; me: number | null }) {
   );
 }
 
+/** Что выдано — одной строкой, для свёрнутого блока прав. Пусто — «ничего». */
+function grantedLabels(granted: Set<string>): string {
+  const labels = PERMISSIONS.filter((p) => granted.has(p.key)).map((p) => p.label);
+  return labels.length ? labels.join(", ") : "ничего не выдано";
+}
+
 /** Карточка админа: кто это, набор прав и кнопка снятия роли. Свой аккаунт показываем только для
  *  чтения — иначе админ снял бы себе роль и запер сам себя, а «выдать себе всё» стало бы одним кликом. */
 function AdminCard({ account, me }: { account: StaffAccount; me: number | null }) {
@@ -62,9 +68,25 @@ function AdminCard({ account, me }: { account: StaffAccount; me: number | null }
         )}
       </div>
 
+      {/* Права свёрнуты по умолчанию: чекбоксов полтора десятка, и в развёрнутом виде каждая
+          карточка админа занимала экран — список команды лиги переставал читаться. Что выдано,
+          видно и в свёрнутом виде: строкой подписей. */}
       <form action={savePermissions} className="mt-3 border-t border-hairline pt-3">
         <input type="hidden" name="accountId" value={account.id} />
-        <div className="grid gap-3 sm:grid-cols-2">
+        <details className="group">
+          <summary className="flex cursor-pointer flex-wrap items-center gap-2 text-xs text-ink-muted">
+            <span className="font-semibold text-ink">Права</span>
+            <span className="text-ink-subtle">
+              {account.perms.length ? `${account.perms.length} из ${PERMISSIONS.length}` : "прав пока нет"}
+            </span>
+            <span className="min-w-0 flex-1 truncate text-ink-subtle group-open:hidden">{grantedLabels(granted)}</span>
+            <span className="shrink-0 text-accent-bright">
+              <span className="group-open:hidden">развернуть</span>
+              <span className="hidden group-open:inline">свернуть</span>
+            </span>
+          </summary>
+
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
           {PERMISSION_GROUPS.map((group) => (
             <div key={group}>
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-subtle">{group}</p>
@@ -92,13 +114,11 @@ function AdminCard({ account, me }: { account: StaffAccount; me: number | null }
         {self ? (
           <p className="mt-3 text-xs text-ink-subtle">Свои права здесь не меняются — их правит владелец лиги.</p>
         ) : (
-          <div className="mt-3 flex items-center gap-3">
+          <div className="mt-3">
             <Button type="submit" size="sm">Сохранить права</Button>
-            <span className="text-xs text-ink-subtle">
-              {account.perms.length ? `${account.perms.length} из ${PERMISSIONS.length}` : "прав пока нет"}
-            </span>
           </div>
         )}
+        </details>
       </form>
     </li>
   );
@@ -162,7 +182,9 @@ export default async function StaffPage() {
         </ul>
       )}
 
-      <h2 className="mt-8 text-sm font-semibold text-ink">Остальные аккаунты</h2>
+      <h2 className="mt-8 text-sm font-semibold text-ink">
+        Остальные аккаунты{others.length > 0 && <span className="ml-2 font-normal text-ink-subtle">{others.length}</span>}
+      </h2>
       <p className="mt-1 text-xs text-ink-subtle">Игроки лиги. Назначенный админ начинает с нуля прав — отметьте нужные в его карточке.</p>
       {others.length === 0 ? (
         <p className="mt-2 rounded-lg border border-hairline bg-surface-1 px-4 py-6 text-center text-sm text-ink-subtle">

@@ -101,7 +101,12 @@ export function splitPlayerName(raw: string): { nickname: string; realName: stri
   return { nickname, realName: `${m[1].trim()} ${m[3].trim()}`.replace(/\s+/g, " ").trim() || null };
 }
 
-/** Ссылка на профиль в нужное поле игрока. Чужие адреса игнорируем — пусть лучше поле пустует. */
+/**
+ * Ссылка на профиль в нужное поле игрока. Чужие адреса игнорируем — пусть лучше поле пустует.
+ *
+ * У OpenDota своего поля в модели нет, но ссылку на неё капитаны присылают наравне с остальными —
+ * поэтому из неё хотя бы забираем account_id: без него игрока не опознать в архиве матчей.
+ */
 export function applyLink(player: PlayerDraft, href: string) {
   const url = href.trim();
   if (!/^https?:/i.test(url)) return;
@@ -109,6 +114,7 @@ export function applyLink(player: PlayerDraft, href: string) {
   else if (/stratz\.com/i.test(url)) player.stratzUrl ??= url;
   else if (/steamcommunity\.com/i.test(url)) player.steamUrl ??= url;
   else if (/t\.me|telegram\./i.test(url)) player.telegram ??= normalizeTelegram(url);
+  else if (/opendota\.com/i.test(url)) player.accountId ??= accountIdFromUrl(url);
   else return;
   player.accountId ??= accountIdFromUrl(url);
 }

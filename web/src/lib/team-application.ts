@@ -46,6 +46,17 @@ export const listApplications = (tournamentId: number) =>
 export type ApplicationRow = Awaited<ReturnType<typeof listApplications>>[number];
 
 /**
+ * Заявки команд, ждущие решения, по всем турнирам разом — для раздела модерации: он собирает всё,
+ * что пришло снаружи, и очередь команд не должна жить только внутри карточки турнира.
+ */
+export const pendingApplications = () =>
+  prisma.teamApplication.findMany({
+    where: { status: "pending" },
+    orderBy: { submittedAt: "asc" },
+    include: { division: true, tournament: true },
+  });
+
+/**
  * Заявка капитана с сайта — единственный способ, которым состав попадает в очередь: импорт таблицы
  * оператор пишет в ростер сразу (подтверждать себе нечего). Здесь же проверяем на месте пустые поля
  * и слишком короткий состав, и запоминаем автора — по нему кабинет показывает статус.
@@ -68,16 +79,26 @@ export async function submitTeamApplication(
   const players = draft.players.filter((p) => p.nickname.trim());
   if (players.length < 5) throw new Error("В составе должно быть не меньше пяти игроков");
 
-  // Одна команда — одна заявка на турнир: повторную отправку трактуем как правку прежней, пока по
-  // ней не приняли решение. Иначе очередь заполняется дублями одного и того же состава.
+  // Одна команда — одна заявка на турнир (решение Стаса, 23.08.2026): повторная отправка правит
+  // прежнюю, а не плодит строку в очереди. Возвращённую заявку это тоже касается — досыл правок
+  // снова ставит её в `pending` (`data.status` ниже), чтобы модератор увидел исправленный состав.
+  //
+  // Ищем и по подавшему, и по слагу команды: заявку может отправить менеджер, а поправить капитан
+  // с другого аккаунта — очередь всё равно должна остаться с одной строкой на команду.
+  const slug = draft.slug || slugify(name);
   const mine = await prisma.teamApplication.findFirst({
-    where: { tournamentId, submittedById: accountId, status: "pending" },
+    where: {
+      tournamentId,
+      status: { in: ["pending", "rejected"] },
+      OR: [{ submittedById: accountId }, { payload: { contains: `"slug":"${slug}"` } }],
+    },
+    orderBy: { submittedAt: "desc" },
   });
   const data = {
     tournamentId,
     divisionId,
     source: "web",
-    payload: formatDraft({ ...draft, name, players, slug: draft.slug || slugify(name) }),
+    payload: formatDraft({ ...draft, name, players, slug }),
     submittedById: accountId,
     status: "pending",
     notes: null,

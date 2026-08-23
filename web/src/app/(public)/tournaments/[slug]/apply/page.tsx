@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { registrationOpen, tournamentBySlug } from "@/lib/tournaments";
 import { currentAccount } from "@/lib/account";
 import { myApplications, parseDraft } from "@/lib/team-application";
+import { prisma } from "@/lib/prisma";
 import { roleLabel } from "@/lib/roles";
 import { SITE_MAX_W } from "../../../../_components/ui";
 import { ApplyForm } from "./apply-form";
@@ -23,6 +24,30 @@ export default async function ApplyPage({ params }: { params: Promise<{ slug: st
   const me = await currentAccount();
   const mine = me ? await myApplications(me.id, tournament.id) : [];
   const open = registrationOpen(tournament);
+
+  // Ники ростера — подсказки в поле состава: «этот игрок в лиге уже есть, вот его ник как в базе».
+  const known = me ? await prisma.player.findMany({ select: { nickname: true }, orderBy: { nickname: "asc" } }) : [];
+
+  // Открытая заявка (ждёт решения или возвращена) открывается на правку, а не заводит вторую
+  // строку в очереди: повторная подача — это досыл правок, а не новая команда.
+  const editable = mine.find((a) => a.status === "pending" || a.status === "rejected") ?? null;
+  const editableDraft = editable ? parseDraft(editable.payload) : null;
+  const initial = editableDraft
+    ? {
+        name: editableDraft.name,
+        tag: editableDraft.tag,
+        divisionId: editable!.divisionId,
+        players: editableDraft.players.map((p) => ({
+          nickname: p.nickname,
+          realName: p.realName ?? null,
+          role: p.role ?? null,
+          mmr: p.mmr ?? null,
+          link: p.dotabuffUrl ?? p.stratzUrl ?? p.steamUrl ?? null,
+          telegram: p.telegram ?? null,
+          isCaptain: p.isCaptain ?? false,
+        })),
+      }
+    : null;
 
   return (
     <main className={`mx-auto w-full ${SITE_MAX_W} flex-1 px-4 py-8 md:px-6`}>
@@ -68,21 +93,33 @@ export default async function ApplyPage({ params }: { params: Promise<{ slug: st
           Заявку подаёт капитан из своего аккаунта.{" "}
           <Link href="/me" className="text-accent-bright hover:underline">Войти в кабинет</Link>
         </p>
-      ) : me.status !== "active" ? (
-        <p className="mt-6 rounded-md border border-amber-900 bg-amber-950/40 px-3 py-4 text-sm text-amber-300">
-          Заявку на команду можно подать после того, как одобрят вашу личную анкету.{" "}
-          <Link href="/me" className="underline">Открыть кабинет</Link>
-        </p>
       ) : !open ? (
         <p className="mt-6 rounded-md border border-hairline bg-surface-1 px-3 py-4 text-sm text-ink-muted">
           Приём заявок на этот турнир сейчас закрыт.
         </p>
       ) : (
-        <div className="mt-6">
+        <div className="mt-6 space-y-3">
+          {/* Свой статус в лиге подаче не мешает (решение 23.08.2026): капитан новой команды часто
+              сам ещё не в ростере, а заявка всё равно проходит модерацию. */}
+          {me.status !== "active" && (
+            <p className="rounded-md border border-hairline bg-surface-1 px-3 py-2 text-xs text-ink-muted">
+              Ваша личная анкета ещё на модерации — на заявку команды это не влияет, её рассмотрят
+              отдельно.
+            </p>
+          )}
+          {editable && (
+            <p className="rounded-md border border-sky-900 bg-sky-950/40 px-3 py-2 text-xs text-sky-300">
+              {editable.status === "rejected"
+                ? "Заявка возвращена — поправьте состав и отправьте снова, новая строка в очереди не появится."
+                : "Заявка уже подана и ждёт решения. Правки сохранятся в неё же."}
+            </p>
+          )}
           <ApplyForm
             tournamentId={tournament.id}
             tournamentSlug={tournament.slug}
             divisions={tournament.divisions.map((d) => ({ id: d.id, name: d.name }))}
+            knownNicknames={known.map((p) => p.nickname)}
+            initial={initial}
           />
         </div>
       )}

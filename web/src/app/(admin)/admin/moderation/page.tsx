@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { pendingClaims, pendingRegistrations, accountApplication, type PendingRegistration } from "@/lib/account";
+import { parseDraft, pendingApplications } from "@/lib/team-application";
+import { roleLabel } from "@/lib/roles";
 import { ApplicationSummary } from "@/app/_components/application-summary";
 import { Button } from "@/components/ui/button";
 import { denyUnlessPermission } from "../../_components/permission-gate";
@@ -9,12 +11,13 @@ import { ReviewForms } from "./review-forms";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Модерация" };
 
-// Один раздел на все решения «пускать в лигу»: анкеты новых игроков и привязки к профилю ростера.
-// Раньше это были два адреса (/admin/registrations и /admin/claims) с одним и тем же правом —
-// оператор проверял то одну страницу, то другую и терял заявки. Теперь вкладки внутри, обе с
-// числом новых; старые адреса редиректят сюда (next.config.ts).
+// Один раздел на все решения «пускать в лигу»: анкеты новых игроков, привязки к профилю ростера и
+// заявки команд на турниры. Раньше это были разные адреса под одним правом — оператор проверял то
+// одну страницу, то другую и терял заявки. Теперь вкладки внутри, у каждой число новых; старые
+// адреса (/admin/registrations, /admin/claims) редиректят сюда (next.config.ts).
 //
-// Имя раздела нарочно шире, чем «регистрации»: следующим сюда переедут заявки команд на турнир.
+// Заявку команды здесь не разбирают: у неё свой экран внутри турнира с замечаниями, выбором
+// дивизиона и «подтянуть данные». Вкладка отвечает за «не пропустить» и ведёт туда.
 //
 // Право accounts.approve: proxy пускает в /admin любого админа, поэтому конкретный раздел закрываем
 // здесь. Не право — не ошибка, а плашка: админ, который ведёт архив серий, просто сюда не ходит.
@@ -22,6 +25,7 @@ export const metadata = { title: "Модерация" };
 const TABS = [
   { key: "profiles", label: "Регистрация личного профиля" },
   { key: "links", label: "Привязка к профилю" },
+  { key: "teams", label: "Заявки команд" },
 ] as const;
 type TabKey = (typeof TABS)[number]["key"];
 const isTab = (v: unknown): v is TabKey => TABS.some((t) => t.key === v);
@@ -39,16 +43,17 @@ export default async function ModerationPage({ searchParams }: { searchParams: P
 
   const raw = (await searchParams).tab;
   const tab: TabKey = isTab(raw) ? raw : "profiles";
-  const [queue, claims] = await Promise.all([pendingRegistrations(), pendingClaims()]);
-  const counts: Record<TabKey, number> = { profiles: queue.length, links: claims.length };
+  const [queue, claims, teams] = await Promise.all([pendingRegistrations(), pendingClaims(), pendingApplications()]);
+  const counts: Record<TabKey, number> = { profiles: queue.length, links: claims.length, teams: teams.length };
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 md:px-6">
       <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-300/80">Служебная часть</p>
       <h1 className="mt-1.5 text-xl font-bold tracking-tight">Модерация</h1>
       <p className="mt-1.5 text-sm text-ink-muted">
-        Всё, что человек отправил из кабинета. Одобрение заводит профиль в ростере (или привязывает
-        существующий) и открывает кабинет; возврат с причиной — анкету можно поправить и прислать снова.
+        Всё, что пришло снаружи: анкеты игроков, привязки к профилю и заявки команд на турниры.
+        Одобрение заводит профиль в ростере (или привязывает существующий) и открывает кабинет;
+        возврат с причиной — анкету можно поправить и прислать снова.
       </p>
 
       {/* Разрез живёт в query, как и везде на сайте: ссылку на нужную вкладку можно кинуть в чат. */}
@@ -74,7 +79,13 @@ export default async function ModerationPage({ searchParams }: { searchParams: P
         ))}
       </div>
 
-      {tab === "profiles" ? <Registrations queue={queue} /> : <Claims claims={claims} />}
+      {tab === "profiles" ? (
+        <Registrations queue={queue} />
+      ) : tab === "links" ? (
+        <Claims claims={claims} />
+      ) : (
+        <TeamApplications rows={teams} />
+      )}
     </main>
   );
 }
@@ -141,6 +152,55 @@ function Card({ account }: { account: PendingRegistration }) {
 
       <ReviewForms accountId={account.id} mmr={account.claim ? undefined : (application?.mmr ?? null)} />
     </div>
+  );
+}
+
+/**
+ * Заявки команд на турниры. Решение по составу принимается на странице турнира (там же замечания,
+ * выбор дивизиона и «подтянуть данные»), поэтому здесь — список со ссылкой: раздел модерации
+ * отвечает за «не пропустить», а не дублирует разбор.
+ */
+function TeamApplications({ rows }: { rows: Awaited<ReturnType<typeof pendingApplications>> }) {
+  if (rows.length === 0) {
+    return (
+      <p className="mt-6 rounded-md border border-hairline bg-surface-1 px-3 py-6 text-center text-sm text-ink-subtle">
+        Заявок команд нет.
+      </p>
+    );
+  }
+  return (
+    <ul className="mt-6 space-y-2">
+      {rows.map((a) => {
+        const draft = parseDraft(a.payload);
+        return (
+          <li key={a.id} className="rounded-lg border border-hairline bg-surface-1 p-4">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span className="rounded-md border border-sky-900 bg-sky-950/40 px-2 py-0.5 text-xs text-sky-300">
+                {a.tournament.short ?? a.tournament.name}
+              </span>
+              <span className="text-sm font-semibold text-ink">{draft?.name ?? "заявка"}</span>
+              <span className="text-xs text-ink-subtle">
+                {a.division ? a.division.name : "дивизион не выбран"} · {draft?.players.length ?? 0} игрок(ов)
+              </span>
+              <span className="ml-auto shrink-0 text-xs text-ink-subtle">
+                отправлено {dateTime.format(a.submittedAt)}
+              </span>
+            </div>
+            {draft && (
+              <p className="mt-1 line-clamp-2 text-xs text-ink-subtle">
+                {draft.players.map((p) => `${p.nickname} (${roleLabel(p.role) ?? "роль не указана"})`).join(", ")}
+              </p>
+            )}
+            <Link
+              href={`/admin/tournaments/${a.tournament.slug}/registrations`}
+              className="mt-2 inline-block text-xs font-semibold text-accent-bright hover:underline"
+            >
+              Разобрать заявку →
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 

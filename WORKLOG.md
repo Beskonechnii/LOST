@@ -5,6 +5,29 @@
 
 ---
 
+## 2026-08-23 — Э6: «Регистрации» + «Заявки» → раздел `/admin/moderation`
+
+**Сделано:**
+- Новый раздел `/admin/moderation` с вкладками в query: «Регистрация личного профиля» (очередь анкет)
+  и «Привязка к профилю». Обе вкладки показывают число новых; страницы `/admin/registrations` и
+  `/admin/claims` удалены, оба адреса — постоянные редиректы (`next.config.ts`, второй с `?tab=links`).
+- Экшены обеих очередей слиты в `moderation/actions.ts` (`approve`/`reject` для анкет,
+  `approveLink`/`rejectLink` для привязок), `revalidatePath` теперь один.
+- На `/admin` вместо двух плиток одна — «Модерация», с индикатором числа новых. У `HubTile` появилось
+  поле `badge`, считается только тому, у кого есть `accounts.approve`.
+
+**Проверено:** `/admin/registrations` → 308 на `/admin/moderation`, `/admin/claims` → 308 на
+`?tab=links`; обе вкладки рендерятся; на тестовой заявке плитка `/admin` показала бейдж «1», заявка
+удалена. tsc чисто.
+
+**Файлы:** `src/app/(admin)/admin/moderation/{page.tsx,actions.ts,review-forms.tsx}` (переезд из
+`registrations`/`claims`), `src/app/(admin)/admin/page.tsx`, `src/app/_components/hub-tiles.tsx`,
+`next.config.ts`, `CLAUDE.md`, `ARCHITECTURE.md`.
+
+**Дальше:** Э7 — «Команда лиги»: роли и сворачиваемый блок прав.
+
+---
+
 ## 2026-08-23 — Э5: история составов в карточке команды
 
 **Сделано:**

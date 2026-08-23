@@ -1,5 +1,5 @@
 import { HubGroupedTiles, type HubTile } from "@/app/_components/hub-tiles";
-import { currentPermissions } from "@/lib/account";
+import { currentPermissions, pendingClaims, pendingRegistrations } from "@/lib/account";
 import type { PermissionKey } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
@@ -29,8 +29,7 @@ const GROUPS: { title: string; tools: Tool[] }[] = [
     title: "Модерация",
     tools: [
       { href: "/admin/tournaments", perm: "tournaments.edit", label: "Турниры", icon: "🏟️", desc: "Завести турнир, описать его, раздать дивизионы и составы." },
-      { href: "/admin/registrations", perm: "accounts.approve", label: "Регистрации", icon: "📝", desc: "Очередь новых заявок: анкета, одобрение с заведением профиля или возврат с причиной." },
-      { href: "/admin/claims", perm: "accounts.approve", label: "Заявки", icon: "🔗", desc: "Подтверждение привязки аккаунтов к профилям ростера." },
+      { href: "/admin/moderation", perm: "accounts.approve", label: "Модерация", icon: "📝", desc: "Анкеты новых игроков и привязки к профилю: одобрить с заведением профиля или вернуть с причиной." },
       { href: "/admin/staff", perm: "accounts.admins", label: "Команда лиги", icon: "🛡️", desc: "Владелец и админы: назначение роли и раздача прав по галочкам." },
       { href: "/admin/tp", perm: "tp.edit", label: "TP", icon: "🏅", desc: "Начисление сезонных очков MVP игрокам." },
     ],
@@ -65,7 +64,20 @@ const GROUPS: { title: string; tools: Tool[] }[] = [
 
 export default async function AdminHome() {
   const perms = await currentPermissions();
-  const groups = GROUPS.map((g) => ({ title: g.title, tiles: g.tools.filter((t) => perms.includes(t.perm)) }));
+  // Число новых на плитке модерации: очередь легко пропустить, если о ней ничего не напоминает.
+  // Считаем только тому, кто её и так видит — остальным запрос ни к чему.
+  const canApprove = perms.includes("accounts.approve");
+  const [queue, claims] = canApprove
+    ? await Promise.all([pendingRegistrations(), pendingClaims()])
+    : [[], []];
+  const pending = queue.length + claims.length;
+
+  const groups = GROUPS.map((g) => ({
+    title: g.title,
+    tiles: g.tools
+      .filter((t) => perms.includes(t.perm))
+      .map((t) => (t.href === "/admin/moderation" && pending > 0 ? { ...t, badge: pending } : t)),
+  }));
   const empty = groups.every((g) => g.tiles.length === 0);
 
   return (

@@ -1,10 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { approveRegistration, rejectRegistration } from "@/lib/account";
+import { approveClaim, approveRegistration, rejectClaim, rejectRegistration } from "@/lib/account";
 
-// Решения по очереди регистраций. Право accounts.approve проверяет сам lib/account.ts — гейт стоит
-// там, чтобы его нельзя было обойти, дойдя до апрува мимо этой страницы.
+// Решения по обеим очередям модерации — анкеты и привязки к профилю. Право accounts.approve
+// проверяет сам lib/account.ts — гейт стоит там, чтобы его нельзя было обойти, дойдя до апрува
+// мимо этой страницы.
 
 // Состояние форм карточки: только текст ошибки — при успехе строка уходит из очереди.
 export type ReviewState = { error?: string } | null;
@@ -23,7 +24,7 @@ export async function approve(_state: ReviewState, form: FormData): Promise<Revi
 
   const res = await approveRegistration(accountIdOf(form), mmr);
   if (!res.ok) return { error: res.error };
-  revalidatePath("/admin/registrations");
+  revalidatePath("/admin/moderation");
   return null;
 }
 
@@ -31,6 +32,20 @@ export async function approve(_state: ReviewState, form: FormData): Promise<Revi
 export async function reject(_state: ReviewState, form: FormData): Promise<ReviewState> {
   const error = await rejectRegistration(accountIdOf(form), String(form.get("reason") ?? ""));
   if (error) return { error };
-  revalidatePath("/admin/registrations");
+  revalidatePath("/admin/moderation");
   return null;
+}
+
+// ── привязка к профилю ───────────────────────────────────────────────────────
+// Отдельная пара экшенов: у привязки нет ни анкеты, ни MMR — решение бинарное, состояние формам
+// не нужно, поэтому это простые form actions, а не useActionState как у анкет.
+
+export async function approveLink(form: FormData): Promise<void> {
+  await approveClaim(Number(form.get("accountId")));
+  revalidatePath("/admin/moderation");
+}
+
+export async function rejectLink(form: FormData): Promise<void> {
+  await rejectClaim(Number(form.get("accountId")));
+  revalidatePath("/admin/moderation");
 }

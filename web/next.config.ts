@@ -8,10 +8,15 @@ import type { NextConfig } from "next";
 const frameAncestors = process.env.FRAME_ANCESTORS?.trim() || "'self'";
 
 const nextConfig: NextConfig = {
-  // Старая панель ролей заменена «Командой лиги» (роль + гранулярные права). Редирект, а не удаление
-  // молча: адрес мог осесть в закладках оператора.
+  // Разъехавшиеся адреса админки. Редирект, а не удаление молча: адреса оседают в закладках
+  // оператора. Панель ролей заменена «Командой лиги» (роль + гранулярные права), а две очереди
+  // модерации («Регистрации» и «Заявки») слиты в один раздел с вкладками.
   async redirects() {
-    return [{ source: "/admin/roles", destination: "/admin/staff", permanent: true }];
+    return [
+      { source: "/admin/roles", destination: "/admin/staff", permanent: true },
+      { source: "/admin/registrations", destination: "/admin/moderation", permanent: true },
+      { source: "/admin/claims", destination: "/admin/moderation?tab=links", permanent: true },
+    ];
   },
 
   async headers() {

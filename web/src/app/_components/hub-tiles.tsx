@@ -8,7 +8,15 @@ import { Badge } from "@/components/pouf/media";
 // Один вид для админки и продукта («архивный» pouf: surface-1, мягкая тень, подъём на hover),
 // чтобы разделы выглядели одним набором. Сам <main> задаёт вызывающая страница/layout.
 
-export type HubTile = { href: string; label: string; desc: string; icon: string; soon?: boolean };
+export type HubTile = {
+  href: string;
+  label: string;
+  desc: string;
+  icon: string;
+  soon?: boolean;
+  /** Сколько новых ждёт внутри (очередь модерации). Ноль и undefined — плитка без индикатора. */
+  badge?: number;
+};
 
 // Раскладка сетки под число плиток: 3 (дивизион, админка) и 4 (сезон) — самые частые.
 const COLS: Record<number, string> = {
@@ -32,6 +40,8 @@ function TileGrid({ tiles, cols }: { tiles: HubTile[]; cols: 2 | 3 | 4 }) {
                   <div className="flex items-center gap-2">
                     <Heading level={3}>{t.label}</Heading>
                     {t.soon && <Badge tone="warn">в разработке</Badge>}
+                    {/* индикатор новых: то же число, что и на вкладке раздела */}
+                    {!!t.badge && <Badge tone="warn">{t.badge}</Badge>}
                   </div>
                   <p className="mt-1 text-sm font-bold text-muted">{t.desc}</p>
                 </div>

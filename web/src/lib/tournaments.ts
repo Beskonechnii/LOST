@@ -430,15 +430,18 @@ export const divisionTeams = (divisionId: number) =>
 export async function setTeamDivision(
   teamId: number,
   divisionId: number | null,
-  opts: { seed?: number | null; group?: string | null } = {},
+  opts: { seed?: number | null; group?: string | null; tournamentId?: number } = {},
 ) {
   if (divisionId === null) {
+    // Снимаем из ЯВНО указанного турнира, а не из «текущего»: карточку открывают у любого сезона,
+    // и привязка к current означала, что кнопка «Убрать» на карточке следующего турнира молча
+    // выкидывала команду из идущего, а на месте не меняла ничего.
+    const tournamentId = opts.tournamentId ?? (await currentTournament())?.id;
+    if (!tournamentId) return null;
+    await prisma.tournamentEntry.deleteMany({ where: { teamId, division: { tournamentId } } });
+    // Зеркало гасим только когда сняли из текущего турнира: `Team.group` описывает актуальный сезон.
     const current = await currentTournament();
-    if (current)
-      await prisma.tournamentEntry.deleteMany({
-        where: { teamId, division: { tournamentId: current.id } },
-      });
-    await prisma.team.update({ where: { id: teamId }, data: { group: null } });
+    if (current?.id === tournamentId) await prisma.team.update({ where: { id: teamId }, data: { group: null } });
     return null;
   }
 

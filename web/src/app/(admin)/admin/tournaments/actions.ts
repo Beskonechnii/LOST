@@ -123,11 +123,20 @@ export async function autoDraw(form: FormData): Promise<void> {
   revalidatePath(`/admin/tournaments/${text(form, "tournamentSlug")}`);
 }
 
-/** Поставить команду в дивизион или снять её оттуда (`divisionId` пустой = снять). */
+/**
+ * Поставить команду в дивизион или снять её оттуда (`divisionId` пустой = снять).
+ *
+ * `tournamentId` обязателен для снятия: без него снималось из «текущего» турнира, а карточку
+ * открывают у любого — кнопка «Убрать» на карточке нового сезона выкидывала команду из идущего.
+ */
 export async function assignTeam(form: FormData): Promise<void> {
   await requirePermission("tournaments.edit");
   const divisionId = num(form, "divisionId");
-  await setTeamDivision(Number(form.get("teamId")), divisionId, { seed: num(form, "seed"), group: text(form, "group") || null });
+  await setTeamDivision(Number(form.get("teamId")), divisionId, {
+    seed: num(form, "seed"),
+    group: text(form, "group") || null,
+    tournamentId: num(form, "tournamentId") ?? undefined,
+  });
   revalidatePath(`/admin/tournaments/${text(form, "tournamentSlug")}`);
   revalidatePath("/roster/teams");
 }

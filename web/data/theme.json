@@ -1,5 +1,5 @@
 {
-  "accent": "#7c3aed",
+  "accent": "#3500f5",
   "accentBright": "#a78bfa",
   "accentContrast": "#ffffff",
   "d2": "#14c6cb",
@@ -18,9 +18,9 @@
   "poufSurface": "#211f2b",
   "poufInk": "#f7f3ff",
   "poufMuted": "#b8afcb",
-  "poufWarn": "#ffe58a",
-  "poufOrange": "#ffb38a",
-  "poufDown": "#ffb3d1",
-  "poufUp": "#a8f0d0",
+  "poufWarn": "#ac9d68",
+  "poufOrange": "#ea590b",
+  "poufDown": "#e66b9c",
+  "poufUp": "#2c892a",
   "poufInfo": "#9ec8ff"
 }

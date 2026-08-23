@@ -175,9 +175,12 @@ export default async function TournamentPage({ params }: { params: Promise<{ slu
                           />
                           <Button type="submit" size="sm" variant="ghost">Сохранить</Button>
                         </form>
+                        {/* Снимаем из ЭТОГО турнира: без явного id экшен брал «текущий», и кнопка
+                            на карточке нового сезона убирала команду из идущего. */}
                         <form action={assignTeam} className="ml-auto">
                           <input type="hidden" name="teamId" value={e.team.id} />
                           <input type="hidden" name="divisionId" value="" />
+                          <input type="hidden" name="tournamentId" value={tournament.id} />
                           <input type="hidden" name="tournamentSlug" value={tournament.slug} />
                           <Button type="submit" size="sm" variant="ghost">Убрать</Button>
                         </form>
@@ -209,6 +212,7 @@ export default async function TournamentPage({ params }: { params: Promise<{ slu
 
                 <form action={assignTeam} className="mt-3 flex flex-wrap items-end gap-2">
                   <input type="hidden" name="divisionId" value={d.id} />
+                  <input type="hidden" name="tournamentId" value={tournament.id} />
                   <input type="hidden" name="tournamentSlug" value={tournament.slug} />
                   <label className="block">
                     <span className="text-xs text-ink-muted">Добавить команду</span>

@@ -103,27 +103,50 @@ export const steamOf = (accountId: string) =>
 const STEAM64_BASE = BigInt("76561197960265728");
 
 /**
- * Ссылка на профиль → Dota account_id (он же steam32). Понимает то, что реально лежит в CRM:
- * steamcommunity.com/profiles/<steam64>, dotabuff/stratz/opendota и просто число (32- или 64-битное).
+ * Ссылка на профиль → Dota account_id (он же steam32). Понимает то, что реально лежит в CRM и
+ * приходит от капитанов: steamcommunity.com/profiles/<steam64>, dotabuff/stratz/opendota и просто
+ * число (32- или 64-битное).
  *
- * Именной адрес steamcommunity.com/id/<vanity> не резолвится: имя → steam64 знает только Steam Web API,
- * ключа у нас нет. Такие возвращаем null — в UI они подсвечиваются как «ссылку надо открыть руками».
+ * Разбор нарочно терпимый к тому, как ссылку скопировали из браузера: поддомен локали
+ * («ru.dotabuff.com»), сегмент локали в пути («stratz.com/ru-ru/players/123»), хвосты вкладок
+ * («/matches», «/overview?date=…»), лишние слэши, «@» и пробелы по краям. Позиционно важно только
+ * одно: сегмент `players`/`profiles`, за которым идёт число.
+ *
+ * Именной адрес steamcommunity.com/id/<vanity> не резолвится: имя → steam64 знает только Steam Web API.
+ * Такие возвращаем null — в мастере импорта они подсвечиваются оператору как нераспознанные.
  */
 export function accountIdFromUrl(raw: string): string | null {
-  const s = raw.trim();
+  const s = raw.trim().replace(/^@+/, "");
   if (!s) return null;
 
   if (/^\d+$/.test(s)) return fromNumeric(s);
 
-  const path = s.replace(/^https?:\/\//i, "").replace(/[?#].*$/, "").replace(/\/+$/, "");
-  const m =
-    /^(?:www\.)?steamcommunity\.com\/profiles\/(\d+)/i.exec(path) ??
-    /^(?:www\.)?dotabuff\.com\/(?:esports\/)?players\/(\d+)/i.exec(path) ??
-    /^(?:www\.)?stratz\.com\/players\/(\d+)/i.exec(path) ??
-    /^(?:www\.)?opendota\.com\/players\/(\d+)/i.exec(path);
+  // Отрезаем протокол, query/hash и нормализуем слэши: дальше работаем со строкой «host/путь».
+  const path = s
+    .replace(/^[a-z]+:\/\//i, "")
+    .replace(/[?#].*$/, "")
+    .replace(/\/{2,}/g, "/")
+    .replace(/^\/+|\/+$/g, "");
+  if (!path) return null;
 
-  return m ? fromNumeric(m[1]) : null;
+  const [hostRaw, ...segments] = path.split("/");
+  const host = hostRaw.toLowerCase();
+  // Поддомены (www, ru, es, de.dotabuff.com) значения не имеют — важен сам домен.
+  const domain = host.split(":")[0].split(".").slice(-2).join(".");
+  if (!PROFILE_HOSTS.has(domain)) return null;
+
+  // Сегмент-указатель может стоять не первым: «dotabuff.com/esports/players/1», «stratz.com/ru-ru/players/1».
+  for (let i = 0; i < segments.length - 1; i += 1) {
+    const key = segments[i].toLowerCase();
+    if (key !== "players" && key !== "profiles" && key !== "player") continue;
+    const next = segments[i + 1];
+    if (/^\d+$/.test(next)) return fromNumeric(next);
+  }
+  return null;
 }
+
+/** Домены, на которых id игрока лежит прямо в пути. Именно домен, без поддомена локали. */
+const PROFILE_HOSTS = new Set(["dotabuff.com", "stratz.com", "opendota.com", "steamcommunity.com"]);
 
 /** steam64 больше 2^53 — сравнение и вычитание только через BigInt, иначе Number всё округлит. */
 function fromNumeric(digits: string): string | null {

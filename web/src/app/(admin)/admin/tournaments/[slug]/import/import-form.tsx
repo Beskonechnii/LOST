@@ -74,6 +74,19 @@ export function ImportForm({
   const teams = enriched?.teams ?? parsed?.teams ?? [];
   const picked = teams.filter((t) => !skip[t.slug]);
 
+  // Игрок без account_id в архиве матчей не находится (см. §7 CLAUDE.md), поэтому такие строки
+  // собираем отдельным списком: ссылка есть, но не разобрана — повод поправить её в таблице
+  // или дожать «Подтянуть данные» (именной адрес Steam резолвится только сетью).
+  const unresolved = picked.flatMap((t) =>
+    t.players
+      .filter((p) => !p.accountId)
+      .map((p) => ({
+        team: t.name,
+        nickname: p.nickname,
+        link: p.dotabuffUrl ?? p.stratzUrl ?? p.steamUrl ?? null,
+      })),
+  );
+
   return (
     <div className="space-y-4">
       <Steps step={step} onGo={setStep} />
@@ -174,6 +187,22 @@ export function ImportForm({
                     </li>
                   ))}
                 </ul>
+              )}
+
+              {unresolved.length > 0 && (
+                <details className="rounded-md border border-amber-900 bg-amber-950/30 p-3">
+                  <summary className="cursor-pointer text-xs font-semibold text-amber-300">
+                    Без account_id: {unresolved.length} — этих игроков не найдёт ни один матч
+                  </summary>
+                  <ul className="mt-2 space-y-0.5">
+                    {unresolved.map((u, i) => (
+                      <li key={i} className="truncate text-[11px] text-ink-subtle">
+                        <span className="text-ink">{u.nickname}</span> · {u.team} ·{" "}
+                        {u.link ? `ссылка не распознана: ${u.link}` : "ссылки нет"}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
               )}
 
               <ul className="space-y-2">

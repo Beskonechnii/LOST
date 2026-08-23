@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { currentTournament, getDivisions } from "@/lib/tournaments";
-import { isAdmin } from "@/lib/admin-session";
 import { SITE_MAX_W } from "@/app/_components/ui";
 import { Card } from "@/components/pouf/surface";
 import { Heading, Eyebrow } from "@/components/pouf/text";
@@ -33,14 +32,6 @@ const SECTIONS = [
     cta: "Открыть турниры",
     accent: "none",
   },
-  // Ростер живёт внутри турнира (состав сезонный) — ссылку достраиваем ниже, когда знаем текущий.
-  {
-    href: "/roster",
-    title: "Ростер",
-    text: "Команды турнира и их составы: роли, MMR основы, профили игроков со ссылками на Dotabuff и Stratz.",
-    cta: "Открыть команды",
-    accent: "none",
-  },
 ] as const;
 
 type Section = { href: string; title: string; text: string; cta: string; accent: string };
@@ -48,9 +39,9 @@ type Section = { href: string; title: string; text: string; cta: string; accent:
 export default async function Home() {
   const current = await currentTournament();
   const divisions = await getDivisions();
-  // Дверь в служебную часть с главной — как вкладка «Админ» в шапке: видна только админам.
-  const admin = await isAdmin();
   // Карточка на дивизион + постоянные разделы. Акцент первых двух — цвета D1/D2, дальше нейтральный.
+  // Ростера и админки здесь нет: ростер живёт внутри турнира и открывается из него, а служебную
+  // часть держит вкладка «Админ» в шапке — на лендинге она дублировалась.
   const sections: Section[] = [
     ...divisions.map((d, i) => ({
       href: current ? `/tournaments/${current.slug}/${d.slug}/groups` : "/tournaments",
@@ -59,21 +50,7 @@ export default async function Home() {
       cta: "Смотреть таблицу",
       accent: i === 0 ? "d1" : i === 1 ? "d2" : "none",
     })),
-    ...SECTIONS.map((x) => ({
-      ...x,
-      href: x.href === "/roster" && current ? `/tournaments/${current.slug}/roster/teams` : x.href,
-    })),
-    ...(admin
-      ? [
-          {
-            href: "/admin",
-            title: "Админ",
-            text: "Служебная часть: турниры и заявки, архив серий, ростер, студия и остальные инструменты лиги.",
-            cta: "Открыть админку",
-            accent: "none",
-          },
-        ]
-      : []),
+    ...SECTIONS,
   ];
 
   return (

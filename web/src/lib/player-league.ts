@@ -35,16 +35,29 @@ export type PlayerGameRow = {
   stageText: string;
 };
 
-/** Строка разреза «турнир»: дивизион + стадия, с карьеркой и самым играемым героем. */
+/**
+ * Строка разреза «турнир»: одна на дивизион турнира, стадии внутри слиты.
+ *
+ * Раньше строка была на стадию и заканчивалась иконкой самого играемого героя — герой здесь лишний
+ * (для него есть свой блок), а разбивка на группу и плей-офф дробила и без того короткую таблицу.
+ * Теперь на строку приходится то, что от неё и ждут: где играл, когда последний матч, чем кончились
+ * встречи и карты.
+ */
 export type PlayerTournamentRow = {
+  key: string;
+  /** Турнир и его слаг — строка кликабельна, ведёт в раздел турнира. */
+  tournament: string;
+  tournamentSlug: string | null;
   division: string;
-  stage: string; // group | playoff
-  label: string; // «Групповая стадия» / «Плей-офф»
+  /** Карты: сыграно, победы, поражения. */
   games: number;
   wins: number;
   losses: number;
   winrate: number;
-  topHero: { slug: string; name: string; games: number } | null;
+  /** Встречи (серии) — то, чем турнир считается по регламенту. */
+  series: { total: number; wins: number; losses: number };
+  /** Когда сыграна последняя карта этого турнира; null — дат нет ни у одной. */
+  lastPlayedAt: Date | null;
 };
 
 export type PlayerLeague = {
@@ -116,12 +129,17 @@ export async function getPlayerLeague(playerId: number, gamesLimit = 15): Promis
           teamB: teamSelect,
           series: {
             select: {
+              id: true,
               slug: true,
+              homeId: true,
+              awayId: true,
+              homeScore: true,
+              awayScore: true,
               division: true,
               divisionId: true,
               // Подпись разреза берём из самого дивизиона с турниром: имена дивизионов повторяются
               // из сезона в сезон, и по имени разрезы двух турниров слиплись бы в один.
-              divisionRef: { select: { short: true, name: true, tournament: { select: { short: true, name: true } } } },
+              divisionRef: { select: { short: true, name: true, tournament: { select: { short: true, name: true, slug: true } } } },
               stage: true,
               group: true,
               bracket: true,
@@ -137,8 +155,19 @@ export async function getPlayerLeague(playerId: number, gamesLimit = 15): Promis
   // --- Сводка (суммы, средние досчитаем в конце) ---
   const sum = { games: 0, wins: 0, kills: 0, deaths: 0, assists: 0, gpm: 0, xpm: 0, dur: 0, durCount: 0 };
 
-  // --- Разрез по турнирам: ключ «division|stage» ---
-  type Bucket = { key: string; division: string; stage: string; games: number; wins: number; heroes: Map<string, number> };
+  // --- Разрез по турнирам: ключ — дивизион турнира (стадии внутри слиты) ---
+  // Встречи считаем по сериям, а не по картам: в турнирной таблице команда получает очки за встречу,
+  // и «5 побед» в профиле должно значить пять выигранных серий, а не пять взятых карт.
+  type Bucket = {
+    key: string;
+    tournament: string;
+    tournamentSlug: string | null;
+    division: string;
+    games: number;
+    wins: number;
+    lastPlayedAt: Date | null;
+    series: Map<number, boolean | null>;
+  };
   const buckets = new Map<string, Bucket>();
 
   // --- Лента карт ---
@@ -161,17 +190,39 @@ export async function getPlayerLeague(playerId: number, gamesLimit = 15): Promis
     }
 
     // Ключ разреза — id дивизиона, а не имя: «Division 1» есть в каждом сезоне.
-    const key = `${series.divisionId ?? series.division}|${series.stage}`;
-    const divisionLabel = series.divisionRef
-      ? [
-          series.divisionRef.tournament.short ?? series.divisionRef.tournament.name,
-          series.divisionRef.short ?? series.divisionRef.name,
-        ].join(" · ")
-      : series.division;
-    const b = buckets.get(key) ?? { key, division: divisionLabel, stage: series.stage, games: 0, wins: 0, heroes: new Map() };
+    const key = String(series.divisionId ?? series.division);
+    const tournamentName = series.divisionRef
+      ? (series.divisionRef.tournament.short ?? series.divisionRef.tournament.name)
+      : "Вне турнира";
+    const shortDivision = series.divisionRef ? (series.divisionRef.short ?? series.divisionRef.name) : series.division;
+    const divisionLabel = [tournamentName, shortDivision].filter(Boolean).join(" · ");
+    const b = buckets.get(key) ?? {
+      key,
+      tournament: tournamentName,
+      tournamentSlug: series.divisionRef?.tournament.slug ?? null,
+      division: shortDivision,
+      games: 0,
+      wins: 0,
+      lastPlayedAt: null,
+      series: new Map<number, boolean | null>(),
+    };
     b.games += 1;
     if (s.won) b.wins += 1;
-    if (s.heroSlug) b.heroes.set(s.heroSlug, (b.heroes.get(s.heroSlug) ?? 0) + 1);
+    const playedAt = m.startedAt ?? m.scheduledAt;
+    if (playedAt && (!b.lastPlayedAt || playedAt > b.lastPlayedAt)) b.lastPlayedAt = playedAt;
+    // Исход встречи — по счёту серии глазами команды игрока. Команду берём из ростера; если игрок
+    // стендинил и ни в одном из составов не значится, исход встречи не считаем (null).
+    if (!b.series.has(series.id)) {
+      const mineIsHome = series.homeId != null && myTeamIds.has(series.homeId);
+      const mineIsAway = series.awayId != null && myTeamIds.has(series.awayId);
+      const outcome =
+        mineIsHome || mineIsAway
+          ? mineIsHome
+            ? series.homeScore > series.awayScore
+            : series.awayScore > series.homeScore
+          : null;
+      b.series.set(series.id, outcome);
+    }
     buckets.set(key, b);
 
     // Команда игрока и соперник: сначала по ростеру (в чьём составе игрок), иначе по победителю.
@@ -215,19 +266,30 @@ export async function getPlayerLeague(playerId: number, gamesLimit = 15): Promis
   games.sort((a, b) => (b.playedAt?.getTime() ?? 0) - (a.playedAt?.getTime() ?? 0));
 
   const tournaments: PlayerTournamentRow[] = [...buckets.values()]
-    // Дивизион по алфавиту (D1 раньше D2), внутри — группа перед плей-оффом.
-    .sort((a, b) => a.division.localeCompare(b.division) || (a.stage === "group" ? -1 : 1) - (b.stage === "group" ? -1 : 1))
+    // Свежий турнир сверху — по дате последней карты; без дат уходят вниз, там же алфавит.
+    .sort(
+      (a, b) =>
+        (b.lastPlayedAt?.getTime() ?? 0) - (a.lastPlayedAt?.getTime() ?? 0) ||
+        a.tournament.localeCompare(b.tournament) ||
+        a.division.localeCompare(b.division),
+    )
     .map((b) => {
-      const top = [...b.heroes.entries()].sort((x, y) => y[1] - x[1])[0] ?? null;
+      const outcomes = [...b.series.values()].filter((v): v is boolean => v !== null);
       return {
+        key: b.key,
+        tournament: b.tournament,
+        tournamentSlug: b.tournamentSlug,
         division: b.division,
-        stage: b.stage,
-        label: b.stage === "group" ? "Групповая стадия" : b.stage === "playoff" ? "Плей-офф" : stageLabel(b.stage),
         games: b.games,
         wins: b.wins,
         losses: b.games - b.wins,
         winrate: b.games ? (b.wins / b.games) * 100 : 0,
-        topHero: top ? { slug: top[0], name: heroBySlug(top[0]).name, games: top[1] } : null,
+        series: {
+          total: b.series.size,
+          wins: outcomes.filter(Boolean).length,
+          losses: outcomes.filter((v) => !v).length,
+        },
+        lastPlayedAt: b.lastPlayedAt,
       };
     });
 

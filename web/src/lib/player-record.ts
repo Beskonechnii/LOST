@@ -20,7 +20,17 @@ export type PlayerRecord = {
 };
 
 const where = (filter: LeadersFilter) => ({
-  match: { series: { is: { divisionId: filter.divisionId, stage: filter.stage, group: filter.group, bracket: filter.bracket } } },
+  match: {
+    series: {
+      is: {
+        // `divisionIds` — разрез «весь турнир» (у него дивизионов несколько), `divisionId` — один.
+        divisionId: filter.divisionIds ? { in: filter.divisionIds } : filter.divisionId,
+        stage: filter.stage,
+        group: filter.group,
+        bracket: filter.bracket,
+      },
+    },
+  },
 });
 
 /**

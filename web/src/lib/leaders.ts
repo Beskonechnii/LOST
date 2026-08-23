@@ -58,7 +58,14 @@ export type Subject = {
   totals: Totals;
 };
 
-export type LeadersFilter = { divisionId?: number; stage?: Stage; group?: string; bracket?: Bracket };
+export type LeadersFilter = {
+  divisionId?: number;
+  /** Несколько дивизионов разом — разрез «весь турнир», у которого их обычно два. */
+  divisionIds?: number[];
+  stage?: Stage;
+  group?: string;
+  bracket?: Bracket;
+};
 
 /**
  * Метрика рейтинга. `sum` — «за турнир», `avg` — «за карту»: у команд, сыгравших разное число карт,

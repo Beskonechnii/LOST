@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listPlayers } from "@/lib/roster-data";
 import { getPlayerRecords } from "@/lib/player-record";
+import { tpByTournament } from "@/lib/tp";
 import { roleLabel } from "@/lib/roles";
 import { playerAccountId, playerGaps, teamAccent } from "@/lib/profiles";
 import { can } from "@/lib/account";
@@ -44,8 +45,15 @@ export default async function PlayersPage({
   const div = parseDiv(divisions, q.div);
 
   // Игроки — те, у кого есть место в дивизионах этого турнира (заявленные), а не весь пул лиги.
+  // Цифры в карточках тоже турнирные: карьерка считается по сериям этих дивизионов, TP — по
+  // реестру начислений этого турнира. Иначе витрина сезона показывала бы итоги за всю историю
+  // лиги, и у новичка сезона рядом с ником стояли бы чужие 300 TP.
   const ids = divisions.filter((d) => !div || d.slug === div).map((d) => d.id);
-  const [allPlayers, records] = await Promise.all([listPlayers(ids), getPlayerRecords(null)]);
+  const [allPlayers, records, tpMap] = await Promise.all([
+    listPlayers(ids),
+    getPlayerRecords(null, { divisionIds: divisions.map((d) => d.id) }),
+    tpByTournament(tournament.id),
+  ]);
   const authed = await can("roster.edit"); // формы и диагностика — те же права, что у пишущих роутов
 
   // Дивизион игрока — по его местам в составе (`RosterSpot.divisionId`): выборка выше уже сужена
@@ -53,10 +61,10 @@ export default async function PlayersPage({
   // фильтр опустошал вкладку дивизиона в новом турнире.
   const players = allPlayers;
 
-  // Карьерка игрока (игры/победы/поражения) — из турнирной статы (кирпич B). Нет статы → нули.
+  // Карьерка игрока (игры/победы/поражения) и TP — за ЭТОТ турнир. Нет статы → нули.
   const ranked = players.map((p) => {
     const rec = records.get(p.id) ?? { games: 0, wins: 0, losses: 0, winrate: 0 };
-    return { ...p, rec };
+    return { ...p, rec, tp: tpMap.get(p.id) ?? 0 };
   });
   const byName = (a: (typeof ranked)[number], b: (typeof ranked)[number]) => a.nickname.localeCompare(b.nickname);
   ranked.sort((a, b) => {
@@ -106,10 +114,13 @@ export default async function PlayersPage({
           if (s.key !== "tp") params.set("sort", s.key);
           if (div) params.set("div", div);
           const qs = params.toString();
+          // Порядок меняем внутри ЭТОГО турнира: раньше ссылка вела на общий `/roster/players`,
+          // а тот редиректит на текущий сезон — со страницы S3 сортировка уносила в S2.
+          const base = `/tournaments/${slug}/roster/players`;
           return (
           <Link
             key={s.key}
-            href={qs ? `/roster/players?${qs}` : "/roster/players"}
+            href={qs ? `${base}?${qs}` : base}
             className={`rounded-[14px] px-3.5 py-[7px] text-[13px] font-black transition-[box-shadow,transform,background] ${
               sort === s.key
                 ? "bg-purple text-[var(--on-accent)] cushion-control"

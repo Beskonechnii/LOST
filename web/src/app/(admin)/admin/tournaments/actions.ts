@@ -7,7 +7,6 @@ import {
   createDivision,
   drawGroups,
   setEntryDraw,
-  createTournament,
   deleteDivision,
   deleteTournament,
   setTeamDivision,
@@ -42,13 +41,6 @@ const tournamentInput = (form: FormData) => ({
   regOpenAt: text(form, "regOpenAt"),
   regCloseAt: text(form, "regCloseAt"),
 });
-
-export async function addTournament(form: FormData): Promise<void> {
-  await requirePermission("tournaments.edit");
-  const tournament = await createTournament(tournamentInput(form));
-  revalidatePath("/admin/tournaments");
-  redirect(`/admin/tournaments/${tournament.slug}`);
-}
 
 /**
  * Правка описания турнира. В отличие от остальных экшенов возвращает состояние: форма показывает

@@ -2,8 +2,7 @@ import Link from "next/link";
 import { currentTournament, listTournaments, TOURNAMENT_STATUS_LABELS, type TournamentStatus } from "@/lib/tournaments";
 import { Button } from "@/components/ui/button";
 import { denyUnlessPermission } from "../../_components/permission-gate";
-import { addTournament } from "./actions";
-import { Field, STATUS_TONE } from "./_components/fields";
+import { STATUS_TONE } from "./_components/fields";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Турниры" };
@@ -65,26 +64,20 @@ export default async function TournamentsPage() {
         </ul>
       )}
 
+      {/* Заведение турнира — мастером, а не формой в подвале списка: сезон это не одно
+          описание, а цепочка «описание → дивизионы → составы → жеребьёвка», и делать её по
+          порядку надёжнее, чем вспоминать, что ещё не заполнено. */}
       <section className="mt-8 rounded-lg border border-hairline bg-surface-1 p-4">
         <h2 className="text-sm font-semibold">Новый турнир</h2>
         <p className="mt-1 text-xs text-ink-subtle">
-          Слаг живёт в адресах и в снимке базы — если не задать, выведется из названия.
+          Мастер проведёт по шагам: описание → дивизионы → импорт составов → жеребьёвка. Черновик
+          создаётся на первом шаге, вернуться и поправить можно в любой момент.
         </p>
-        <form action={addTournament} className="mt-3 grid gap-3 sm:grid-cols-2">
-          <Field name="name" label="Название" required placeholder="LOST Season 3" />
-          <Field name="slug" label="Слаг" placeholder="s3" />
-          <Field name="short" label="Короткое имя" placeholder="S3" />
-          <Field name="format" label="Формат" placeholder="2 дивизиона, группа + плей-офф" />
-          <Field name="startAt" label="Старт" type="date" />
-          <Field name="endAt" label="Финиш" type="date" />
-          <div className="sm:col-span-2">
-            <Field name="description" label="Описание и регламент" textarea />
-          </div>
-          <div className="sm:col-span-2">
-            <Button type="submit" size="sm">Завести турнир</Button>
-          </div>
-        </form>
+        <Link href="/admin/tournaments/new/describe" className="mt-3 inline-block">
+          <Button type="button" size="sm">Завести турнир →</Button>
+        </Link>
       </section>
+
     </main>
   );
 }

@@ -41,7 +41,8 @@ export default async function ClaimsPage() {
                 </p>
                 <p className="mt-0.5 text-sm">
                   заявляет:{" "}
-                  <Link href={`/roster/players/${c.claim!.slug}`} className="font-semibold text-accent-bright hover:underline">
+                  {/* карточка игрока живёт по числовому id, не по слагу (см. /roster/players/[id]) */}
+                  <Link href={`/roster/players/${c.claim!.id}`} className="font-semibold text-accent-bright hover:underline">
                     {c.claim!.nickname}
                   </Link>
                 </p>

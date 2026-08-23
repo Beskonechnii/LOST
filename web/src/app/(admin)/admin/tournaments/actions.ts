@@ -15,6 +15,7 @@ import {
   updateDivision,
   updateTournament,
 } from "@/lib/tournaments";
+import type { SaveState } from "./_components/save-form";
 
 // Экшены админки турниров. Право `tournaments.edit` проверяется здесь, а не только гейтом страницы:
 // до экшена можно дойти и мимо неё, а сама страница могла быть отрисована со старыми правами
@@ -49,11 +50,22 @@ export async function addTournament(form: FormData): Promise<void> {
   redirect(`/admin/tournaments/${tournament.slug}`);
 }
 
-export async function saveTournament(form: FormData): Promise<void> {
+/**
+ * Правка описания турнира. В отличие от остальных экшенов возвращает состояние: форма показывает
+ * оператору «Сохранено» или причину отказа — иначе после нажатия страница выглядит нетронутой
+ * (см. _components/save-form.tsx).
+ */
+export async function saveTournament(_state: SaveState, form: FormData): Promise<SaveState> {
   await requirePermission("tournaments.edit");
-  const tournament = await updateTournament(Number(form.get("id")), tournamentInput(form));
-  revalidatePath("/admin/tournaments");
-  revalidatePath(`/admin/tournaments/${tournament.slug}`);
+  try {
+    const tournament = await updateTournament(Number(form.get("id")), tournamentInput(form));
+    revalidatePath("/admin/tournaments");
+    revalidatePath(`/admin/tournaments/${tournament.slug}`);
+    return { ok: true };
+  } catch (e) {
+    // Чаще всего сюда прилетает занятый слаг: показать причину полезнее, чем экран ошибки.
+    return { ok: false, error: e instanceof Error ? e.message : "Не удалось сохранить" };
+  }
 }
 
 /**

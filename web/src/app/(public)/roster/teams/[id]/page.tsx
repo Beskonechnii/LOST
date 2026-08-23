@@ -16,7 +16,8 @@ export const dynamic = "force-dynamic";
 
 export default async function TeamPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const team = await getTeamProfile(Number(id));
+  // id или слаг — см. rosterKey: на слаге страница раньше падала с 500
+  const team = await getTeamProfile(id);
   if (!team) notFound();
 
   // Таблицу берём по дивизиону команды в текущем турнире — тому же, что показывает его раздел.

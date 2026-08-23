@@ -41,16 +41,18 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
 
 export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const pid = Number(id);
-  const [player, authed, heroes, record, teammates, league] = await Promise.all([
-    getPlayerProfile(pid),
+  // В адресе ждём числовой id, но ссылка по слагу тоже встречается — карточку ищем по обоим
+  // (rosterKey), иначе на слаге страница падала с 500 вместо «нет такого игрока».
+  const player = await getPlayerProfile(id);
+  if (!player) notFound();
+  const pid = player.id;
+  const [authed, heroes, record, teammates, league] = await Promise.all([
     can("roster.edit"), // кнопка «Править» — ровно то право, что откроет саму страницу правки
     getPlayerHeroes(pid),
     getPlayerRecord(pid),
     getTeammates(pid),
     getPlayerLeague(pid),
   ]);
-  if (!player) notFound();
 
   // главное место — первое по порядку ролей: оно и задаёт цвет страницы, и рисуется в крошках
   const main = player.spots[0] ?? null;

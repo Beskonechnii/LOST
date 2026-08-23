@@ -188,10 +188,20 @@ export async function listTeamRosters(divisionIds?: number[]): Promise<TeamWithR
   return Promise.all(teams.map(({ roster, ...t }) => withRoster(t, roster)));
 }
 
+/**
+ * Ключ карточки ростера: число — это id, всё остальное — слаг. Ссылки по слагу до сих пор попадаются
+ * (старые адреса, ручной ввод), а `Number("bsk")` даёт NaN — Prisma на нём падает, и вместо карточки
+ * посетитель видел 500. Разбираем ключ здесь, одним местом на команду и игрока.
+ */
+export function rosterKey(key: string | number): { id: number } | { slug: string } {
+  const id = typeof key === "number" ? key : Number(key);
+  return Number.isInteger(id) && id > 0 ? { id } : { slug: String(key).trim() };
+}
+
 /** Всё для страницы команды: картинки, состав и агрегаты по MMR. */
-export async function getTeamProfile(id: number) {
+export async function getTeamProfile(key: string | number) {
   const team = await prisma.team.findUnique({
-    where: { id },
+    where: rosterKey(key),
     include: { roster: { where: await seasonRosterWhere(), include: { player: true } } },
   });
   if (!team) return null;
@@ -227,9 +237,9 @@ export function getPlayer(id: number) {
  * Всё для страницы профиля: человек, его места в составах — с лого команды и сокомандниками.
  * Отдельно от getPlayer(), потому что редактору эта развесистая выборка не нужна.
  */
-export async function getPlayerProfile(id: number) {
+export async function getPlayerProfile(key: string | number) {
   const player = await prisma.player.findUnique({
-    where: { id },
+    where: rosterKey(key),
     include: {
       spots: {
         // Историю не режем: на странице игрока видно все его места, каждое — со своим турниром.
@@ -252,7 +262,7 @@ export async function getPlayerProfile(id: number) {
         team: await withTeamUploads(team),
         teammates: await Promise.all(
           team.roster
-            .filter((m) => m.playerId !== id)
+            .filter((m) => m.playerId !== player.id)
             .sort((a, b) => roleOrder(a.role) - roleOrder(b.role) || a.player.nickname.localeCompare(b.player.nickname))
             .map(async (m) => ({ ...(await withPlayerUploads(m.player)), role: m.role, isCaptain: m.isCaptain })),
         ),

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { denyUnlessPermission } from "../../../_components/permission-gate";
 import { Field, STATUS_TONE } from "../_components/fields";
 import { DeleteTournament } from "../_components/delete-tournament";
+import { SaveForm } from "../_components/save-form";
 import { addDivision, assignTeam, autoDraw, changeStatus, removeDivision, removeTournament, saveDivision, saveDraw, saveTournament } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -95,7 +96,7 @@ export default async function TournamentPage({ params }: { params: Promise<{ slu
 
       <section className="mt-4 rounded-lg border border-hairline bg-surface-1 p-4">
         <h2 className="text-sm font-semibold">Описание</h2>
-        <form action={saveTournament} className="mt-3 grid gap-3 sm:grid-cols-2">
+        <SaveForm action={saveTournament} className="mt-3 grid gap-3 sm:grid-cols-2">
           <input type="hidden" name="id" value={tournament.id} />
           <input type="hidden" name="slug" value={tournament.slug} />
           <Field name="name" label="Название" value={tournament.name} required />
@@ -109,10 +110,7 @@ export default async function TournamentPage({ params }: { params: Promise<{ slu
           <div className="sm:col-span-2">
             <Field name="description" label="Описание и регламент" value={tournament.description} textarea />
           </div>
-          <div className="sm:col-span-2">
-            <Button type="submit" size="sm">Сохранить</Button>
-          </div>
-        </form>
+        </SaveForm>
       </section>
 
       <section className="mt-4 space-y-3">

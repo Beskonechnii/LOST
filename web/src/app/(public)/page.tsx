@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { currentTournament, getDivisions } from "@/lib/tournaments";
+import { isAdmin } from "@/lib/admin-session";
 import { SITE_MAX_W } from "@/app/_components/ui";
 import { Card } from "@/components/pouf/surface";
 import { Heading, Eyebrow } from "@/components/pouf/text";
@@ -47,6 +48,8 @@ type Section = { href: string; title: string; text: string; cta: string; accent:
 export default async function Home() {
   const current = await currentTournament();
   const divisions = await getDivisions();
+  // Дверь в служебную часть с главной — как вкладка «Админ» в шапке: видна только админам.
+  const admin = await isAdmin();
   // Карточка на дивизион + постоянные разделы. Акцент первых двух — цвета D1/D2, дальше нейтральный.
   const sections: Section[] = [
     ...divisions.map((d, i) => ({
@@ -60,6 +63,17 @@ export default async function Home() {
       ...x,
       href: x.href === "/roster" && current ? `/tournaments/${current.slug}/roster/teams` : x.href,
     })),
+    ...(admin
+      ? [
+          {
+            href: "/admin",
+            title: "Админ",
+            text: "Служебная часть: турниры и заявки, архив серий, ростер, студия и остальные инструменты лиги.",
+            cta: "Открыть админку",
+            accent: "none",
+          },
+        ]
+      : []),
   ];
 
   return (

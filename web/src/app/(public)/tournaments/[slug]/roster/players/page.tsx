@@ -2,7 +2,7 @@ import Link from "next/link";
 import { listPlayers } from "@/lib/roster-data";
 import { getPlayerRecords } from "@/lib/player-record";
 import { roleLabel } from "@/lib/roles";
-import { playerGaps, teamAccent } from "@/lib/profiles";
+import { playerAccountId, playerGaps, teamAccent } from "@/lib/profiles";
 import { can } from "@/lib/account";
 import { CreateForm } from "@/app/_components/roster-editors";
 import { SectionHeader } from "@/app/_components/ui";
@@ -68,8 +68,9 @@ export default async function PlayersPage({
       default: return byName(a, b);
     }
   });
-  // Без account_id игрок не подтягивается из OpenDota; остальные дыры анкеты — из CRM, их добиваем руками
-  const noId = players.filter((p) => !p.accountId).length;
+  // Без account_id игрок не подтягивается из OpenDota; остальные дыры анкеты — из CRM, их добиваем
+  // руками. Считаем по `playerAccountId`: id может лежать в ссылке на профиль, а не в своём поле.
+  const noId = players.filter((p) => !playerAccountId(p)).length;
   const incomplete = players.filter((p) => playerGaps(p).length > 0).length;
 
   return (
@@ -126,7 +127,7 @@ export default async function PlayersPage({
           // Пробелы анкеты подсвечиваем только оператору — это состояние наших данных,
           // а не факт об игроке. Посетитель видит ровную сетку карточек.
           const gaps = authed ? playerGaps(p) : [];
-          const flagId = authed && !p.accountId;
+          const flagId = authed && !playerAccountId(p);
           return (
             <PlayerMiniCard
               key={p.id}
@@ -163,7 +164,7 @@ export default async function PlayersPage({
                   )}
                   {/* чек-лист анкеты: что осталось добить из CRM (пусто для посетителя) */}
                   {gaps.length > 0 && (
-                    <div className={`truncate text-xs ${p.accountId ? "text-ink-subtle" : "text-amber-400"}`}>
+                    <div className={`truncate text-xs ${playerAccountId(p) ? "text-ink-subtle" : "text-amber-400"}`}>
                       нет: {gaps.join(", ")}
                     </div>
                   )}

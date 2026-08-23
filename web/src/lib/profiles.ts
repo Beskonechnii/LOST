@@ -255,6 +255,9 @@ export function yearsLabel(age: number): string {
  */
 export function playerGaps(p: {
   accountId?: string | null;
+  dotabuffUrl?: string | null;
+  stratzUrl?: string | null;
+  steamUrl?: string | null;
   realName?: string | null;
   birthday?: Date | null;
   city?: string | null;
@@ -262,7 +265,10 @@ export function playerGaps(p: {
   telegram?: string | null;
 }): string[] {
   return [
-    !p.accountId && "account_id",
+    // Дырка — это когда id не выводится ВООБЩЕ ниоткуда. Пустое поле при живой ссылке на профиль
+    // дыркой не считается: id из неё разбирается на лету (`playerAccountId`), и матчи такого
+    // игрока находятся. Иначе витрина ругалась на игроков, у которых всё в порядке.
+    !playerAccountId(p) && "account_id",
     !p.realName && "имя",
     !p.birthday && "дата рождения",
     // в CRM часто указана только страна — считаем, что место жительства всё-таки есть

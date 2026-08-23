@@ -195,18 +195,22 @@ export function TeamCards({ teams, divisions: all }: { teams: TeamWithRoster[]; 
   // По умолчанию составы свёрнуты: сначала виден список команд, состав разворачивается по клику.
   const [collapsed, setCollapsed] = useState(true);
 
-  // Под-вкладки дивизионов: команды делим по Team.group, а общий пулл игроков остаётся единым
-  // (страница /roster/players его не трогает). Показываем только те дивизионы, где есть команды,
-  // в порядке справочника; безгрупповые (если появятся) сваливаем в отдельную вкладку «Прочие».
-  const divisions = all.filter((d) => teams.some((t) => t.group === d.name));
-  const hasOther = teams.some((t) => !divisions.some((d) => d.name === t.group));
+  // Под-вкладки дивизионов: команды делим по участию (`divisionIds`), а не по строке-зеркалу
+  // `Team.group` — в новом турнире зеркало держит имя дивизиона прошлого сезона, и вкладка
+  // дивизиона оказывалась пустой. Показываем только дивизионы, где есть команды, в порядке
+  // справочника; команды вне дивизионов (если появятся) — вкладкой «Прочие».
+  const inDiv = (t: TeamWithRoster, id: number) => t.divisionIds.includes(id);
+  const divisions = all.filter((d) => teams.some((t) => inDiv(t, d.id)));
+  const other = (t: TeamWithRoster) => !divisions.some((d) => inDiv(t, d.id));
+  const hasOther = teams.some(other);
   const tabs = [
-    ...divisions.map((d) => ({ key: d.name, label: d.short })),
+    ...divisions.map((d) => ({ key: String(d.id), label: d.short })),
     ...(hasOther ? [{ key: "—", label: "Прочие" }] : []),
   ];
   const [tab, setTab] = useState(tabs[0]?.key ?? "—");
   const active = tabs.some((t) => t.key === tab) ? tab : (tabs[0]?.key ?? "—");
-  const shown = teams.filter((t) => (active === "—" ? !divisions.some((d) => d.name === t.group) : t.group === active));
+  const matches = (t: TeamWithRoster, key: string) => (key === "—" ? other(t) : inDiv(t, Number(key)));
+  const shown = teams.filter((t) => matches(t, active));
 
   return (
     <div className="space-y-4 font-pouf">
@@ -214,9 +218,7 @@ export function TeamCards({ teams, divisions: all }: { teams: TeamWithRoster[]; 
         {tabs.length > 1 ? (
           <div className="flex gap-2">
             {tabs.map((t) => {
-              const count = teams.filter((x) =>
-                t.key === "—" ? !divisions.some((d) => d.name === x.group) : x.group === t.key,
-              ).length;
+              const count = teams.filter((x) => matches(x, t.key)).length;
               return (
                 <button
                   key={t.key}

@@ -4,7 +4,7 @@ import { CreateForm } from "@/app/_components/roster-editors";
 import { SectionHeader } from "@/app/_components/ui";
 import { notFound } from "next/navigation";
 import { TeamCards } from "@/app/(public)/roster/_components/team-cards";
-import { DivTabs, parseDiv, divName } from "@/app/(public)/roster/_components/div-tabs";
+import { DivTabs, parseDiv } from "@/app/(public)/roster/_components/div-tabs";
 import { getDivisions, tournamentBySlug } from "@/lib/tournaments";
 
 export const dynamic = "force-dynamic";
@@ -27,10 +27,11 @@ export default async function TeamsPage({
   const authed = await can("roster.edit");
 
   // Команды берём по участию в дивизионах ЭТОГО турнира, а не по всей лиге: иначе новый сезон
-  // показывал бы команды прошлого. Вкладка дивизиона сужает список дальше.
-  const name = divName(divisions, div);
+  // показывал бы команды прошлого. Вкладка дивизиона сужает список дальше — тоже по `divisionId`:
+  // фильтр по строке-зеркалу `Team.group` в новом турнире давал пустой дивизион (зеркало хранит
+  // имя дивизиона прошлого сезона), и команды были видны только на вкладке «Все».
   const ids = divisions.filter((d) => !div || d.slug === div).map((d) => d.id);
-  const teams = (await listTeamRosters(ids)).filter((t) => !name || t.group === name);
+  const teams = await listTeamRosters(ids);
   const noId = teams.reduce((sum, t) => sum + t.noAccountIdCount, 0);
 
   return (

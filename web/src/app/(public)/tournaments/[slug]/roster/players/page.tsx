@@ -8,7 +8,7 @@ import { CreateForm } from "@/app/_components/roster-editors";
 import { SectionHeader } from "@/app/_components/ui";
 import { notFound } from "next/navigation";
 import { PlayerMiniCard } from "@/app/(public)/roster/_components/player-card";
-import { DivTabs, parseDiv, divName } from "@/app/(public)/roster/_components/div-tabs";
+import { DivTabs, parseDiv } from "@/app/(public)/roster/_components/div-tabs";
 import { getDivisions, tournamentBySlug } from "@/lib/tournaments";
 
 export const dynamic = "force-dynamic";
@@ -48,10 +48,10 @@ export default async function PlayersPage({
   const [allPlayers, records] = await Promise.all([listPlayers(ids), getPlayerRecords(null)]);
   const authed = await can("roster.edit"); // формы и диагностика — те же права, что у пишущих роутов
 
-  // Дивизион игрока — по его командам (Team.group): игрок попадает в D1/D2, если в этом дивизионе
-  // у него есть место в составе. «Все» — весь пул, включая игроков без команды.
-  const name = divName(divisions, div);
-  const players = name ? allPlayers.filter((p) => p.spots.some((s) => s.team.group === name)) : allPlayers;
+  // Дивизион игрока — по его местам в составе (`RosterSpot.divisionId`): выборка выше уже сужена
+  // переданными `ids`, второй раз резать по строке-зеркалу `Team.group` не нужно — именно этот
+  // фильтр опустошал вкладку дивизиона в новом турнире.
+  const players = allPlayers;
 
   // Карьерка игрока (игры/победы/поражения) — из турнирной статы (кирпич B). Нет статы → нули.
   const ranked = players.map((p) => {

@@ -106,7 +106,13 @@ export type RosterMember = {
   accountId: string | null;
 };
 
-export type TeamWithRoster = TeamCard & { players: RosterMember[] };
+export type TeamWithRoster = TeamCard & {
+  players: RosterMember[];
+  /** Дивизионы, в которых команда участвует (`TournamentEntry.divisionId`) — разрез витрин идёт по ним,
+   *  а не по строке-зеркалу `Team.group`: зеркало хранит имя дивизиона последнего турнира и в новом
+   *  сезоне врёт (команда была видна только на вкладке «Все»). */
+  divisionIds: number[];
+};
 
 type SpotWithPlayer = { role: string | null; isCaptain: boolean; player: PlayerRecord };
 type PlayerRecord = {
@@ -183,9 +189,18 @@ export async function listTeamRosters(divisionIds?: number[]): Promise<TeamWithR
   const teams = await prisma.team.findMany({
     where: divisionIds ? { entries: { some: { divisionId: { in: divisionIds } } } } : undefined,
     orderBy: [{ group: "asc" }, { name: "asc" }],
-    include: { roster: { where, include: { player: true } } },
+    include: {
+      roster: { where, include: { player: true } },
+      // участие нужно витрине: по нему она делит команды на дивизионы (см. TeamWithRoster.divisionIds)
+      entries: { select: { divisionId: true } },
+    },
   });
-  return Promise.all(teams.map(({ roster, ...t }) => withRoster(t, roster)));
+  return Promise.all(
+    teams.map(async ({ roster, entries, ...t }) => ({
+      ...(await withRoster(t, roster)),
+      divisionIds: entries.map((e) => e.divisionId).filter((id) => !divisionIds || divisionIds.includes(id)),
+    })),
+  );
 }
 
 /**

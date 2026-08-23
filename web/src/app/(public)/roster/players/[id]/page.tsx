@@ -10,6 +10,7 @@ import { rankLabel } from "@/lib/dota-rank";
 import { roleLabel } from "@/lib/roles";
 import { parseTags, tagLabel } from "@/lib/player-tags";
 import { can } from "@/lib/account";
+import { getDivisions } from "@/lib/tournaments";
 import { buttonClasses } from "@/components/pouf/Button";
 import { Eyebrow } from "@/app/_components/ui";
 import { PlayerAvatar, TeamLogo } from "../../_components/avatar";
@@ -46,16 +47,24 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
   const player = await getPlayerProfile(id);
   if (!player) notFound();
   const pid = player.id;
-  const [authed, heroes, record, teammates, league] = await Promise.all([
+  const [authed, heroes, record, teammates, league, divisions] = await Promise.all([
     can("roster.edit"), // кнопка «Править» — ровно то право, что откроет саму страницу правки
     getPlayerHeroes(pid),
     getPlayerRecord(pid),
     getTeammates(pid),
     getPlayerLeague(pid),
+    getDivisions(), // дивизионы текущего турнира: по ним отделяем «сейчас» от истории
   ]);
 
   // главное место — первое по порядку ролей: оно и задаёт цвет страницы, и рисуется в крошках
   const main = player.spots[0] ?? null;
+
+  // «Сейчас в команде» — места в дивизионах текущего турнира плюс места вне турниров: страница
+  // показывает всю историю мест, и без такого разделения непонятно, где игрок играет сегодня.
+  // По одной строке на команду: в одной команде можно стоять и основой, и заменой разом.
+  const currentIds = new Set(divisions.map((d) => d.id));
+  const nowSpots = player.spots.filter((s) => s.divisionId === null || currentIds.has(s.divisionId));
+  const nowTeams = [...new Map(nowSpots.map((s) => [s.team.id, s])).values()];
   const accent = main ? teamAccent(main.team) : "#a855f7";
   const links = playerLinks(player);
   const where = [player.city, player.country].filter(Boolean).join(", ");
@@ -186,6 +195,34 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
         )}
       </section>
 
+      {/* Команды, за которые игрок заявлен сейчас: лого, название и роль — без состава.
+          Состав каждой команды идёт ниже отдельными блоками, здесь нужен быстрый ответ
+          «за кого он играет» и ссылка на команду. */}
+      {nowTeams.length > 0 && (
+        <section>
+          <Eyebrow className="mb-3">Сейчас в командах</Eyebrow>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {nowTeams.map((spot) => (
+              <Link
+                key={spot.team.id}
+                href={`/roster/teams/${spot.team.id}`}
+                className="flex items-center gap-3 rounded-control bg-surface p-3 cushion-field transition hover:-translate-y-0.5"
+              >
+                <TeamLogo team={spot.team} size={40} className="rounded-[12px] bg-surface-2 p-1" />
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-black text-ink">{spot.team.name}</div>
+                  <div className="truncate text-xs font-bold text-muted">
+                    {[roleLabel(spot.role) ?? "роль не задана", spot.division?.short ?? spot.division?.name]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Все места в составах: у действующего игрока оно одно, у замены и тренера может быть несколько */}
       {player.spots.map((spot) => (
         <section key={spot.id}>
@@ -194,14 +231,19 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
             <Link href={`/roster/teams/${spot.team.id}`} className="text-sm font-medium text-ink-muted hover:text-[var(--purple)]">
               {spot.team.name}
             </Link>
-            <span className="text-xs text-ink-subtle">
-              {/* Состав сезонный: подписываем место турниром и дивизионом, а не текущей группой команды */}
-              {[
-                roleLabel(spot.role) ?? "роль не задана",
-                spot.division && `${spot.division.tournament.short ?? spot.division.tournament.name} · ${spot.division.short ?? spot.division.name}`,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
+            {/* Турнир и роль — отдельными плашками, а не строкой через точки: состав сезонный, и
+                «в каком турнире и на какой роли» — первое, что с этой строки читают. */}
+            <span className="flex flex-wrap items-center gap-1.5">
+              <Chip>{roleLabel(spot.role) ?? "роль не задана"}</Chip>
+              {spot.division ? (
+                <Chip>
+                  {spot.division.tournament.short ?? spot.division.tournament.name}
+                  <span className="ml-1 text-ink-subtle">{spot.division.short ?? spot.division.name}</span>
+                </Chip>
+              ) : (
+                <Chip>вне турнира</Chip>
+              )}
+              {spot.isCaptain && <Chip>капитан</Chip>}
             </span>
           </div>
 

@@ -337,9 +337,11 @@ export async function getPlayerProfile(key: string | number) {
       .map(async ({ team, ...spot }) => ({
         ...spot,
         team: await withTeamUploads(team),
+        // Состав того же турнира, что и само место: `team.roster` держит места всех сезонов разом,
+        // и без этого фильтра рядом с местом S2 стояли и игроки S3 — один и тот же человек дважды.
         teammates: await Promise.all(
           team.roster
-            .filter((m) => m.playerId !== player.id)
+            .filter((m) => m.playerId !== player.id && m.divisionId === spot.divisionId)
             .sort((a, b) => roleOrder(a.role) - roleOrder(b.role) || a.player.nickname.localeCompare(b.player.nickname))
             .map(async (m) => ({ ...(await withPlayerUploads(m.player)), role: m.role, isCaptain: m.isCaptain })),
         ),

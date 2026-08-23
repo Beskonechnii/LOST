@@ -213,6 +213,68 @@ export function rosterKey(key: string | number): { id: number } | { slug: string
   return Number.isInteger(id) && id > 0 ? { id } : { slug: String(key).trim() };
 }
 
+/**
+ * История составов команды по турнирам. Состав сезонный (`RosterSpot.divisionId`), поэтому у команды,
+ * прожившей два сезона, лежат два разных состава — карточка показывает текущий сверху, прошлые ниже.
+ *
+ * Дивизионы текущего турнира сюда не попадают (их показывает блок «Основа»), места без дивизиона —
+ * тоже: это состав команды вне турниров, он и есть текущий.
+ *
+ * Итог участия берём из снимка таблицы (`GroupEntry`): место и группа. Считать его заново по сериям
+ * прошлого сезона незачем — карточка не таблица, а подпись «где команда закончила».
+ */
+export async function teamRosterHistory(teamId: number) {
+  const currentIds = (await getDivisions()).map((d) => d.id);
+  const spots = await prisma.rosterSpot.findMany({
+    where: { teamId, divisionId: { not: null, notIn: currentIds } },
+    include: {
+      player: true,
+      division: { include: { tournament: true } },
+    },
+  });
+  if (spots.length === 0) return [];
+
+  const divisionIds = [...new Set(spots.map((s) => s.divisionId!))];
+  const places = await prisma.groupEntry.findMany({
+    where: { teamId, divisionId: { in: divisionIds } },
+    select: { divisionId: true, group: true, place: true },
+  });
+  const placeBy = new Map(places.map((p) => [p.divisionId, p]));
+
+  const byDivision = new Map<number, typeof spots>();
+  for (const spot of spots) {
+    const list = byDivision.get(spot.divisionId!) ?? [];
+    list.push(spot);
+    byDivision.set(spot.divisionId!, list);
+  }
+
+  const seasons = await Promise.all(
+    [...byDivision.entries()].map(async ([divisionId, list]) => {
+      const division = list[0].division!;
+      return {
+        divisionId,
+        division: { slug: division.slug, name: division.name, label: division.label },
+        tournament: {
+          slug: division.tournament.slug,
+          name: division.tournament.name,
+          short: division.tournament.short,
+          startAt: division.tournament.startAt,
+        },
+        result: placeBy.get(divisionId) ?? null,
+        players: await Promise.all([...list].sort(byRole).map(toRosterMember)),
+      };
+    }),
+  );
+
+  // Свежие сезоны сверху: у турнира без даты старта порядок по id дивизиона — тоже «позже завели».
+  return seasons.sort(
+    (a, b) =>
+      (b.tournament.startAt?.getTime() ?? 0) - (a.tournament.startAt?.getTime() ?? 0) || b.divisionId - a.divisionId,
+  );
+}
+
+export type TeamSeasonRoster = Awaited<ReturnType<typeof teamRosterHistory>>[number];
+
 /** Всё для страницы команды: картинки, состав и агрегаты по MMR. */
 export async function getTeamProfile(key: string | number) {
   const team = await prisma.team.findUnique({

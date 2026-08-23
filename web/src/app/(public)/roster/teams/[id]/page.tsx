@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTeamProfile, type RosterMember } from "@/lib/roster-data";
+import { getTeamProfile, teamRosterHistory, type RosterMember, type TeamSeasonRoster } from "@/lib/roster-data";
 import { getStandings } from "@/lib/standings";
 import { teamDivision } from "@/lib/tournaments";
 import { teamAccent, teamTag } from "@/lib/profiles";
@@ -23,9 +23,11 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
   // Таблицу берём по дивизиону команды в текущем турнире — тому же, что показывает его раздел.
   // Команда вне турнира (например, из прошлого сезона) таблицы не получает — это не ошибка.
   const division = await teamDivision(team.id);
-  const [standings, authed] = await Promise.all([
+  const [standings, authed, history] = await Promise.all([
     division ? getStandings(division.id) : Promise.resolve([]),
     can("roster.edit"),
+    // Состав сезонный, поэтому у команды, прожившей не один турнир, есть прошлые составы.
+    teamRosterHistory(team.id),
   ]);
 
   const accent = teamAccent(team);
@@ -132,7 +134,53 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
         empty="Основа не заведена."
       />
       {staff.length > 0 && <RosterSection title="Штаб" players={staff} accent={accent} empty="" />}
+
+      {/* Составы других турниров: по одному блоку на турнир, свежие сверху. Свёрнуты — на карточке
+          в первую очередь смотрят состав текущего турнира, остальные нужны реже. Заголовок не
+          «прошлые»: сюда попадает и уже заявленный состав следующего сезона. */}
+      {history.length > 0 && (
+        <section className="space-y-3">
+          <Eyebrow>Составы в других турнирах</Eyebrow>
+          {history.map((season) => (
+            <SeasonRoster key={season.divisionId} season={season} accent={accent} />
+          ))}
+        </section>
+      )}
     </div>
+  );
+}
+
+/** Состав команды в прошлом турнире: шапка с турниром, дивизионом и итогом, внутри — игроки с ролями. */
+function SeasonRoster({ season, accent }: { season: TeamSeasonRoster; accent: string }) {
+  const { tournament, division, result, players } = season;
+  return (
+    <details className="rounded-card bg-surface px-4 py-3 cushion-field">
+      <summary className="flex cursor-pointer flex-wrap items-center gap-2 text-sm font-black text-ink">
+        <Link href={`/tournaments/${tournament.slug}`} className="hover:text-[var(--purple)]">
+          {tournament.short ?? tournament.name}
+        </Link>
+        <span className="text-xs font-bold text-ink-muted">{division.label ?? division.name}</span>
+        {result?.place ? (
+          <span className="text-xs font-bold text-ink-subtle">
+            группа {result.group} · {result.place} место
+          </span>
+        ) : null}
+        <span className="text-xs font-bold text-ink-subtle">{players.length} игрок(ов)</span>
+      </summary>
+
+      <ul className="mt-3 space-y-1">
+        {players.map((p) => (
+          <li key={p.id} className="flex flex-wrap items-center gap-2 text-xs text-ink-muted">
+            <Link href={`/roster/players/${p.id}`} className="font-bold text-ink hover:text-[var(--purple)]">
+              {p.nickname}
+            </Link>
+            {p.isCaptain && <span className="font-black" style={{ color: accent }}>C</span>}
+            <span>{roleLabel(p.role) ?? "роль не задана"}</span>
+            {p.mmr && <span className="text-ink-subtle">{p.mmr} MMR</span>}
+          </li>
+        ))}
+      </ul>
+    </details>
   );
 }
 

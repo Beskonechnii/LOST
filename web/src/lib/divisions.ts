@@ -1,19 +1,34 @@
-// Дивизионы лиги — один справочник для навигации, маршрутов /standings/<slug> и разделения ростера.
-// slug живёт в URL (d1/d2); name — как дивизион записан в Team.group и в *.division ("Division 1"),
-// поэтому одно значение связывает адрес, таблицу и групповую стадию.
+// Дивизионы лиги — чистый справочник: тип и хелперы поверх списка. Раньше здесь лежал сам список
+// константой, теперь дивизионы живут в БД (модель `Division` турнира), а список приходит из
+// src/lib/tournaments.ts — серверного модуля, который и знает, какой турнир текущий.
+//
+// Почему модуль всё-таки остался: DIVISIONS читали и клиентские компоненты (вкладки ростера,
+// карточки команд), а тянуть в них БД нельзя. Список им передаётся пропом, а разбор («какой
+// дивизион по слагу из URL») остаётся общим для сервера и клиента — как roles.ts и stages.ts.
 
-export type Division = { slug: string; name: string; label: string; short: string };
-
-/** Порядок массива = порядок вкладок в навигации и блоков в ростере. */
-export const DIVISIONS: Division[] = [
-  { slug: "d1", name: "Division 1", label: "LOST D1", short: "D1" },
-  { slug: "d2", name: "Division 2", label: "LOST D2", short: "D2" },
-];
+export type Division = {
+  /** id строки в БД; нужен формам админки, витринам — нет. */
+  id: number;
+  /** живёт в URL: /tournaments/<турнир>/d1 */
+  slug: string;
+  /** «Division 1» — то же значение, что в Team.group и Series.division */
+  name: string;
+  /** «LOST D1» — подпись раздела */
+  label: string;
+  /** «D1» — короткая подпись вкладки */
+  short: string;
+  /** Вылетают ли последние из группы (см. qualification.ts). */
+  relegation: boolean;
+};
 
 /** Дивизион по слагу из URL — null, если такого нет (роут отдаёт notFound). */
-export const divisionBySlug = (slug: string): Division | null =>
-  DIVISIONS.find((d) => d.slug === slug) ?? null;
+export const divisionBySlug = (list: Division[], slug: string): Division | null =>
+  list.find((d) => d.slug === slug) ?? null;
 
-/** Слаг по имени дивизиона (из Team.group). Неизвестное имя → первый дивизион. */
-export const divisionSlug = (name: string | null | undefined): string =>
-  DIVISIONS.find((d) => d.name === name)?.slug ?? DIVISIONS[0].slug;
+/** Слаг по имени дивизиона (из Team.group). Неизвестное имя → первый дивизион списка. */
+export const divisionSlug = (list: Division[], name: string | null | undefined): string =>
+  list.find((d) => d.name === name)?.slug ?? list[0]?.slug ?? "d1";
+
+/** Имя дивизиона по слагу; null — слаг чужой. Обратное к `divisionSlug`. */
+export const divisionName = (list: Division[], slug: string | null | undefined): string | null =>
+  list.find((d) => d.slug === slug)?.name ?? null;

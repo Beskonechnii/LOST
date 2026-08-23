@@ -200,7 +200,7 @@ function AwardSheet({ players, open, onOpenChange, onSaved }: {
   );
 }
 
-export function TpAdmin({ players }: { players: Row[] }) {
+export function TpAdmin({ players, title = "TP" }: { players: Row[]; title?: string }) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [only, setOnly] = useState<"all" | "scored">("scored");
@@ -221,7 +221,7 @@ export function TpAdmin({ players }: { players: Row[] }) {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <Eyebrow>Служебная часть · зачёт</Eyebrow>
-          <Heading level={1}>TP</Heading>
+          <Heading level={1}>{title}</Heading>
         </div>
         <div className="flex flex-wrap items-center gap-4">
           <Text size="sm" muted>

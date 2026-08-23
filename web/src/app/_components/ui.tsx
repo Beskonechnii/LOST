@@ -14,14 +14,16 @@ import { Badge } from "@/components/ui/badge";
  */
 export const SITE_MAX_W = "max-w-[96rem]";
 
-/** Надпись-категория над заголовком секции: 11px, uppercase, положительный трекинг. */
+/** Надпись-категория над заголовком секции: uppercase, положительный трекинг, шрифт pouf.
+    Визуал 1st-Pouf — единый eyebrow на весь сайт (совпадает с pouf Eyebrow). */
 export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <p className={`text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-subtle ${className}`}>{children}</p>
+    <p className={`font-pouf text-[13px] font-extrabold uppercase tracking-[2px] text-muted ${className}`}>{children}</p>
   );
 }
 
-/** Шапка секции: eyebrow + заголовок слева, счётчик/действие справа. */
+/** Шапка секции: eyebrow + заголовок слева, счётчик/действие справа.
+    Заголовок — крупный жирный Nunito в духе pouf Heading. */
 export function SectionHeader({
   eyebrow,
   title,
@@ -32,30 +34,32 @@ export function SectionHeader({
   aside?: ReactNode;
 }) {
   return (
-    <div className="flex items-end justify-between gap-3">
+    <div className="flex items-end justify-between gap-3 font-pouf">
       <div className="min-w-0">
         {eyebrow && <Eyebrow className="mb-2">{eyebrow}</Eyebrow>}
-        <h1 className="text-2xl font-bold tracking-tight text-ink md:text-[28px]">{title}</h1>
+        <h1 className="text-[28px] font-black leading-[1.2] tracking-[-0.5px] text-ink md:text-4xl">{title}</h1>
       </div>
-      {aside && <div className="shrink-0 pb-1 text-sm text-ink-subtle">{aside}</div>}
+      {aside && <div className="shrink-0 pb-1 font-pouf text-sm font-bold text-muted">{aside}</div>}
     </div>
   );
 }
 
-/** Небольшой чип-метка (роль, тег, статус). База — shadcn Badge; вид LOST задаём поверх:
-    капсула rounded-full, surface-2, приглушённый текст, 10px. */
+/** Небольшой чип-метка (роль, тег, статус). Тихая «подушка»-капсула в стиле pouf:
+    поверхность с внутренним cushion-field, без пастельной заливки — чтобы много чипов
+    в ряду не кричали, но читались как один набор с остальным визуалом. */
 export function Chip({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <Badge
       variant="secondary"
-      className={`gap-1 rounded-full border-hairline bg-surface-2 px-2 py-0.5 text-[10px] font-medium text-ink-muted ${className}`}
+      className={`gap-1 rounded-pill border-none bg-surface-2 px-3 py-1 font-pouf text-[11px] font-bold text-ink-muted cushion-field ${className}`}
     >
       {children}
     </Badge>
   );
 }
 
-/** Плитка показателя: подпись сверху, крупное число, опциональная сноска. */
+/** Плитка показателя: подпись сверху, крупное число, опциональная сноска.
+    «Подушка» pouf: поверхность с cushion-card, крупное жирное число Nunito. */
 export function StatTile({
   label,
   value,
@@ -72,13 +76,15 @@ export function StatTile({
 }) {
   return (
     <div
-      className={`rounded-xl border px-3.5 py-3 ${
-        accent ? "border-accent/25 bg-accent/10" : "border-hairline bg-surface-1"
+      className={`rounded-blob px-4 pb-[calc(0.75rem+5px)] pt-[calc(0.75rem-5px)] font-pouf ${
+        accent
+          ? "bg-purple text-[var(--on-accent)] cushion-control"
+          : "bg-surface-1 cushion-card"
       }`}
     >
-      <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-subtle">{label}</div>
-      <div className={`mt-0.5 text-xl font-extrabold tabular-nums tracking-tight ${valueClass}`}>{value}</div>
-      {hint && <div className="mt-0.5 text-xs text-ink-subtle">{hint}</div>}
+      <div className={`text-[11px] font-extrabold uppercase tracking-[1px] ${accent ? "text-[var(--on-accent-muted)]" : "text-muted"}`}>{label}</div>
+      <div className={`mt-1 text-2xl font-black tabular-nums tracking-[-0.5px] ${accent ? "" : valueClass}`}>{value}</div>
+      {hint && <div className={`mt-0.5 text-xs font-bold ${accent ? "text-[var(--on-accent-muted)]" : "text-muted"}`}>{hint}</div>}
     </div>
   );
 }
@@ -89,9 +95,9 @@ export function StatTile({
  */
 export function Meter({ pct, className = "" }: { pct: number; className?: string }) {
   return (
-    <div className={`h-1 overflow-hidden rounded-full bg-surface-3 ${className}`}>
+    <div className={`h-[6px] overflow-hidden rounded-pill bg-surface-3 ${className}`}>
       <div
-        className="h-full rounded-full bg-gradient-to-r from-accent to-accent-bright"
+        className="h-full rounded-pill bg-purple [box-shadow:inset_0_-2px_0_rgba(0,0,0,0.15)]"
         style={{ width: `${Math.max(0, Math.min(100, pct))}%` }}
       />
     </div>

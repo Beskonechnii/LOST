@@ -32,8 +32,8 @@ function roll(): Record<Attr, LocalHero | null> {
 
 function HeroCard({ attr, hero }: { attr: (typeof ATTRS)[number]; hero: LocalHero | null }) {
   return (
-    <div className="flex flex-col overflow-hidden rounded-2xl border border-hairline bg-surface-1">
-      <div className={`border-b px-4 py-2 text-xs font-semibold uppercase tracking-[0.1em] ${attr.accent}`}>
+    <div className="flex flex-col overflow-hidden rounded-card bg-surface font-pouf cushion-card">
+      <div className={`border-b border-hairline px-4 py-2.5 text-xs font-black uppercase tracking-[0.1em] ${attr.accent}`}>
         {attr.label}
       </div>
       <div className="flex flex-col items-center gap-3 px-4 py-6">
@@ -72,11 +72,11 @@ export function SingleDraft() {
   useEffect(() => reroll(), [reroll]);
 
   return (
-    <div className="mt-8">
+    <div className="mt-8 font-pouf">
       <button
         type="button"
         onClick={reroll}
-        className="rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-accent/90"
+        className="rounded-control bg-purple px-6 py-[14px] text-[15px] font-black text-[var(--on-accent)] cushion-control transition-[box-shadow,transform] active:translate-y-0.5 active:cushion-control-active"
       >
         🎲 Перекрутить
       </button>

@@ -58,7 +58,7 @@ export type Subject = {
   totals: Totals;
 };
 
-export type LeadersFilter = { division?: string; stage?: Stage; group?: string; bracket?: Bracket };
+export type LeadersFilter = { divisionId?: number; stage?: Stage; group?: string; bracket?: Bracket };
 
 /**
  * Метрика рейтинга. `sum` — «за турнир», `avg` — «за карту»: у команд, сыгравших разное число карт,
@@ -144,7 +144,7 @@ export async function getLeaders(filter: LeadersFilter = {}): Promise<LeadersDat
     where: {
       match: {
         // Карта без серии в рейтинг не идёт: у неё нет ни дивизиона, ни стадии.
-        series: { is: { division: filter.division, stage: filter.stage, group: filter.group, bracket: filter.bracket } },
+        series: { is: { divisionId: filter.divisionId, stage: filter.stage, group: filter.group, bracket: filter.bracket } },
       },
     },
     select: {

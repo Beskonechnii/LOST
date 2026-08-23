@@ -16,13 +16,17 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { getStandings, type StandingGroup } from "@/lib/standings";
 import { QUALIFICATION, qualificationOf, type Qualification } from "@/lib/qualification";
-import { DIVISIONS, divisionBySlug } from "@/lib/divisions";
+import { divisionBySlug } from "@/lib/divisions";
+import { listDivisions } from "@/lib/tournaments";
 
 const args = process.argv.slice(2);
 const outDir = path.resolve(process.cwd(), argValue("--out") ?? "dist/standings");
 const light = args.includes("--light");
 // Какой дивизион собирать: --div d1|d2 (по умолчанию первый).
-const division = (argValue("--div") && divisionBySlug(argValue("--div")!)) || DIVISIONS[0];
+// Дивизионы теперь в БД (турнир), поэтому справочник читаем, а не берём из константы.
+const divisions = await listDivisions();
+const division = (argValue("--div") && divisionBySlug(divisions, argValue("--div")!)) || divisions[0];
+if (!division) throw new Error("В базе нет ни одного дивизиона — заведите турнир (см. TOURNAMENTS-PLAN.md)");
 
 function argValue(flag: string): string | null {
   const i = args.indexOf(flag);
@@ -82,7 +86,7 @@ function tableFor(g: StandingGroup): string {
   const rows = g.rows
     .map((r, i) => {
       const place = r.place ?? i + 1;
-      const zone = qualificationOf(place, g.rows.length, division.name);
+      const zone = qualificationOf(place, g.rows.length, division.relegation);
       const color = ZONE_COLOR[zone];
       // Команда — просто текст, без ссылки: в статике страниц команд нет,
       // а битая ссылка хуже её отсутствия.
@@ -150,7 +154,7 @@ ${groups.map(tableFor).join("\n")}
 }
 
 async function main() {
-  const groups = await getStandings(division.name);
+  const groups = await getStandings(division.id);
   if (groups.length === 0) {
     console.error(`В базе нет команд дивизиона ${division.name} — сначала залей ростер (см. CLAUDE.md §7).`);
     process.exit(1);

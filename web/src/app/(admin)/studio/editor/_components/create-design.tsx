@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/pouf/Button";
 import { FORMAT_PRESETS } from "@/studio/editor/model";
 
 // Создание новой публикации → POST /api/studio/designs → переход в редактор.
@@ -29,7 +29,7 @@ export function CreateDesign() {
   }
 
   return (
-    <Button type="button" disabled={busy} onClick={() => void create()}>
+    <Button type="button" loading={busy} onClick={() => void create()}>
       + Создать публикацию
     </Button>
   );

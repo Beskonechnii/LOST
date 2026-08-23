@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { getLeaders, METRICS, type Subject } from "@/lib/leaders";
-import { DIVISIONS } from "@/lib/divisions";
+import { getDivisions } from "@/lib/tournaments";
 import { isStage } from "@/lib/stages";
 import { Eyebrow } from "@/app/_components/ui";
+import { denyUnlessPermission } from "../../_components/permission-gate";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Показатели" };
@@ -32,26 +33,26 @@ function Board({ label, hint, rows, decimals, perLabel }: {
   perLabel?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-hairline bg-surface-1 p-4">
+    <div className="rounded-card bg-surface p-4 cushion-card">
       <div className="mb-3">
-        <div className="font-semibold text-ink">{label}</div>
-        <div className="text-xs text-ink-subtle">{hint}</div>
+        <div className="font-black text-ink">{label}</div>
+        <div className="text-xs font-bold text-muted">{hint}</div>
       </div>
       {rows.length === 0 ? (
-        <p className="text-sm text-ink-subtle">Нет данных.</p>
+        <p className="text-sm font-bold text-muted">Нет данных.</p>
       ) : (
         <ol className="space-y-1.5">
           {rows.map((r, i) => (
             <li key={`${r.name}-${i}`} className="flex items-center gap-2 text-sm">
-              <span className={`w-4 shrink-0 text-right text-xs tabular-nums ${i === 0 ? "font-bold text-accent-bright" : "text-ink-subtle"}`}>{i + 1}</span>
+              <span className={`w-4 shrink-0 text-right text-xs tabular-nums ${i === 0 ? "font-black text-[var(--purple)]" : "text-ink-subtle"}`}>{i + 1}</span>
               <span className="min-w-0 flex-1 truncate">
-                <span className="text-ink">{r.name}</span>
-                {r.tag && <span className="ml-1 text-xs text-ink-subtle">{r.tag}</span>}
+                <span className="font-bold text-ink">{r.name}</span>
+                {r.tag && <span className="ml-1 text-xs text-muted">{r.tag}</span>}
               </span>
               <span className="shrink-0 text-right tabular-nums">
-                <span className="font-semibold text-ink">{fmt(r.value, decimals)}</span>
+                <span className="font-black text-ink">{fmt(r.value, decimals)}</span>
                 {r.per !== undefined && perLabel && (
-                  <span className="ml-1 text-xs text-ink-subtle">{fmt(r.per, decimals ? decimals : 1)} {perLabel}</span>
+                  <span className="ml-1 text-xs text-muted">{fmt(r.per, decimals ? decimals : 1)} {perLabel}</span>
                 )}
               </span>
             </li>
@@ -63,12 +64,16 @@ function Board({ label, hint, rows, decimals, perLabel }: {
 }
 
 export default async function AdminStatsPage({ searchParams }: { searchParams: Promise<Query> }) {
+  const denied = await denyUnlessPermission("tools", "Показатели");
+  if (denied) return denied;
+
   const q = await searchParams;
-  const division = DIVISIONS.find((d) => d.slug === q.div)?.name; // undefined = оба дивизиона
+  const divisions = await getDivisions();
+  const division = divisions.find((d) => d.slug === q.div)?.id; // undefined = оба дивизиона
   const stage = isStage(q.stage) ? q.stage : undefined; // undefined = вся дистанция
   const kind = q.kind === "teams" ? "teams" : "players";
 
-  const data = await getLeaders({ division, stage });
+  const data = await getLeaders({ divisionId: division, stage });
   const subjects: Subject[] = kind === "teams" ? data.teams : data.players;
 
   // Ссылка-фильтр: тот же адрес с подменённым параметром. Пустое значение убирает параметр («все»).
@@ -86,10 +91,10 @@ export default async function AdminStatsPage({ searchParams }: { searchParams: P
     <Link
       key={href}
       href={href}
-      className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+      className={`rounded-[14px] px-3.5 py-[7px] text-[13px] font-black transition-[box-shadow,transform,background] ${
         active
-          ? "bg-gradient-to-b from-accent-bright to-accent text-white shadow-[0_5px_14px_-6px_var(--color-accent)]"
-          : "border border-hairline bg-surface-1 text-ink-muted hover:border-accent/60 hover:text-ink"
+          ? "bg-purple text-[var(--on-accent)] cushion-control"
+          : "bg-surface text-ink-muted cushion-field hover:text-ink"
       }`}
     >
       {children}
@@ -97,9 +102,9 @@ export default async function AdminStatsPage({ searchParams }: { searchParams: P
   );
 
   return (
-    <main className="mx-auto w-full max-w-[96rem] flex-1 px-4 py-8 md:px-6">
+    <main className="mx-auto w-full max-w-[96rem] flex-1 px-4 py-8 font-pouf md:px-6">
       <Eyebrow className="mb-2">Служебная часть · показатели</Eyebrow>
-      <h1 className="text-2xl font-bold tracking-tight text-ink md:text-[28px]">Показатели турнира</h1>
+      <h1 className="text-[28px] font-black tracking-[-0.5px] text-ink md:text-4xl">Показатели турнира</h1>
 
       <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
         <div className="flex flex-wrap gap-2">
@@ -109,7 +114,7 @@ export default async function AdminStatsPage({ searchParams }: { searchParams: P
         <span className="text-hairline-strong">·</span>
         <div className="flex flex-wrap gap-2">
           {chip(link({ div: undefined }), !q.div, "Оба дивизиона")}
-          {DIVISIONS.map((d) => chip(link({ div: d.slug }), q.div === d.slug, d.short))}
+          {divisions.map((d) => chip(link({ div: d.slug }), q.div === d.slug, d.short))}
         </div>
         <span className="text-hairline-strong">·</span>
         <div className="flex flex-wrap gap-2">

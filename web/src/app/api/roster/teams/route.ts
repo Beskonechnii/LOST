@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { listTeams } from "@/lib/roster-data";
 import { isColor, slugify } from "@/lib/profiles";
+import { guard } from "@/lib/api-guard";
 
 export async function GET() {
   return NextResponse.json(await listTeams());
@@ -9,6 +10,8 @@ export async function GET() {
 
 // Создание команды. slug — из названия, если не задан явно; он же ключ импорта составов.
 export async function POST(req: Request) {
+  const denied = await guard("roster.edit");
+  if (denied) return denied;
   const body = (await req.json()) as { name?: string; slug?: string; tag?: string; group?: string; color?: string };
   const name = body.name?.trim();
   if (!name) return NextResponse.json({ error: "Нужно название команды" }, { status: 400 });

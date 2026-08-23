@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { bad, parseId } from "@/lib/api";
 import { normalizeDoc } from "@/studio/editor/model";
+import { guard } from "@/lib/api-guard";
 
 // Один документ редактора: GET — читать, PUT — сохранить (title + doc), DELETE — удалить.
 
@@ -14,6 +15,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 }
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("studio");
+  if (denied) return denied;
   const id = parseId((await params).id);
   if (!id) return bad("id: ожидался числовой id");
   const body = (await req.json().catch(() => ({}))) as { title?: string; doc?: unknown };
@@ -28,6 +31,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("studio");
+  if (denied) return denied;
   const id = parseId((await params).id);
   if (!id) return bad("id: ожидался числовой id");
   const { count } = await prisma.design.deleteMany({ where: { id } });

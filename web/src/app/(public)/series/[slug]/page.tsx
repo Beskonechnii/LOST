@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Icon, TeamCrest } from "@/app/_components/postgame/blocks";
 import { Eyebrow } from "@/app/_components/ui";
 import { BackButton } from "@/app/_components/back-button";
-import { divisionSlug } from "@/lib/divisions";
+import { divisionWithTournament } from "@/lib/tournaments";
 import { getSeriesDetail, type GamePlayer, type SeriesDetail, type SeriesGameDetail } from "@/lib/series";
 import { playoffLabel, stageLabel } from "@/lib/stages";
 
@@ -116,11 +116,11 @@ function GameCard({ game, home, away }: { game: SeriesGameDetail; home: Team; aw
     : away.id;
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-hairline bg-surface-1 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-26px_rgba(0,0,0,0.9)]">
+    <section className="overflow-hidden rounded-card bg-surface font-pouf cushion-card">
       <div className="flex flex-wrap items-center gap-3 border-b border-hairline bg-surface-2 px-4 py-2.5">
-        <span className="text-sm font-bold text-ink-muted">#{game.gameNumber ?? "?"}</span>
+        <span className="text-sm font-black text-ink-muted">#{game.gameNumber ?? "?"}</span>
         {game.openDotaMatchId && (
-          <Link href={`/match/${game.openDotaMatchId}`} className="text-xs text-accent-bright hover:underline">
+          <Link href={`/match/${game.openDotaMatchId}`} className="text-xs font-bold text-[var(--purple)] hover:underline">
             {game.openDotaMatchId}
           </Link>
         )}
@@ -150,31 +150,33 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
   const s = await getSeriesDetail(slug);
   if (!s) notFound();
 
-  const div = divisionSlug(s.division);
+  // Раздел дивизиона живёт внутри турнира, поэтому ссылку строим по самому дивизиону встречи.
+  const division = s.divisionId ? await divisionWithTournament(s.divisionId) : null;
+  const divHref = division ? `/tournaments/${division.tournament.slug}/${division.slug}` : "/tournaments";
   const winner = s.homeScore > s.awayScore ? s.home.id : s.awayScore > s.homeScore ? s.away.id : null;
   const bo = s.homeScore + s.awayScore <= 1 ? "Bo1" : "Bo3";
 
   return (
-    <main className="flex-1 p-4 md:p-8">
+    <main className="flex-1 p-4 font-pouf md:p-8">
       {/* Уже, чем остальной сайт (SITE_MAX_W), намеренно: это читательская страница одной встречи —
           счёт и составы по карте. На всю ширину экрана строки состава растянулись бы некрасиво. */}
       <div className="mx-auto max-w-6xl space-y-4">
-        <BackButton fallback={`/standings/${div}`} />
+        <BackButton fallback={divHref} />
 
         {/* Шапка встречи: крошки разреза + счёт серии одной карточкой с мягкой тенью */}
-        <div className="overflow-hidden rounded-2xl border border-hairline shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_18px_50px_-28px_rgba(0,0,0,0.9)]">
+        <div className="overflow-hidden rounded-card bg-surface cushion-card">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline bg-surface-2 px-4 py-2.5">
             <div className="flex flex-wrap items-center gap-2 text-sm">
-              <Link href={`/standings/${div}`} className="font-medium text-accent-bright hover:underline">
+              <Link href={divHref} className="font-black text-[var(--purple)] hover:underline">
                 {s.division}
               </Link>
               <span className="text-ink-subtle">·</span>
-              <span className="text-ink-muted">{cutLabel(s)}</span>
+              <span className="font-bold text-ink-muted">{cutLabel(s)}</span>
             </div>
-            <span className="text-xs text-ink-subtle">{s.slug}</span>
+            <span className="text-xs font-bold text-muted">{s.slug}</span>
           </div>
 
-          <div className="bg-surface-1 p-5">
+          <div className="p-5">
             <div className="flex items-center gap-4">
               <SeriesSide team={s.home} winnerId={winner} align="left" />
               <div className="shrink-0 text-center">
@@ -197,7 +199,7 @@ export default async function SeriesPage({ params }: { params: Promise<{ slug: s
         <Eyebrow className="pt-2 text-ink-muted">Карты</Eyebrow>
 
         {s.games.length === 0 && (
-          <p className="rounded-lg border border-dashed border-hairline p-6 text-sm text-ink-muted">
+          <p className="rounded-card bg-surface p-6 text-sm font-bold text-muted cushion-field">
             К этой встрече ещё не привязано ни одной карты — известен только счёт серии.
           </p>
         )}

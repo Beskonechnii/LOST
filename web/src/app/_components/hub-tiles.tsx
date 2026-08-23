@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { Eyebrow } from "./ui";
+import { Card } from "@/components/pouf/surface";
+import { Heading } from "@/components/pouf/text";
+import { Badge } from "@/components/pouf/media";
 
 // Плитки-хаб раздела: вместо ряда вкладок — карточки с иконкой, названием и одной строкой описания.
 // Один вид для админки и продукта («архивный» pouf: surface-1, мягкая тень, подъём на hover),
@@ -14,6 +17,42 @@ const COLS: Record<number, string> = {
   4: "sm:grid-cols-2 lg:grid-cols-4",
 };
 
+/** Сама сетка карточек — общая для плоского хаба и для хаба, разбитого на блоки. */
+function TileGrid({ tiles, cols }: { tiles: HubTile[]; cols: 2 | 3 | 4 }) {
+  return (
+    <div className={`grid gap-4 ${COLS[cols]}`}>
+      {tiles.map((t) => (
+          <Link key={t.href} href={t.href} className="group block">
+            <Card motion="lift">
+              <div className="flex items-start gap-3">
+                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-purple text-xl text-[var(--on-accent)] cushion-blob">
+                  <span className="[transform:translateY(-1px)]">{t.icon}</span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <Heading level={3}>{t.label}</Heading>
+                    {t.soon && <Badge tone="warn">в разработке</Badge>}
+                  </div>
+                  <p className="mt-1 text-sm font-bold text-muted">{t.desc}</p>
+                </div>
+              </div>
+            </Card>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+/** Заголовок хаба — общая шапка обоих вариантов. */
+function HubHead({ eyebrow, title }: { eyebrow: string; title: string }) {
+  return (
+    <>
+      <Eyebrow className="mb-2">{eyebrow}</Eyebrow>
+      <h1 className="text-[28px] font-black leading-[1.2] tracking-[-0.5px] text-ink md:text-4xl">{title}</h1>
+    </>
+  );
+}
+
 export function HubTiles({
   eyebrow,
   title,
@@ -26,32 +65,46 @@ export function HubTiles({
   cols?: 2 | 3 | 4;
 }) {
   return (
-    <>
-      <Eyebrow className="mb-2">{eyebrow}</Eyebrow>
-      <h1 className="text-2xl font-bold tracking-tight text-ink md:text-[28px]">{title}</h1>
-
-      <div className={`mt-6 grid gap-4 ${COLS[cols]}`}>
-        {tiles.map((t) => (
-          <Link
-            key={t.href}
-            href={t.href}
-            className="group flex items-start gap-3 rounded-2xl border border-hairline bg-surface-1 p-5 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-26px_rgba(0,0,0,0.9)] transition duration-200 hover:-translate-y-0.5 hover:border-accent/50 hover:bg-surface-2"
-          >
-            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-surface-2 text-xl">{t.icon}</div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-ink">{t.label}</span>
-                {t.soon && (
-                  <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] text-amber-300">
-                    в разработке
-                  </span>
-                )}
-              </div>
-              <p className="mt-1 text-sm text-ink-muted">{t.desc}</p>
-            </div>
-          </Link>
-        ))}
+    <div className="font-pouf">
+      <HubHead eyebrow={eyebrow} title={title} />
+      <div className="mt-6">
+        <TileGrid tiles={tiles} cols={cols} />
       </div>
-    </>
+    </div>
+  );
+}
+
+export type HubGroup = { title: string; tiles: HubTile[] };
+
+/**
+ * Тот же хаб, но плитки разложены по блокам с подписью. Нужен там, где инструментов больше десятка:
+ * плоской сеткой уже не видно, что к чему относится. Пустые блоки (все плитки срезаны правами) не рисуем.
+ */
+export function HubGroupedTiles({
+  eyebrow,
+  title,
+  groups,
+  cols = 3,
+}: {
+  eyebrow: string;
+  title: string;
+  groups: HubGroup[];
+  cols?: 2 | 3 | 4;
+}) {
+  return (
+    <div className="font-pouf">
+      <HubHead eyebrow={eyebrow} title={title} />
+
+      <div className="mt-8 space-y-8">
+        {groups
+          .filter((g) => g.tiles.length > 0)
+          .map((g) => (
+            <section key={g.title}>
+              <h2 className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-muted">{g.title}</h2>
+              <TileGrid tiles={g.tiles} cols={cols} />
+            </section>
+          ))}
+      </div>
+    </div>
   );
 }

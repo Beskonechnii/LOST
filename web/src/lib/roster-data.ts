@@ -2,6 +2,7 @@
 // Пишет — только API-роуты (/api/studio/*), здесь только выборки.
 
 import { prisma } from "@/lib/prisma";
+import { getDivisions } from "@/lib/tournaments";
 import { playerAccountId } from "@/lib/profiles";
 import { rolePosition, roleOrder } from "@/lib/roles";
 import { withPlayerUploads, withTeamUploads } from "@/lib/uploads";
@@ -40,11 +41,34 @@ export type TeamCard = {
   lineup: { accountId: string; nickname: string }[];
 };
 
-export async function listTeams(): Promise<TeamCard[]> {
+/**
+ * Фильтр состава по сезону. Состав принадлежит дивизиону турнира (`RosterSpot.divisionId`), поэтому
+ * витрины показывают состав ТЕКУЩЕГО турнира; места без дивизиона (команды вне турнира, старые
+ * записи) показываем всегда — иначе команда, ни в чём не участвующая, выглядела бы пустой.
+ *
+ * Историю прошлых сезонов это не прячет: она осталась в местах с их дивизионом и видна на странице
+ * игрока, где показаны все его места с подписью турнира.
+ */
+export async function seasonRosterWhere(divisionIds?: number[]) {
+  const ids = divisionIds ?? (await getDivisions()).map((d) => d.id);
+  if (ids.length === 0) return undefined;
+  return { OR: [{ divisionId: { in: ids } }, { divisionId: null }] };
+}
+
+/**
+ * Команды турнира. `divisionIds` — дивизионы того турнира, чью витрину рисуем: команда попадает в
+ * список по участию (`TournamentEntry`), а не по строке-зеркалу `Team.group`. Без него список был
+ * бы общим для всех сезонов сразу — ровно то, из-за чего ростер нового турнира показывал чужие
+ * команды. Без аргумента (студия, драфт) — весь ростер лиги, как раньше.
+ */
+export async function listTeams(divisionIds?: number[]): Promise<TeamCard[]> {
+  const where = await seasonRosterWhere(divisionIds);
   const teams = await prisma.team.findMany({
+    where: divisionIds ? { entries: { some: { divisionId: { in: divisionIds } } } } : undefined,
     orderBy: [{ group: "asc" }, { name: "asc" }],
     include: {
       roster: {
+        where,
         select: {
           role: true,
           player: {
@@ -153,17 +177,23 @@ async function withRoster<T extends { slug: string; logo: string | null; wordmar
  * Список команд вместе с составами — для карточек на /roster/teams, которые разворачиваются
  * прямо в списке. Отдельно от listTeams(): там состав не нужен, а тут без него нечего показывать.
  */
-export async function listTeamRosters(): Promise<TeamWithRoster[]> {
+/** То же, что `listTeams`, но с полным составом — витрина команд турнира. */
+export async function listTeamRosters(divisionIds?: number[]): Promise<TeamWithRoster[]> {
+  const where = await seasonRosterWhere(divisionIds);
   const teams = await prisma.team.findMany({
+    where: divisionIds ? { entries: { some: { divisionId: { in: divisionIds } } } } : undefined,
     orderBy: [{ group: "asc" }, { name: "asc" }],
-    include: { roster: { include: { player: true } } },
+    include: { roster: { where, include: { player: true } } },
   });
   return Promise.all(teams.map(({ roster, ...t }) => withRoster(t, roster)));
 }
 
 /** Всё для страницы команды: картинки, состав и агрегаты по MMR. */
 export async function getTeamProfile(id: number) {
-  const team = await prisma.team.findUnique({ where: { id }, include: { roster: { include: { player: true } } } });
+  const team = await prisma.team.findUnique({
+    where: { id },
+    include: { roster: { where: await seasonRosterWhere(), include: { player: true } } },
+  });
   if (!team) return null;
   const { roster, ...rest } = team;
   return withRoster(rest, roster);
@@ -202,7 +232,11 @@ export async function getPlayerProfile(id: number) {
     where: { id },
     include: {
       spots: {
-        include: { team: { include: { roster: { include: { player: true } } } } },
+        // Историю не режем: на странице игрока видно все его места, каждое — со своим турниром.
+        include: {
+          team: { include: { roster: { include: { player: true } } } },
+          division: { include: { tournament: true } },
+        },
         orderBy: { id: "asc" },
       },
     },
@@ -228,11 +262,18 @@ export async function getPlayerProfile(id: number) {
   return { ...(await withPlayerUploads(player)), spots };
 }
 
-export async function listPlayers() {
+/**
+ * Игроки турнира: те, у кого есть место в его дивизионах. Без аргумента — весь пул лиги (драфт,
+ * студия): там нужны все, включая тех, кто сейчас ни за кого не заявлен.
+ */
+export async function listPlayers(divisionIds?: number[]) {
+  const where = await seasonRosterWhere(divisionIds);
   const players = await prisma.player.findMany({
+    where: divisionIds ? { spots: { some: { divisionId: { in: divisionIds } } } } : undefined,
     orderBy: [{ nickname: "asc" }],
-    // slug и color нужны аватаркам-заглушкам: цвет команды выводится из слага (teamAccent)
-    include: { spots: { include: { team: { select: { id: true, slug: true, name: true, tag: true, color: true } } } } },
+    // slug и color нужны аватаркам-заглушкам: цвет команды выводится из слага (teamAccent);
+    // group — чтобы делить список по дивизиону (вкладки D1/D2/Все на /roster/players)
+    include: { spots: { where, include: { team: { select: { id: true, slug: true, name: true, tag: true, color: true, group: true } } } } },
   });
   // в списке показываем основное место (действующее, если оно есть), остальные — счётчиком
   return Promise.all(

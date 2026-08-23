@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { currentTournament, getDivisions } from "@/lib/tournaments";
 import { SITE_MAX_W } from "@/app/_components/ui";
+import { Card } from "@/components/pouf/surface";
+import { Heading, Eyebrow } from "@/components/pouf/text";
 
 // Входная дверь продукта. До этого на `/` стояло поле ввода id матча — посетитель попадал
 // в операторский инструмент и не понимал, куда пришёл. Здесь: что за лига и что тут можно сделать.
@@ -18,135 +20,91 @@ export const metadata: Metadata = {
 
 const SITE = "https://leagueofspirits.ru/lost_s1";
 
-// Акцент = идентичность секции (перенос per-product identity из HashiCorp на дивизионы).
-// Классы литеральные: Tailwind вычитывает их статически, динамические имена не соберутся.
-const ACCENT = {
-  d1: { hover: "hover:border-d1/60", cta: "text-d1-bright", rail: "bg-d1" },
-  d2: { hover: "hover:border-d2/60", cta: "text-d2-bright", rail: "bg-d2" },
-  none: { hover: "hover:border-ink-subtle/60", cta: "text-ink-muted", rail: "bg-surface-3" },
-} as const;
-
-/** Разделы продукта. Порядок тот же, что в верхней навигации, — карточки её и повторяют. */
+/**
+ * Разделы продукта. Дивизионы сюда подставляются из текущего турнира (см. ниже), а не вписаны
+ * руками: заведёшь новый сезон — карточки на лендинге сменятся сами.
+ */
 const SECTIONS = [
   {
-    href: "/standings/d1/groups",
-    title: "LOST D1",
-    text: "Первый дивизион: таблица с зонами выхода, сетка групповой стадии и плей-офф. Правка результата встречи двигает и сетку, и таблицу.",
-    cta: "Смотреть таблицу",
-    accent: "d1",
+    href: "/tournaments",
+    title: "Турниры",
+    text: "Сезоны и кубки лиги: регламент, сроки, дивизионы и заявленные составы. Отсюда — вход в таблицы конкретного дивизиона.",
+    cta: "Открыть турниры",
+    accent: "none",
   },
+  // Ростер живёт внутри турнира (состав сезонный) — ссылку достраиваем ниже, когда знаем текущий.
   {
-    href: "/standings/d2/groups",
-    title: "LOST D2",
-    text: "Второй дивизион: своя таблица, группы и плей-офф. Считается по тем же правилам, что и первый.",
-    cta: "Смотреть таблицу",
-    accent: "d2",
-  },
-  {
-    href: "/roster/teams",
+    href: "/roster",
     title: "Ростер",
-    text: "Команды дивизиона и их составы: роли, MMR основы, профили игроков со ссылками на Dotabuff и Stratz.",
+    text: "Команды турнира и их составы: роли, MMR основы, профили игроков со ссылками на Dotabuff и Stratz.",
     cta: "Открыть команды",
     accent: "none",
   },
 ] as const;
 
-export default async function Home() {
-  // Считаем прямо здесь: показать надо четыре числа, тянуть ради них выборки страниц незачем.
-  // Считаем по всей лиге, а не по одному дивизиону: на витрине цифры общие (D1 + D2).
-  const [teams, players, series, groups] = await Promise.all([
-    prisma.team.count(),
-    prisma.player.count(),
-    prisma.series.count(),
-    prisma.groupEntry.findMany({ distinct: ["division", "group"], select: { group: true } }),
-  ]);
+type Section = { href: string; title: string; text: string; cta: string; accent: string };
 
-  const stats = [
-    { value: teams, label: "команд" },
-    { value: players, label: "игроков" },
-    { value: groups.length, label: "групп" },
-    { value: series, label: "сыгранных серий" },
+export default async function Home() {
+  const current = await currentTournament();
+  const divisions = await getDivisions();
+  // Карточка на дивизион + постоянные разделы. Акцент первых двух — цвета D1/D2, дальше нейтральный.
+  const sections: Section[] = [
+    ...divisions.map((d, i) => ({
+      href: current ? `/tournaments/${current.slug}/${d.slug}/groups` : "/tournaments",
+      title: d.label,
+      text: `Таблица с зонами выхода, сетка групповой стадии и плей-офф. Правка результата встречи двигает и сетку, и таблицу.`,
+      cta: "Смотреть таблицу",
+      accent: i === 0 ? "d1" : i === 1 ? "d2" : "none",
+    })),
+    ...SECTIONS.map((x) => ({
+      ...x,
+      href: x.href === "/roster" && current ? `/tournaments/${current.slug}/roster/teams` : x.href,
+    })),
   ];
 
   return (
-    <main className="flex-1">
-      {/* Первый экран: кто мы и куда идти дальше */}
+    <main className="flex-1 font-pouf">
+      {/* Первый экран: одно название лиги */}
       <section className="relative overflow-hidden border-b border-hairline">
-        {/* фирменное свечение — акцент дивизиона D1 (наш основной бренд-фиолетовый) */}
+        {/* фирменное свечение — бренд-фиолетовый LOST */}
         <div
           aria-hidden
           className="pointer-events-none absolute -top-40 left-1/2 h-96 w-[48rem] -translate-x-1/2 rounded-full bg-gradient-to-br from-d1/25 to-d2/15 blur-3xl"
         />
         <div className={`relative mx-auto ${SITE_MAX_W} px-4 py-16 md:px-6 md:py-24`}>
-          <p className="eyebrow text-d1-bright">Dota 2 · Минск</p>
-          {/* display-тип: плотный line-height + отрицательный трекинг — «голос» системы */}
-          <h1 className="mt-4 text-5xl font-bold uppercase leading-[1.05] tracking-[-0.03em] md:text-7xl">
+          {/* Только название лиги: подзаголовки, кнопки и цифры ушли — вход в разделы ниже,
+              дублировать его первым экраном незачем.
+              display-тип: плотный line-height + отрицательный трекинг — «голос» pouf */}
+          <h1 className="text-5xl font-black uppercase leading-[1.05] tracking-[-0.03em] text-ink md:text-7xl">
             League of Spirit
           </h1>
-          <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-muted">
-            Больше чем турнир — это твоё киберспортивное комьюнити.
-          </p>
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-ink-subtle">
-            Сезонные турниры по Dota 2 с собственным кастом. Здесь живут таблица дивизиона и составы команд.
-          </p>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href="/standings/d1/groups"
-              className="rounded-md bg-d1 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-d1-bright hover:text-canvas"
-            >
-              Таблица дивизиона
-            </Link>
-            <Link
-              href="/roster/teams"
-              className="rounded-md border border-hairline-strong px-5 py-2.5 text-sm font-semibold text-ink-muted transition-colors hover:border-ink-subtle hover:text-ink"
-            >
-              Составы команд
-            </Link>
-          </div>
-
-          {/* Цифры сезона — единой панелью с 1px-разделителями (gap-px на цвет hairline) */}
-          <dl className="mt-12 grid max-w-2xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-hairline bg-hairline shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_16px_44px_-28px_rgba(0,0,0,0.9)] sm:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.label} className="bg-surface-1 px-5 py-4">
-                <dt className="sr-only">{s.label}</dt>
-                <dd className="text-3xl font-extrabold tabular-nums tracking-tight text-ink">{s.value}</dd>
-                <p className="eyebrow mt-1 text-ink-subtle">{s.label}</p>
-              </div>
-            ))}
-          </dl>
         </div>
       </section>
 
       {/* Разделы: карточка = пункт меню, чтобы «что тут вообще есть» читалось без клика.
-          Возвышение — surface-lift + мягкая тень, при наведении карточка приподнимается. */}
+          Возвышение — «подушка» pouf, при наведении карточка приподнимается (motion=lift). */}
       <section className={`mx-auto ${SITE_MAX_W} px-4 py-12 md:px-6 md:py-16`}>
-        <p className="eyebrow mb-6 text-ink-subtle">Разделы</p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {SECTIONS.map((s) => {
-            const a = ACCENT[s.accent];
-            return (
-              <Link
-                key={s.href}
-                href={s.href}
-                className={`group relative flex flex-col overflow-hidden rounded-2xl border border-hairline bg-surface-1 p-5 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_14px_40px_-26px_rgba(0,0,0,0.9)] transition duration-200 hover:-translate-y-0.5 hover:bg-surface-2 ${a.hover}`}
-              >
-                {/* тонкая цветная рейка сверху — секция «краем глаза» читается как D1/D2 */}
-                <span aria-hidden className={`absolute inset-x-0 top-0 h-0.5 ${a.rail}`} />
-                <h2 className="text-lg font-semibold tracking-[-0.01em] text-ink">{s.title}</h2>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-muted">{s.text}</p>
-                <span className={`mt-4 inline-flex items-center gap-1 text-sm font-semibold transition-colors ${a.cta}`}>
-                  {s.cta}
-                  <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
-                </span>
-              </Link>
-            );
-          })}
+        <Eyebrow>Разделы</Eyebrow>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {sections.map((s) => (
+            <Link key={s.href} href={s.href} className="group block">
+              <Card motion="lift">
+                <div className="flex h-full flex-col gap-3">
+                  <Heading level={3}>{s.title}</Heading>
+                  <p className="flex-1 text-sm font-bold leading-relaxed text-muted">{s.text}</p>
+                  <span className="inline-flex items-center gap-1 text-sm font-black text-[var(--purple)]">
+                    {s.cta}
+                    <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+                  </span>
+                </div>
+              </Card>
+            </Link>
+          ))}
         </div>
 
-        <p className="mt-10 text-sm text-ink-subtle">
+        <p className="mt-10 text-sm font-bold text-muted">
           Основной сайт лиги и анонсы сезона —{" "}
-          <a href={SITE} target="_blank" rel="noreferrer" className="text-d1-bright hover:underline">
+          <a href={SITE} target="_blank" rel="noreferrer" className="text-[var(--purple)] hover:underline">
             leagueofspirits.ru
           </a>
           .

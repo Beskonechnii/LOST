@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { bad, parseId } from "@/lib/api";
 import { DRAFT_VERSION, type DraftState } from "@/lib/draft";
+import { guard } from "@/lib/api-guard";
 
 // Одна сессия драфта: чтение, автосейв состояния (payload) по каждому ходу, удаление.
 // Правила хода живут в src/lib/draft.ts и применяются на клиенте — сюда прилетает уже готовое
@@ -17,6 +18,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 }
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("underbeer");
+  if (denied) return denied;
   const id = parseId((await params).id);
   if (!id) return bad("id: ожидался числовой id");
   const body = (await req.json()) as { payload?: DraftState; title?: string; status?: string };
@@ -38,6 +41,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("underbeer");
+  if (denied) return denied;
   const id = parseId((await params).id);
   if (!id) return bad("id: ожидался числовой id");
   const { count } = await prisma.draftSession.deleteMany({ where: { id } });

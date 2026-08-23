@@ -3,6 +3,7 @@ import Image from "next/image";
 import { SITE_MAX_W } from "@/app/_components/ui";
 import { VisionMap } from "@/app/_components/postgame/vision-map";
 import { listTeamsWithWards, teamVision, mapVision } from "@/lib/vision";
+import { denyUnlessPermission } from "../../_components/permission-gate";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Карта вардов" };
@@ -14,10 +15,10 @@ const fmtDate = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString("ru-RU", { day: "numeric", month: "short" }) : "—";
 
 const chip = (active: boolean) =>
-  `rounded-full px-3 py-1.5 text-sm font-semibold transition ${
+  `rounded-[14px] px-3.5 py-[9px] text-[13px] font-black transition-[box-shadow,transform,background] ${
     active
-      ? "bg-gradient-to-b from-accent-bright to-accent text-white shadow-[0_6px_18px_-6px_var(--color-accent)]"
-      : "border border-hairline bg-surface-1 text-ink-muted hover:text-ink"
+      ? "bg-purple text-[var(--on-accent)] cushion-control"
+      : "bg-surface text-ink-muted cushion-field hover:text-ink"
   }`;
 
 export default async function VisionPage({
@@ -25,20 +26,23 @@ export default async function VisionPage({
 }: {
   searchParams: Promise<{ team?: string; map?: string }>;
 }) {
+  const denied = await denyUnlessPermission("tools", "Карта вардов");
+  if (denied) return denied;
+
   const q = await searchParams;
   const teams = await listTeamsWithWards();
   const vision = q.team ? await teamVision(q.team) : null;
   const map = vision && q.map ? await mapVision(Number(q.map)) : null;
 
   return (
-    <main className={`mx-auto w-full ${SITE_MAX_W} flex-1 px-4 py-8 md:px-6`}>
-      <h1 className="text-2xl font-black text-ink">Карта вардов</h1>
-      <p className="mt-1 text-sm text-ink-muted">
+    <main className={`mx-auto w-full ${SITE_MAX_W} flex-1 px-4 py-8 font-pouf md:px-6`}>
+      <h1 className="text-[28px] font-black tracking-[-0.5px] text-ink md:text-4xl">Карта вардов</h1>
+      <p className="mt-1 text-sm font-bold text-muted">
         Расстановка вардов команды по всем её картам из архива. Выбери команду — увидишь сводное наложение и каждую карту отдельно.
       </p>
 
       {teams.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-hairline bg-surface-1 p-6 text-sm text-ink-muted">
+        <div className="mt-6 rounded-card bg-surface p-6 text-sm font-bold text-muted cushion-card">
           Вардов в архиве пока нет. Они появляются, когда карта привязана и перечитана из OpenDota (распарсенный матч).
           Для уже привязанных карт запусти перечитку: <code className="text-ink">npx tsx scripts/backfill-wards.ts</code>.
         </div>

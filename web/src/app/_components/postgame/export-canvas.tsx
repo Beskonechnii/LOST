@@ -9,7 +9,7 @@
 import { useRef, useState } from "react";
 import { domToPng } from "modern-screenshot";
 import { Canvas } from "@/studio/Canvas";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/pouf/Button";
 import { archiveShot, type ArchiveDraft, type ShotKind } from "../match-archive";
 import { AdvantageChart, BuildingMap, EventBadges, HeroFrame, HeroPortrait, ItemsRow, TeamCrest } from "./blocks";
 import { clock, fmt, kFmt1, pad, type MatchReport, type PlayerReport, type Side } from "./types";
@@ -381,18 +381,19 @@ function ExportBlock({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 font-pouf">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="text-sm font-medium text-neutral-200">{title}</span>
-        <Button type="button" size="sm" disabled={!!busy} onClick={() => void download()}>
+        <span className="text-sm font-black text-ink">{title}</span>
+        <Button type="button" size="sm" loading={busy === "download"} disabled={!!busy} onClick={() => void download()}>
           {busy === "download" ? "Готовлю PNG…" : `Скачать PNG ${EXPORT_W * EXPORT_SCALE}×${EXPORT_H * EXPORT_SCALE}`}
         </Button>
         {/* Архив — операторская полка, посетителю её не показываем (и запись всё равно закрыта паролем). */}
         {canArchive && (
           <Button
             type="button"
-            variant="outline"
+            variant="quiet"
             size="sm"
+            loading={busy === "archive"}
             disabled={!!busy}
             onClick={() => void toArchive()}
             title="Положить эту картинку в архив выгрузок"
@@ -400,7 +401,7 @@ function ExportBlock({
             {busy === "archive" ? "Сохраняю…" : "В архив"}
           </Button>
         )}
-        {note && <span className="text-xs text-neutral-500">{note}</span>}
+        {note && <span className="text-xs font-bold text-muted">{note}</span>}
       </div>
       <div className="h-[42vh] min-h-[240px]">
         <Canvas w={EXPORT_W} h={EXPORT_H} nodeRef={node}>

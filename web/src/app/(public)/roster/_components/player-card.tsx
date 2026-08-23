@@ -43,24 +43,24 @@ export function PlayerMiniCard({
   return (
     <Link
       href={`/roster/players/${id}`}
-      className={`group flex items-center gap-3 rounded-xl border bg-surface-1 p-2.5 shadow-[0_1px_0_rgba(255,255,255,0.03)_inset,0_10px_28px_-20px_rgba(0,0,0,0.9)] transition duration-200 hover:-translate-y-0.5 hover:bg-surface-2 ${
-        flagged ? "border-amber-500/50 bg-amber-500/[0.06]" : "border-hairline hover:border-accent/50"
+      className={`group flex items-center gap-3 rounded-control p-2.5 font-pouf transition duration-200 hover:-translate-y-0.5 ${
+        flagged ? "bg-orange/[0.10] [box-shadow:var(--pouf-field),inset_0_0_0_2px_var(--orange)]" : "bg-surface cushion-row hover:cushion-row-hover"
       }`}
     >
       <PlayerAvatar photo={photo} nickname={nickname} color={accent} size={size} className="rounded-xl" />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <span className="truncate font-semibold text-ink transition-colors group-hover:text-accent-bright">
+          <span className="truncate font-black text-ink transition-colors group-hover:text-[var(--purple)]">
             {nickname}
           </span>
-          {isCaptain && <span className="shrink-0 text-[11px] font-bold text-accent-bright">C</span>}
-          {code && <span className="shrink-0 text-[10px] font-medium text-ink-subtle">{code}</span>}
+          {isCaptain && <span className="shrink-0 text-[11px] font-black text-[var(--purple)]">C</span>}
+          {code && <span className="shrink-0 text-[10px] font-bold text-ink-subtle">{code}</span>}
         </div>
 
         <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
           {role && <Chip>{role}</Chip>}
-          {mmr ? <span className="text-xs font-semibold tabular-nums text-ink-muted">{mmr.toLocaleString("ru")} MMR</span> : null}
+          {mmr ? <span className="text-xs font-bold tabular-nums text-muted">{mmr.toLocaleString("ru")} MMR</span> : null}
         </div>
 
         {subtitle}

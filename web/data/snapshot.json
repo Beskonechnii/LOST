@@ -1,6 +1,6 @@
 {
-  "version": 7,
-  "exportedAt": "2026-08-09T03:29:42.677Z",
+  "version": 14,
+  "exportedAt": "2026-08-22T13:05:03.524Z",
   "teams": [
     {
       "slug": "300",
@@ -343,9 +343,11 @@
     {
       "slug": "1-01b",
       "nickname": "1.01b",
+      "nicknameChangedAt": null,
       "realName": "Евгений Антипов",
       "accountId": "60041347",
       "mmr": 4800,
+      "rank": null,
       "tp": 196,
       "photo": "/uploads/players/1-01b-photo.png",
       "steamUrl": null,
@@ -365,9 +367,11 @@
     {
       "slug": "44",
       "nickname": "44",
+      "nicknameChangedAt": null,
       "realName": "Максим Самойленко",
       "accountId": "204746759",
       "mmr": 5246,
+      "rank": null,
       "tp": 29,
       "photo": "/uploads/players/44-photo.png",
       "steamUrl": null,
@@ -387,9 +391,11 @@
     {
       "slug": "akama",
       "nickname": "Akama",
+      "nicknameChangedAt": null,
       "realName": "Владислав Черных",
       "accountId": "55045938",
       "mmr": 7400,
+      "rank": null,
       "tp": 18,
       "photo": "/uploads/players/akama-photo.png",
       "steamUrl": null,
@@ -409,9 +415,11 @@
     {
       "slug": "amok",
       "nickname": "Amok",
+      "nicknameChangedAt": null,
       "realName": "Дмитрий Богданович",
       "accountId": "149826299",
       "mmr": 6400,
+      "rank": null,
       "tp": 74,
       "photo": null,
       "steamUrl": null,
@@ -431,9 +439,11 @@
     {
       "slug": "andryusha",
       "nickname": "Андрюша",
+      "nicknameChangedAt": null,
       "realName": "Андрей Лобач",
       "accountId": "171135579",
       "mmr": 7020,
+      "rank": null,
       "tp": 10,
       "photo": "/uploads/players/andryusha-photo.png",
       "steamUrl": null,
@@ -453,9 +463,11 @@
     {
       "slug": "ark",
       "nickname": ".Ark",
+      "nicknameChangedAt": null,
       "realName": "Егор Жаботинский",
       "accountId": null,
       "mmr": null,
+      "rank": null,
       "tp": 0,
       "photo": null,
       "steamUrl": null,
@@ -475,9 +487,11 @@
     {
       "slug": "armyanman",
       "nickname": "ArmyanMan",
+      "nicknameChangedAt": null,
       "realName": "Артём Умбриян",
       "accountId": "85500942",
       "mmr": 7598,
+      "rank": null,
       "tp": 289,
       "photo": "/uploads/players/armyanman-photo.png",
       "steamUrl": null,
@@ -497,9 +511,11 @@
     {
       "slug": "ash",
       "nickname": "Ash",
+      "nicknameChangedAt": null,
       "realName": "Станислав Шавенько",
       "accountId": "240005286",
       "mmr": 7000,
+      "rank": null,
       "tp": 139,
       "photo": "/uploads/players/ash-photo.png",
       "steamUrl": null,
@@ -519,9 +535,11 @@
     {
       "slug": "askme",
       "nickname": "Askme",
+      "nicknameChangedAt": null,
       "realName": "Артём Малинчик",
       "accountId": "523030749",
       "mmr": 6949,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/askme-photo.png",
       "steamUrl": null,
@@ -541,9 +559,11 @@
     {
       "slug": "astarotzio",
       "nickname": "AstarOtzio",
+      "nicknameChangedAt": null,
       "realName": "Илья Кузьмин",
       "accountId": "342558870",
       "mmr": 5869,
+      "rank": null,
       "tp": 19,
       "photo": "/uploads/players/astarotzio-photo.png",
       "steamUrl": null,
@@ -563,9 +583,11 @@
     {
       "slug": "ayori",
       "nickname": "ayori",
+      "nicknameChangedAt": null,
       "realName": "Антон Минаев",
       "accountId": "184258639",
       "mmr": 9400,
+      "rank": null,
       "tp": 150,
       "photo": null,
       "steamUrl": null,
@@ -585,9 +607,11 @@
     {
       "slug": "b-u-r-i-z-a",
       "nickname": "B U R I Z A",
+      "nicknameChangedAt": null,
       "realName": "Владислав Перепелкин",
       "accountId": "1012138182",
       "mmr": 4601,
+      "rank": null,
       "tp": 78,
       "photo": "/uploads/players/b-u-r-i-z-a-photo.png",
       "steamUrl": null,
@@ -607,9 +631,11 @@
     {
       "slug": "bann",
       "nickname": "Bann",
+      "nicknameChangedAt": null,
       "realName": "Егор Мостыко",
       "accountId": "130599630",
       "mmr": 9213,
+      "rank": null,
       "tp": 70,
       "photo": "/uploads/players/bann-photo.png",
       "steamUrl": null,
@@ -629,9 +655,11 @@
     {
       "slug": "beda",
       "nickname": "Beda...",
+      "nicknameChangedAt": null,
       "realName": "Александр Григорьев",
       "accountId": "52757916",
       "mmr": 4974,
+      "rank": null,
       "tp": 244,
       "photo": "/uploads/players/beda-photo.png",
       "steamUrl": null,
@@ -651,9 +679,11 @@
     {
       "slug": "benzo",
       "nickname": "BENZO",
+      "nicknameChangedAt": null,
       "realName": "Егор Грицук",
       "accountId": "173901887",
       "mmr": 6219,
+      "rank": null,
       "tp": 41,
       "photo": "/uploads/players/benzo-photo.png",
       "steamUrl": null,
@@ -673,9 +703,11 @@
     {
       "slug": "blas",
       "nickname": "Blasé",
+      "nicknameChangedAt": null,
       "realName": "Константин Смоликов",
       "accountId": "314655412",
       "mmr": 5200,
+      "rank": null,
       "tp": 1,
       "photo": "/uploads/players/blas-photo.png",
       "steamUrl": null,
@@ -695,9 +727,11 @@
     {
       "slug": "borts",
       "nickname": "Borts",
+      "nicknameChangedAt": null,
       "realName": "Роман Пугин",
       "accountId": null,
       "mmr": 5463,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/borts-photo.png",
       "steamUrl": null,
@@ -717,9 +751,11 @@
     {
       "slug": "brazil",
       "nickname": "BRAZIL",
+      "nicknameChangedAt": null,
       "realName": "Никита Стариков",
       "accountId": "215123629",
       "mmr": 5873,
+      "rank": null,
       "tp": 20,
       "photo": "/uploads/players/brazil-photo.png",
       "steamUrl": null,
@@ -739,9 +775,11 @@
     {
       "slug": "breaoutlik",
       "nickname": "breaoutlik",
+      "nicknameChangedAt": null,
       "realName": "Вячеслав Чумак",
       "accountId": "1156943782",
       "mmr": 7089,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/breaoutlik-photo.png",
       "steamUrl": null,
@@ -761,9 +799,11 @@
     {
       "slug": "brokeboi",
       "nickname": "Brokeboi..",
+      "nicknameChangedAt": null,
       "realName": "Максим Грищенко",
       "accountId": "122713009",
       "mmr": null,
+      "rank": null,
       "tp": 186,
       "photo": null,
       "steamUrl": null,
@@ -783,9 +823,11 @@
     {
       "slug": "bronepoezd",
       "nickname": "BRONEPOEZD",
+      "nicknameChangedAt": null,
       "realName": "Илья Лазарев",
       "accountId": "240351462",
       "mmr": 2847,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/bronepoezd-photo.png",
       "steamUrl": null,
@@ -803,11 +845,37 @@
       "createdAt": "2026-07-28T14:35:32.479Z"
     },
     {
+      "slug": "bsk",
+      "nickname": "BSK",
+      "nicknameChangedAt": null,
+      "realName": null,
+      "accountId": null,
+      "mmr": null,
+      "rank": null,
+      "tp": 0,
+      "photo": "/uploads/players/d527d087-bb87-46e9-87bb-cb1a2181e6ff.jpg",
+      "steamUrl": null,
+      "dotabuffUrl": null,
+      "stratzUrl": null,
+      "telegram": null,
+      "birthday": null,
+      "city": null,
+      "country": null,
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": null,
+      "tags": null,
+      "createdAt": "2026-08-12T00:04:07.584Z"
+    },
+    {
       "slug": "burlesk",
       "nickname": "Бурлеск",
+      "nicknameChangedAt": null,
       "realName": "Иван Нагорняк",
       "accountId": "415062653",
       "mmr": 4501,
+      "rank": null,
       "tp": 40,
       "photo": "/uploads/players/burlesk-photo.png",
       "steamUrl": "https://steamcommunity.com/id/F_L_E_E_O_W/",
@@ -827,9 +895,11 @@
     {
       "slug": "chervyak",
       "nickname": "Chervyak",
+      "nicknameChangedAt": null,
       "realName": "Никита Черницкий",
       "accountId": "323190968",
       "mmr": 5909,
+      "rank": null,
       "tp": 145,
       "photo": "/uploads/players/chervyak-photo.png",
       "steamUrl": "https://steamcommunity.com/id/abs0lu1e/",
@@ -849,9 +919,11 @@
     {
       "slug": "chiga",
       "nickname": "Chiga",
+      "nicknameChangedAt": null,
       "realName": "Владислав Чубис",
       "accountId": "134771207",
       "mmr": 3053,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/chiga-photo.png",
       "steamUrl": null,
@@ -871,9 +943,11 @@
     {
       "slug": "chipollino",
       "nickname": "Chipollino",
+      "nicknameChangedAt": null,
       "realName": "Вадим Лукша",
       "accountId": "180989790",
       "mmr": 4370,
+      "rank": null,
       "tp": 113,
       "photo": "/uploads/players/chipollino-photo.png",
       "steamUrl": null,
@@ -893,9 +967,11 @@
     {
       "slug": "chomoske",
       "nickname": "Chomoske",
+      "nicknameChangedAt": null,
       "realName": "Евгений Дашкевич",
       "accountId": "1692832135",
       "mmr": 5086,
+      "rank": null,
       "tp": 21,
       "photo": "/uploads/players/chomoske-photo.png",
       "steamUrl": null,
@@ -915,9 +991,11 @@
     {
       "slug": "cookei-1",
       "nickname": "Cookei_1",
+      "nicknameChangedAt": null,
       "realName": "Александр Шереметьев",
       "accountId": "157709694",
       "mmr": 2882,
+      "rank": null,
       "tp": 33,
       "photo": "/uploads/players/cookei-1-photo.png",
       "steamUrl": "https://steamcommunity.com/id/cookei1/",
@@ -937,9 +1015,11 @@
     {
       "slug": "da-eto-zhestko",
       "nickname": "Да это жёстко",
+      "nicknameChangedAt": null,
       "realName": "Роман Гуленков",
       "accountId": "126491412",
       "mmr": 5070,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/da-eto-zhestko-photo.png",
       "steamUrl": null,
@@ -959,9 +1039,11 @@
     {
       "slug": "dafutka",
       "nickname": "dafutka",
+      "nicknameChangedAt": null,
       "realName": "Алексей Новицкий",
       "accountId": "320109485",
       "mmr": 6558,
+      "rank": null,
       "tp": 118,
       "photo": "/uploads/players/dafutka-photo.png",
       "steamUrl": null,
@@ -981,9 +1063,11 @@
     {
       "slug": "danya-ze-faker",
       "nickname": "Даня Зе Факер",
+      "nicknameChangedAt": null,
       "realName": "Даниил Сметанин",
       "accountId": "373679557",
       "mmr": 5885,
+      "rank": null,
       "tp": 2,
       "photo": "/uploads/players/danya-ze-faker-photo.png",
       "steamUrl": null,
@@ -1003,9 +1087,11 @@
     {
       "slug": "delovo1",
       "nickname": "delovo1",
+      "nicknameChangedAt": null,
       "realName": "Евгений Гайдельцов",
       "accountId": "299001884",
       "mmr": 2842,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/delovo1-photo.png",
       "steamUrl": null,
@@ -1025,9 +1111,11 @@
     {
       "slug": "despair",
       "nickname": "despair",
+      "nicknameChangedAt": null,
       "realName": "Дмитрий Стельмашенко",
       "accountId": "181052442",
       "mmr": 5800,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/despair-photo.png",
       "steamUrl": null,
@@ -1047,9 +1135,11 @@
     {
       "slug": "destro",
       "nickname": "Destro",
+      "nicknameChangedAt": null,
       "realName": "Андрей Антонович",
       "accountId": "181836469",
       "mmr": 5812,
+      "rank": null,
       "tp": 171,
       "photo": "/uploads/players/destro-photo.png",
       "steamUrl": null,
@@ -1069,9 +1159,11 @@
     {
       "slug": "devileye",
       "nickname": "Devileye",
+      "nicknameChangedAt": null,
       "realName": "Павел Канаш",
       "accountId": "169018608",
       "mmr": 7013,
+      "rank": null,
       "tp": 12,
       "photo": "/uploads/players/devileye-photo.png",
       "steamUrl": null,
@@ -1091,9 +1183,11 @@
     {
       "slug": "dezesmol",
       "nickname": "DeZeSmoL",
+      "nicknameChangedAt": null,
       "realName": "Даниил Смоликов",
       "accountId": "1742965709",
       "mmr": 6600,
+      "rank": null,
       "tp": 28,
       "photo": "/uploads/players/dezesmol-photo.png",
       "steamUrl": null,
@@ -1113,9 +1207,11 @@
     {
       "slug": "dezzare",
       "nickname": "dezzare",
+      "nicknameChangedAt": null,
       "realName": "Илья Сверепа",
       "accountId": "105921806",
       "mmr": 6120,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/dezzare-photo.png",
       "steamUrl": null,
@@ -1135,9 +1231,11 @@
     {
       "slug": "dmetrodiy",
       "nickname": "Dmetrodiy",
+      "nicknameChangedAt": null,
       "realName": "Дмитрий Спиридонов",
       "accountId": "150628298",
       "mmr": 7314,
+      "rank": null,
       "tp": 2,
       "photo": "/uploads/players/dmetrodiy-photo.png",
       "steamUrl": null,
@@ -1157,9 +1255,11 @@
     {
       "slug": "e-sim",
       "nickname": "E-sim",
+      "nicknameChangedAt": null,
       "realName": "Есимхан Наби",
       "accountId": "1145610752",
       "mmr": 9846,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/e-sim-photo.png",
       "steamUrl": null,
@@ -1179,9 +1279,11 @@
     {
       "slug": "egorkanoobas",
       "nickname": "EgorkaNoobas",
+      "nicknameChangedAt": null,
       "realName": "Егор Митасов",
       "accountId": "258661729",
       "mmr": 6882,
+      "rank": null,
       "tp": 5,
       "photo": "/uploads/players/egorkanoobas-photo.png",
       "steamUrl": null,
@@ -1201,9 +1303,11 @@
     {
       "slug": "ehot",
       "nickname": "EHOT",
+      "nicknameChangedAt": null,
       "realName": "Алексей Хмелюк",
       "accountId": "403414705",
       "mmr": 6400,
+      "rank": null,
       "tp": 323,
       "photo": "/uploads/players/ehot-photo.png",
       "steamUrl": null,
@@ -1223,9 +1327,11 @@
     {
       "slug": "elamashka",
       "nickname": "Еламашка",
+      "nicknameChangedAt": null,
       "realName": "Еламан Ауелбек",
       "accountId": "1023666038",
       "mmr": 5796,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/elamashka-photo.png",
       "steamUrl": null,
@@ -1245,9 +1351,11 @@
     {
       "slug": "estacada",
       "nickname": "Estacada",
+      "nicknameChangedAt": null,
       "realName": "Евгений Саевич",
       "accountId": "82226499",
       "mmr": 3098,
+      "rank": null,
       "tp": 40,
       "photo": "/uploads/players/estacada-photo.png",
       "steamUrl": null,
@@ -1267,9 +1375,11 @@
     {
       "slug": "fallen",
       "nickname": "fallen",
+      "nicknameChangedAt": null,
       "realName": "Егор Жанкевич",
       "accountId": "166808107",
       "mmr": 7409,
+      "rank": null,
       "tp": 35,
       "photo": "/uploads/players/fallen-photo.png",
       "steamUrl": null,
@@ -1289,9 +1399,11 @@
     {
       "slug": "flint-lockwood",
       "nickname": "Flint Lockwood",
+      "nicknameChangedAt": null,
       "realName": "Данила Бодров",
       "accountId": "193065263",
       "mmr": 6585,
+      "rank": null,
       "tp": 125,
       "photo": "/uploads/players/flint-lockwood-photo.png",
       "steamUrl": null,
@@ -1311,9 +1423,11 @@
     {
       "slug": "fmy",
       "nickname": "FMY",
+      "nicknameChangedAt": null,
       "realName": "Александр Корнилов",
       "accountId": "111197622",
       "mmr": 5875,
+      "rank": null,
       "tp": 18,
       "photo": "/uploads/players/fmy-photo.png",
       "steamUrl": null,
@@ -1333,9 +1447,11 @@
     {
       "slug": "foolovskiy",
       "nickname": "foolovskiy",
+      "nicknameChangedAt": null,
       "realName": "Алексей Толкач",
       "accountId": "120771854",
       "mmr": 6210,
+      "rank": null,
       "tp": 110,
       "photo": "/uploads/players/foolovskiy-photo.png",
       "steamUrl": null,
@@ -1355,9 +1471,11 @@
     {
       "slug": "foxxxyyy",
       "nickname": "Foxxxyyy",
+      "nicknameChangedAt": null,
       "realName": "Николай Горелов",
       "accountId": "317520268",
       "mmr": 8700,
+      "rank": null,
       "tp": 2,
       "photo": "/uploads/players/foxxxyyy-photo.png",
       "steamUrl": null,
@@ -1377,9 +1495,11 @@
     {
       "slug": "frizzing",
       "nickname": "FRIZZING",
+      "nicknameChangedAt": null,
       "realName": "Никита Василец",
       "accountId": "153799080",
       "mmr": 7644,
+      "rank": null,
       "tp": 20,
       "photo": "/uploads/players/frizzing-photo.png",
       "steamUrl": null,
@@ -1399,9 +1519,11 @@
     {
       "slug": "frvr",
       "nickname": "FRVR",
+      "nicknameChangedAt": null,
       "realName": "Алексей Плотников",
       "accountId": "1257015351",
       "mmr": 7009,
+      "rank": null,
       "tp": 5,
       "photo": "/uploads/players/frvr-photo.png",
       "steamUrl": null,
@@ -1421,9 +1543,11 @@
     {
       "slug": "gata-me-liga",
       "nickname": "Gata me liga",
+      "nicknameChangedAt": null,
       "realName": "Максим Вербило",
       "accountId": "385004528",
       "mmr": 5688,
+      "rank": null,
       "tp": 144,
       "photo": "/uploads/players/gata-me-liga-photo.png",
       "steamUrl": null,
@@ -1443,9 +1567,11 @@
     {
       "slug": "gerein3008",
       "nickname": "gerein3008",
+      "nicknameChangedAt": null,
       "realName": "Герман Жуковень",
       "accountId": "888442162",
       "mmr": 5500,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/gerein3008-photo.png",
       "steamUrl": null,
@@ -1465,9 +1591,11 @@
     {
       "slug": "glebasta-cmstorm",
       "nickname": "GLEBASTA*CMSTORM",
+      "nicknameChangedAt": null,
       "realName": "Глеб Астапенко",
       "accountId": "121416513",
       "mmr": 4609,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/glebasta-cmstorm-photo.png",
       "steamUrl": null,
@@ -1487,9 +1615,11 @@
     {
       "slug": "gommage",
       "nickname": "Gommage",
+      "nicknameChangedAt": null,
       "realName": "Николай Лысак",
       "accountId": "1845180554",
       "mmr": 5629,
+      "rank": null,
       "tp": 1,
       "photo": null,
       "steamUrl": null,
@@ -1509,9 +1639,11 @@
     {
       "slug": "happysadman",
       "nickname": "HappySadMan",
+      "nicknameChangedAt": null,
       "realName": "Алексей Древило",
       "accountId": "896562795",
       "mmr": 4067,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/happysadman-photo.png",
       "steamUrl": null,
@@ -1531,9 +1663,11 @@
     {
       "slug": "highlight-provider",
       "nickname": "highlight provider",
+      "nicknameChangedAt": null,
       "realName": "Павел Ларионов",
       "accountId": "116591842",
       "mmr": 5200,
+      "rank": null,
       "tp": 119,
       "photo": "/uploads/players/highlight-provider-photo.png",
       "steamUrl": null,
@@ -1553,9 +1687,11 @@
     {
       "slug": "ilyushka",
       "nickname": "Илюшка",
+      "nicknameChangedAt": null,
       "realName": "Илья Аргунов",
       "accountId": "413522078",
       "mmr": 8315,
+      "rank": null,
       "tp": 48,
       "photo": "/uploads/players/ilyushka-photo.png",
       "steamUrl": null,
@@ -1575,9 +1711,11 @@
     {
       "slug": "irishtea",
       "nickname": "irishtea",
+      "nicknameChangedAt": null,
       "realName": "Матвей",
       "accountId": "908708042",
       "mmr": null,
+      "rank": null,
       "tp": 96,
       "photo": "/uploads/players/irishtea-photo.png",
       "steamUrl": "https://steamcommunity.com/id/raixxx/",
@@ -1597,9 +1735,11 @@
     {
       "slug": "katyushka",
       "nickname": "Катюшка",
+      "nicknameChangedAt": null,
       "realName": "Екатерина Матвеева",
       "accountId": null,
       "mmr": null,
+      "rank": null,
       "tp": 0,
       "photo": null,
       "steamUrl": null,
@@ -1619,9 +1759,11 @@
     {
       "slug": "kislomolochnyy",
       "nickname": "КиСлОмОлОчНыЙ",
+      "nicknameChangedAt": null,
       "realName": "Анатолий Орлов",
       "accountId": "466902186",
       "mmr": 2882,
+      "rank": null,
       "tp": 6,
       "photo": "/uploads/players/kislomolochnyy-photo.png",
       "steamUrl": null,
@@ -1641,9 +1783,11 @@
     {
       "slug": "kislyy",
       "nickname": "Кислый",
+      "nicknameChangedAt": null,
       "realName": "Степан Новиков",
       "accountId": "862268643",
       "mmr": 5546,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/kislyy-photo.png",
       "steamUrl": null,
@@ -1663,9 +1807,11 @@
     {
       "slug": "kit-ano",
       "nickname": "KIT_ANO",
+      "nicknameChangedAt": null,
       "realName": "Артем Захарчук",
       "accountId": "246057084",
       "mmr": 6500,
+      "rank": null,
       "tp": 2,
       "photo": "/uploads/players/kit-ano-photo.png",
       "steamUrl": null,
@@ -1685,9 +1831,11 @@
     {
       "slug": "kolpaks",
       "nickname": "Колпакс",
+      "nicknameChangedAt": null,
       "realName": "Влад Шитик",
       "accountId": "314868544",
       "mmr": 4258,
+      "rank": null,
       "tp": 105,
       "photo": "/uploads/players/kolpaks-photo.png",
       "steamUrl": "https://steamcommunity.com/id/dunich",
@@ -1707,9 +1855,11 @@
     {
       "slug": "kungfury",
       "nickname": "Kungfury",
+      "nicknameChangedAt": null,
       "realName": "Алексей Титов",
       "accountId": "118567104",
       "mmr": 3030,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/kungfury-photo.png",
       "steamUrl": null,
@@ -1729,9 +1879,11 @@
     {
       "slug": "kurame",
       "nickname": "kurame",
+      "nicknameChangedAt": null,
       "realName": "Вадим Дорожко",
       "accountId": "1349998060",
       "mmr": 8983,
+      "rank": null,
       "tp": 21,
       "photo": "/uploads/players/kurame-photo.png",
       "steamUrl": null,
@@ -1751,9 +1903,11 @@
     {
       "slug": "l-bionix-l",
       "nickname": "l_BioniX_l",
+      "nicknameChangedAt": null,
       "realName": "Виталий Карпеко",
       "accountId": "217937466",
       "mmr": 3407,
+      "rank": null,
       "tp": 110,
       "photo": "/uploads/players/l-bionix-l-photo.png",
       "steamUrl": null,
@@ -1773,9 +1927,11 @@
     {
       "slug": "let-s-dance",
       "nickname": "let's dance",
+      "nicknameChangedAt": null,
       "realName": "Владислав Дубаневич",
       "accountId": "225420683",
       "mmr": 6045,
+      "rank": null,
       "tp": 41,
       "photo": "/uploads/players/let-s-dance-photo.png",
       "steamUrl": null,
@@ -1795,9 +1951,11 @@
     {
       "slug": "light",
       "nickname": "Light-",
+      "nicknameChangedAt": null,
       "realName": "Алексей Лавров",
       "accountId": "847759783",
       "mmr": 3570,
+      "rank": null,
       "tp": 220,
       "photo": "/uploads/players/light-photo.png",
       "steamUrl": null,
@@ -1817,9 +1975,11 @@
     {
       "slug": "lonely",
       "nickname": "Lonely",
+      "nicknameChangedAt": null,
       "realName": "Артём Лизурчик",
       "accountId": "190163227",
       "mmr": 4936,
+      "rank": null,
       "tp": 130,
       "photo": "/uploads/players/lonely-photo.png",
       "steamUrl": null,
@@ -1839,9 +1999,11 @@
     {
       "slug": "maksimka",
       "nickname": "Максимка",
+      "nicknameChangedAt": null,
       "realName": "Макс Огуров",
       "accountId": "270001984",
       "mmr": 9385,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/maksimka-photo.png",
       "steamUrl": null,
@@ -1861,9 +2023,11 @@
     {
       "slug": "mangekyou6o",
       "nickname": "mangekyou6o$$",
+      "nicknameChangedAt": null,
       "realName": "Никита Воронявский",
       "accountId": "907146500",
       "mmr": 9892,
+      "rank": null,
       "tp": 3,
       "photo": "/uploads/players/mangekyou6o-photo.png",
       "steamUrl": null,
@@ -1883,9 +2047,11 @@
     {
       "slug": "manjalord",
       "nickname": "ManjaLord-",
+      "nicknameChangedAt": null,
       "realName": "Станислав Маджара",
       "accountId": "136225521",
       "mmr": 8415,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/manjalord-photo.png",
       "steamUrl": null,
@@ -1905,9 +2071,11 @@
     {
       "slug": "masterokxd",
       "nickname": "masterokxd",
+      "nicknameChangedAt": null,
       "realName": "Антон Никишин",
       "accountId": "151907727",
       "mmr": 4456,
+      "rank": null,
       "tp": 0,
       "photo": null,
       "steamUrl": null,
@@ -1927,9 +2095,11 @@
     {
       "slug": "maxina",
       "nickname": "MAXINA",
+      "nicknameChangedAt": null,
       "realName": "Владислав Дроздов",
       "accountId": "162607746",
       "mmr": 7667,
+      "rank": null,
       "tp": 124,
       "photo": "/uploads/players/maxina-photo.png",
       "steamUrl": null,
@@ -1949,9 +2119,11 @@
     {
       "slug": "maxtree",
       "nickname": "Maxtree",
+      "nicknameChangedAt": null,
       "realName": "Максим",
       "accountId": null,
       "mmr": null,
+      "rank": null,
       "tp": 0,
       "photo": null,
       "steamUrl": null,
@@ -1971,9 +2143,11 @@
     {
       "slug": "mayonez1s",
       "nickname": "Mayonez1s",
+      "nicknameChangedAt": null,
       "realName": "Владислав Мытько",
       "accountId": "113798996",
       "mmr": 6305,
+      "rank": null,
       "tp": 49,
       "photo": "/uploads/players/mayonez1s-photo.png",
       "steamUrl": null,
@@ -1993,9 +2167,11 @@
     {
       "slug": "mel",
       "nickname": "Mel",
+      "nicknameChangedAt": null,
       "realName": "Алексей Гусейнов",
       "accountId": "95301378",
       "mmr": 5997,
+      "rank": null,
       "tp": 55,
       "photo": "/uploads/players/mel-photo.png",
       "steamUrl": null,
@@ -2015,9 +2191,11 @@
     {
       "slug": "mini-bayk",
       "nickname": "мини байк",
+      "nicknameChangedAt": null,
       "realName": "Денис Велесевич",
       "accountId": "167518771",
       "mmr": 6135,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/mini-bayk-photo.png",
       "steamUrl": null,
@@ -2035,11 +2213,37 @@
       "createdAt": "2026-07-22T18:52:37.277Z"
     },
     {
+      "slug": "miracle",
+      "nickname": "miracle",
+      "nicknameChangedAt": null,
+      "realName": "Desin",
+      "accountId": "288687180",
+      "mmr": 9999,
+      "rank": null,
+      "tp": 0,
+      "photo": null,
+      "steamUrl": null,
+      "dotabuffUrl": "https://www.dotabuff.com/players/288687180",
+      "stratzUrl": null,
+      "telegram": "bsknchni",
+      "birthday": "2007-05-17T12:00:00.000Z",
+      "city": "Minsk",
+      "country": "Belarus",
+      "banner": null,
+      "interviewUrl": null,
+      "orderNo": null,
+      "achievements": "основатель ебки",
+      "tags": null,
+      "createdAt": "2026-08-20T21:43:06.510Z"
+    },
+    {
       "slug": "moiofc",
       "nickname": "moiofc",
+      "nicknameChangedAt": null,
       "realName": "Женя Манузин",
       "accountId": "1120525108",
       "mmr": 6500,
+      "rank": null,
       "tp": 0,
       "photo": null,
       "steamUrl": null,
@@ -2059,9 +2263,11 @@
     {
       "slug": "moody",
       "nickname": "Moody",
+      "nicknameChangedAt": null,
       "realName": "Алексей Аникеенко",
       "accountId": "259744027",
       "mmr": 7600,
+      "rank": null,
       "tp": 100,
       "photo": "/uploads/players/moody-photo.png",
       "steamUrl": null,
@@ -2081,9 +2287,11 @@
     {
       "slug": "moonrise",
       "nickname": "moonrise’",
+      "nicknameChangedAt": null,
       "realName": "Андрей Каракулин",
       "accountId": "1115554253",
       "mmr": 7376,
+      "rank": null,
       "tp": 50,
       "photo": null,
       "steamUrl": null,
@@ -2103,9 +2311,11 @@
     {
       "slug": "morda",
       "nickname": "Morda",
+      "nicknameChangedAt": null,
       "realName": "Эдуард Ковалев",
       "accountId": "1099503699",
       "mmr": 4400,
+      "rank": null,
       "tp": 223,
       "photo": "/uploads/players/morda-photo.png",
       "steamUrl": null,
@@ -2125,9 +2335,11 @@
     {
       "slug": "morgan",
       "nickname": "morgan",
+      "nicknameChangedAt": null,
       "realName": "Сергей Ковчур",
       "accountId": "223110729",
       "mmr": 7952,
+      "rank": null,
       "tp": 172,
       "photo": "/uploads/players/morgan-photo.png",
       "steamUrl": null,
@@ -2147,9 +2359,11 @@
     {
       "slug": "morphine",
       "nickname": "morphine ($)",
+      "nicknameChangedAt": null,
       "realName": "Кирилл Московченко",
       "accountId": "370114878",
       "mmr": 7720,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/morphine-photo.png",
       "steamUrl": null,
@@ -2169,9 +2383,11 @@
     {
       "slug": "mr-daddy",
       "nickname": "Mr.Daddy",
+      "nicknameChangedAt": null,
       "realName": "Дмитрий Шпинёв",
       "accountId": "131935693",
       "mmr": 2930,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/mr-daddy-photo.png",
       "steamUrl": null,
@@ -2191,9 +2407,11 @@
     {
       "slug": "mrkekman",
       "nickname": "mrKekman",
+      "nicknameChangedAt": null,
       "realName": "Владислав Игнатов",
       "accountId": "163362211",
       "mmr": 5400,
+      "rank": null,
       "tp": 0,
       "photo": null,
       "steamUrl": null,
@@ -2213,9 +2431,11 @@
     {
       "slug": "neverland",
       "nickname": "Neverland",
+      "nicknameChangedAt": null,
       "realName": "Артур Аксянович",
       "accountId": "124574932",
       "mmr": 4900,
+      "rank": null,
       "tp": 53,
       "photo": "/uploads/players/neverland-photo.png",
       "steamUrl": null,
@@ -2235,9 +2455,11 @@
     {
       "slug": "nico",
       "nickname": "Nico",
+      "nicknameChangedAt": null,
       "realName": "Николай Федоров",
       "accountId": "393073914",
       "mmr": 7170,
+      "rank": null,
       "tp": 18,
       "photo": "/uploads/players/nico-photo.png",
       "steamUrl": null,
@@ -2257,9 +2479,11 @@
     {
       "slug": "nicolas-sarcozy",
       "nickname": "Nicolas Sarcozy",
+      "nicknameChangedAt": null,
       "realName": "Николай Голчанов",
       "accountId": "113616669",
       "mmr": 5400,
+      "rank": null,
       "tp": 180,
       "photo": "/uploads/players/nicolas-sarcozy-photo.png",
       "steamUrl": null,
@@ -2279,9 +2503,11 @@
     {
       "slug": "nikita",
       "nickname": "Nikita",
+      "nicknameChangedAt": null,
       "realName": "Никита Яжевский",
       "accountId": "253907721",
       "mmr": 7004,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/nikita-photo.png",
       "steamUrl": null,
@@ -2301,9 +2527,11 @@
     {
       "slug": "nimpo",
       "nickname": "Nimpo",
+      "nicknameChangedAt": null,
       "realName": "Максим Курач",
       "accountId": "1032418592",
       "mmr": 4622,
+      "rank": null,
       "tp": 20,
       "photo": "/uploads/players/nimpo-photo.png",
       "steamUrl": null,
@@ -2323,9 +2551,11 @@
     {
       "slug": "nohara",
       "nickname": "nohara",
+      "nicknameChangedAt": null,
       "realName": "Артем Драбушевич",
       "accountId": "1257422957",
       "mmr": 9000,
+      "rank": null,
       "tp": 110,
       "photo": "/uploads/players/nohara-photo.png",
       "steamUrl": null,
@@ -2345,9 +2575,11 @@
     {
       "slug": "nosferatu",
       "nickname": "Nosferatu",
+      "nicknameChangedAt": null,
       "realName": "Валерий Лапо",
       "accountId": "112174078",
       "mmr": 8191,
+      "rank": null,
       "tp": 1,
       "photo": "/uploads/players/nosferatu-photo.png",
       "steamUrl": null,
@@ -2367,9 +2599,11 @@
     {
       "slug": "npq",
       "nickname": "NPQ",
+      "nicknameChangedAt": null,
       "realName": "Дмитрий Приставка",
       "accountId": "368509389",
       "mmr": 5168,
+      "rank": null,
       "tp": 105,
       "photo": "/uploads/players/npq-photo.png",
       "steamUrl": null,
@@ -2389,9 +2623,11 @@
     {
       "slug": "osumayosu",
       "nickname": "Osumayosu",
+      "nicknameChangedAt": null,
       "realName": "Даниил Усов",
       "accountId": "1279203829",
       "mmr": 7024,
+      "rank": null,
       "tp": 0,
       "photo": null,
       "steamUrl": null,
@@ -2411,9 +2647,11 @@
     {
       "slug": "p1rat",
       "nickname": "p1rat",
+      "nicknameChangedAt": null,
       "realName": "Владимир Лишаненко",
       "accountId": "176203249",
       "mmr": 4135,
+      "rank": null,
       "tp": 26,
       "photo": "/uploads/players/p1rat-photo.png",
       "steamUrl": null,
@@ -2433,9 +2671,11 @@
     {
       "slug": "pashcock",
       "nickname": "PashCOCK",
+      "nicknameChangedAt": null,
       "realName": "Павел Лашкевич",
       "accountId": "182274273",
       "mmr": 8031,
+      "rank": null,
       "tp": 2,
       "photo": "/uploads/players/pashcock-photo.png",
       "steamUrl": null,
@@ -2455,9 +2695,11 @@
     {
       "slug": "pasteroni-ja",
       "nickname": "pasteroni_ja",
+      "nicknameChangedAt": null,
       "realName": "Никита Романов",
       "accountId": "155657602",
       "mmr": 7798,
+      "rank": null,
       "tp": 127,
       "photo": "/uploads/players/pasteroni-ja-photo.png",
       "steamUrl": "https://steamcommunity.com/id/pasteroni_ja/",
@@ -2477,9 +2719,11 @@
     {
       "slug": "petka",
       "nickname": "Петька",
+      "nicknameChangedAt": null,
       "realName": "Пётр Сотский",
       "accountId": "880577260",
       "mmr": 6659,
+      "rank": null,
       "tp": 133,
       "photo": "/uploads/players/petka-photo.png",
       "steamUrl": null,
@@ -2499,9 +2743,11 @@
     {
       "slug": "pizzacodeine",
       "nickname": "pizzacodeine",
+      "nicknameChangedAt": null,
       "realName": "Владислав Зайцев",
       "accountId": "120388948",
       "mmr": 9900,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/pizzacodeine-photo.png",
       "steamUrl": null,
@@ -2521,9 +2767,11 @@
     {
       "slug": "pugovichka-otorvalasya",
       "nickname": "Pugovichka otorvalasya",
+      "nicknameChangedAt": null,
       "realName": "Даниил Семашко",
       "accountId": "190742831",
       "mmr": 6021,
+      "rank": null,
       "tp": 26,
       "photo": "/uploads/players/pugovichka-otorvalasya-photo.png",
       "steamUrl": null,
@@ -2543,9 +2791,11 @@
     {
       "slug": "qsarigama",
       "nickname": "qsarigama",
+      "nicknameChangedAt": null,
       "realName": "Захар Базаров",
       "accountId": "1079850867",
       "mmr": 8652,
+      "rank": null,
       "tp": 26,
       "photo": "/uploads/players/qsarigama-photo.png",
       "steamUrl": null,
@@ -2565,9 +2815,11 @@
     {
       "slug": "qwick",
       "nickname": "qwick",
+      "nicknameChangedAt": null,
       "realName": "Евгений Быков",
       "accountId": "1158935528",
       "mmr": 4705,
+      "rank": null,
       "tp": 87,
       "photo": "/uploads/players/qwick-photo.png",
       "steamUrl": null,
@@ -2587,9 +2839,11 @@
     {
       "slug": "renaissance",
       "nickname": "RENAISSANCE",
+      "nicknameChangedAt": null,
       "realName": "Артём Аврамов",
       "accountId": "228351925",
       "mmr": 6181,
+      "rank": null,
       "tp": 70,
       "photo": "/uploads/players/renaissance-photo.png",
       "steamUrl": null,
@@ -2609,9 +2863,11 @@
     {
       "slug": "rom-o-ne",
       "nickname": "Rom[o]ne",
+      "nicknameChangedAt": null,
       "realName": "Роман Агафонов",
       "accountId": "256493317",
       "mmr": 5600,
+      "rank": null,
       "tp": 0,
       "photo": null,
       "steamUrl": null,
@@ -2631,9 +2887,11 @@
     {
       "slug": "roma-shkereberd",
       "nickname": "Рома шкеребердь",
+      "nicknameChangedAt": null,
       "realName": "Денис Бондаренко",
       "accountId": "1852440160",
       "mmr": 2019,
+      "rank": null,
       "tp": 0,
       "photo": null,
       "steamUrl": null,
@@ -2653,9 +2911,11 @@
     {
       "slug": "rost1k",
       "nickname": "rost1k",
+      "nicknameChangedAt": null,
       "realName": "Ростислав Иванов",
       "accountId": "303770159",
       "mmr": 4213,
+      "rank": null,
       "tp": 90,
       "photo": "/uploads/players/rost1k-photo.png",
       "steamUrl": null,
@@ -2675,9 +2935,11 @@
     {
       "slug": "rox",
       "nickname": "Rox",
+      "nicknameChangedAt": null,
       "realName": "Виктор Кох",
       "accountId": "203947582",
       "mmr": 7600,
+      "rank": null,
       "tp": 1,
       "photo": "/uploads/players/rox-photo.png",
       "steamUrl": null,
@@ -2697,9 +2959,11 @@
     {
       "slug": "rty",
       "nickname": "rty",
+      "nicknameChangedAt": null,
       "realName": "Андрей Шафалович",
       "accountId": "122641754",
       "mmr": 5118,
+      "rank": null,
       "tp": 20,
       "photo": null,
       "steamUrl": null,
@@ -2719,9 +2983,11 @@
     {
       "slug": "saldatau",
       "nickname": "saldatau",
+      "nicknameChangedAt": null,
       "realName": "Дмитрий Солдатов",
       "accountId": "70372759",
       "mmr": null,
+      "rank": null,
       "tp": 146,
       "photo": "/uploads/players/saldatau-photo.png",
       "steamUrl": null,
@@ -2741,9 +3007,11 @@
     {
       "slug": "sanek",
       "nickname": "Санёк",
+      "nicknameChangedAt": null,
       "realName": "Александр Михаленко",
       "accountId": "2536225",
       "mmr": 6633,
+      "rank": null,
       "tp": 146,
       "photo": "/uploads/players/sanek-photo.png",
       "steamUrl": null,
@@ -2763,9 +3031,11 @@
     {
       "slug": "sashka",
       "nickname": "Сашка",
+      "nicknameChangedAt": null,
       "realName": "Александр Лосич",
       "accountId": "157235939",
       "mmr": 4400,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/sashka-photo.png",
       "steamUrl": null,
@@ -2785,9 +3055,11 @@
     {
       "slug": "savety",
       "nickname": "Savety",
+      "nicknameChangedAt": null,
       "realName": "Максим Терешко",
       "accountId": "412319624",
       "mmr": 7181,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/savety-photo.png",
       "steamUrl": null,
@@ -2807,9 +3079,11 @@
     {
       "slug": "sdd",
       "nickname": "sdd",
+      "nicknameChangedAt": null,
       "realName": "Сергей Шиманский",
       "accountId": "188636945",
       "mmr": 10400,
+      "rank": null,
       "tp": 3,
       "photo": "/uploads/players/sdd-photo.png",
       "steamUrl": null,
@@ -2829,9 +3103,11 @@
     {
       "slug": "seraphim",
       "nickname": "Seraphim",
+      "nicknameChangedAt": null,
       "realName": "Вадим Парахневич",
       "accountId": "372695044",
       "mmr": 5400,
+      "rank": null,
       "tp": 1,
       "photo": "/uploads/players/seraphim-photo.png",
       "steamUrl": null,
@@ -2851,9 +3127,11 @@
     {
       "slug": "serhio",
       "nickname": "Serhio",
+      "nicknameChangedAt": null,
       "realName": "Илья Морозов",
       "accountId": "986457572",
       "mmr": 7000,
+      "rank": null,
       "tp": 110,
       "photo": "/uploads/players/serhio-photo.png",
       "steamUrl": null,
@@ -2873,9 +3151,11 @@
     {
       "slug": "sett",
       "nickname": "Sett",
+      "nicknameChangedAt": null,
       "realName": "Дмитрий Ларин",
       "accountId": null,
       "mmr": 2854,
+      "rank": null,
       "tp": 114,
       "photo": null,
       "steamUrl": null,
@@ -2895,9 +3175,11 @@
     {
       "slug": "sexmachine",
       "nickname": "sexmachine",
+      "nicknameChangedAt": null,
       "realName": "Дмитрий Велесевич",
       "accountId": "361022505",
       "mmr": 5101,
+      "rank": null,
       "tp": 2,
       "photo": "/uploads/players/sexmachine-photo.png",
       "steamUrl": null,
@@ -2917,9 +3199,11 @@
     {
       "slug": "sh1za-qb",
       "nickname": "sh1za_qb",
+      "nicknameChangedAt": null,
       "realName": "Никита Корячко",
       "accountId": "189312219",
       "mmr": 5692,
+      "rank": null,
       "tp": 156,
       "photo": "/uploads/players/sh1za-qb-photo.png",
       "steamUrl": null,
@@ -2939,9 +3223,11 @@
     {
       "slug": "shastik",
       "nickname": "Шастик",
+      "nicknameChangedAt": null,
       "realName": "Павел Шаститко",
       "accountId": "133767790",
       "mmr": 2806,
+      "rank": null,
       "tp": 20,
       "photo": "/uploads/players/shastik-photo.png",
       "steamUrl": null,
@@ -2961,9 +3247,11 @@
     {
       "slug": "smn",
       "nickname": "smn^",
+      "nicknameChangedAt": null,
       "realName": "Дмитрий Дидычук",
       "accountId": null,
       "mmr": 5885,
+      "rank": null,
       "tp": 282,
       "photo": "/uploads/players/smn-photo.png",
       "steamUrl": "https://steamcommunity.com/id/Wild_Strawberry/",
@@ -2983,9 +3271,11 @@
     {
       "slug": "snorlax212",
       "nickname": "Snorlax212",
+      "nicknameChangedAt": null,
       "realName": "Антон Карпилов",
       "accountId": null,
       "mmr": 5200,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/snorlax212-photo.png",
       "steamUrl": null,
@@ -3005,9 +3295,11 @@
     {
       "slug": "staryy-ezh",
       "nickname": "Старый Ёж",
+      "nicknameChangedAt": null,
       "realName": "Вадим Манаев",
       "accountId": "913264608",
       "mmr": 6132,
+      "rank": null,
       "tp": 1,
       "photo": "/uploads/players/staryy-ezh-photo.png",
       "steamUrl": null,
@@ -3027,9 +3319,11 @@
     {
       "slug": "sunlive",
       "nickname": "sunlive",
+      "nicknameChangedAt": null,
       "realName": "Александр Семченко",
       "accountId": "1146118555",
       "mmr": 7545,
+      "rank": null,
       "tp": 241,
       "photo": "/uploads/players/sunlive-photo.png",
       "steamUrl": null,
@@ -3049,9 +3343,11 @@
     {
       "slug": "svinovizhimalka",
       "nickname": "svinovizhimalka",
+      "nicknameChangedAt": null,
       "realName": "Евгений Лайша",
       "accountId": "1108367641",
       "mmr": 4915,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/svinovizhimalka-photo.png",
       "steamUrl": null,
@@ -3071,9 +3367,11 @@
     {
       "slug": "the-one",
       "nickname": "The One",
+      "nicknameChangedAt": null,
       "realName": "Денис Грузневич",
       "accountId": "211359650",
       "mmr": 5958,
+      "rank": null,
       "tp": 1,
       "photo": "/uploads/players/the-one-photo.png",
       "steamUrl": null,
@@ -3093,9 +3391,11 @@
     {
       "slug": "timurka",
       "nickname": "Тимурка",
+      "nicknameChangedAt": null,
       "realName": "Тимур",
       "accountId": null,
       "mmr": null,
+      "rank": null,
       "tp": 0,
       "photo": null,
       "steamUrl": null,
@@ -3115,9 +3415,11 @@
     {
       "slug": "tokyomane",
       "nickname": "Tokyomane",
+      "nicknameChangedAt": null,
       "realName": "Сергей Белков",
       "accountId": "122505509",
       "mmr": 6412,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/tokyomane-photo.png",
       "steamUrl": null,
@@ -3137,9 +3439,11 @@
     {
       "slug": "tpabka",
       "nickname": "TpaBka",
+      "nicknameChangedAt": null,
       "realName": "Вадим Витковский",
       "accountId": "119292010",
       "mmr": 5340,
+      "rank": null,
       "tp": 81,
       "photo": "/uploads/players/tpabka-photo.png",
       "steamUrl": "https://steamcommunity.com/id/TpaBka1994/",
@@ -3159,9 +3463,11 @@
     {
       "slug": "treshzor",
       "nickname": "treshzor",
+      "nicknameChangedAt": null,
       "realName": "Андрей Мацук",
       "accountId": "232360451",
       "mmr": 5419,
+      "rank": null,
       "tp": 61,
       "photo": "/uploads/players/treshzor-photo.png",
       "steamUrl": null,
@@ -3181,9 +3487,11 @@
     {
       "slug": "turtle",
       "nickname": "Turtle",
+      "nicknameChangedAt": null,
       "realName": "Владислав Зыль",
       "accountId": "238255127",
       "mmr": 8364,
+      "rank": null,
       "tp": 2,
       "photo": "/uploads/players/turtle-photo.png",
       "steamUrl": null,
@@ -3203,9 +3511,11 @@
     {
       "slug": "twilightnest",
       "nickname": "TwilightNest",
+      "nicknameChangedAt": null,
       "realName": "Ярослав Воинский",
       "accountId": "153794111",
       "mmr": 4130,
+      "rank": null,
       "tp": 135,
       "photo": "/uploads/players/twilightnest-photo.png",
       "steamUrl": null,
@@ -3225,9 +3535,11 @@
     {
       "slug": "v1ole",
       "nickname": "V1ole",
+      "nicknameChangedAt": null,
       "realName": "Данила Хитрик",
       "accountId": "307662377",
       "mmr": 6459,
+      "rank": null,
       "tp": 36,
       "photo": "/uploads/players/v1ole-photo.png",
       "steamUrl": null,
@@ -3247,9 +3559,11 @@
     {
       "slug": "vargos",
       "nickname": "VarGos",
+      "nicknameChangedAt": null,
       "realName": "Иван Горошко",
       "accountId": "480806505",
       "mmr": 4592,
+      "rank": null,
       "tp": 1,
       "photo": "/uploads/players/vargos-photo.png",
       "steamUrl": null,
@@ -3269,9 +3583,11 @@
     {
       "slug": "wilkinson",
       "nickname": "Wilkinson",
+      "nicknameChangedAt": null,
       "realName": "Артём Шиманский",
       "accountId": "206557872",
       "mmr": 3200,
+      "rank": null,
       "tp": 76,
       "photo": "/uploads/players/wilkinson-photo.png",
       "steamUrl": null,
@@ -3291,9 +3607,11 @@
     {
       "slug": "xrumiks",
       "nickname": "Xrumiks",
+      "nicknameChangedAt": null,
       "realName": "Павел Волчек",
       "accountId": "196411029",
       "mmr": 6123,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/xrumiks-photo.png",
       "steamUrl": null,
@@ -3313,9 +3631,11 @@
     {
       "slug": "xus",
       "nickname": "Xus",
+      "nicknameChangedAt": null,
       "realName": "Алексей Пуршнев",
       "accountId": "475658285",
       "mmr": 6500,
+      "rank": null,
       "tp": 2,
       "photo": "/uploads/players/xus-photo.png",
       "steamUrl": null,
@@ -3335,9 +3655,11 @@
     {
       "slug": "ya-pinayu-eti-dengi",
       "nickname": "я пинаю эти деньги",
+      "nicknameChangedAt": null,
       "realName": "Андрей Кузнецов",
       "accountId": "117164935",
       "mmr": 5400,
+      "rank": null,
       "tp": 0,
       "photo": null,
       "steamUrl": null,
@@ -3357,9 +3679,11 @@
     {
       "slug": "yng",
       "nickname": "Yng",
+      "nicknameChangedAt": null,
       "realName": "Егор Ботян",
       "accountId": "131477091",
       "mmr": 10247,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/yng-photo.png",
       "steamUrl": null,
@@ -3379,9 +3703,11 @@
     {
       "slug": "zagada",
       "nickname": "Zagada",
+      "nicknameChangedAt": null,
       "realName": "Сергей Быков",
       "accountId": "400981177",
       "mmr": 8400,
+      "rank": null,
       "tp": 106,
       "photo": "/uploads/players/zagada-photo.png",
       "steamUrl": null,
@@ -3401,9 +3727,11 @@
     {
       "slug": "zhozik",
       "nickname": "Zhozik",
+      "nicknameChangedAt": null,
       "realName": "Андрей Адамович",
       "accountId": "13159715",
       "mmr": 6598,
+      "rank": null,
       "tp": 116,
       "photo": "/uploads/players/zhozik-photo.png",
       "steamUrl": null,
@@ -3423,9 +3751,11 @@
     {
       "slug": "zodiak",
       "nickname": "Zodiak",
+      "nicknameChangedAt": null,
       "realName": "Даниил Карпеня",
       "accountId": "207426479",
       "mmr": 6200,
+      "rank": null,
       "tp": 0,
       "photo": "/uploads/players/zodiak-photo.png",
       "steamUrl": null,
@@ -3447,6 +3777,7 @@
     {
       "teamSlug": "300",
       "playerSlug": "andryusha",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3454,6 +3785,7 @@
     {
       "teamSlug": "300",
       "playerSlug": "devileye",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3461,6 +3793,7 @@
     {
       "teamSlug": "300",
       "playerSlug": "kolpaks",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3468,6 +3801,7 @@
     {
       "teamSlug": "300",
       "playerSlug": "mangekyou6o",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3475,6 +3809,7 @@
     {
       "teamSlug": "300",
       "playerSlug": "tokyomane",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3482,6 +3817,7 @@
     {
       "teamSlug": "4naturala",
       "playerSlug": "ark",
+      "divisionKey": "s2/d1",
       "role": "coach",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3489,6 +3825,7 @@
     {
       "teamSlug": "4naturala",
       "playerSlug": "askme",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3496,6 +3833,7 @@
     {
       "teamSlug": "4naturala",
       "playerSlug": "danya-ze-faker",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3503,6 +3841,7 @@
     {
       "teamSlug": "4naturala",
       "playerSlug": "nikita",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3510,6 +3849,7 @@
     {
       "teamSlug": "4naturala",
       "playerSlug": "svinovizhimalka",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3517,6 +3857,7 @@
     {
       "teamSlug": "4naturala",
       "playerSlug": "yng",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3524,6 +3865,7 @@
     {
       "teamSlug": "5kn",
       "playerSlug": "amok",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3531,6 +3873,7 @@
     {
       "teamSlug": "5kn",
       "playerSlug": "qsarigama",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3538,6 +3881,7 @@
     {
       "teamSlug": "5kn",
       "playerSlug": "sanek",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3545,6 +3889,7 @@
     {
       "teamSlug": "5kn",
       "playerSlug": "treshzor",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3552,6 +3897,7 @@
     {
       "teamSlug": "5kn",
       "playerSlug": "zhozik",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3559,6 +3905,7 @@
     {
       "teamSlug": "acolytes",
       "playerSlug": "chervyak",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.457Z"
@@ -3566,6 +3913,7 @@
     {
       "teamSlug": "acolytes",
       "playerSlug": "happysadman",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.458Z"
@@ -3573,6 +3921,7 @@
     {
       "teamSlug": "acolytes",
       "playerSlug": "l-bionix-l",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.460Z"
@@ -3580,6 +3929,7 @@
     {
       "teamSlug": "acolytes",
       "playerSlug": "lonely",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.455Z"
@@ -3587,6 +3937,7 @@
     {
       "teamSlug": "acolytes",
       "playerSlug": "saldatau",
+      "divisionKey": "s2/d2",
       "role": "coach",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.461Z"
@@ -3594,6 +3945,7 @@
     {
       "teamSlug": "acolytes",
       "playerSlug": "serhio",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.454Z"
@@ -3601,6 +3953,7 @@
     {
       "teamSlug": "alt-q-q",
       "playerSlug": "da-eto-zhestko",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.529Z"
@@ -3608,6 +3961,7 @@
     {
       "teamSlug": "alt-q-q",
       "playerSlug": "gata-me-liga",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.524Z"
@@ -3615,6 +3969,7 @@
     {
       "teamSlug": "alt-q-q",
       "playerSlug": "kislyy",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.526Z"
@@ -3622,6 +3977,7 @@
     {
       "teamSlug": "alt-q-q",
       "playerSlug": "shastik",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.527Z"
@@ -3629,6 +3985,7 @@
     {
       "teamSlug": "alt-q-q",
       "playerSlug": "tpabka",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.522Z"
@@ -3636,6 +3993,7 @@
     {
       "teamSlug": "bbc",
       "playerSlug": "ayori",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3643,6 +4001,7 @@
     {
       "teamSlug": "bbc",
       "playerSlug": "fallen",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3650,6 +4009,7 @@
     {
       "teamSlug": "bbc",
       "playerSlug": "moonrise",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3657,6 +4017,7 @@
     {
       "teamSlug": "bbc",
       "playerSlug": "p1rat",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3664,6 +4025,7 @@
     {
       "teamSlug": "bbc",
       "playerSlug": "pugovichka-otorvalasya",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3671,6 +4033,7 @@
     {
       "teamSlug": "bbc",
       "playerSlug": "turtle",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3678,6 +4041,7 @@
     {
       "teamSlug": "bbc",
       "playerSlug": "v1ole",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3685,6 +4049,7 @@
     {
       "teamSlug": "chubriki",
       "playerSlug": "chomoske",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.471Z"
@@ -3692,6 +4057,7 @@
     {
       "teamSlug": "chubriki",
       "playerSlug": "cookei-1",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.468Z"
@@ -3699,6 +4065,7 @@
     {
       "teamSlug": "chubriki",
       "playerSlug": "egorkanoobas",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.466Z"
@@ -3706,6 +4073,7 @@
     {
       "teamSlug": "chubriki",
       "playerSlug": "kislomolochnyy",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.470Z"
@@ -3713,6 +4081,7 @@
     {
       "teamSlug": "chubriki",
       "playerSlug": "mel",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.464Z"
@@ -3720,6 +4089,7 @@
     {
       "teamSlug": "chubriki",
       "playerSlug": "sett",
+      "divisionKey": "s2/d2",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.473Z"
@@ -3727,6 +4097,7 @@
     {
       "teamSlug": "cruiser-aurora-team",
       "playerSlug": "b-u-r-i-z-a",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3734,6 +4105,7 @@
     {
       "teamSlug": "cruiser-aurora-team",
       "playerSlug": "chervyak",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3741,6 +4113,7 @@
     {
       "teamSlug": "cruiser-aurora-team",
       "playerSlug": "frizzing",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3748,6 +4121,7 @@
     {
       "teamSlug": "cruiser-aurora-team",
       "playerSlug": "manjalord",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3755,6 +4129,7 @@
     {
       "teamSlug": "cruiser-aurora-team",
       "playerSlug": "pasteroni-ja",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3762,6 +4137,7 @@
     {
       "teamSlug": "cruiser-aurora-team",
       "playerSlug": "renaissance",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3769,6 +4145,7 @@
     {
       "teamSlug": "cruiser-aurora-team",
       "playerSlug": "rom-o-ne",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3776,6 +4153,7 @@
     {
       "teamSlug": "dark-aria",
       "playerSlug": "chiga",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.490Z"
@@ -3783,6 +4161,7 @@
     {
       "teamSlug": "dark-aria",
       "playerSlug": "frvr",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.489Z"
@@ -3790,6 +4169,7 @@
     {
       "teamSlug": "dark-aria",
       "playerSlug": "glebasta-cmstorm",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.488Z"
@@ -3797,6 +4177,7 @@
     {
       "teamSlug": "dark-aria",
       "playerSlug": "nimpo",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.486Z"
@@ -3804,6 +4185,7 @@
     {
       "teamSlug": "dark-aria",
       "playerSlug": "the-one",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.485Z"
@@ -3811,6 +4193,7 @@
     {
       "teamSlug": "eclipse-gaming-young",
       "playerSlug": "b-u-r-i-z-a",
+      "divisionKey": "s2/d2",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.481Z"
@@ -3818,6 +4201,7 @@
     {
       "teamSlug": "eclipse-gaming-young",
       "playerSlug": "bronepoezd",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.480Z"
@@ -3825,6 +4209,7 @@
     {
       "teamSlug": "eclipse-gaming-young",
       "playerSlug": "flint-lockwood",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.477Z"
@@ -3832,6 +4217,7 @@
     {
       "teamSlug": "eclipse-gaming-young",
       "playerSlug": "p1rat",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.478Z"
@@ -3839,6 +4225,7 @@
     {
       "teamSlug": "eclipse-gaming-young",
       "playerSlug": "pugovichka-otorvalasya",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.475Z"
@@ -3846,6 +4233,7 @@
     {
       "teamSlug": "eclipse-gaming-young",
       "playerSlug": "smn",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.476Z"
@@ -3853,6 +4241,7 @@
     {
       "teamSlug": "eclipse-gaming-young",
       "playerSlug": "v1ole",
+      "divisionKey": "s2/d2",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.483Z"
@@ -3860,6 +4249,7 @@
     {
       "teamSlug": "eclipse-gaming",
       "playerSlug": "bann",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3867,6 +4257,7 @@
     {
       "teamSlug": "eclipse-gaming",
       "playerSlug": "benzo",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3874,6 +4265,7 @@
     {
       "teamSlug": "eclipse-gaming",
       "playerSlug": "burlesk",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3881,6 +4273,7 @@
     {
       "teamSlug": "eclipse-gaming",
       "playerSlug": "dafutka",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3888,6 +4281,7 @@
     {
       "teamSlug": "eclipse-gaming",
       "playerSlug": "foxxxyyy",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3895,6 +4289,7 @@
     {
       "teamSlug": "eclipse-gaming",
       "playerSlug": "rost1k",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3902,6 +4297,7 @@
     {
       "teamSlug": "ethereal",
       "playerSlug": "despair",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3909,6 +4305,7 @@
     {
       "teamSlug": "ethereal",
       "playerSlug": "gerein3008",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3916,6 +4313,7 @@
     {
       "teamSlug": "ethereal",
       "playerSlug": "maxtree",
+      "divisionKey": "s2/d1",
       "role": "coach",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3923,6 +4321,7 @@
     {
       "teamSlug": "ethereal",
       "playerSlug": "neverland",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3930,6 +4329,7 @@
     {
       "teamSlug": "ethereal",
       "playerSlug": "pizzacodeine",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3937,6 +4337,7 @@
     {
       "teamSlug": "ethereal",
       "playerSlug": "xus",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3944,6 +4345,7 @@
     {
       "teamSlug": "ethereal",
       "playerSlug": "zodiak",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3951,6 +4353,7 @@
     {
       "teamSlug": "etherial-prime",
       "playerSlug": "blas",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3958,6 +4361,7 @@
     {
       "teamSlug": "etherial-prime",
       "playerSlug": "dezesmol",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3965,6 +4369,7 @@
     {
       "teamSlug": "etherial-prime",
       "playerSlug": "mrkekman",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3972,6 +4377,7 @@
     {
       "teamSlug": "etherial-prime",
       "playerSlug": "rox",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3979,6 +4385,7 @@
     {
       "teamSlug": "etherial-prime",
       "playerSlug": "sdd",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3986,6 +4393,7 @@
     {
       "teamSlug": "etherial-prime",
       "playerSlug": "seraphim",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -3993,6 +4401,7 @@
     {
       "teamSlug": "from-paris",
       "playerSlug": "destro",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4000,6 +4409,7 @@
     {
       "teamSlug": "from-paris",
       "playerSlug": "flint-lockwood",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4007,6 +4417,7 @@
     {
       "teamSlug": "from-paris",
       "playerSlug": "foolovskiy",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4014,6 +4425,7 @@
     {
       "teamSlug": "from-paris",
       "playerSlug": "frvr",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4021,6 +4433,7 @@
     {
       "teamSlug": "from-paris",
       "playerSlug": "nohara",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4028,6 +4441,7 @@
     {
       "teamSlug": "gitlz",
       "playerSlug": "akama",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4035,6 +4449,7 @@
     {
       "teamSlug": "gitlz",
       "playerSlug": "astarotzio",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4042,6 +4457,7 @@
     {
       "teamSlug": "gitlz",
       "playerSlug": "breaoutlik",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4049,6 +4465,7 @@
     {
       "teamSlug": "gitlz",
       "playerSlug": "fmy",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4056,6 +4473,7 @@
     {
       "teamSlug": "gitlz",
       "playerSlug": "moody",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4063,6 +4481,7 @@
     {
       "teamSlug": "gitlz",
       "playerSlug": "nico",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4070,6 +4489,7 @@
     {
       "teamSlug": "gitlz",
       "playerSlug": "osumayosu",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4077,6 +4497,7 @@
     {
       "teamSlug": "guzliki",
       "playerSlug": "kurame",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4084,6 +4505,7 @@
     {
       "teamSlug": "guzliki",
       "playerSlug": "pashcock",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4091,6 +4513,7 @@
     {
       "teamSlug": "guzliki",
       "playerSlug": "rty",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4098,6 +4521,7 @@
     {
       "teamSlug": "guzliki",
       "playerSlug": "sexmachine",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4105,6 +4529,7 @@
     {
       "teamSlug": "guzliki",
       "playerSlug": "sunlive",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4112,6 +4537,7 @@
     {
       "teamSlug": "malchishki",
       "playerSlug": "elamashka",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4119,6 +4545,7 @@
     {
       "teamSlug": "malchishki",
       "playerSlug": "ilyushka",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4126,6 +4553,7 @@
     {
       "teamSlug": "malchishki",
       "playerSlug": "katyushka",
+      "divisionKey": "s2/d1",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4133,6 +4561,7 @@
     {
       "teamSlug": "malchishki",
       "playerSlug": "maksimka",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4140,6 +4569,7 @@
     {
       "teamSlug": "malchishki",
       "playerSlug": "petka",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4147,6 +4577,7 @@
     {
       "teamSlug": "malchishki",
       "playerSlug": "sashka",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4154,6 +4585,7 @@
     {
       "teamSlug": "malchishki",
       "playerSlug": "timurka",
+      "divisionKey": "s2/d1",
       "role": "coach",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4161,6 +4593,7 @@
     {
       "teamSlug": "moloko",
       "playerSlug": "brazil",
+      "divisionKey": "s2/d1",
       "role": "coach",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4168,6 +4601,7 @@
     {
       "teamSlug": "moloko",
       "playerSlug": "ehot",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4175,6 +4609,7 @@
     {
       "teamSlug": "moloko",
       "playerSlug": "irishtea",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4182,6 +4617,7 @@
     {
       "teamSlug": "moloko",
       "playerSlug": "morgan",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4189,6 +4625,7 @@
     {
       "teamSlug": "moloko",
       "playerSlug": "npq",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4196,6 +4633,7 @@
     {
       "teamSlug": "moloko",
       "playerSlug": "saldatau",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4203,6 +4641,7 @@
     {
       "teamSlug": "morbus-mentis",
       "playerSlug": "armyanman",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4210,6 +4649,7 @@
     {
       "teamSlug": "morbus-mentis",
       "playerSlug": "ash",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4217,6 +4657,7 @@
     {
       "teamSlug": "morbus-mentis",
       "playerSlug": "chipollino",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4224,6 +4665,7 @@
     {
       "teamSlug": "morbus-mentis",
       "playerSlug": "e-sim",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4231,6 +4673,7 @@
     {
       "teamSlug": "morbus-mentis",
       "playerSlug": "sh1za-qb",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4238,6 +4681,7 @@
     {
       "teamSlug": "navi",
       "playerSlug": "beda",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.513Z"
@@ -4245,6 +4689,7 @@
     {
       "teamSlug": "navi",
       "playerSlug": "kit-ano",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.510Z"
@@ -4252,6 +4697,7 @@
     {
       "teamSlug": "navi",
       "playerSlug": "nicolas-sarcozy",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.518Z"
@@ -4259,6 +4705,7 @@
     {
       "teamSlug": "navi",
       "playerSlug": "snorlax212",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.516Z"
@@ -4266,6 +4713,7 @@
     {
       "teamSlug": "navi",
       "playerSlug": "wilkinson",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.511Z"
@@ -4273,6 +4721,7 @@
     {
       "teamSlug": "navi",
       "playerSlug": "ya-pinayu-eti-dengi",
+      "divisionKey": "s2/d2",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.519Z"
@@ -4280,6 +4729,7 @@
     {
       "teamSlug": "pasechniki",
       "playerSlug": "borts",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.544Z"
@@ -4287,6 +4737,7 @@
     {
       "teamSlug": "pasechniki",
       "playerSlug": "brokeboi",
+      "divisionKey": "s2/d2",
       "role": "coach",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.552Z"
@@ -4294,6 +4745,7 @@
     {
       "teamSlug": "pasechniki",
       "playerSlug": "dezzare",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.542Z"
@@ -4301,6 +4753,7 @@
     {
       "teamSlug": "pasechniki",
       "playerSlug": "light",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.550Z"
@@ -4308,6 +4761,7 @@
     {
       "teamSlug": "pasechniki",
       "playerSlug": "morda",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.548Z"
@@ -4315,6 +4769,7 @@
     {
       "teamSlug": "pasechniki",
       "playerSlug": "treshzor",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.546Z"
@@ -4322,6 +4777,7 @@
     {
       "teamSlug": "pomidory",
       "playerSlug": "kungfury",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.507Z"
@@ -4329,6 +4785,7 @@
     {
       "teamSlug": "pomidory",
       "playerSlug": "let-s-dance",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.502Z"
@@ -4336,6 +4793,7 @@
     {
       "teamSlug": "pomidory",
       "playerSlug": "rty",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.505Z"
@@ -4343,6 +4801,7 @@
     {
       "teamSlug": "pomidory",
       "playerSlug": "sexmachine",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.503Z"
@@ -4350,6 +4809,7 @@
     {
       "teamSlug": "pomidory",
       "playerSlug": "xrumiks",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.504Z"
@@ -4357,6 +4817,7 @@
     {
       "teamSlug": "psixdispancer",
       "playerSlug": "dmetrodiy",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4364,6 +4825,7 @@
     {
       "teamSlug": "psixdispancer",
       "playerSlug": "maxina",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4371,6 +4833,7 @@
     {
       "teamSlug": "psixdispancer",
       "playerSlug": "qwick",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4378,6 +4841,7 @@
     {
       "teamSlug": "psixdispancer",
       "playerSlug": "savety",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4385,6 +4849,7 @@
     {
       "teamSlug": "psixdispancer",
       "playerSlug": "zagada",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4392,6 +4857,7 @@
     {
       "teamSlug": "remix-d2",
       "playerSlug": "44",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.532Z"
@@ -4399,6 +4865,7 @@
     {
       "teamSlug": "remix-d2",
       "playerSlug": "mayonez1s",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.534Z"
@@ -4406,6 +4873,7 @@
     {
       "teamSlug": "remix-d2",
       "playerSlug": "mr-daddy",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.539Z"
@@ -4413,6 +4881,7 @@
     {
       "teamSlug": "remix-d2",
       "playerSlug": "staryy-ezh",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.533Z"
@@ -4420,6 +4889,7 @@
     {
       "teamSlug": "remix-d2",
       "playerSlug": "vargos",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.536Z"
@@ -4427,6 +4897,7 @@
     {
       "teamSlug": "remix",
       "playerSlug": "mayonez1s",
+      "divisionKey": "s2/d1",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4434,6 +4905,7 @@
     {
       "teamSlug": "remix",
       "playerSlug": "mini-bayk",
+      "divisionKey": "s2/d1",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4441,6 +4913,7 @@
     {
       "teamSlug": "remix",
       "playerSlug": "morphine",
+      "divisionKey": "s2/d1",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4448,6 +4921,7 @@
     {
       "teamSlug": "remix",
       "playerSlug": "nosferatu",
+      "divisionKey": "s2/d1",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4455,6 +4929,7 @@
     {
       "teamSlug": "remix",
       "playerSlug": "staryy-ezh",
+      "divisionKey": "s2/d1",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-23T00:30:35.000Z"
@@ -4462,6 +4937,7 @@
     {
       "teamSlug": "slonimskiy-pachastunok",
       "playerSlug": "1-01b",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.441Z"
@@ -4469,6 +4945,7 @@
     {
       "teamSlug": "slonimskiy-pachastunok",
       "playerSlug": "brazil",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.443Z"
@@ -4476,6 +4953,7 @@
     {
       "teamSlug": "slonimskiy-pachastunok",
       "playerSlug": "chipollino",
+      "divisionKey": "s2/d2",
       "role": "standin",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.449Z"
@@ -4483,6 +4961,7 @@
     {
       "teamSlug": "slonimskiy-pachastunok",
       "playerSlug": "estacada",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.447Z"
@@ -4490,6 +4969,7 @@
     {
       "teamSlug": "slonimskiy-pachastunok",
       "playerSlug": "highlight-provider",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.445Z"
@@ -4497,6 +4977,7 @@
     {
       "teamSlug": "slonimskiy-pachastunok",
       "playerSlug": "irishtea",
+      "divisionKey": "s2/d2",
       "role": "coach",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.451Z"
@@ -4504,6 +4985,7 @@
     {
       "teamSlug": "slonimskiy-pachastunok",
       "playerSlug": "npq",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.442Z"
@@ -4511,6 +4993,7 @@
     {
       "teamSlug": "team-sausages-disbanded",
       "playerSlug": "gommage",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.555Z"
@@ -4518,6 +5001,7 @@
     {
       "teamSlug": "team-sausages-disbanded",
       "playerSlug": "masterokxd",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.560Z"
@@ -4525,6 +5009,7 @@
     {
       "teamSlug": "team-sausages-disbanded",
       "playerSlug": "mini-bayk",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.558Z"
@@ -4532,6 +5017,7 @@
     {
       "teamSlug": "team-sausages-disbanded",
       "playerSlug": "moiofc",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.556Z"
@@ -4539,6 +5025,7 @@
     {
       "teamSlug": "team-sausages-disbanded",
       "playerSlug": "roma-shkereberd",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.561Z"
@@ -4546,6 +5033,7 @@
     {
       "teamSlug": "u-s-burgers",
       "playerSlug": "andryusha",
+      "divisionKey": "s2/d2",
       "role": "offlane",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.496Z"
@@ -4553,6 +5041,7 @@
     {
       "teamSlug": "u-s-burgers",
       "playerSlug": "delovo1",
+      "divisionKey": "s2/d2",
       "role": "hard-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.500Z"
@@ -4560,6 +5049,7 @@
     {
       "teamSlug": "u-s-burgers",
       "playerSlug": "devileye",
+      "divisionKey": "s2/d2",
       "role": "carry",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.492Z"
@@ -4567,6 +5057,7 @@
     {
       "teamSlug": "u-s-burgers",
       "playerSlug": "kolpaks",
+      "divisionKey": "s2/d2",
       "role": "soft-support",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.497Z"
@@ -4574,6 +5065,7 @@
     {
       "teamSlug": "u-s-burgers",
       "playerSlug": "twilightnest",
+      "divisionKey": "s2/d2",
       "role": "mid",
       "isCaptain": false,
       "createdAt": "2026-07-28T14:35:32.495Z"
@@ -8397,6 +8889,290 @@
       "gameNumber": 3
     }
   ],
+  "tournaments": [
+    {
+      "slug": "rtb",
+      "name": "test",
+      "short": "S3",
+      "description": "123qwe",
+      "format": "test",
+      "prize": "300$",
+      "logo": null,
+      "banner": null,
+      "status": "registration",
+      "startAt": "2026-08-24T00:00:00.000Z",
+      "endAt": "2026-08-31T00:00:00.000Z",
+      "regOpenAt": "2026-08-24T00:00:00.000Z",
+      "regCloseAt": "2026-10-30T00:00:00.000Z",
+      "createdAt": "2026-08-22T09:22:26.912Z",
+      "divisions": [
+        {
+          "slug": "d1",
+          "name": "div1",
+          "label": "ETSTT",
+          "short": "d12",
+          "orderNo": 0,
+          "mmrFrom": 32,
+          "mmrTo": 6000,
+          "relegation": true
+        }
+      ]
+    },
+    {
+      "slug": "s2",
+      "name": "LOST Season 2",
+      "short": "LOST S2",
+      "description": null,
+      "format": "2 дивизион(а), групповая стадия + плей-офф",
+      "prize": null,
+      "logo": null,
+      "banner": null,
+      "status": "running",
+      "startAt": null,
+      "endAt": null,
+      "regOpenAt": null,
+      "regCloseAt": null,
+      "createdAt": "2026-08-21T23:04:25.798Z",
+      "divisions": [
+        {
+          "slug": "d1",
+          "name": "Division 1",
+          "label": "LOST D1",
+          "short": "D1",
+          "orderNo": 0,
+          "mmrFrom": null,
+          "mmrTo": null,
+          "relegation": true
+        },
+        {
+          "slug": "d2",
+          "name": "Division 2",
+          "label": "LOST D2",
+          "short": "D2",
+          "orderNo": 1,
+          "mmrFrom": null,
+          "mmrTo": null,
+          "relegation": false
+        }
+      ]
+    },
+    {
+      "slug": "trdrt",
+      "name": "yftft",
+      "short": "gcf",
+      "description": null,
+      "format": "hgv",
+      "prize": null,
+      "logo": null,
+      "banner": null,
+      "status": "draft",
+      "startAt": "2026-07-30T00:00:00.000Z",
+      "endAt": "2026-09-02T00:00:00.000Z",
+      "regOpenAt": null,
+      "regCloseAt": null,
+      "createdAt": "2026-08-22T12:40:36.139Z",
+      "divisions": []
+    }
+  ],
+  "tournamentEntries": [
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "300",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.822Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "4naturala",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.826Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "5kn",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.828Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "bbc",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.838Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "cruiser-aurora-team",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.848Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "eclipse-gaming",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.851Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "ethereal",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.857Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "etherial-prime",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.858Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "from-paris",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.860Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "gitlz",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.863Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "guzliki",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.865Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "malchishki",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.866Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "moloko",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.870Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "morbus-mentis",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.872Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "psixdispancer",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.880Z"
+    },
+    {
+      "divisionKey": "s2/d1",
+      "teamSlug": "remix",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.882Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "acolytes",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.831Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "alt-q-q",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.834Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "chubriki",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.845Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "dark-aria",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.849Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "eclipse-gaming-young",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.854Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "navi",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.874Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "pasechniki",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.876Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "pomidory",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.878Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "remix-d2",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.884Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "slonimskiy-pachastunok",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.888Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "team-sausages-disbanded",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.889Z"
+    },
+    {
+      "divisionKey": "s2/d2",
+      "teamSlug": "u-s-burgers",
+      "seed": null,
+      "group": null,
+      "createdAt": "2026-08-21T23:04:25.891Z"
+    }
+  ],
+  "teamApplications": [],
   "groupEntries": [
     {
       "division": "Division 1",
@@ -8406,7 +9182,8 @@
       "wins": 6,
       "losses": 1,
       "points": 15,
-      "teamSlug": "guzliki"
+      "teamSlug": "guzliki",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8416,7 +9193,8 @@
       "wins": 5,
       "losses": 2,
       "points": 15,
-      "teamSlug": "ethereal"
+      "teamSlug": "ethereal",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8426,7 +9204,8 @@
       "wins": 4,
       "losses": 3,
       "points": 13,
-      "teamSlug": "300"
+      "teamSlug": "300",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8436,7 +9215,8 @@
       "wins": 4,
       "losses": 3,
       "points": 12,
-      "teamSlug": "morbus-mentis"
+      "teamSlug": "morbus-mentis",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8446,7 +9226,8 @@
       "wins": 4,
       "losses": 3,
       "points": 12,
-      "teamSlug": "eclipse-gaming"
+      "teamSlug": "eclipse-gaming",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8456,7 +9237,8 @@
       "wins": 3,
       "losses": 4,
       "points": 8,
-      "teamSlug": "gitlz"
+      "teamSlug": "gitlz",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8466,7 +9248,8 @@
       "wins": 2,
       "losses": 5,
       "points": 7,
-      "teamSlug": "4naturala"
+      "teamSlug": "4naturala",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8476,7 +9259,8 @@
       "wins": 0,
       "losses": 7,
       "points": 2,
-      "teamSlug": "5kn"
+      "teamSlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8486,7 +9270,8 @@
       "wins": 7,
       "losses": 0,
       "points": 18,
-      "teamSlug": "moloko"
+      "teamSlug": "moloko",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8496,7 +9281,8 @@
       "wins": 5,
       "losses": 2,
       "points": 17,
-      "teamSlug": "psixdispancer"
+      "teamSlug": "psixdispancer",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8506,7 +9292,8 @@
       "wins": 5,
       "losses": 2,
       "points": 13,
-      "teamSlug": "etherial-prime"
+      "teamSlug": "etherial-prime",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8516,7 +9303,8 @@
       "wins": 4,
       "losses": 3,
       "points": 11,
-      "teamSlug": "from-paris"
+      "teamSlug": "from-paris",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8526,7 +9314,8 @@
       "wins": 3,
       "losses": 4,
       "points": 10,
-      "teamSlug": "bbc"
+      "teamSlug": "bbc",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8536,7 +9325,8 @@
       "wins": 2,
       "losses": 5,
       "points": 7,
-      "teamSlug": "remix"
+      "teamSlug": "remix",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8546,7 +9336,8 @@
       "wins": 1,
       "losses": 6,
       "points": 4,
-      "teamSlug": "cruiser-aurora-team"
+      "teamSlug": "cruiser-aurora-team",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 1",
@@ -8556,7 +9347,8 @@
       "wins": 1,
       "losses": 6,
       "points": 4,
-      "teamSlug": "malchishki"
+      "teamSlug": "malchishki",
+      "divisionKey": "s2/d1"
     },
     {
       "division": "Division 2",
@@ -8566,7 +9358,8 @@
       "wins": 5,
       "losses": 0,
       "points": 13,
-      "teamSlug": "eclipse-gaming-young"
+      "teamSlug": "eclipse-gaming-young",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8576,7 +9369,8 @@
       "wins": 4,
       "losses": 1,
       "points": 11,
-      "teamSlug": "pomidory"
+      "teamSlug": "pomidory",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8586,7 +9380,8 @@
       "wins": 3,
       "losses": 2,
       "points": 11,
-      "teamSlug": "alt-q-q"
+      "teamSlug": "alt-q-q",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8596,7 +9391,8 @@
       "wins": 2,
       "losses": 3,
       "points": 6,
-      "teamSlug": "acolytes"
+      "teamSlug": "acolytes",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8606,7 +9402,8 @@
       "wins": 1,
       "losses": 4,
       "points": 4,
-      "teamSlug": "slonimskiy-pachastunok"
+      "teamSlug": "slonimskiy-pachastunok",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8616,7 +9413,8 @@
       "wins": 0,
       "losses": 5,
       "points": 0,
-      "teamSlug": "team-sausages-disbanded"
+      "teamSlug": "team-sausages-disbanded",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8626,7 +9424,8 @@
       "wins": 4,
       "losses": 1,
       "points": 12,
-      "teamSlug": "u-s-burgers"
+      "teamSlug": "u-s-burgers",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8636,7 +9435,8 @@
       "wins": 3,
       "losses": 2,
       "points": 10,
-      "teamSlug": "remix-d2"
+      "teamSlug": "remix-d2",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8646,7 +9446,8 @@
       "wins": 3,
       "losses": 2,
       "points": 8,
-      "teamSlug": "chubriki"
+      "teamSlug": "chubriki",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8656,7 +9457,8 @@
       "wins": 3,
       "losses": 2,
       "points": 7,
-      "teamSlug": "pasechniki"
+      "teamSlug": "pasechniki",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8666,7 +9468,8 @@
       "wins": 1,
       "losses": 4,
       "points": 5,
-      "teamSlug": "dark-aria"
+      "teamSlug": "dark-aria",
+      "divisionKey": "s2/d2"
     },
     {
       "division": "Division 2",
@@ -8676,7 +9479,8 @@
       "wins": 1,
       "losses": 4,
       "points": 3,
-      "teamSlug": "navi"
+      "teamSlug": "navi",
+      "divisionKey": "s2/d2"
     }
   ],
   "series": [
@@ -8695,7 +9499,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "300",
-      "awaySlug": "5kn"
+      "awaySlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "300-vs-bbc",
@@ -8712,7 +9517,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "300",
-      "awaySlug": "bbc"
+      "awaySlug": "bbc",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "300-vs-guzliki",
@@ -8729,7 +9535,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "300",
-      "awaySlug": "guzliki"
+      "awaySlug": "guzliki",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "300-vs-morbus-mentis",
@@ -8746,7 +9553,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "300",
-      "awaySlug": "morbus-mentis"
+      "awaySlug": "morbus-mentis",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "4naturala-vs-300",
@@ -8763,7 +9571,8 @@
       "awayScore": 2,
       "guessed": false,
       "homeSlug": "4naturala",
-      "awaySlug": "300"
+      "awaySlug": "300",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "4naturala-vs-5kn",
@@ -8780,7 +9589,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "4naturala",
-      "awaySlug": "5kn"
+      "awaySlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "4naturala-vs-gitlz",
@@ -8797,7 +9607,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "4naturala",
-      "awaySlug": "gitlz"
+      "awaySlug": "gitlz",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "4naturala-vs-morbus-mentis",
@@ -8814,7 +9625,8 @@
       "awayScore": 2,
       "guessed": false,
       "homeSlug": "4naturala",
-      "awaySlug": "morbus-mentis"
+      "awaySlug": "morbus-mentis",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "acolytes-vs-slonimskiy-pachastunok",
@@ -8831,7 +9643,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "acolytes",
-      "awaySlug": "slonimskiy-pachastunok"
+      "awaySlug": "slonimskiy-pachastunok",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "acolytes-vs-team-sausages-disbanded",
@@ -8848,7 +9661,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "acolytes",
-      "awaySlug": "team-sausages-disbanded"
+      "awaySlug": "team-sausages-disbanded",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "alt-q-q-vs-acolytes",
@@ -8865,7 +9679,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "alt-q-q",
-      "awaySlug": "acolytes"
+      "awaySlug": "acolytes",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "alt-q-q-vs-dark-aria",
@@ -8882,7 +9697,8 @@
       "awayScore": 2,
       "guessed": false,
       "homeSlug": "alt-q-q",
-      "awaySlug": "dark-aria"
+      "awaySlug": "dark-aria",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "alt-q-q-vs-slonimskiy-pachastunok",
@@ -8899,7 +9715,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "alt-q-q",
-      "awaySlug": "slonimskiy-pachastunok"
+      "awaySlug": "slonimskiy-pachastunok",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "alt-q-q-vs-team-sausages-disbanded",
@@ -8916,7 +9733,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "alt-q-q",
-      "awaySlug": "team-sausages-disbanded"
+      "awaySlug": "team-sausages-disbanded",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "bbc-vs-cruiser-aurora-team",
@@ -8933,7 +9751,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "bbc",
-      "awaySlug": "cruiser-aurora-team"
+      "awaySlug": "cruiser-aurora-team",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "bbc-vs-from-paris",
@@ -8950,7 +9769,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "bbc",
-      "awaySlug": "from-paris"
+      "awaySlug": "from-paris",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "bbc-vs-malchishki",
@@ -8967,7 +9787,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "bbc",
-      "awaySlug": "malchishki"
+      "awaySlug": "malchishki",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "chubriki-vs-dark-aria",
@@ -8984,7 +9805,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "chubriki",
-      "awaySlug": "dark-aria"
+      "awaySlug": "dark-aria",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "chubriki-vs-remix-d2",
@@ -9001,7 +9823,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "chubriki",
-      "awaySlug": "remix-d2"
+      "awaySlug": "remix-d2",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "chubriki-vs-u-s-burgers",
@@ -9018,7 +9841,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "chubriki",
-      "awaySlug": "u-s-burgers"
+      "awaySlug": "u-s-burgers",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "cruiser-aurora-team-vs-malchishki",
@@ -9035,7 +9859,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "cruiser-aurora-team",
-      "awaySlug": "malchishki"
+      "awaySlug": "malchishki",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "dark-aria-vs-navi",
@@ -9052,7 +9877,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "dark-aria",
-      "awaySlug": "navi"
+      "awaySlug": "navi",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "eclipse-gaming-vs-300",
@@ -9069,7 +9895,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "eclipse-gaming",
-      "awaySlug": "300"
+      "awaySlug": "300",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "eclipse-gaming-vs-4naturala",
@@ -9086,7 +9913,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "eclipse-gaming",
-      "awaySlug": "4naturala"
+      "awaySlug": "4naturala",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "eclipse-gaming-vs-5kn",
@@ -9103,7 +9931,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "eclipse-gaming",
-      "awaySlug": "5kn"
+      "awaySlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "eclipse-gaming-vs-gitlz",
@@ -9120,7 +9949,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "eclipse-gaming",
-      "awaySlug": "gitlz"
+      "awaySlug": "gitlz",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "eclipse-gaming-young-vs-acolytes",
@@ -9137,7 +9967,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "eclipse-gaming-young",
-      "awaySlug": "acolytes"
+      "awaySlug": "acolytes",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "eclipse-gaming-young-vs-alt-q-q",
@@ -9154,7 +9985,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "eclipse-gaming-young",
-      "awaySlug": "alt-q-q"
+      "awaySlug": "alt-q-q",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "eclipse-gaming-young-vs-pasechniki",
@@ -9171,7 +10003,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "eclipse-gaming-young",
-      "awaySlug": "pasechniki"
+      "awaySlug": "pasechniki",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "eclipse-gaming-young-vs-pomidory",
@@ -9188,7 +10021,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "eclipse-gaming-young",
-      "awaySlug": "pomidory"
+      "awaySlug": "pomidory",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "eclipse-gaming-young-vs-remix-d2",
@@ -9205,7 +10039,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "eclipse-gaming-young",
-      "awaySlug": "remix-d2"
+      "awaySlug": "remix-d2",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "eclipse-gaming-young-vs-slonimskiy-pachastunok",
@@ -9222,7 +10057,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "eclipse-gaming-young",
-      "awaySlug": "slonimskiy-pachastunok"
+      "awaySlug": "slonimskiy-pachastunok",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "eclipse-gaming-young-vs-team-sausages-disbanded",
@@ -9239,7 +10075,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "eclipse-gaming-young",
-      "awaySlug": "team-sausages-disbanded"
+      "awaySlug": "team-sausages-disbanded",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "ethereal-vs-300",
@@ -9256,7 +10093,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "ethereal",
-      "awaySlug": "300"
+      "awaySlug": "300",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "ethereal-vs-4naturala",
@@ -9273,7 +10111,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "ethereal",
-      "awaySlug": "4naturala"
+      "awaySlug": "4naturala",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "ethereal-vs-5kn",
@@ -9290,7 +10129,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "ethereal",
-      "awaySlug": "5kn"
+      "awaySlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "ethereal-vs-eclipse-gaming",
@@ -9307,7 +10147,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "ethereal",
-      "awaySlug": "eclipse-gaming"
+      "awaySlug": "eclipse-gaming",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "ethereal-vs-eclipse-gaming-2",
@@ -9324,7 +10165,8 @@
       "awayScore": 1,
       "guessed": true,
       "homeSlug": "ethereal",
-      "awaySlug": "eclipse-gaming"
+      "awaySlug": "eclipse-gaming",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "ethereal-vs-gitlz",
@@ -9341,7 +10183,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "ethereal",
-      "awaySlug": "gitlz"
+      "awaySlug": "gitlz",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "etherial-prime-vs-bbc",
@@ -9358,7 +10201,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "etherial-prime",
-      "awaySlug": "bbc"
+      "awaySlug": "bbc",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "etherial-prime-vs-cruiser-aurora-team",
@@ -9375,7 +10219,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "etherial-prime",
-      "awaySlug": "cruiser-aurora-team"
+      "awaySlug": "cruiser-aurora-team",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "etherial-prime-vs-ethereal",
@@ -9392,7 +10237,8 @@
       "awayScore": 1,
       "guessed": true,
       "homeSlug": "etherial-prime",
-      "awaySlug": "ethereal"
+      "awaySlug": "ethereal",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "etherial-prime-vs-from-paris",
@@ -9409,7 +10255,8 @@
       "awayScore": 2,
       "guessed": false,
       "homeSlug": "etherial-prime",
-      "awaySlug": "from-paris"
+      "awaySlug": "from-paris",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "etherial-prime-vs-malchishki",
@@ -9426,7 +10273,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "etherial-prime",
-      "awaySlug": "malchishki"
+      "awaySlug": "malchishki",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "etherial-prime-vs-psixdispancer",
@@ -9443,7 +10291,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "etherial-prime",
-      "awaySlug": "psixdispancer"
+      "awaySlug": "psixdispancer",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "etherial-prime-vs-remix",
@@ -9460,7 +10309,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "etherial-prime",
-      "awaySlug": "remix"
+      "awaySlug": "remix",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "from-paris-vs-cruiser-aurora-team",
@@ -9477,7 +10327,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "from-paris",
-      "awaySlug": "cruiser-aurora-team"
+      "awaySlug": "cruiser-aurora-team",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "from-paris-vs-malchishki",
@@ -9494,7 +10345,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "from-paris",
-      "awaySlug": "malchishki"
+      "awaySlug": "malchishki",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "from-paris-vs-remix",
@@ -9511,7 +10363,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "from-paris",
-      "awaySlug": "remix"
+      "awaySlug": "remix",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "gitlz-vs-300",
@@ -9528,7 +10381,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "gitlz",
-      "awaySlug": "300"
+      "awaySlug": "300",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "gitlz-vs-5kn",
@@ -9545,7 +10399,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "gitlz",
-      "awaySlug": "5kn"
+      "awaySlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "gitlz-vs-morbus-mentis",
@@ -9562,7 +10417,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "gitlz",
-      "awaySlug": "morbus-mentis"
+      "awaySlug": "morbus-mentis",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "guzliki-vs-4naturala",
@@ -9579,7 +10435,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "guzliki",
-      "awaySlug": "4naturala"
+      "awaySlug": "4naturala",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "guzliki-vs-5kn",
@@ -9596,7 +10453,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "guzliki",
-      "awaySlug": "5kn"
+      "awaySlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "guzliki-vs-eclipse-gaming",
@@ -9613,7 +10471,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "guzliki",
-      "awaySlug": "eclipse-gaming"
+      "awaySlug": "eclipse-gaming",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "guzliki-vs-ethereal",
@@ -9630,7 +10489,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "guzliki",
-      "awaySlug": "ethereal"
+      "awaySlug": "ethereal",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "guzliki-vs-from-paris",
@@ -9647,7 +10507,8 @@
       "awayScore": 1,
       "guessed": true,
       "homeSlug": "guzliki",
-      "awaySlug": "from-paris"
+      "awaySlug": "from-paris",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "guzliki-vs-gitlz",
@@ -9664,7 +10525,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "guzliki",
-      "awaySlug": "gitlz"
+      "awaySlug": "gitlz",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "guzliki-vs-morbus-mentis",
@@ -9681,7 +10543,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "guzliki",
-      "awaySlug": "morbus-mentis"
+      "awaySlug": "morbus-mentis",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "malchishki-vs-remix",
@@ -9698,7 +10561,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "malchishki",
-      "awaySlug": "remix"
+      "awaySlug": "remix",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-bbc",
@@ -9715,7 +10579,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "moloko",
-      "awaySlug": "bbc"
+      "awaySlug": "bbc",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-cruiser-aurora-team",
@@ -9732,7 +10597,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "moloko",
-      "awaySlug": "cruiser-aurora-team"
+      "awaySlug": "cruiser-aurora-team",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-etherial-prime",
@@ -9749,7 +10615,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "moloko",
-      "awaySlug": "etherial-prime"
+      "awaySlug": "etherial-prime",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-from-paris",
@@ -9766,7 +10633,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "moloko",
-      "awaySlug": "from-paris"
+      "awaySlug": "from-paris",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-malchishki",
@@ -9783,7 +10651,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "moloko",
-      "awaySlug": "malchishki"
+      "awaySlug": "malchishki",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-psixdispancer",
@@ -9800,7 +10669,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "moloko",
-      "awaySlug": "psixdispancer"
+      "awaySlug": "psixdispancer",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-remix",
@@ -9817,7 +10687,8 @@
       "awayScore": 0,
       "guessed": true,
       "homeSlug": "moloko",
-      "awaySlug": "remix"
+      "awaySlug": "remix",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "moloko-vs-remix-2",
@@ -9834,7 +10705,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "moloko",
-      "awaySlug": "remix"
+      "awaySlug": "remix",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "morbus-mentis-vs-5kn",
@@ -9851,7 +10723,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "morbus-mentis",
-      "awaySlug": "5kn"
+      "awaySlug": "5kn",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "morbus-mentis-vs-eclipse-gaming",
@@ -9868,7 +10741,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "morbus-mentis",
-      "awaySlug": "eclipse-gaming"
+      "awaySlug": "eclipse-gaming",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "morbus-mentis-vs-ethereal",
@@ -9885,7 +10759,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "morbus-mentis",
-      "awaySlug": "ethereal"
+      "awaySlug": "ethereal",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "morbus-mentis-vs-etherial-prime",
@@ -9902,7 +10777,8 @@
       "awayScore": 1,
       "guessed": true,
       "homeSlug": "morbus-mentis",
-      "awaySlug": "etherial-prime"
+      "awaySlug": "etherial-prime",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "morbus-mentis-vs-moloko",
@@ -9919,7 +10795,8 @@
       "awayScore": 0,
       "guessed": true,
       "homeSlug": "morbus-mentis",
-      "awaySlug": "moloko"
+      "awaySlug": "moloko",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "navi-vs-chubriki",
@@ -9936,7 +10813,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "navi",
-      "awaySlug": "chubriki"
+      "awaySlug": "chubriki",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pasechniki-vs-chubriki",
@@ -9953,7 +10831,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "pasechniki",
-      "awaySlug": "chubriki"
+      "awaySlug": "chubriki",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pasechniki-vs-dark-aria",
@@ -9970,7 +10849,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "pasechniki",
-      "awaySlug": "dark-aria"
+      "awaySlug": "dark-aria",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pasechniki-vs-navi",
@@ -9987,7 +10867,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "pasechniki",
-      "awaySlug": "navi"
+      "awaySlug": "navi",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pomidory-vs-acolytes",
@@ -10004,7 +10885,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "pomidory",
-      "awaySlug": "acolytes"
+      "awaySlug": "acolytes",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pomidory-vs-alt-q-q",
@@ -10021,7 +10903,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "pomidory",
-      "awaySlug": "alt-q-q"
+      "awaySlug": "alt-q-q",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pomidory-vs-chubriki",
@@ -10038,7 +10921,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "pomidory",
-      "awaySlug": "chubriki"
+      "awaySlug": "chubriki",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pomidory-vs-slonimskiy-pachastunok",
@@ -10055,7 +10939,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "pomidory",
-      "awaySlug": "slonimskiy-pachastunok"
+      "awaySlug": "slonimskiy-pachastunok",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pomidory-vs-team-sausages-disbanded",
@@ -10072,7 +10957,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "pomidory",
-      "awaySlug": "team-sausages-disbanded"
+      "awaySlug": "team-sausages-disbanded",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "pomidory-vs-u-s-burgers",
@@ -10089,7 +10975,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "pomidory",
-      "awaySlug": "u-s-burgers"
+      "awaySlug": "u-s-burgers",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "psixdispancer-vs-300",
@@ -10106,7 +10993,8 @@
       "awayScore": 0,
       "guessed": true,
       "homeSlug": "psixdispancer",
-      "awaySlug": "300"
+      "awaySlug": "300",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "psixdispancer-vs-bbc",
@@ -10123,7 +11011,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "psixdispancer",
-      "awaySlug": "bbc"
+      "awaySlug": "bbc",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "psixdispancer-vs-cruiser-aurora-team",
@@ -10140,7 +11029,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "psixdispancer",
-      "awaySlug": "cruiser-aurora-team"
+      "awaySlug": "cruiser-aurora-team",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "psixdispancer-vs-from-paris",
@@ -10157,7 +11047,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "psixdispancer",
-      "awaySlug": "from-paris"
+      "awaySlug": "from-paris",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "psixdispancer-vs-malchishki",
@@ -10174,7 +11065,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "psixdispancer",
-      "awaySlug": "malchishki"
+      "awaySlug": "malchishki",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "psixdispancer-vs-remix",
@@ -10191,7 +11083,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "psixdispancer",
-      "awaySlug": "remix"
+      "awaySlug": "remix",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "remix-d2-vs-alt-q-q",
@@ -10208,7 +11101,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "remix-d2",
-      "awaySlug": "alt-q-q"
+      "awaySlug": "alt-q-q",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "remix-d2-vs-dark-aria",
@@ -10225,7 +11119,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "remix-d2",
-      "awaySlug": "dark-aria"
+      "awaySlug": "dark-aria",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "remix-d2-vs-navi",
@@ -10242,7 +11137,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "remix-d2",
-      "awaySlug": "navi"
+      "awaySlug": "navi",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "remix-d2-vs-pasechniki",
@@ -10259,7 +11155,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "remix-d2",
-      "awaySlug": "pasechniki"
+      "awaySlug": "pasechniki",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "remix-vs-bbc",
@@ -10276,7 +11173,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "remix",
-      "awaySlug": "bbc"
+      "awaySlug": "bbc",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "remix-vs-cruiser-aurora-team",
@@ -10293,7 +11191,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "remix",
-      "awaySlug": "cruiser-aurora-team"
+      "awaySlug": "cruiser-aurora-team",
+      "divisionKey": "s2/d1"
     },
     {
       "slug": "slonimskiy-pachastunok-vs-team-sausages-disbanded",
@@ -10310,7 +11209,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "slonimskiy-pachastunok",
-      "awaySlug": "team-sausages-disbanded"
+      "awaySlug": "team-sausages-disbanded",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "u-s-burgers-vs-acolytes",
@@ -10327,7 +11227,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "u-s-burgers",
-      "awaySlug": "acolytes"
+      "awaySlug": "acolytes",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "u-s-burgers-vs-dark-aria",
@@ -10344,7 +11245,8 @@
       "awayScore": 1,
       "guessed": false,
       "homeSlug": "u-s-burgers",
-      "awaySlug": "dark-aria"
+      "awaySlug": "dark-aria",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "u-s-burgers-vs-navi",
@@ -10361,7 +11263,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "u-s-burgers",
-      "awaySlug": "navi"
+      "awaySlug": "navi",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "u-s-burgers-vs-pasechniki",
@@ -10378,7 +11281,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "u-s-burgers",
-      "awaySlug": "pasechniki"
+      "awaySlug": "pasechniki",
+      "divisionKey": "s2/d2"
     },
     {
       "slug": "u-s-burgers-vs-remix-d2",
@@ -10395,7 +11299,8 @@
       "awayScore": 0,
       "guessed": false,
       "homeSlug": "u-s-burgers",
-      "awaySlug": "remix-d2"
+      "awaySlug": "remix-d2",
+      "divisionKey": "s2/d2"
     }
   ],
   "matchStats": [
@@ -53009,7 +53914,1196 @@
       "playerSlug": "tpabka"
     }
   ],
-  "pointsEntries": [],
+  "pointsEntries": [
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 96,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.488Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "irishtea",
+      "subjectRawId": 21,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 105,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.491Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "npq",
+      "subjectRawId": 22,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 172,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.492Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "morgan",
+      "subjectRawId": 23,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 146,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.494Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "saldatau",
+      "subjectRawId": 24,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 323,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.495Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "ehot",
+      "subjectRawId": 25,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 145,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.497Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "chervyak",
+      "subjectRawId": 26,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 130,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.498Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "lonely",
+      "subjectRawId": 27,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 289,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.499Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "armyanman",
+      "subjectRawId": 29,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 139,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.501Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "ash",
+      "subjectRawId": 30,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 156,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.504Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "sh1za-qb",
+      "subjectRawId": 31,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 113,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.505Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "chipollino",
+      "subjectRawId": 32,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 12,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.506Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "devileye",
+      "subjectRawId": 33,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 3,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.507Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "mangekyou6o",
+      "subjectRawId": 34,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 10,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.508Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "andryusha",
+      "subjectRawId": 35,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 105,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.510Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "kolpaks",
+      "subjectRawId": 36,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 1,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.512Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "staryy-ezh",
+      "subjectRawId": 39,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 49,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.513Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "mayonez1s",
+      "subjectRawId": 40,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 1,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.514Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "nosferatu",
+      "subjectRawId": 42,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 20,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.515Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "brazil",
+      "subjectRawId": 43,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 106,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.516Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "zagada",
+      "subjectRawId": 45,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 2,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.518Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "dmetrodiy",
+      "subjectRawId": 46,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 124,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.518Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "maxina",
+      "subjectRawId": 47,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 87,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.520Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "qwick",
+      "subjectRawId": 48,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 26,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.521Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "pugovichka-otorvalasya",
+      "subjectRawId": 50,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 2,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.522Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "turtle",
+      "subjectRawId": 51,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 36,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.523Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "v1ole",
+      "subjectRawId": 52,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 26,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.523Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "p1rat",
+      "subjectRawId": 53,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 35,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.524Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "fallen",
+      "subjectRawId": 54,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 50,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.525Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "moonrise",
+      "subjectRawId": 55,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 150,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.526Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "ayori",
+      "subjectRawId": 56,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 110,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.526Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "nohara",
+      "subjectRawId": 57,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 110,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.527Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "foolovskiy",
+      "subjectRawId": 58,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 125,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.527Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "flint-lockwood",
+      "subjectRawId": 59,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 171,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.528Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "destro",
+      "subjectRawId": 60,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 5,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.529Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "frvr",
+      "subjectRawId": 61,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 3,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.530Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "sdd",
+      "subjectRawId": 62,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 28,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.532Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "dezesmol",
+      "subjectRawId": 63,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 1,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.533Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "rox",
+      "subjectRawId": 64,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 1,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.535Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "seraphim",
+      "subjectRawId": 65,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 1,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.538Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "blas",
+      "subjectRawId": 66,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 2,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.539Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "xus",
+      "subjectRawId": 70,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 53,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.540Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "neverland",
+      "subjectRawId": 72,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 21,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.542Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "kurame",
+      "subjectRawId": 75,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 2,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.543Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "sexmachine",
+      "subjectRawId": 76,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 2,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.544Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "pashcock",
+      "subjectRawId": 77,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 20,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.545Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "rty",
+      "subjectRawId": 78,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 241,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.545Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "sunlive",
+      "subjectRawId": 79,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 133,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.547Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "petka",
+      "subjectRawId": 80,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 48,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.548Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "ilyushka",
+      "subjectRawId": 81,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 116,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.549Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "zhozik",
+      "subjectRawId": 87,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 26,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.550Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "qsarigama",
+      "subjectRawId": 88,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 61,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.551Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "treshzor",
+      "subjectRawId": 89,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 74,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.552Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "amok",
+      "subjectRawId": 90,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 146,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.553Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "sanek",
+      "subjectRawId": 91,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 118,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.554Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "dafutka",
+      "subjectRawId": 92,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 2,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.556Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "foxxxyyy",
+      "subjectRawId": 93,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 70,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.557Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "bann",
+      "subjectRawId": 94,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 41,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.559Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "benzo",
+      "subjectRawId": 95,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 90,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.560Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "rost1k",
+      "subjectRawId": 96,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 40,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.561Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "burlesk",
+      "subjectRawId": 97,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 2,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.562Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "danya-ze-faker",
+      "subjectRawId": 100,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 18,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.563Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "fmy",
+      "subjectRawId": 104,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 18,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.564Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "akama",
+      "subjectRawId": 105,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 100,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.564Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "moody",
+      "subjectRawId": 106,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 19,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.565Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "astarotzio",
+      "subjectRawId": 107,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 18,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.566Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "nico",
+      "subjectRawId": 108,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 78,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.567Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "b-u-r-i-z-a",
+      "subjectRawId": 112,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 127,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.568Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "pasteroni-ja",
+      "subjectRawId": 113,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 20,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.569Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "frizzing",
+      "subjectRawId": 114,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 70,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.569Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "renaissance",
+      "subjectRawId": 116,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 196,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.570Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "1-01b",
+      "subjectRawId": 117,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 119,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.571Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "highlight-provider",
+      "subjectRawId": 118,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 40,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.573Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "estacada",
+      "subjectRawId": 119,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 110,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.574Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "serhio",
+      "subjectRawId": 120,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 110,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.575Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "l-bionix-l",
+      "subjectRawId": 122,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 55,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.576Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "mel",
+      "subjectRawId": 123,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 5,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.577Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "egorkanoobas",
+      "subjectRawId": 124,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 33,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.578Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "cookei-1",
+      "subjectRawId": 125,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 6,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.579Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "kislomolochnyy",
+      "subjectRawId": 126,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 21,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.580Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "chomoske",
+      "subjectRawId": 127,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 114,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.580Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "sett",
+      "subjectRawId": 128,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 282,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.581Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "smn",
+      "subjectRawId": 129,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 1,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.583Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "the-one",
+      "subjectRawId": 131,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 20,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.585Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "nimpo",
+      "subjectRawId": 132,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 135,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.589Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "twilightnest",
+      "subjectRawId": 135,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 41,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.591Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "let-s-dance",
+      "subjectRawId": 137,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 2,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.594Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "kit-ano",
+      "subjectRawId": 140,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 76,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.596Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "wilkinson",
+      "subjectRawId": 141,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 244,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.599Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "beda",
+      "subjectRawId": 142,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 180,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.601Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "nicolas-sarcozy",
+      "subjectRawId": 144,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 81,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.604Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "tpabka",
+      "subjectRawId": 146,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 144,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.605Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "gata-me-liga",
+      "subjectRawId": 147,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 20,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.607Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "shastik",
+      "subjectRawId": 149,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 29,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.609Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "44",
+      "subjectRawId": 151,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 1,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.610Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "vargos",
+      "subjectRawId": 152,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 223,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.611Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "morda",
+      "subjectRawId": 156,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 220,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.614Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "light",
+      "subjectRawId": 157,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 186,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.615Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "brokeboi",
+      "subjectRawId": 158,
+      "matchKey": null
+    },
+    {
+      "subjectType": "player",
+      "reason": "tp",
+      "amount": 1,
+      "note": "перенос сезонного зачёта LOST S2",
+      "createdBy": null,
+      "createdAt": "2026-08-22T10:00:55.616Z",
+      "tournamentSlug": "s2",
+      "subjectSlug": "gommage",
+      "subjectRawId": 159,
+      "matchKey": null
+    }
+  ],
   "renders": [],
   "wards": [
     {
@@ -325807,6 +327901,65 @@
       "killerSlug": "",
       "matchKey": "8928152174",
       "teamSlug": "alt-q-q"
+    }
+  ],
+  "accounts": [
+    {
+      "email": "mehhhh12221@gmail.com",
+      "googleSub": "109864542485506344784",
+      "passwordHash": "bb8fe04426c79060351fe6f2db1c8525:23ba156c67e36ce9f4d91715f5eae2fc0f486abb521715d775e2311f0cf0fc6aa3c9bbbf5b6b051ee872a3236e289edc56b3eea9b763288873e5650a567212e7",
+      "emailVerified": true,
+      "name": "Mehdi larbi",
+      "avatar": "https://lh3.googleusercontent.com/a/ACg8ocImqaDGXYqE9bm9vNWM_R0qlRflaLhF2VdEynrDTKN0SkQ2Og=s96-c",
+      "role": "admin",
+      "permissions": "accounts.admins,roster.edit",
+      "status": "active",
+      "application": null,
+      "policyAcceptedAt": null,
+      "submittedAt": null,
+      "reviewedAt": null,
+      "rejectedReason": null,
+      "createdAt": "2026-08-20T19:08:56.496Z",
+      "playerSlug": "sett",
+      "claimSlug": null
+    },
+    {
+      "email": "razel55a@gmail.com",
+      "googleSub": null,
+      "passwordHash": "608aa2f118b433ec12fd4e43e3a74dd1:4a22e673818b8d6338e542b5cd14844e073aa338a2ac9c9b122d32d73bf757918b515d1fa278a50df43769d47061c152a0803f78947ecf6e0aa5bc7692f29240",
+      "emailVerified": false,
+      "name": "NPQ",
+      "avatar": null,
+      "role": "admin",
+      "permissions": "tp.edit",
+      "status": "active",
+      "application": "{\"nickname\":\"miracle\",\"realName\":\"Desin\",\"birthday\":\"2007-05-17\",\"city\":\"Minsk\",\"country\":\"Belarus\",\"dotabuff\":\"https://www.dotabuff.com/players/288687180\",\"stratz\":\"\",\"steam\":\"\",\"telegram\":\"bsknchni\",\"position\":\"carry\",\"mmr\":9999,\"achievements\":\"основатель ебки\"}",
+      "policyAcceptedAt": "2026-08-20T21:42:25.937Z",
+      "submittedAt": "2026-08-20T21:42:25.937Z",
+      "reviewedAt": "2026-08-20T21:43:06.512Z",
+      "rejectedReason": null,
+      "createdAt": "2026-08-20T21:40:24.371Z",
+      "playerSlug": "miracle",
+      "claimSlug": null
+    },
+    {
+      "email": "stanislav.bovshis@gmail.com",
+      "googleSub": "106907069221969989962",
+      "passwordHash": "e859581ce74ca0fa8eb8344f1e2f332e:3ce7060a6dfd99af3489fd415d0eb1ec8d485e5dcbbeb5c618360fb30dae5ca72b8722b6003e649de85ccfc285546679eb19437913290decc5c7fdc0b4c4099b",
+      "emailVerified": true,
+      "name": "Stanislau Boushys",
+      "avatar": "https://lh3.googleusercontent.com/a/ACg8ocLTSxM7QcROSAf3Yee6su_1pQ2FhwPzTj7y1VFkjRXG880QPkB4=s96-c",
+      "role": "owner",
+      "permissions": null,
+      "status": "active",
+      "application": null,
+      "policyAcceptedAt": null,
+      "submittedAt": null,
+      "reviewedAt": null,
+      "rejectedReason": null,
+      "createdAt": "2026-08-12T00:03:21.034Z",
+      "playerSlug": "bsk",
+      "claimSlug": null
     }
   ]
 }

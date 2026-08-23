@@ -3,11 +3,15 @@ import { notFound } from "next/navigation";
 import { getPlayer, listTeams } from "@/lib/roster-data";
 import { roleOrder } from "@/lib/roles";
 import { PlayerEditor, SpotsEditor } from "@/app/_components/roster-editors";
+import { denyUnlessPermission } from "../../../../../_components/permission-gate";
 
 export const dynamic = "force-dynamic";
 
 // Правка отделена от профиля: страница игрока читается как карточка, а формы живут здесь.
 export default async function PlayerEditPage({ params }: { params: Promise<{ id: string }> }) {
+  const denied = await denyUnlessPermission("roster.edit", "Правка игрока");
+  if (denied) return denied;
+
   const { id } = await params;
   const [player, teams] = await Promise.all([getPlayer(Number(id)), listTeams()]);
   if (!player) notFound();
@@ -15,13 +19,13 @@ export default async function PlayerEditPage({ params }: { params: Promise<{ id:
   const spots = [...player.spots].sort((a, b) => roleOrder(a.role) - roleOrder(b.role));
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-2 text-sm text-ink-subtle">
-        <Link href="/roster/players" className="hover:text-ink-muted">
+    <div className="space-y-6 font-pouf">
+      <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-muted">
+        <Link href="/roster/players" className="hover:text-[var(--purple)]">
           Игроки
         </Link>
         <span className="text-ink-subtle">/</span>
-        <Link href={`/roster/players/${player.id}`} className="hover:text-ink-muted">
+        <Link href={`/roster/players/${player.id}`} className="hover:text-[var(--purple)]">
           {player.nickname}
         </Link>
         <span className="text-ink-subtle">/</span>
@@ -29,8 +33,8 @@ export default async function PlayerEditPage({ params }: { params: Promise<{ id:
       </div>
 
       <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <h1 className="text-2xl font-bold tracking-tight">{player.nickname}</h1>
-        <Link href={`/roster/players/${player.id}`} className="text-sm text-ink-muted hover:text-accent-bright">
+        <h1 className="text-[28px] font-black tracking-[-0.5px] text-ink md:text-4xl">{player.nickname}</h1>
+        <Link href={`/roster/players/${player.id}`} className="text-sm font-bold text-muted hover:text-[var(--purple)]">
           ← к профилю
         </Link>
       </div>
@@ -57,7 +61,7 @@ export default async function PlayerEditPage({ params }: { params: Promise<{ id:
       />
 
       <section>
-        <h2 className="mb-3 text-xs uppercase tracking-widest text-ink-subtle">Составы</h2>
+        <h2 className="mb-3 text-[13px] font-extrabold uppercase tracking-[1.5px] text-muted">Составы</h2>
         <SpotsEditor
           playerId={player.id}
           teams={teams.map((t) => ({ id: t.id, name: t.name }))}

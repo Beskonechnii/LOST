@@ -42,21 +42,35 @@ function omit<T extends object, K extends keyof T>(row: T, ...keys: K[]): Omit<T
 }
 
 async function main() {
-  const [teams, players, spots, matches, groupEntries, series, stats, points, renders, wards] =
+  const [teams, players, spots, matches, groupEntries, series, stats, points, renders, wards, accounts, tournaments, entries, applications] =
     await Promise.all([
       prisma.team.findMany({ orderBy: { slug: "asc" } }),
       prisma.player.findMany({ orderBy: { slug: "asc" } }),
-      prisma.rosterSpot.findMany({ include: { team: true, player: true } }),
+      prisma.rosterSpot.findMany({ include: { team: true, player: true, division: { include: { tournament: true } } } }),
       prisma.match.findMany({
         include: { teamA: true, teamB: true, winner: true, radiantTeam: true, series: { select: { slug: true } } },
       }),
       prisma.groupEntry.findMany({ include: { team: true } }),
       prisma.series.findMany({ include: { home: true, away: true } }),
       prisma.matchStat.findMany({ include: { player: true, match: { include: { teamA: true, teamB: true } } } }),
-      prisma.pointsEntry.findMany({ include: { match: { include: { teamA: true, teamB: true } } } }),
+      prisma.pointsEntry.findMany({ include: { match: { include: { teamA: true, teamB: true } }, tournament: true } }),
       prisma.render.findMany({ include: { match: { include: { teamA: true, teamB: true } } } }),
       prisma.ward.findMany({ include: { team: true, match: { include: { teamA: true, teamB: true } } } }),
+      prisma.userAccount.findMany({ include: { player: true, claim: true } }),
+      prisma.tournament.findMany({ orderBy: { slug: "asc" }, include: { divisions: { orderBy: { orderNo: "asc" } } } }),
+      prisma.tournamentEntry.findMany({ include: { team: true, division: { include: { tournament: true } } } }),
+      prisma.teamApplication.findMany({
+        include: { team: true, tournament: true, division: { include: { tournament: true } } },
+      }),
     ]);
+
+  // Дивизион в связях — пара «слаг турнира / слаг дивизиона»: id автоинкрементные и на другой
+  // машине другие, а слаг дивизиона уникален только внутри своего турнира.
+  const divKey = (d: { slug: string; tournament: { slug: string } } | null | undefined) =>
+    d ? `${d.tournament.slug}/${d.slug}` : null;
+  const divById = new Map(
+    tournaments.flatMap((t) => t.divisions.map((d) => [d.id, `${t.slug}/${d.slug}`] as const)),
+  );
 
   // Баллы ссылаются на субъекта сырым id + типом, без relation — разворачиваем в slug вручную.
   const teamById = new Map(teams.map((t) => [t.id, t.slug]));
@@ -65,14 +79,22 @@ async function main() {
     matchKey(m, m.teamA.slug, m.teamB.slug);
 
   const snapshot = {
-    version: 7, // 7 — доп. поля ростера: banner (Team+Player), interviewUrl/orderNo/achievements/tags у Player
+    version: 14, // 14 — сезонные составы (divisionKey у RosterSpot) и турнирный зачёт TP (tournamentSlug у начислений)
     exportedAt: new Date().toISOString(),
 
     teams: teams.map((t) => omit(t, "id")),
     players: players.map((p) => omit(p, "id")),
 
     rosterSpots: spots
-      .map((s) => ({ teamSlug: s.team.slug, playerSlug: s.player.slug, role: s.role, isCaptain: s.isCaptain, createdAt: s.createdAt }))
+      .map((s) => ({
+        teamSlug: s.team.slug,
+        playerSlug: s.player.slug,
+        // Состав сезонный: место принадлежит дивизиону турнира. Ключ — «турнир/дивизион», как везде.
+        divisionKey: divKey(s.division),
+        role: s.role,
+        isCaptain: s.isCaptain,
+        createdAt: s.createdAt,
+      }))
       .sort((a, b) => `${a.teamSlug}${a.playerSlug}`.localeCompare(`${b.teamSlug}${b.playerSlug}`)),
 
     matches: matches
@@ -96,12 +118,43 @@ async function main() {
       }))
       .sort((a, b) => a.key.localeCompare(b.key)),
 
+    tournaments: tournaments.map((t) => ({
+      ...omit(t, "id", "divisions"),
+      divisions: t.divisions.map((d) => omit(d, "id", "tournamentId")),
+    })),
+
+    tournamentEntries: entries
+      .map((e) => ({
+        divisionKey: divKey(e.division),
+        teamSlug: e.team.slug,
+        seed: e.seed,
+        group: e.group,
+        createdAt: e.createdAt,
+      }))
+      .sort((a, b) => `${a.divisionKey}${a.teamSlug}`.localeCompare(`${b.divisionKey}${b.teamSlug}`)),
+
+    teamApplications: applications
+      .map((a) => ({
+        // reviewedById/submittedById не переносим: это id аккаунтов, а они на машинах разные —
+        // след в истории, а не связь (то же правило, что у UserAccount.reviewedById).
+        ...omit(a, "id", "tournamentId", "divisionId", "teamId", "tournament", "division", "team", "reviewedById", "submittedById"),
+        tournamentSlug: a.tournament.slug,
+        divisionKey: divKey(a.division),
+        teamSlug: a.team?.slug ?? null,
+      }))
+      .sort((a, b) => a.submittedAt.getTime() - b.submittedAt.getTime()),
+
     groupEntries: groupEntries
-      .map((g) => ({ ...omit(g, "id", "teamId", "team"), teamSlug: g.team.slug }))
+      .map((g) => ({ ...omit(g, "id", "teamId", "team", "divisionId"), teamSlug: g.team.slug, divisionKey: divById.get(g.divisionId ?? -1) ?? null }))
       .sort((a, b) => `${a.division}${a.group}${a.place}`.localeCompare(`${b.division}${b.group}${b.place}`)),
 
     series: series
-      .map((s) => ({ ...omit(s, "id", "homeId", "awayId", "home", "away"), homeSlug: s.home.slug, awaySlug: s.away.slug }))
+      .map((s) => ({
+        ...omit(s, "id", "homeId", "awayId", "home", "away", "divisionId"),
+        homeSlug: s.home.slug,
+        awaySlug: s.away.slug,
+        divisionKey: divById.get(s.divisionId ?? -1) ?? null,
+      }))
       .sort((a, b) => a.slug.localeCompare(b.slug)),
 
     matchStats: stats
@@ -110,7 +163,9 @@ async function main() {
 
     pointsEntries: points
       .map((p) => ({
-        ...omit(p, "id", "matchId", "match", "subjectId"),
+        ...omit(p, "id", "matchId", "match", "subjectId", "tournamentId", "tournament"),
+        // Турнир — по слагу: id на машинах разные (то же правило, что у дивизионов).
+        tournamentSlug: p.tournament?.slug ?? null,
         // team | player разворачиваем в slug; caster/streamer пока не имеют своей таблицы — оставляем id как есть.
         subjectSlug:
           p.subjectType === "team" ? teamById.get(p.subjectId) ?? null
@@ -132,6 +187,32 @@ async function main() {
         teamSlug: w.team?.slug ?? null, // сторону не распознали → вард без команды
       }))
       .sort((a, b) => `${a.matchKey}${a.placed}${a.x}${a.y}`.localeCompare(`${b.matchKey}${b.placed}${b.x}${b.y}`)),
+
+    // Аккаунты — реальные данные пользователей, а не производные: должны переживать db:import (зеркало),
+    // иначе привязки и пароли потерялись бы. Ключ переноса — email (уникален и есть всегда, в отличие
+    // от googleSub — у парольного аккаунта его нет); профиль/заявка — по slug игрока. `reviewedById`
+    // не переносим: это id аккаунта, а id на другой машине другие — след «кто рассмотрел» не связь.
+    accounts: accounts
+      .map((a) => ({
+        email: a.email,
+        googleSub: a.googleSub,
+        passwordHash: a.passwordHash,
+        emailVerified: a.emailVerified,
+        name: a.name,
+        avatar: a.avatar,
+        role: a.role,
+        permissions: a.permissions,
+        status: a.status,
+        application: a.application,
+        policyAcceptedAt: a.policyAcceptedAt,
+        submittedAt: a.submittedAt,
+        reviewedAt: a.reviewedAt,
+        rejectedReason: a.rejectedReason,
+        createdAt: a.createdAt,
+        playerSlug: a.player?.slug ?? null,
+        claimSlug: a.claim?.slug ?? null,
+      }))
+      .sort((a, b) => a.email.localeCompare(b.email)),
   };
 
   writeFileSync(out, JSON.stringify(snapshot, null, 2) + "\n", "utf8");
@@ -148,6 +229,10 @@ async function main() {
     баллы: snapshot.pointsEntries.length,
     генерации: snapshot.renders.length,
     варды: snapshot.wards.length,
+    аккаунты: snapshot.accounts.length,
+    турниры: snapshot.tournaments.length,
+    "участие команд": snapshot.tournamentEntries.length,
+    "заявки команд": snapshot.teamApplications.length,
   });
 }
 

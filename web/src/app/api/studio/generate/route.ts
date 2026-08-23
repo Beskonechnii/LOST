@@ -4,6 +4,7 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { generateImages, OpenAIError } from "@/lib/openai-images";
 import { isModel, isQuality, isSize, MAX_IMAGES, MAX_REFERENCES } from "@/lib/image-options";
+import { guard } from "@/lib/api-guard";
 
 // Генерация картинок в студии: multipart { model, prompt, size, quality, n, ref } →
 // файлы в public/uploads/generated + пути. Ключ OpenAI читается здесь и наружу не отдаётся.
@@ -15,6 +16,8 @@ const REF_MIME = ["image/png", "image/jpeg", "image/webp"];
 const DIR = "generated";
 
 export async function POST(req: Request) {
+  const denied = await guard("studio");
+  if (denied) return denied;
   const form = await req.formData();
   const model = String(form.get("model") ?? "");
   const prompt = String(form.get("prompt") ?? "").trim();

@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { bad, parseId } from "@/lib/api";
 import { isColor } from "@/lib/profiles";
+import { guard } from "@/lib/api-guard";
 
 // Редактируемые поля профиля команды. Всё, чего нет в теле запроса, не трогаем.
 const FIELDS = ["name", "tag", "group", "color", "logo", "wordmark", "photo", "banner"] as const;
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("roster.edit");
+  if (denied) return denied;
   const id = parseId((await params).id);
   if (!id) return bad("id: ожидался числовой id");
   const body = (await req.json()) as Record<string, string | null>;
@@ -25,6 +28,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("roster.delete");
+  if (denied) return denied;
   const teamId = parseId((await params).id);
   if (!teamId) return bad("id: ожидался числовой id");
 

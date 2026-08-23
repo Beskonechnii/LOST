@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getTemplate } from "@/studio/registry";
+import { guard } from "@/lib/api-guard";
 
 // История генераций: payload формы, чтобы переоткрыть анонс и поправить, а не собирать заново.
 
@@ -9,6 +10,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const denied = await guard("studio");
+  if (denied) return denied;
   const body = (await req.json()) as { templateId?: string; payload?: unknown; title?: string; matchId?: number };
   const template = body.templateId ? getTemplate(body.templateId) : undefined;
   if (!template) return NextResponse.json({ error: "Неизвестный шаблон" }, { status: 400 });

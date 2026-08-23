@@ -2,12 +2,15 @@ import { NextResponse } from "next/server";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { prisma } from "@/lib/prisma";
+import { guard } from "@/lib/api-guard";
 
 // Удаление материала медиатеки: снимаем запись MediaAsset и файл из public/uploads/library.
 
 const bad = (error: string, status = 400) => NextResponse.json({ error }, { status });
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("studio");
+  if (denied) return denied;
   const id = Number((await params).id);
   if (!Number.isInteger(id) || id <= 0) return bad("id: ожидался числовой id");
 

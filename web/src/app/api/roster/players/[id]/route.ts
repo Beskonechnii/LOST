@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { bad, parseId } from "@/lib/api";
 import { accountIdFromUrl, normalizeTelegram, parseBirthday } from "@/lib/profiles";
 import { parseTags } from "@/lib/player-tags";
+import { guard } from "@/lib/api-guard";
+import { setPlayerTp } from "@/lib/tp";
 
 const TEXT_FIELDS = [
   "nickname", "realName", "photo", "steamUrl", "dotabuffUrl", "stratzUrl", "city", "country",
@@ -13,6 +15,18 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const id = parseId((await params).id);
   if (!id) return bad("id: ожидался числовой id");
   const body = (await req.json()) as Record<string, unknown>;
+
+  // Через этот же PATCH пишет панель TP (одним полем tp), поэтому право зависит от тела запроса:
+  // за TP отвечает tp.edit, за всё остальное в анкете — roster.edit. Иначе «начислить очки»
+  // потребовало бы полного доступа к ростеру, а правка анкеты открывала бы сезонный зачёт.
+  if ("tp" in body) {
+    const denied = await guard("tp.edit");
+    if (denied) return denied;
+  }
+  if (Object.keys(body).some((k) => k !== "tp")) {
+    const denied = await guard("roster.edit");
+    if (denied) return denied;
+  }
 
   const data: Record<string, unknown> = {};
   for (const f of TEXT_FIELDS) {
@@ -68,18 +82,21 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       data.mmr = Math.round(mmr);
     }
   }
+  // TP не пишем полем: зачёт турнирный, истина — реестр начислений (src/lib/tp.ts). Поле
+  // `Player.tp` там же и пересчитывается, поэтому в `data` его класть нельзя — затрёт кеш.
+  let tpTotal: number | null = null;
   if ("tp" in body) {
-    // TP — сезонные очки MVP, оператор правит их вручную. Пустое поле = 0 (в отличие от MMR,
-    // где пусто значит «не указан»): TP есть у всех, просто у большинства ноль.
+    // Пустое поле = 0 (в отличие от MMR, где пусто значит «не указан»): TP есть у всех, просто
+    // у большинства ноль.
     const raw = String(body.tp ?? "").trim();
     if (raw === "") {
-      data.tp = 0;
+      tpTotal = 0;
     } else {
       const tp = Number(raw);
       if (!Number.isInteger(tp) || tp < 0) {
         return NextResponse.json({ error: `TP должны быть целым числом ≥ 0, а не «${raw}»` }, { status: 400 });
       }
-      data.tp = tp;
+      tpTotal = tp;
     }
   }
   if ("orderNo" in body) {
@@ -105,10 +122,17 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   const { count } = await prisma.player.updateMany({ where: { id }, data });
   if (!count) return bad("Игрок не найден", 404);
+
+  // TP — отдельной операцией и после проверки существования игрока: она пишет строку реестра
+  // (начисление за текущий турнир) и сама пересчитывает кеш `Player.tp`.
+  if (tpTotal !== null) await setPlayerTp(id, tpTotal, { by: "admin" });
+
   return NextResponse.json(await prisma.player.findUnique({ where: { id } }));
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("roster.delete");
+  if (denied) return denied;
   const playerId = parseId((await params).id);
   if (!playerId) return bad("id: ожидался числовой id");
 

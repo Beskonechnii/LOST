@@ -12,16 +12,18 @@ export const QUALIFICATION: Record<Qualification, { label: string; text: string;
 };
 
 /**
- * Регламент отличается по дивизионам:
- *  - Division 1 (8 команд в группе): 1–4 — верхняя, 5–6 — нижняя, два последних вылетают.
- *  - Division 2 (6 команд в группе): 1–4 — верхняя, все остальные — нижняя, вылета из группы нет.
- * Дивизион — имя из Team.group ("Division 1"/"Division 2"), как в divisions.ts.
+ * Регламент: 1–4 место — верхняя сетка, дальше зависит от дивизиона. В D1 (8 команд в группе) два
+ * последних вылетают, в D2 вылета из группы нет — все непопавшие в верхнюю падают в нижнюю.
+ *
+ * Раньше это решалось сравнением имени дивизиона со строкой «Division 2»: в новом турнире с другими
+ * именами правило молча стало бы D1-овским. Теперь признак живёт у дивизиона (`Division.relegation`),
+ * а сюда приходит булевым — модуль остаётся чистым и годится клиентским компонентам.
+ *
  * Считаем от низа, а не по фиксированным местам: в группе может быть не восемь команд.
  */
-export function qualificationOf(place: number, groupSize: number, division: string): Qualification {
+export function qualificationOf(place: number, groupSize: number, relegation: boolean): Qualification {
   if (place <= 4) return "upper";
-  // В D2 нижние команды не вылетают, а падают в нижнюю сетку.
-  if (division === "Division 2") return "lower";
+  if (!relegation) return "lower";
   return place > groupSize - 2 ? "out" : "lower";
 }
 

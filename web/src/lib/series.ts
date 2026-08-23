@@ -26,6 +26,8 @@ export type SeriesRow = {
   /** Ключ адреса `/series/<slug>` — переживает `db:import`, в отличие от `id`. */
   slug: string;
   division: string;
+  /** Истина о принадлежности встречи дивизиону; `division` — имя-зеркало для подписей. */
+  divisionId: number | null;
   stage: string;
   group: string | null;
   bracket: string | null;
@@ -46,7 +48,7 @@ const teamSelect = { select: { id: true, slug: true, name: true, tag: true, logo
 /** Счёт серии Bo3 — только эти исходы; всё прочее ломает формулу очков (см. qualification.ts). */
 export const VALID_SCORES = ["2:0", "2:1", "1:2", "0:2"];
 
-export type SeriesFilter = { id?: number; slug?: string; division?: string; stage?: Stage; group?: string; bracket?: Bracket; teamId?: number };
+export type SeriesFilter = { id?: number; slug?: string; divisionId?: number; stage?: Stage; group?: string; bracket?: Bracket; teamId?: number };
 
 /**
  * Серии по фильтру, свежие сверху. `playedAt` заполняется не всегда (групповую стадию заливали
@@ -57,7 +59,7 @@ export async function listSeries(filter: SeriesFilter = {}): Promise<SeriesRow[]
     where: {
       id: filter.id,
       slug: filter.slug,
-      division: filter.division,
+      divisionId: filter.divisionId,
       stage: filter.stage,
       group: filter.group,
       bracket: filter.bracket,
@@ -90,6 +92,7 @@ export async function listSeries(filter: SeriesFilter = {}): Promise<SeriesRow[]
     id: r.id,
     slug: r.slug,
     division: r.division,
+    divisionId: r.divisionId,
     stage: r.stage,
     group: r.group,
     bracket: r.bracket,
@@ -244,7 +247,7 @@ async function recomputeSeriesScore(seriesId: number) {
 }
 
 export type NewSeries = {
-  division: string;
+  divisionId: number;
   stage: string;
   group?: string | null;
   /** Плей-офф: ключ слота сетки (src/lib/playoff-bracket.ts). Из него выводятся bracket и round. */
@@ -274,15 +277,21 @@ export async function createSeries(input: NewSeries) {
   // Слот занят? Один слот — одна серия (в БД это @@unique([division, slot])), но проверяем заранее,
   // чтобы отдать понятную ошибку вместо сырого нарушения индекса.
   if (slot) {
-    const taken = await prisma.series.findFirst({ where: { division: input.division, slot: slot.key } });
+    const taken = await prisma.series.findFirst({ where: { divisionId: input.divisionId, slot: slot.key } });
     if (taken) throw new Error(`Слот «${slot.label}» уже занят другой встречей`);
   }
+
+  // Имя дивизиона в серии — зеркало (src/lib/tournaments.ts): по нему читают старые выборки,
+  // но истина — divisionId, поэтому имя берём из самого дивизиона, а не из формы.
+  const division = await prisma.division.findUnique({ where: { id: input.divisionId } });
+  if (!division) throw new Error("Дивизион не найден");
 
   const [homeScore, awayScore] = input.score.split(":").map(Number);
   return prisma.series.create({
     data: {
       slug: await uniqueSlug(input.homeId, input.awayId),
-      division: input.division,
+      divisionId: division.id,
+      division: division.name,
       stage: input.stage,
       // У плей-офф группы нет — пустую строку из формы приводим к NULL, иначе сломается @@unique.
       group: input.stage === "group" ? input.group! : null,

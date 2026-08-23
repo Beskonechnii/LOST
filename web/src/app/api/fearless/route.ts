@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { guard } from "@/lib/api-guard";
 
-// Сессии fearless-драфта. Запись за паролем (needsAdmin в proxy.ts) — операторский инструмент.
+// Сессии fearless-драфта. Право tools — то же, что открывает страницы драфта: сессия эфемерная,
+// в данные лиги не попадает.
 // Пустой payload у новой сессии = борд стартует с экрана настройки (см. fearless-board.tsx).
 
 export async function GET() {
@@ -14,6 +16,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const denied = await guard("tools");
+  if (denied) return denied;
   const body = (await req.json().catch(() => ({}))) as { title?: string };
   const saved = await prisma.fearlessSession.create({
     data: { title: body.title?.trim() || null, payload: "" },

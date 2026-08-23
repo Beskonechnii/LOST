@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { bad, parseId } from "@/lib/api";
 import { FEARLESS_VERSION, type FearlessState } from "@/lib/fearless";
+import { guard } from "@/lib/api-guard";
 
 // Одна сессия fearless: чтение, автосейв payload по каждому ходу, удаление. Правила живут на клиенте
 // (src/lib/fearless.ts) — сюда прилетает готовое состояние; сервер проверяет версию и валидность.
@@ -15,6 +16,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 }
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("tools");
+  if (denied) return denied;
   const id = parseId((await params).id);
   if (!id) return bad("id: ожидался числовой id");
   const body = (await req.json()) as { payload?: FearlessState; title?: string; status?: string };
@@ -36,6 +39,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await guard("tools");
+  if (denied) return denied;
   const id = parseId((await params).id);
   if (!id) return bad("id: ожидался числовой id");
   const { count } = await prisma.fearlessSession.deleteMany({ where: { id } });

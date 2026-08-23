@@ -4,6 +4,8 @@ import "./globals.css";
 // Шрифт для компонентов 1st-Pouf (класс font-pouf → 'Nunito Variable').
 import "@fontsource-variable/nunito";
 import { Toaster } from "@/components/ui/sonner";
+import { readTheme } from "@/lib/theme-store";
+import { themeToStyle } from "@/lib/theme";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,11 +22,16 @@ export const metadata: Metadata = {
   description: "Стата матчей, таблица лиги и студия графики League of Spirit",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Тема UI из data/theme.json → сырые токены (--lost-* и --accent) прямо на <html>=:root, инлайновым
+  // style. Токены в globals.css развёрнуты в var(--lost-*, fallback), поэтому один объект перекрашивает
+  // весь сайт. Значения санитайзятся в themeToStyle. Style-атрибут (а не <style>-тег) — чтобы не
+  // связываться с хостингом стилей в React и чисто обновляться. Правит панель /admin/theme.
+  const themeStyle = themeToStyle(await readTheme());
   return (
     <html
       lang="ru"
@@ -33,11 +40,16 @@ export default function RootLayout({
       // живущие в <body> вне обёртки страницы, тоже получали тёмную палитру pouf.
       // Наши собственные токены его не читают — на остальной сайт не влияет.
       data-theme="dark"
+      style={themeStyle}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       {/* Навигации здесь намеренно нет: она своя у каждой группы маршрутов —
           (public)/layout.tsx для продукта и (admin)/layout.tsx для служебной части. */}
-      <body className="flex min-h-full flex-col bg-canvas font-sans text-ink">
+      {/* pouf-lost — скоуп дизайн-системы 1st-Pouf на весь сайт: перекрашивает пастельный
+          --purple в бренд-violet LOST и ставит --on-accent=белый. Трогает только токены pouf
+          (--purple/--on-accent) и утилиту text-muted, которых вне pouf-компонентов нигде нет,
+          поэтому на старую вёрстку не влияет, а любой pouf-компонент выходит сразу в теме LOST. */}
+      <body className="pouf-lost flex min-h-full flex-col bg-canvas font-sans text-ink">
         {children}
         {/* Тосты (sonner) — один хост на весь сайт; заменяют webview-глохнущий alert(). */}
         <Toaster position="bottom-right" richColors />

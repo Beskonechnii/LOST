@@ -17,7 +17,7 @@ import {
 } from "@/studio/types";
 import { Label, SelectField, TextField } from "../../../_components/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/pouf/Button";
 
 // Мастер генерации: форма строится из schema шаблона, справа — живое превью,
 // снизу — экспорт PNG в натуральном размере и сохранение payload в историю.
@@ -152,10 +152,10 @@ function WizardForm({
   const groupKey = template.fields.find((f) => f.kind === "group")?.key;
 
   return (
-    <div className="grid items-start gap-8 lg:grid-cols-[minmax(300px,380px)_minmax(0,1fr)]">
+    <div className="grid items-start gap-8 font-pouf lg:grid-cols-[minmax(300px,380px)_minmax(0,1fr)]">
       <div className="space-y-5">
         {matches.length > 0 && (
-          <div className="rounded border border-hairline bg-surface-1/40 p-3">
+          <div className="rounded-card bg-surface p-4 cushion-field">
             <Label>Взять из матча</Label>
             {/* Пикер-действие, а не поле: контролируемый value="" держит плейсхолдер после выбора,
                 поэтому список сам «сбрасывается» — как раньше делал e.currentTarget.value = "". */}
@@ -208,17 +208,17 @@ function WizardForm({
           ),
         )}
 
-        {boardBusy && <p className="text-sm text-ink-subtle">Собираю скорборд…</p>}
-        {boardError && <p className="text-sm text-rose-400">{boardError}</p>}
+        {boardBusy && <p className="text-sm font-bold text-muted">Собираю скорборд…</p>}
+        {boardError && <p className="text-sm font-bold text-rose-400">{boardError}</p>}
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
-          <Button type="button" disabled={busy} onClick={() => void exportPng()}>
+          <Button type="button" loading={busy} onClick={() => void exportPng()}>
             {busy ? "Готовлю PNG…" : `Скачать PNG ${size.w}×${size.h}`}
           </Button>
-          <Button type="button" variant="outline" onClick={() => void save()}>
+          <Button type="button" variant="quiet" onClick={() => void save()}>
             Сохранить в историю
           </Button>
-          {saved && <span className="text-sm text-ink-muted">{saved}</span>}
+          {saved && <span className="text-sm font-bold text-ink-muted">{saved}</span>}
         </div>
       </div>
 
@@ -229,7 +229,7 @@ function WizardForm({
             <Render data={data} />
           </Canvas>
         </div>
-        <p className="mt-2 text-center text-xs text-ink-subtle">
+        <p className="mt-2 text-center text-xs font-bold text-muted">
           Превью масштабировано; PNG выгружается в натуральных {size.w}×{size.h}.
         </p>
       </div>
@@ -321,14 +321,14 @@ function GroupField({
       <div className="flex items-center justify-between">
         <Label>{field.label}</Label>
         {rows.length < field.max && (
-          <button type="button" onClick={onAdd} className="text-xs text-accent-bright hover:underline">
+          <button type="button" onClick={onAdd} className="text-xs font-black text-[var(--purple)] hover:underline">
             + добавить
           </button>
         )}
       </div>
       {rows.map((row, i) => (
-        <div key={i} className="space-y-3 rounded border border-hairline bg-surface-1/40 p-3">
-          <div className="flex items-center justify-between text-xs text-ink-subtle">
+        <div key={i} className="space-y-3 rounded-card bg-surface p-4 cushion-field">
+          <div className="flex items-center justify-between text-xs font-bold text-muted">
             <span>#{i + 1}</span>
             <button type="button" onClick={() => onRemove(i)} className="hover:text-rose-400">
               убрать

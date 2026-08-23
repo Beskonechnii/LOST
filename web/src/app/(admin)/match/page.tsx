@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { isAdmin } from "@/lib/admin-session";
 import { SITE_MAX_W } from "@/app/_components/ui";
 import { ArchiveShelf } from "./_components/archive-shelf";
 import { MatchForm } from "./_components/match-form";
+import { denyUnlessPermission } from "../_components/permission-gate";
 
 // Входная дверь постгейма: ввод id матча. Сам отчёт — на /match/<id>, у него постоянная ссылка.
 // Сервис публичный (решено с заказчиком): разбираем любой матч Dota 2, не только матчи лиги.
@@ -13,13 +13,15 @@ export const metadata: Metadata = {
 };
 
 export default async function MatchPage() {
-  const admin = await isAdmin();
+  // Разбор матча — операторский инструмент чтения (право tools), а не публичный сервис.
+  const denied = await denyUnlessPermission("tools", "Разбор матча");
+  if (denied) return denied;
 
   return (
     <main className="flex-1 px-4 py-8 md:px-6">
-      <div className={`mx-auto w-full ${SITE_MAX_W}`}>
-        <h1 className="text-lg font-bold tracking-tight">Разбор матча Dota 2</h1>
-        <p className="mt-1 max-w-2xl text-sm text-ink-muted">
+      <div className={`mx-auto w-full ${SITE_MAX_W} font-pouf`}>
+        <h1 className="text-[28px] font-black tracking-[-0.5px] text-ink md:text-4xl">Разбор матча Dota 2</h1>
+        <p className="mt-1 max-w-2xl text-sm font-bold text-muted">
           Вставь ID матча — соберём постгейм-отчёт: счёт, драфт, скорборд, таланты, предметы и график
           преимущества. Данные из OpenDota, а если она лежит — из Steam. У отчёта постоянная ссылка,
           ей можно поделиться.
@@ -29,12 +31,11 @@ export default async function MatchPage() {
           <MatchForm />
         </div>
 
-        {/* Полка выгруженных PNG — черновики оператора, посетителю она ни о чём не говорит. */}
-        {admin && (
-          <div className="mt-8">
-            <ArchiveShelf />
-          </div>
-        )}
+        {/* Полка выгруженных PNG — черновики оператора. Право на страницу и на полку одно (tools),
+            поэтому отдельной проверки здесь уже нет. */}
+        <div className="mt-8">
+          <ArchiveShelf />
+        </div>
       </div>
     </main>
   );

@@ -26,7 +26,11 @@ export type GroupRow = {
 export type GroupCell = { id: number; score: string; guessed: boolean; flipped: boolean } | null;
 
 export type GroupTable = {
+  /** Имя дивизиона — для подписей; выборки идут по id (`divisionId`). */
   division: string;
+  divisionId: number;
+  /** Вылетают ли последние из группы — правило дивизиона, а не глобальное (qualification.ts). */
+  relegation: boolean;
   group: string;
   rows: GroupRow[];
   /** Матрица [строка][столбец] в порядке rows: счёт серии глазами команды-строки. */
@@ -36,10 +40,10 @@ export type GroupTable = {
 };
 
 /** Кто куда вышел: команды по зонам, в порядке места в группе. Для сетки плей-офф. */
-export async function getQualified(division: string) {
-  const tables = await getGroupStage(division);
+export async function getQualified(divisionId: number) {
+  const tables = await getGroupStage(divisionId);
   const seeded = tables.flatMap((t) =>
-    t.rows.map((r) => ({ ...r, group: t.group, zone: qualificationOf(r.place, t.rows.length, t.division) })),
+    t.rows.map((r) => ({ ...r, group: t.group, zone: qualificationOf(r.place, t.rows.length, t.relegation) })),
   );
   const byPlace = (a: { place: number; group: string }, b: { place: number; group: string }) =>
     a.place - b.place || a.group.localeCompare(b.group);
@@ -51,15 +55,47 @@ export async function getQualified(division: string) {
   };
 }
 
-export async function getGroupStage(division: string): Promise<GroupTable[]> {
-  const [entries, series] = await Promise.all([
+/**
+ * Групповая стадия дивизиона. Ключ — `divisionId`, а не имя: имена дивизионов повторяются из сезона
+ * в сезон («Division 1» есть у каждого), и по имени таблицы двух турниров слились бы в одну.
+ */
+export async function getGroupStage(divisionId: number): Promise<GroupTable[]> {
+  const [division, sheet, participants, series] = await Promise.all([
+    prisma.division.findUnique({ where: { id: divisionId } }),
     prisma.groupEntry.findMany({
-      where: { division },
+      where: { divisionId },
       include: { team: { select: { id: true, slug: true, name: true, tag: true, logo: true } } },
       orderBy: [{ group: "asc" }, { place: "asc" }],
     }),
-    prisma.series.findMany({ where: { division, stage: "group" } }),
+    prisma.tournamentEntry.findMany({
+      where: { divisionId },
+      include: { team: { select: { id: true, slug: true, name: true, tag: true, logo: true } } },
+      orderBy: [{ group: "asc" }, { seed: "asc" }],
+    }),
+    prisma.series.findMany({ where: { divisionId, stage: "group" } }),
   ]);
+  if (!division) return [];
+
+  /**
+   * Строки таблицы. У сезона S2 они пришли снимком таблицы («GS»), поэтому там есть напечатанные
+   * место и очки. У турнира, заведённого в админке, снимка нет — берём жеребьёвку (`TournamentEntry`)
+   * и считаем всё из сетки. Так новый турнир показывает группы сразу после жеребьёвки, а не после
+   * ручной заливки итогов.
+   */
+  const entries = sheet.length
+    ? sheet
+    : participants
+        .filter((p) => p.group)
+        .map((p) => ({
+          teamId: p.teamId,
+          team: p.team,
+          group: p.group!,
+          place: p.seed ?? 0,
+          played: 0,
+          wins: 0,
+          losses: 0,
+          points: 0,
+        }));
 
   // Лого разрешаем разом до сборки таблиц: дальше идёт синхронный расчёт очков, асинхронность туда не тащим.
   const logoByTeam = new Map(
@@ -101,6 +137,16 @@ export async function getGroupStage(division: string): Promise<GroupTable[]> {
         sheet: { played: e.played, wins: e.wins, losses: e.losses, points: e.points },
       };
     });
+
+    // Без снимка таблицы место считаем сами — по очкам, победам и алфавиту. Со снимком порядок
+    // задавал организатор (при равенстве очков его по цифрам не восстановить), и мы его не трогаем.
+    if (!sheet.length) {
+      rows.sort((a, b) => b.points - a.points || b.wins - a.wins || a.name.localeCompare(b.name));
+      rows.forEach((r, i) => {
+        r.place = i + 1;
+      });
+    }
+
     const grid = rows.map((r) =>
       rows.map<GroupCell>((c) => {
         if (r.teamId === c.teamId) return null; // диагональ — сам с собой не играет
@@ -114,6 +160,14 @@ export async function getGroupStage(division: string): Promise<GroupTable[]> {
       }),
     );
 
-    return { division, group, rows, grid, guessedCount: mine.filter((s) => s.guessed).length };
+    return {
+      division: division.name,
+      divisionId,
+      relegation: division.relegation,
+      group,
+      rows,
+      grid,
+      guessedCount: mine.filter((s) => s.guessed).length,
+    };
   });
 }

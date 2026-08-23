@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AdminNav } from "../_components/site-nav";
 import { BackBar } from "../_components/back-button";
+import { isAdmin } from "@/lib/admin-session";
 
 // Служебная часть: студия графики, правка ростера, вход. Всё это закрыто паролем
 // (`needsAdmin()` в src/lib/auth.ts) и посетителю не показывается.
@@ -12,11 +13,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <AdminNav />
-      <BackBar fallback="/admin" hideOn={["/admin", "/admin/login"]} />
+      <AdminNav isAdmin={await isAdmin()} />
+      <BackBar fallback="/admin" hideOn={["/admin"]} />
       {children}
     </>
   );

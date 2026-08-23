@@ -6,7 +6,7 @@ import { rolePosition } from "@/lib/roles";
 /** Действующий игрок — тот, кто занимает позицию 1–5. Замена и тренер действующими не считаются. */
 export const isCoreRole = (role: string | null | undefined) => rolePosition(role) !== null;
 
-export type SpotLike = { teamId: number; role: string | null; division?: string | null };
+export type SpotLike = { teamId: number; role: string | null; divisionId?: number | null };
 
 /**
  * Можно ли отдать игроку это место. Жёсткий запрет — быть **действующим** (поз. 1–5) сразу в двух
@@ -14,7 +14,8 @@ export type SpotLike = { teamId: number; role: string | null; division?: string 
  * А вот в разных дивизионах (D1 и D2 — раздельные турниры) действующим быть можно: игрок нередко
  * заявлен и в первом, и во втором. Замена и тренер — сколько угодно раз в любом дивизионе.
  *
- * @param existing  места, которые у игрока уже есть (кроме того, что сейчас меняем); дивизион — из Team.group
+ * @param existing  места, которые у игрока уже есть (кроме того, что сейчас меняем); дивизион —
+ *                  `RosterSpot.divisionId`: состав принадлежит дивизиону турнира, а не команде
  * @returns текст ошибки или null, если всё в порядке
  */
 export function spotConflict(
@@ -23,9 +24,9 @@ export function spotConflict(
 ): string | null {
   if (!isCoreRole(next.role)) return null;
 
-  const nextDiv = next.division ?? null;
+  const nextDiv = next.divisionId ?? null;
   const clash = existing.find(
-    (s) => s.teamId !== next.teamId && isCoreRole(s.role) && (s.division ?? null) === nextDiv,
+    (s) => s.teamId !== next.teamId && isCoreRole(s.role) && (s.divisionId ?? null) === nextDiv,
   );
   if (!clash) return null;
 

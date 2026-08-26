@@ -5,6 +5,39 @@
 
 ---
 
+## 2026-08-26 — Ревизия документации: MAP + BACKLOG, мёртвые файлы убраны
+
+**Зачем.** Три вещи, которые нужны на глазах — структура проекта, роадмап и открытые вопросы — были
+размазаны по пяти файлам, а `CLAUDE.md` (48 КБ) держал и правила агенту, и всю карту разом.
+
+**Сделано:**
+- **`MAP.md`** — структура: дерево репозитория, разделы приложения и маршруты, ответственность каждого
+  файла `src/lib/`, движок студии, наполнение ростера, перенос данных, карта документации.
+  Переехало из `CLAUDE.md` §1–4, §7, §7.1.
+- **`BACKLOG.md`** — всё, что впереди, одним файлом: открытые вопросы (VPS, кто главный по базе,
+  сезон в модели, возврат писем), долги в коде (статистика игрока по турнирам, UI реестра баллов,
+  сброс пароля, OG-картинки, TG-бот), продуктовый роадмап и кандидаты в скиллы.
+  Собран из `ROADMAP.md`, `HOTSKILLS.md`, `CLAUDE.md` §9, `TOURNAMENTS-PLAN.md` §5, `ACCOUNTS-PLAN.md` §8.
+- **`CLAUDE.md` ужат** с 271 до 105 строк: правила работы, короткое дерево, запуск и грабли,
+  конвенции, карта доков. Детали — по ссылке в `MAP.md`.
+- **Удалены:** `SETUP.md` (полный дубль «первого запуска» из `web/README.md`, ноль входящих ссылок),
+  `HOTSKILLS.md` (ручной каталог скиллов разъехался с `.claude/skills/`: не было `stage` и `serve`,
+  был несуществующий `/team-logo`), `ROADMAP.md` (влился в `BACKLOG.md`).
+- **Переехали:** `DOCS.md`/`BRENDBOOK.md`/`COMPETITORS.md` → `docs/brand/` (это бренд и разведка,
+  не дев-документация), закрытый `ACCOUNTS-PLAN.md` → `docs/archive/`. Ссылки на них поправлены
+  в 15 файлах `web/src`, `.env.example`, `ARCHITECTURE.md` — правились только комментарии.
+- Скилл и агент `stage` смотрели на закрытый `ACCOUNTS-PLAN.md` → переведены на активный
+  `TOURNAMENTS-PLAN.md`. В `ARCHITECTURE.md` освежены два устаревших пункта «Что реализуем»
+  (защита теперь по роли, а не `ADMIN_PASSWORD`; реестр баллов частично закрыт на TP).
+
+**Файлы:** `MAP.md`, `BACKLOG.md`, `CLAUDE.md`, `ARCHITECTURE.md`, `docs/**`, `.claude/{skills,agents}/stage*`.
+
+**Дальше:** `ARCHITECTURE.md` — 945 строк, из них ~25 блоков «Решение: … (дата)»: просится разрез на
+«как устроено» + `DECISIONS.md`. Отложено сознательно. Ближайшая работа по коду — статистика игрока
+в разрезе турниров (`BACKLOG.md` §2).
+
+---
+
 ## 2026-08-23 — Турнир как раздел: ростер внутри турнира, одна вкладка в шапке
 
 **Сделано:**
@@ -232,7 +265,7 @@
 
 ## 2026-08-21 — Аккаунты, этап 4: команда лиги и раздача прав (план закрыт)
 
-**Сделано** (по `ACCOUNTS-PLAN.md`, этап 4 — последний, план закрыт целиком):
+**Сделано** (по `docs/archive/ACCOUNTS-PLAN.md`, этап 4 — последний, план закрыт целиком):
 - **`/admin/staff`** («Команда лиги», новый раздел вместо `/admin/roles`): владелец, админы и
   «остальные аккаунты» — тремя списками. У каждого админа чекбоксы прав по группам реестра, там же
   «Сделать админом» / «Снять админа». Панель открывает обычный ключ `accounts.admins` (у владельца
@@ -291,9 +324,9 @@
 `web/src/app/(admin)/admin/roles/` (удалён), `web/next.config.ts` (редирект),
 все страницы группы `(admin)` + `studio/layout.tsx`, `underbeer/layout.tsx`,
 все пишущие роуты `web/src/app/api/**`, публичные `roster/{players,teams}` и `tp`,
-`CLAUDE.md`, `ARCHITECTURE.md`, `ACCOUNTS-PLAN.md`.
+`CLAUDE.md`, `ARCHITECTURE.md`, `docs/archive/ACCOUNTS-PLAN.md`.
 
-**Дальше:** `ACCOUNTS-PLAN.md` закрыт. Открытые долги оттуда (§8): восстановление пароля (сейчас его
+**Дальше:** `docs/archive/ACCOUNTS-PLAN.md` закрыт. Открытые долги оттуда (§8): восстановление пароля (сейчас его
 нет — можно добавить владельцу «сбросить пароль аккаунта» в «Команде лиги»), возврат почтового флоу
 из git, когда появится `RESEND_API_KEY`, и привязка лимита смены ника к сезонам.
 
@@ -301,7 +334,7 @@
 
 ## 2026-08-21 — Аккаунты, этап 3: модерация регистраций
 
-**Сделано** (по `ACCOUNTS-PLAN.md`, этап 3):
+**Сделано** (по `docs/archive/ACCOUNTS-PLAN.md`, этап 3):
 - **`/admin/registrations`** (новый раздел в группе `(admin)`): очередь `pending` — обе ветки воронки
   в одном списке и помечены типом («новая анкета» / «привязка к профилю»), ранние сверху по
   `submittedAt`. Карточка показывает анкету целиком; у ветки привязки — ссылка на заявленный профиль
@@ -351,7 +384,7 @@
 `web/src/app/(admin)/admin/registrations/{page.tsx,actions.ts,review-forms.tsx}` (новые),
 `web/src/app/_components/application-summary.tsx` (новый),
 `web/src/app/(public)/me/{page.tsx,application-form.tsx}`, `web/src/app/(admin)/admin/page.tsx`,
-`CLAUDE.md`, `ARCHITECTURE.md`, `ACCOUNTS-PLAN.md`.
+`CLAUDE.md`, `ARCHITECTURE.md`, `docs/archive/ACCOUNTS-PLAN.md`.
 
 **Дальше:** этап 4 — `/admin/staff`: владелец и админы отдельными списками, чекбоксы прав,
 назначение/снятие админа; `requirePermission` во всех админ-страницах, экшенах и пишущих
@@ -362,7 +395,7 @@ API-роутах; фильтрация плиток `/admin` по правам; 
 
 ## 2026-08-20 — Аккаунты, этап 2: анкета-заявка и политика площадки
 
-**Сделано** (по `ACCOUNTS-PLAN.md`, этап 2):
+**Сделано** (по `docs/archive/ACCOUNTS-PLAN.md`, этап 2):
 - **`/rules`** (новая публичная страница, группа `(public)`): политика площадки — аккаунт и вход,
   заявка на вступление, пароль, данные профиля, поведение. Черновик v1 из концепта ЛК переписан под
   то, как система работает сейчас: писем нет, «забыли пароль» не обещаем, регистрация — заявка.
@@ -413,7 +446,7 @@ dev-origin и страница не гидрируется; всё провер�
 **Файлы:** `web/src/lib/{application.ts,account.ts}`, `web/src/app/(public)/rules/page.tsx`,
 `web/src/app/(public)/me/{page.tsx,application-form.tsx,onboarding.tsx,actions.ts,auth-forms.tsx}`,
 `web/src/app/(public)/me/profile/{page.tsx,profile-form.tsx,actions.ts}`,
-`CLAUDE.md`, `ARCHITECTURE.md`, `ACCOUNTS-PLAN.md`. `web/prisma/dev.db` изменён технически (заводили и
+`CLAUDE.md`, `ARCHITECTURE.md`, `docs/archive/ACCOUNTS-PLAN.md`. `web/prisma/dev.db` изменён технически (заводили и
 удаляли временный аккаунт), данные прежние.
 
 **Дальше:** этап 3 — `/admin/registrations`: очередь `pending`, карточка заявки, апрув (создаёт `Player`
@@ -424,7 +457,7 @@ dev-origin и страница не гидрируется; всё провер�
 
 ## 2026-08-20 — Аккаунты, этап 1: фундамент доступа (воронка, права, отказ от писем)
 
-**Сделано** (по `ACCOUNTS-PLAN.md`, этап 1):
+**Сделано** (по `docs/archive/ACCOUNTS-PLAN.md`, этап 1):
 - **Схема + миграция** `20260820170000_accounts_funnel_permissions`: у `UserAccount` появились `status`
   (`draft` по умолчанию), `application`, `policyAcceptedAt`, `submittedAt`, `reviewedAt`, `reviewedById`,
   `rejectedReason`, `permissions`; модель `AuthToken` удалена. Одноразовым `UPDATE` в той же миграции все
@@ -466,7 +499,7 @@ dev-origin и страница не гидрируется; всё провер�
 `web/src/lib/{permissions.ts,account.ts}`, `web/src/app/(public)/me/{page.tsx,actions.ts,auth-forms.tsx}`,
 `web/src/app/(public)/me/security/{page.tsx,actions.ts,security-forms.tsx}`,
 `web/src/app/api/auth/google/callback/route.ts`, `web/scripts/{export-db.ts,import-db.ts}`,
-`web/data/snapshot.json`, `web/.env.example`, `CLAUDE.md`, `ARCHITECTURE.md`, `ACCOUNTS-PLAN.md`.
+`web/data/snapshot.json`, `web/.env.example`, `CLAUDE.md`, `ARCHITECTURE.md`, `docs/archive/ACCOUNTS-PLAN.md`.
 Удалены: `web/src/lib/{mailer.ts,auth-tokens.ts,app-url.ts}`, `web/src/app/api/auth/verify/`,
 `web/src/app/(public)/reset/`.
 
@@ -478,7 +511,7 @@ dev-origin и страница не гидрируется; всё провер�
 
 ## 2026-08-20 — План: аккаунты, модерация регистраций, права админов
 
-**Сделано:** продуман и записан план большой задачи — `ACCOUNTS-PLAN.md` (добавлен в индекс доков в
+**Сделано:** продуман и записан план большой задачи — `docs/archive/ACCOUNTS-PLAN.md` (добавлен в индекс доков в
 `CLAUDE.md` §6). Кода не писали.
 
 **Решения (Стас):** почтовый флоу убрать совсем (следствие: «Забыли пароль» не работает — пути обхода
